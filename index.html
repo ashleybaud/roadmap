@@ -154,6 +154,16 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 .risklist .rbad{color:var(--bad);font-weight:600}
 .risklist .rwarn{color:var(--warn);font-weight:600}
 .risklist .rinfo{color:var(--muted)}
+.pill.dist.long{background:var(--warn);color:var(--onfill)}
+.flags{display:inline-flex;gap:4px;margin-left:auto}
+.flag{width:26px;height:26px;border-radius:50%;border:0;color:var(--onfill);font-size:.9rem;line-height:1;cursor:pointer;display:inline-grid;place-items:center}
+.flag.fwarn{background:var(--warn)}.flag.fbad{background:var(--bad)}.flag.finfo{background:var(--chip);color:var(--ink)}
+.ovday{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-top:1px solid var(--line);cursor:pointer}
+.ovtop{display:flex;align-items:center;gap:10px}
+.ovtop b{font-family:var(--f-display);font-size:1.05rem}
+.ovroute{display:flex;align-items:center;gap:8px}
+.ovroute .fromto{white-space:nowrap;font-size:.9rem}
+.ovbits{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
 </style>
 </head>
 <body>
@@ -665,7 +675,7 @@ function dayRisk(k){
   const f=rangeFuel(pd.a,pd.b); if(f&&f.level) add(f.level,f.text,"fuel",f.short);
   const mins=dayMinutes(k), arrive=toMin(settings.leave)+mins, s=sunMin(k);
   if(s!=null){ if(s<arrive) add("bad",`Arrives after dark: ${fmtT(arrive)}, sunset ${fmtT(s)}.`,"dark","After dark"); else if(s-arrive<60) add("warn",`Arrives ${fmtT(arrive)}, under an hour before sunset.`,"dark","Near sunset"); }
-  if(mins>+settings.maxHours*60) add("warn",`Long day: ${fmtDur(mins)} of riding.`,"long",`Long day ${fmtDur(mins)}`);
+  if(mins>+settings.maxHours*60) add("warn",`Travel time ${fmtDur(mins)}, over your ${settings.maxHours}h setting.`,"long",`Travel time ${fmtDur(mins)}`);
   const w=dayWx(k);
   if(w&&!w.none){
     if(w.code>=95) add("warn","Thunderstorms forecast.","wx","Storms");
@@ -687,48 +697,33 @@ function sunMin(k){
   const to=dayTo(k); if(!to) return null; const ss=sunset(dayDate(k),to.lat,to.lon); return ss.getHours()*60+ss.getMinutes();
 }
 const LIGHT_TXT={ok:"Clear",warn:"Take care",bad:"Problem"};
-function lightPill(r,k){ if(!r) return ""; const n=r.reasons.filter(x=>x.lvl!=="info").length;
-  const tag=k!=null?"button":"span";
-  return `<${tag} ${k!=null?`type="button" data-risk="${k}"`:""} class="pill btnlike ${r.level==="bad"?"fbad":r.level==="warn"?"fwarn":"fok"}" title="${esc(r.reasons.map(x=>x.text).join("\n")||"Nothing flagged")}">● ${LIGHT_TXT[r.level]}${n?" · "+n:""}</${tag}>`; }
+const FLAG_ICON={dark:"☾",wx:"☂",ford:"≈",med:"✚",tz:"◷"};
+/* fuel and travel time colour their own pills; everything else is a small coloured icon */
+function flagIcons(r,k){
+  if(!r) return "";
+  const seen=new Set();
+  return r.reasons.filter(x=>FLAG_ICON[x.kind]&&!(x.lvl==="info"&&x.kind!=="tz")).filter(x=>!seen.has(x.kind)&&seen.add(x.kind)).map(x=>
+    `<button type="button" class="flag ${x.lvl==="bad"?"fbad":x.lvl==="warn"?"fwarn":"finfo"}" data-risk="${k}" title="${esc(r.reasons.filter(y=>y.kind===x.kind).map(y=>y.text).join("\n"))}" aria-label="${esc(x.text)}">${FLAG_ICON[x.kind]}</button>`).join("");
+}
 const riskOpen=new Set();
 function riskHtml(r,k){
   if(!r||!riskOpen.has(k)) return "";
   return `<div class="risklist">${r.reasons.map(x=>`<div class="${x.lvl==="bad"?"rbad":x.lvl==="warn"?"rwarn":"rinfo"}">${esc(x.text)}</div>`).join("")||`<div class="rinfo">Nothing flagged for this day.</div>`}</div>`;
 }
+function timePill(k,km,mins,attrs){ const long=mins>+settings.maxHours*60; return `<span class="pill dist ${long?"long":""}" ${attrs||""} title="${long?`Travel time over your ${settings.maxHours}h setting. `:""}Show on the map">${Math.round(km)} km · ${fmtDur(mins)}</span>`; }
+function wxShort(w){ if(!w) return ""; if(w.none) return `<span class="note">Forecast from ${esc(fmtDate(new Date(w.opens+"T12:00:00")))}</span>`; return `<span class="note">${esc(WXW(w.code))} ${Math.round(w.tmin)}–${Math.round(w.tmax)}°C</span>`; }
 
-const OV_ITEMS={dist:"Distance and riding time",fuel:"Fuel",safety:"Safety light",wx:"Weather",sun:"Arrival and sunset",stay:"Places to stay",med:"Hospitals",tz:"Time zone changes"};
-let ovOpen=false;
-function ovPick(){ return Object.assign({dist:true,fuel:true,safety:true,wx:true,sun:false,stay:true,med:false,tz:true},ui.ov||{}); }
 function overviewHtml(){
-  const pick=ovPick();
-  let h=`<div class="tbslot"></div>`;
-  if(plan){
-    const rows=plan.days.map((d,k)=>({k,r:dayRisk(k)})).filter(x=>x.r&&x.r.level!=="ok");
-    h+=`<div><h2>Warnings</h2>${rows.length?rows.map(({k,r})=>`<div class="dayline" data-gotoday="${k}"><b>Day ${k+1}</b>${lightPill(r)}<span>${r.reasons.filter(x=>x.lvl!=="info").map(x=>esc(x.short)).join(" · ")}</span></div>`).join(""):`<div class="note">Nothing flagged. Check again closer to the date for weather.</div>`}</div>`;
-  }
-  h+=`<div><h2>Night stops</h2><div class="note">One per night. Pick the town; the beds there often decide it.</div></div><div>`;
-  if(nDays()===1) h+=`<div class="note">A day ride. Set a later "Back" date to add nights.</div>`;
-  trip.days.slice(0,-1).forEach((d,k)=>{
-    const c=d.to&&placesOk?(stayFor(d.to)?.places.length||0):null;
-    h+=`<div class="nightrow"><span class="when"><b>Night ${k+1}</b><br><span class="note">${esc(fmtDate(dayDate(k)))}</span></span>${searchBox("night-"+k,d.to?d.to.name:"","Town or place to sleep")}
-      ${d.to?`<button class="chip2 stay" type="button" data-panel="${k}:last:stay" title="Places to stay">${ICON.stay}<span>${c==null?"…":c}</span></button>`:`<span></span>`}</div>`;
-  });
-  h+=`</div><div class="ovhead"><h2>Days</h2><details class="legopts" ${ovOpen?"open":""}><summary class="btn ghost small">Choose what shows</summary><div class="legmenu">${Object.entries(OV_ITEMS).map(([x,n])=>`<label class="chk"><input type="checkbox" data-ov="${x}" ${pick[x]?"checked":""}> ${n}</label>`).join("")}</div></details></div><div>`;
+  let h=`<div class="tbslot"></div><div><h2>Days</h2>${nDays()===1?`<div class="note">A day ride. Set a later "Back" date to add nights.</div>`:""}</div><div>`;
   trip.days.forEach((d,k)=>{
-    const pd=plan&&plan.days[k], from=dayFrom(k), to=dayTo(k);
-    let bits="";
-    if(pd){
-      const r=dayRisk(k), w=dayWx(k);
-      if(pick.safety) bits+=lightPill(r);
-      if(pick.dist) bits+=distPill(pd.km,dayMinutes(k));
-      if(pick.fuel) bits+=fuelPill(rangeFuel(pd.a,pd.b));
-      if(pick.sun){const s=sunMin(k); bits+=`<span class="note">Arrive ${fmtT(toMin(settings.leave)+dayMinutes(k))} · sunset ${s!=null?fmtT(s):"?"}</span>`;}
-      if(pick.stay&&k<nDays()-1&&d.to&&placesOk) bits+=`<span class="note">${stayFor(d.to)?.places.length||0} places to stay</span>`;
-      if(pick.med){const m=dayMed(k); if(m) bits+=`<span class="note">Up to ${fmtFar(m.far)} km from a hospital</span>`;}
-      if(pick.wx&&w) bits+=`<span class="note wxline">${esc(wxText(w))}</span>`;
-      if(pick.tz&&w&&w.tz) bits+=`<span class="note">Clocks: ${utc(w.tz.from)} → ${utc(w.tz.to)}</span>`;
-    } else bits=`<span class="note">${to?"No route yet":"Pick the night stop"}</span>`;
-    h+=`<div class="dayline" data-gotoday="${k}"><b>Day ${k+1}</b><span class="note">${esc(fmtDate(dayDate(k)))}</span><span>${esc(from?from.name:"?")} → ${esc(to?to.name:"?")}</span>${d.style==="fast"?`<span class="note">Liaison</span>`:""}<div class="bits">${bits}</div></div>`;
+    const pd=plan&&plan.days[k], from=dayFrom(k), to=dayTo(k), last=k===nDays()-1, r=pd?dayRisk(k):null;
+    const c=!last&&d.to&&placesOk?(stayFor(d.to)?.places.length||0):null;
+    h+=`<div class="ovday" data-gotoday="${k}">
+      <div class="ovtop"><b>Day ${k+1}</b><span class="note">${esc(fmtDate(dayDate(k)))}</span>${d.style==="fast"?`<span class="note">Liaison</span>`:""}<span class="flags">${flagIcons(r,k)}</span></div>
+      <div class="ovroute"><span class="fromto">${esc(from?from.name:"?")} →</span>${last?`<span class="fixed">${esc(to?to.name:"?")}</span>`:searchBox("night-"+k,d.to?d.to.name:"","Where you sleep")}
+        ${!last&&d.to?`<button class="chip2 stay" type="button" data-panel="${k}:last:stay" title="Places to stay">${ICON.stay}<span>${c==null?"…":c}</span></button>`:""}</div>
+      <div class="ovbits">${pd?timePill(k,pd.km,dayMinutes(k))+fuelPill(rangeFuel(pd.a,pd.b))+wxShort(dayWx(k)):`<span class="note">${to?"No route yet":"Pick where you sleep"}</span>`}</div>
+      ${riskHtml(r,k)}</div>`;
   });
   h+=`</div>`;
   if(plan){
@@ -736,7 +731,7 @@ function overviewHtml(){
     h+=`<div class="sumrow"><div class="stat"><span class="lbl">Total</span><span class="v">${Math.round(tot)} km</span></div><div class="stat"><span class="lbl">Days</span><span class="v">${nDays()}</span></div></div>`;
     h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px">${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">Day ${k+1} GPX</button>`:"").join("")}</div></div>`;
   }
-  if(placesOk&&dataDate) h+=`<div class="note">Fuel, hospitals and river crossings from OpenStreetMap, as of ${esc(dataDate)}. Weather from Open-Meteo. Phone ahead on remote legs.</div>`;
+  if(placesOk&&dataDate) h+=`<div class="note">Map data from OpenStreetMap, as of ${esc(dataDate)}. Weather from Open-Meteo. Phone ahead on remote legs.</div>`;
   return h;
 }
 function dayHtml(k){
@@ -747,7 +742,7 @@ function dayHtml(k){
   if(!pd) return h+`<div class="note">${to?"No route yet. Check your connection.":"Pick where you sleep tonight to see this day."}</div>`;
   const mins=dayMinutes(k), leave=toMin(settings.leave), arrive=leave+mins, ssMin=sunMin(k), df=rangeFuel(pd.a,pd.b), w=dayWx(k), m=dayMed(k);
   const rk=dayRisk(k), arrTxt=fmtT(arrive)+(arrive>=1440?` +${Math.floor(arrive/1440)}d`:"");
-  h+=`<div class="sumrow">${distPill(pd.km,mins,`data-focusday="${k}"`)}${fuelPill(df)}${lightPill(rk,k)}
+  h+=`<div class="sumrow">${timePill(k,pd.km,mins,`data-focusday="${k}"`)}${fuelPill(df)}<span class="flags">${flagIcons(rk,k)}</span>
     <div class="stat"><span class="lbl">Leave</span><span class="v">${fmtT(leave)}</span></div><div class="stat"><span class="lbl">Arrive</span><span class="v">${arrTxt}</span></div><div class="stat"><span class="lbl">Sunset</span><span class="v">${ssMin!=null?fmtT(ssMin):"?"}</span></div></div>`;
   h+=riskHtml(rk,k);
   if(!placesOk&&settings.fuelMode!=="off") h+=`<div class="verdict v-warn">Station data isn't loaded. Fuel is checked against your own fuel stops only.</div>`;
@@ -799,7 +794,7 @@ $("details").addEventListener("click",e=>{
   const t=e.target, k=ui.tab;
   const go=t.closest("[data-gotoday]"); if(go&&!t.closest("button,input,a")){ui.tab=+go.dataset.gotoday;saveUi();renderAll();return;}
   const pn=t.closest("[data-panel]"); if(pn){hidePeek();const [dk,j,tab]=pn.dataset.panel.split(":");openPanel(+dk,j==="last"?"last":+j,tab);return;}
-  const rb=t.closest("[data-risk]"); if(rb&&!rb.closest("[data-gotoday]")){const k2=+rb.dataset.risk; riskOpen.has(k2)?riskOpen.delete(k2):riskOpen.add(k2); renderDetails(); return;}
+  const rb=t.closest("[data-risk]"); if(rb){const k2=+rb.dataset.risk; riskOpen.has(k2)?riskOpen.delete(k2):riskOpen.add(k2); renderDetails(); return;}
   const g=t.closest("[data-gpx]"); if(g){downloadGpx(+g.dataset.gpx);return;}
   const sty=t.closest("[data-style]"); if(sty&&k!=="ov"){trip.days[k].style=sty.dataset.style;trip.days[k].legs=(trip.days[k].legs||[]).map(x=>x&&x.track?{track:x.track,trackName:x.trackName}:{});changed();return;}
   const fl=t.closest("[data-focusleg]"); if(fl&&plan&&k!=="ov"){const L=plan.days[k].legs[+fl.dataset.focusleg-1]; focusRange(L.a,L.b); return;}
@@ -811,7 +806,6 @@ $("details").addEventListener("click",e=>{
 });
 $("details").addEventListener("change",async e=>{
   const t=e.target, k=ui.tab;
-  if(t.dataset.ov!==undefined){ovOpen=true;ui.ov=Object.assign(ovPick(),{[t.dataset.ov]:t.checked});saveUi();renderAll();ovOpen=false;return;}
   if(k==="ov") return; const d=trip.days[k];
   if(t.dataset.vtype!==undefined){d.vias[+t.dataset.vtype].type=t.value;changed();}
   if(t.dataset.alt!==undefined){const j=+t.dataset.alt; d.legs[j]=Object.assign({},d.legs[j],{alt:+t.value}); changed();}
@@ -870,15 +864,6 @@ $("pBody").addEventListener("click",e=>{
 });
 const canHover=window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 function hidePeek(){ $("peek").hidden=true; }
-$("details").addEventListener("mouseover",e=>{
-  if(!canHover) return; const b=e.target.closest('[data-panel$=":stay"]'); if(!b){hidePeek();return;}
-  const [k,j]=b.dataset.panel.split(":"), sc=scope(+k,j==="last"?"last":+j); if(!sc) return; const sf=stayFor(sc.p); if(!sf||!sf.places.length) return;
-  const r=b.getBoundingClientRect(), pk=$("peek");
-  pk.innerHTML=`<b>Places to stay near ${esc(sc.p.name)}</b>`+sf.places.slice(0,6).map(p=>`<div><b>${esc(p.name)}</b><br><span class="note">${esc((p.tags.tourism||"").replace("_"," "))} · ${p.dist.toFixed(1)} km${p.tags.phone?" · "+esc(p.tags.phone):""}</span></div>`).join("")+`<span class="note">Click for all ${sf.places.length}</span>`;
-  pk.hidden=false; pk.style.left=Math.max(8,Math.min(r.left,innerWidth-300))+"px"; pk.style.top=(r.bottom+6)+"px";
-});
-$("details").addEventListener("mouseout",e=>{const b=e.target.closest('[data-panel$=":stay"]'); if(b&&!b.contains(e.relatedTarget)) hidePeek();});
-$("details").addEventListener("mouseleave",hidePeek);
 window.addEventListener("scroll",hidePeek,{passive:true});
 
 /* ---------- map ---------- */
