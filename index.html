@@ -319,7 +319,7 @@ async function recalc(){
     $("status").textContent="Finding fuel and places along the way…";
     render(); setGpx(true);
     const ok=await loadPlaces(my); if(my!==seq) return;
-    $("status").textContent=ok===false?"Fuel stations and places couldn't load. Try again in a minute.":""; render();
+    if(ok===false) $("status").textContent="Fuel stations couldn't load. Try again in a minute."; else if(ok!=="partial") $("status").textContent=""; render();
   }catch(e){ if(my===seq) $("status").textContent="Couldn't get a route. Check each stop is a real place on a road, and your connection."; }
 }
 
@@ -337,33 +337,43 @@ function kindOf(t){
   if(/^(hotel|guest_house|hostel|chalet|motel|apartment)$/.test(t.tourism||"")) return "sleep";
   return "sight";
 }
-async function loadPlaces(my){
-  const line=simplify(plan.geom,400).map(p=>p.lat.toFixed(4)+","+p.lon.toFixed(4)).join(",");
-  const R=Math.round(Math.max(1,+settings.corridor)*1000);
-  const nights=plan.ds.slice(0,-1).map(d=>d[d.length-1]);
-  const q=`[out:json][timeout:40];(
-nwr(around:2000,${line})[amenity=fuel];
-nwr(around:${R},${line})[tourism=viewpoint][name];
-node(around:${R},${line})[mountain_pass=yes][name];
-nwr(around:${R},${line})[tourism~"^(attraction|museum)$"][name];
-nwr(around:${R},${line})[historic~"^(monument|ruins|archaeological_site|memorial|castle|fort)$"][name];
-nwr(around:${R},${line})[amenity~"^(restaurant|cafe|pub)$"][name];
-nwr(around:${R},${line})[tourism=camp_site][name];
-${nights.map(n=>`nwr(around:15000,${n.lat},${n.lon})[tourism~"^(hotel|guest_house|hostel|chalet|motel|camp_site|apartment)$"][name];`).join("\n")}
-);out center tags;`;
-  let els=[];
-  try{ els=await overpass(q); placesOk=true; }catch(e){ placesOk=false; return false; }
-  if(my!==seq) return;
-  const seen=new Set(); const all=[];
+/* route split into short chunks; each chunk's box (padded) is a fast indexed lookup */
+function boxes(padKm){
+  const out=[]; let chunk=[plan.geom[0]],startKm=0;
+  for(let i=1;i<plan.geom.length;i++){chunk.push(plan.geom[i]); if(plan.cum[i]-startKm>=30||i===plan.geom.length-1){out.push(chunk);chunk=[plan.geom[i]];startKm=plan.cum[i];}}
+  return out.map(c=>{let s=90,w=180,n=-90,e=-180;c.forEach(p=>{s=Math.min(s,p.lat);n=Math.max(n,p.lat);w=Math.min(w,p.lon);e=Math.max(e,p.lon);});
+    const dLat=padKm/110.5,dLon=padKm/(111.3*Math.cos(rad((s+n)/2)));return `${(s-dLat).toFixed(4)},${(w-dLon).toFixed(4)},${(n+dLat).toFixed(4)},${(e+dLon).toFixed(4)}`;});
+}
+function toPlaces(els){
+  const out=[],seen=new Set();
   els.forEach(e=>{
     const lat=e.lat??e.center?.lat, lon=e.lon??e.center?.lon; if(lat==null) return;
-    const t=e.tags||{}; const k=kindOf(t); const id=e.type+e.id; if(seen.has(id)) return; seen.add(id);
+    const t=e.tags||{}, k=kindOf(t), id=e.type+e.id; if(seen.has(id)) return; seen.add(id);
     const p={id,lat,lon,name:t.name||t.brand||(k==="fuel"?"Fuel":""),kind:k,tags:t};
-    Object.assign(p,locate(p,plan.geom,plan.cum)); all.push(p);
+    Object.assign(p,locate(p,plan.geom,plan.cum)); out.push(p);
   });
-  fuelStations=all.filter(p=>p.kind==="fuel"&&p.off<=2.5).sort((a,b)=>a.km-b.km);
-  pois=all.filter(p=>p.kind!=="fuel"&&p.kind!=="sleep"&&p.off<=+settings.corridor+0.5);
-  stays=nights.map((n,i)=>({night:n,day:i+1,places:all.filter(p=>(p.kind==="sleep"||p.kind==="camp")&&hav(p,n)<=15).map(p=>Object.assign({},p,{dist:hav(p,n)})).sort((a,b)=>a.dist-b.dist).slice(0,12)}));
+  return out;
+}
+async function loadPlaces(my){
+  const nights=plan.ds.slice(0,-1).map(d=>d[d.length-1]);
+  const fb=boxes(2.5), pb=boxes(Math.max(1,+settings.corridor));
+  // 1. fuel first: it decides whether the ride works
+  try{
+    const els=await overpass(`[out:json][timeout:30];(${fb.map(b=>`nwr[amenity=fuel](${b});`).join("")});out center tags;`);
+    if(my!==seq) return;
+    fuelStations=toPlaces(els).filter(p=>p.off<=2.5).sort((a,b)=>a.km-b.km); placesOk=true;
+  }catch(e){ placesOk=false; return false; }
+  render();
+  // 2. points of interest and places to sleep
+  try{
+    const sel=b=>`nwr[tourism~"^(viewpoint|attraction|museum|camp_site)$"][name](${b});node[mountain_pass=yes][name](${b});nwr[historic~"^(monument|ruins|archaeological_site|memorial|castle|fort)$"][name](${b});nwr[amenity~"^(restaurant|cafe|pub)$"][name](${b});`;
+    const sleepQ=nights.map(n=>`nwr(around:15000,${n.lat},${n.lon})[tourism~"^(hotel|guest_house|hostel|chalet|motel|camp_site|apartment)$"][name];`).join("");
+    const els=await overpass(`[out:json][timeout:40];(${pb.map(sel).join("")}${sleepQ});out center tags;`);
+    if(my!==seq) return;
+    const all=toPlaces(els);
+    pois=all.filter(p=>p.kind!=="fuel"&&p.kind!=="sleep"&&p.off<=+settings.corridor+0.5);
+    stays=nights.map((n,i)=>({night:n,day:i+1,places:all.filter(p=>(p.kind==="sleep"||p.kind==="camp")&&hav(p,n)<=15).map(p=>Object.assign({},p,{dist:hav(p,n)})).sort((a,b)=>a.dist-b.dist).slice(0,12)}));
+  }catch(e){ $("status").textContent="Points of interest couldn't load. Fuel planning still works."; return "partial"; }
 }
 
 /* fuel: fill at the furthest station you can reach with the reserve intact */
