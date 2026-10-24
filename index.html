@@ -354,7 +354,52 @@ function toPlaces(els){
   });
   return out;
 }
+/* own data snapshot (refreshed monthly), falls back to the live service */
+const COUNTRY_BOX={za:[-35.2,16.3,-22.0,33.1],na:[-29.1,11.6,-16.9,25.4]};
+const fileCache=new Map();
+async function localKind(kind,ccs){
+  const rows=[];
+  for(const cc of ccs){
+    const key=cc+"/"+kind;
+    if(!fileCache.has(key)) fileCache.set(key,fetch(`/data/${key}.json`).then(r=>r.ok?r.json():null).catch(()=>null));
+    const d=await fileCache.get(key); if(!d) return null; rows.push(...d);
+  }
+  return rows;
+}
+function nearRoute(rows,kind,padKm){
+  const bx=boxes(padKm).map(b=>b.split(",").map(Number));
+  const out=[];
+  rows.forEach((r,i)=>{
+    const [lat,lon,name,type,phone,web,email]=r;
+    if(!bx.some(([s,w,n,e])=>lat>=s&&lat<=n&&lon>=w&&lon<=e)) return;
+    const k=kind==="sleep"&&type==="camp_site"?"camp":kind;
+    const p={id:kind+i,lat,lon,name:name||(kind==="fuel"?"Fuel":""),kind:k,tags:{tourism:type,phone,website:web,email}};
+    Object.assign(p,locate(p,plan.geom,plan.cum)); out.push(p);
+  });
+  return out;
+}
+async function loadLocal(my){
+  const g=plan.geom; let s=90,w=180,n=-90,e=-180; g.forEach(p=>{s=Math.min(s,p.lat);n=Math.max(n,p.lat);w=Math.min(w,p.lon);e=Math.max(e,p.lon);});
+  const ccs=Object.entries(COUNTRY_BOX).filter(([,b])=>!(b[0]>n||b[2]<s||b[1]>e||b[3]<w)).map(([c])=>c);
+  if(!ccs.length) return null;
+  const fuel=await localKind("fuel",ccs); if(!fuel) return null;
+  if(my!==seq) return;
+  fuelStations=nearRoute(fuel,"fuel",2.5).filter(p=>p.off<=2.5).sort((a,b)=>a.km-b.km); placesOk=true; render();
+  const corridor=Math.max(1,+settings.corridor); let all=[];
+  for(const k of ["view","pass","sight","food","camp"]){ const rows=await localKind(k,ccs); if(rows) all.push(...nearRoute(rows,k,corridor)); }
+  pois=all.filter(p=>p.off<=corridor+0.5);
+  const nights=plan.ds.slice(0,-1).map(d=>d[d.length-1]);
+  if(nights.length){
+    const sl=[...(await localKind("sleep",ccs)||[]),...(await localKind("camp",ccs)||[]).map(r=>[r[0],r[1],r[2],"camp_site",r[4],r[5],r[6]])];
+    stays=nights.map((nt,i)=>({night:nt,day:i+1,places:sl.map((r,j)=>({id:"s"+j,lat:r[0],lon:r[1],name:r[2],kind:"sleep",tags:{tourism:r[3],phone:r[4],website:r[5],email:r[6]}})).filter(p=>hav(p,nt)<=15).map(p=>Object.assign(p,{dist:hav(p,nt)},locate(p,plan.geom,plan.cum))).sort((a,b)=>a.dist-b.dist).slice(0,12)}));
+  } else stays=[];
+  return true;
+}
 async function loadPlaces(my){
+  try{ const r=await loadLocal(my); if(r) return; }catch(e){}
+  return loadRemote(my);
+}
+async function loadRemote(my){
   const nights=plan.ds.slice(0,-1).map(d=>d[d.length-1]);
   const fb=boxes(2.5), pb=boxes(Math.max(1,+settings.corridor));
   // 1. fuel first: it decides whether the ride works
