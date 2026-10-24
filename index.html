@@ -657,22 +657,22 @@ const fmtFar=f=>f>150?"over 150":String(Math.round(f));
 const RANK_L={bad:2,warn:1,info:0};
 function dayRisk(k){
   const pd=plan&&plan.days[k]; if(!pd) return null;
-  const r=[], add=(lvl,text,kind)=>r.push({lvl,text,kind});
-  const f=rangeFuel(pd.a,pd.b); if(f&&f.level) add(f.level,f.text,"fuel");
+  const r=[], add=(lvl,text,kind,short)=>r.push({lvl,text,kind,short:short||text});
+  const f=rangeFuel(pd.a,pd.b); if(f&&f.level) add(f.level,f.text,"fuel",f.short);
   const mins=dayMinutes(k), arrive=toMin(settings.leave)+mins, s=sunMin(k);
-  if(s!=null){ if(s<arrive) add("bad",`Arrives after dark: ${fmtT(arrive)}, sunset ${fmtT(s)}.`,"dark"); else if(s-arrive<60) add("warn",`Arrives ${fmtT(arrive)}, under an hour before sunset.`,"dark"); }
-  if(mins>+settings.maxHours*60) add("warn",`Long day: ${fmtDur(mins)} of riding.`,"long");
+  if(s!=null){ if(s<arrive) add("bad",`Arrives after dark: ${fmtT(arrive)}, sunset ${fmtT(s)}.`,"dark","After dark"); else if(s-arrive<60) add("warn",`Arrives ${fmtT(arrive)}, under an hour before sunset.`,"dark","Near sunset"); }
+  if(mins>+settings.maxHours*60) add("warn",`Long day: ${fmtDur(mins)} of riding.`,"long",`Long day ${fmtDur(mins)}`);
   const w=dayWx(k);
   if(w&&!w.none){
-    if(w.code>=95) add("warn","Thunderstorms forecast.","wx");
-    if(w.gust>=80) add("bad",`Wind gusts to ${Math.round(w.gust)} km/h.`,"wx"); else if(w.gust>=60) add("warn",`Strong wind, gusts to ${Math.round(w.gust)} km/h.`,"wx");
-    if(w.tmax>=42) add("bad",`Extreme heat: ${Math.round(w.tmax)}°C.`,"wx"); else if(w.tmax>=37) add("warn",`Hot: ${Math.round(w.tmax)}°C. Carry extra water.`,"wx");
-    if(w.tmin<=2) add("warn",`Near freezing: ${Math.round(w.tmin)}°C. Watch for ice early.`,"wx");
-    if(w.rain>=25) add("bad",`Heavy rain: ${Math.round(w.rain)} mm.`,"wx"); else if(w.rain>=8&&w.prob>=50) add("warn",`Rain likely: ${Math.round(w.rain)} mm.`,"wx");
+    if(w.code>=95) add("warn","Thunderstorms forecast.","wx","Storms");
+    if(w.gust>=80) add("bad",`Wind gusts to ${Math.round(w.gust)} km/h.`,"wx",`Gusts ${Math.round(w.gust)} km/h`); else if(w.gust>=60) add("warn",`Strong wind, gusts to ${Math.round(w.gust)} km/h.`,"wx",`Gusts ${Math.round(w.gust)} km/h`);
+    if(w.tmax>=42) add("bad",`Extreme heat: ${Math.round(w.tmax)}°C.`,"wx",`${Math.round(w.tmax)}°C`); else if(w.tmax>=37) add("warn",`Hot: ${Math.round(w.tmax)}°C. Carry extra water.`,"wx",`${Math.round(w.tmax)}°C`);
+    if(w.tmin<=2) add("warn",`Near freezing: ${Math.round(w.tmin)}°C. Watch for ice early.`,"wx","Near freezing");
+    if(w.rain>=25) add("bad",`Heavy rain: ${Math.round(w.rain)} mm.`,"wx",`Rain ${Math.round(w.rain)} mm`); else if(w.rain>=8&&w.prob>=50) add("warn",`Rain likely: ${Math.round(w.rain)} mm.`,"wx",`Rain ${Math.round(w.rain)} mm`);
   }
   const fd=dayFords(k);
-  if(fd) add(w&&!w.none&&w.rain>=5?"warn":"info",`${fd} river crossing${fd>1?"s":""} on the route${w&&!w.none&&w.rain>=5?", and rain forecast":""}.`,"ford");
-  const m=dayMed(k); if(m&&m.far>100) add("warn",`Remote: up to ${fmtFar(m.far)} km from a hospital.`,"med");
+  if(fd) add(w&&!w.none&&w.rain>=5?"warn":"info",`${fd} river crossing${fd>1?"s":""} on the route${w&&!w.none&&w.rain>=5?", and rain forecast":""}.`,"ford",`${fd} river crossing${fd>1?"s":""}`);
+  const m=dayMed(k); if(m&&m.far>100) add("warn",`Remote: up to ${fmtFar(m.far)} km from a hospital.`,"med","Remote");
   if(w&&w.tz) add("info",`Clocks change: ${utc(w.tz.from)} to ${utc(w.tz.to)}.`,"tz");
   r.sort((a,b)=>RANK_L[b.lvl]-RANK_L[a.lvl]);
   const top=r.length?r[0].lvl:"info";
@@ -701,9 +701,8 @@ function overviewHtml(){
   const pick=ovPick();
   let h=`<div class="tbslot"></div>`;
   if(plan){
-    const all=[]; plan.days.forEach((d,k)=>{const r=dayRisk(k); if(r) r.reasons.filter(x=>x.lvl!=="info").forEach(x=>all.push({k,...x}));});
-    all.sort((a,b)=>RANK_L[b.lvl]-RANK_L[a.lvl]||a.k-b.k);
-    h+=`<div><h2>Warnings</h2>${all.length?all.map(x=>`<div class="verdict ${x.lvl==="bad"?"v-bad":"v-warn"}" data-gotoday="${x.k}" style="cursor:pointer">Day ${x.k+1}: ${esc(x.text)}</div>`).join(""):`<div class="note">Nothing flagged. Check again closer to the date for weather.</div>`}</div>`;
+    const rows=plan.days.map((d,k)=>({k,r:dayRisk(k)})).filter(x=>x.r&&x.r.level!=="ok");
+    h+=`<div><h2>Warnings</h2>${rows.length?rows.map(({k,r})=>`<div class="dayline" data-gotoday="${k}"><b>Day ${k+1}</b>${lightPill(r)}<span>${r.reasons.filter(x=>x.lvl!=="info").map(x=>esc(x.short)).join(" · ")}</span></div>`).join(""):`<div class="note">Nothing flagged. Check again closer to the date for weather.</div>`}</div>`;
   }
   h+=`<div><h2>Night stops</h2><div class="note">One per night. Pick the town; the beds there often decide it.</div></div><div>`;
   if(nDays()===1) h+=`<div class="note">A day ride. Set a later "Back" date to add nights.</div>`;
