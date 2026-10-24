@@ -93,6 +93,16 @@ a{color:var(--accent)}
 dialog{border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);padding:18px;width:min(420px,calc(100vw - 32px))}
 dialog::backdrop{background:rgba(0,0,0,.4)}
 .leaflet-container{font:inherit}
+.mapbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:-6px}
+.layers{position:relative}
+.layers summary{list-style:none;display:inline-block}
+.layers summary::-webkit-details-marker{display:none}
+.layerlist{position:absolute;z-index:1100;top:calc(100% + 4px);left:0;background:var(--panel);border:1px solid var(--line);border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:10px 12px;display:flex;flex-direction:column;gap:6px;min-width:220px}
+.layerlist label{display:flex;align-items:center;gap:8px;font-size:.86rem;cursor:pointer}
+.fuel{font-weight:600}
+.fuel.ok{color:var(--ok)} .fuel.warn{color:var(--warn)} .fuel.bad{color:var(--bad)}
+.legkm{cursor:pointer;text-decoration:underline dotted;text-underline-offset:3px}
+.dayhdr span:first-child{cursor:pointer}
 .mk{border:2px solid #18201C;background:#fff}
 </style>
 </head>
@@ -128,6 +138,11 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 
     <main class="panel" style="gap:16px">
       <div class="days" id="days"></div>
+      <div class="mapbar">
+        <details class="layers" id="layersBox"><summary class="btn ghost small">Show on map</summary><div class="layerlist" id="layers"></div></details>
+        <button class="btn ghost small" type="button" id="wholeTrip" hidden>Whole trip</button>
+        <span class="note" id="focusNote"></span>
+      </div>
       <div id="map"></div>
       <div>
         <h2 style="margin-bottom:8px">Roadbook</h2>
@@ -135,7 +150,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
           <thead><tr><th style="text-align:right">Km</th><th>Point</th><th style="text-align:right">Leg</th><th style="text-align:right">Tank left</th></tr></thead>
           <tbody id="roadbook"></tbody>
         </table></div>
-        <p class="note">Fuel stations come from OpenStreetMap. A station can close or run dry, so check rider reports or phone ahead on remote legs.</p>
+        <p class="note"><span id="dataDate"></span>Fuel stations come from OpenStreetMap. A station can close or run dry, so phone ahead on remote legs.</p>
       </div>
     </main>
   </div>
@@ -148,7 +163,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
         <select id="poiMax" style="width:auto"><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="1000">All</option></select>
       </div>
     </div>
-    <div class="chips" id="poiTypes"></div>
+    <div class="note">Choose which kinds show in <b>Show on map</b> above the map.</div>
     <div class="poilist" id="pois"><div class="note">Points of interest load once the route is ready.</div></div>
   </section>
 
@@ -214,7 +229,11 @@ const trip=store.get("rr2-trip")||DEFAULT_TRIP;
 trip.stops.forEach(st=>{ if(st.night){st.type="sleep";delete st.night;} if(!st.type) st.type="pass"; });
 const SET_FIELDS=["range","reserve","leave","pace","corridor","style","fuelMode","maxHours"];
 const settings=Object.assign({range:200,reserve:30,leave:"08:00",pace:0,corridor:5,style:"rough",fuelMode:"suggest",maxHours:8},store.get("rr2-settings")||{});
-const ui=Object.assign({types:Object.fromEntries(TYPES.map(t=>[t.id,t.on])),max:"10"},store.get("rr2-ui")||{});
+const ui=Object.assign({types:Object.fromEntries(TYPES.map(t=>[t.id,t.on])),max:"10",fuelAll:true,fuelSugg:true,sleep:true},store.get("rr2-ui")||{});
+let focus=null; // {from:km,to:km,label}
+const legFuel=new Map(); // stop -> {arrive,gap,fill,few}
+let dataDate="";
+fetch("/data/updated.json").then(r=>r.ok?r.json():null).then(j=>{if(j&&j.updated)dataDate=new Date(j.updated).toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"});}).catch(()=>{});
 const tomorrow=new Date(Date.now()+86400000).toISOString().slice(0,10);
 $("tripDate").value=trip.date||tomorrow;
 let plan=null, pois=[], fuelStations=[], stays=[], placesOk=false;
@@ -235,7 +254,7 @@ function renderStops(){
       let j=i+1; while(j<n-1&&trip.stops[j].type!=="sleep") j++;
       const end=trip.stops[Math.min(j,n-1)];
       const h=document.createElement("div"); h.className="dayhdr";
-      h.innerHTML=`<span>Day ${day+1} · ${esc(fmtDate(dayDate(day)))}</span><span class="note">${esc(st.name||"Start")} → ${esc(end.name||"…")}</span>`;
+      h.innerHTML=`<span data-focusday="${day}" title="Show this day on the map">Day ${day+1} · ${esc(fmtDate(dayDate(day)))}</span><span class="note">${esc(st.name||"Start")} → ${esc(end.name||"…")}</span>`;
       box.appendChild(h); day++;
     };
     if(first) header();
@@ -258,7 +277,10 @@ function renderStops(){
     if(!last){
       const lg=st.leg||{}, info=legInfo.get(st);
       const leg=document.createElement("div"); leg.className="leg";
-      leg.innerHTML=`<span class="mono">${info?Math.round(info.km)+" km · "+fmtDur(info.min):"…"}</span>
+      const lf=legFuel.get(st);
+      const fuelHtml=!lf?"":lf.gap?`<span class="fuel bad">No fuel for ${Math.round(lf.gap)} km. Range ${settings.range} km.</span>${lf.fill?`<button class="btn small" type="button" data-addfuel="${i}">Add fuel stop: ${esc(lf.fill.name)}</button>`:""}`
+        :`<span class="fuel ${lf.arrive<0?"bad":lf.arrive<+settings.reserve?"warn":"ok"}">Fuel left on arrival: ${Math.round(lf.arrive)} km</span>${lf.fill&&lf.arrive<+settings.reserve?`<button class="btn small" type="button" data-addfuel="${i}">Add fuel stop: ${esc(lf.fill.name)}</button>`:""}${lf.few?`<span class="note">Few stations here. Confirm before you ride.</span>`:""}`;
+      leg.innerHTML=`<span class="mono legkm" data-focusleg="${i}" title="Show this leg on the map">${info?Math.round(info.km)+" km · "+fmtDur(info.min):"…"}</span>${fuelHtml}
         <label class="chk"><input type="checkbox" data-fast="${i}" ${lg.fast?"checked":""}> Get me there fast</label>
         ${info&&info.n>1&&!lg.track?`<select data-alt="${i}" aria-label="Way">${Array.from({length:info.n},(_,k)=>`<option value="${k}" ${(lg.alt||0)===k?"selected":""}>Way ${k+1}${info.alts?" · "+Math.round(info.alts[k])+" km":""}</option>`).join("")}</select>`:""}
         ${lg.track?`<span class="note">Own track: ${esc(lg.trackName||"GPX")}</span><button class="btn small ghost" type="button" data-untrack="${i}">Remove track</button>`
@@ -269,6 +291,10 @@ function renderStops(){
 }
 $("stops").addEventListener("click",e=>{
   const up=e.target.closest("[data-up]"),del=e.target.closest("[data-del]"),un=e.target.closest("[data-untrack]");
+  const fl=e.target.closest("[data-focusleg]"),fd=e.target.closest("[data-focusday]"),af=e.target.closest("[data-addfuel]");
+  if(fl&&plan){const i=+fl.dataset.focusleg,sk=stopKms(),a=sk.get(trip.stops[i]),b=sk.get(trip.stops[i+1]); if(a!=null&&b!=null) setFocus(a,b,`${trip.stops[i].name} → ${trip.stops[i+1].name}`);}
+  if(fd&&plan){const di=+fd.dataset.focusday,s0=plan.dayStart[di].km,s1=di<plan.ds.length-1?plan.dayStart[di+1].km:plan.total; setFocus(s0,s1,`Day ${di+1}`);}
+  if(af){const i=+af.dataset.addfuel,f=legFuel.get(trip.stops[i])?.fill; if(f){trip.stops.splice(i+1,0,{name:f.name&&f.name!=="Fuel"?f.name:"Fuel stop",lat:f.lat,lon:f.lon,type:"fuel"}); $("status").textContent="Fuel stop added."; changed();}}
   if(up){const i=+up.dataset.up; if(i>1){[trip.stops[i-1],trip.stops[i]]=[trip.stops[i],trip.stops[i-1]];changed();}}
   if(del){trip.stops.splice(+del.dataset.del,1);changed();}
   if(un){const st=trip.stops[+un.dataset.untrack]; delete st.leg.track; delete st.leg.trackName; changed();}
@@ -539,7 +565,7 @@ function fuelPlan(){
   const range=+settings.range,reserve=+settings.reserve,total=plan.total;
   const sk=stopKms();
   const mine=trip.stops.filter(st=>st.type==="fuel"&&sk.has(st)).map(st=>({id:"me"+sk.get(st),lat:st.lat,lon:st.lon,name:st.name,km:sk.get(st),mine:true}));
-  const st=[...mine,...fuelStations].sort((a,b)=>a.km-b.km).filter((x,i,a)=>!a.slice(0,i).some(o=>Math.abs(o.km-x.km)<1));
+  const st=[...mine,...(placesOk?fuelStations:[])].sort((a,b)=>a.km-b.km).filter((x,i,a)=>!a.slice(0,i).some(o=>Math.abs(o.km-x.km)<1));
   let pos=0,tank=range; const fills=[],gaps=[]; let guard=0;
   const use=s=>{tank-=s.km-pos; fills.push(Object.assign({},s,{arrive:tank})); pos=s.km; tank=range;};
   while(pos<total && guard++<300){
@@ -588,11 +614,12 @@ function render(){
     const msgs=[];
     const gap=fp.gaps.find(g=>g.from>=s0-0.5&&g.from<s1-0.5);
     if(fm==="off"){}
-    else if(!placesOk) msgs.push(["v-warn","Fuel stations not loaded yet, so fuel can't be checked."]);
+    else if(!placesOk&&gap) msgs.push(["v-bad",`No fuel stop planned for ${Math.round(gap.to-gap.from)} km. Station data isn't loaded, so only your own fuel stops count.`]);
+    else if(!placesOk) msgs.push(["v-warn","Station data isn't loaded. Fuel is checked against your own fuel stops only."]);
     else if(gap) msgs.push(["v-bad",`No fuel for ${Math.round(gap.to-gap.from)} km from km ${Math.round(gap.from)}. Carry extra or add a fuel stop.`]);
     else if(worst<reserve) msgs.push(["v-warn",`Tight: down to ${Math.round(worst)} km of fuel at worst.`]);
     else msgs.push(["v-ok",`Fuel fine: never below ${Math.round(worst)} km left.`]);
-    if(fm!=="off"&&placesOk&&di<plan.ds.length-1) msgs.push(["v-warn",`Arrive with about ${Math.round(fp.tankAt(s1))} km in the tank. Fill up before ${esc(end.name)} if it has no fuel.`]);
+    if(fm!=="off"&&di<plan.ds.length-1) msgs.push(["v-warn",`Arrive with about ${Math.round(fp.tankAt(s1))} km in the tank. Fill up before ${esc(end.name)} if it has no fuel.`]);
     if(mins>+settings.maxHours*60) msgs.push(["v-warn",`Long day: ${fmtDur(mins)} of riding. Add a night stop.`]);
     if(ssMin-arrive<60) msgs.push([ssMin<arrive?"v-bad":"v-warn",ssMin<arrive?`Arrives after dark (${fmtT(arrive)}, sunset ${fmtT(ssMin)}). Leave earlier.`:`Arrives ${fmtT(arrive)}, under an hour before sunset (${fmtT(ssMin)}).`]);
     const dateTxt=date.toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"});
@@ -616,23 +643,44 @@ function render(){
     rows.forEach((x,i)=>{
       const t=fp.tankAt(x.km), col=t<0?"var(--bad)":t<reserve?"var(--warn)":"var(--ok)";
       const tag=x.k==="fuel"?`<span class="kind fuel">Fuel${x.f.tight?" · tight":""}</span>`:x.k==="night"?`<span class="kind night">${di===plan.ds.length-1&&i===rows.length-1?"Finish":"Sleep"}</span>`:x.k==="stop"?`<span class="kind">${esc(STOP_TYPES[x.t]?.n||"Stop")}</span>`:"";
-      rb+=`<tr><td class="n">${Math.round(x.km)}</td><td><b>${esc(x.n)}</b> ${tag}</td><td class="n">${i?Math.round(x.km-prev)+" km":""}</td><td class="n" style="color:${placesOk?col:"var(--muted)"}">${placesOk&&fm!=="off"?Math.round(x.k==="fuel"?x.f.arrive:t):"–"}</td></tr>`;
+      rb+=`<tr><td class="n">${Math.round(x.km)}</td><td><b>${esc(x.n)}</b> ${tag}</td><td class="n">${i?Math.round(x.km-prev)+" km":""}</td><td class="n" style="color:${fm!=="off"?col:"var(--muted)"}">${fm!=="off"?Math.round(x.k==="fuel"?x.f.arrive:t):"–"}</td></tr>`;
       prev=x.km;
     });
   });
   $("days").innerHTML=html; $("roadbook").innerHTML=rb;
   $("hdrSummary").textContent=`${Math.round(plan.total)} km · ${plan.ds.length} day${plan.ds.length>1?"s":""}`;
+  legFuel.clear();
+  if(settings.fuelMode!=="off"){
+    const sk=stopKms();
+    trip.stops.forEach((st,i)=>{
+      const nx=trip.stops[i+1]; if(!nx||!sk.has(st)||!sk.has(nx)) return;
+      const a=sk.get(st),b=sk.get(nx);
+      const gap=fp.gaps.find(g=>g.from<b-0.5&&g.to>a+0.5);
+      const fill=fp.fills.find(f=>!f.mine&&f.km>a+0.3&&f.km<=b+0.3)||(gap?fuelStations.find(f=>f.km>a&&f.km<b):null);
+      const few=placesOk&&b-a>80&&fuelStations.filter(f=>f.km>a&&f.km<b).length<=1;
+      legFuel.set(st,{arrive:fp.tankAt(b-0.01),gap:gap?gap.to-gap.from:0,fill:settings.fuelMode==="suggest"?fill:null,few});
+    });
+  }
+  $("dataDate").textContent=placesOk&&dataDate?`Fuel stations as of ${dataDate}. `:"";
+  if(!document.activeElement||!document.activeElement.closest("#stops")) renderStops();
   renderPois(); renderStays(); drawMap(fp);
 }
 
 function renderTypes(){
-  $("poiTypes").innerHTML=TYPES.map(t=>`<label class="chip"><input type="checkbox" id="type-${t.id}" data-type="${t.id}" ${ui.types[t.id]?"checked":""}><span class="dot" style="background:${t.c}"></span>${t.n}</label>`).join("");
+  const box=(id,on,label,dot)=>`<label><input type="checkbox" data-layer="${id}" ${on?"checked":""}>${dot}${label}</label>`;
+  const sq=c=>`<span class="dot" style="background:${c};border-radius:2px;border:1px solid #18201C"></span>`;
+  $("layers").innerHTML=box("fuelSugg",ui.fuelSugg,"Suggested fuel stops",sq("#0B6E4F"))+box("fuelAll",ui.fuelAll,"All fuel stations",sq("#ffffff"))+box("sleep",ui.sleep,"Places to sleep",`<span class="dot" style="background:#2F5BA8"></span>`)
+    +TYPES.map(t=>box("t-"+t.id,ui.types[t.id],t.n,`<span class="dot" style="background:${t.c}"></span>`)).join("");
   $("poiMax").value=ui.max;
 }
-$("poiTypes").addEventListener("change",e=>{const t=e.target.dataset.type;if(!t)return;ui.types[t]=e.target.checked;store.set("rr2-ui",ui);render();});
+$("layers").addEventListener("change",e=>{const l=e.target.dataset.layer;if(!l)return; if(l.startsWith("t-")) ui.types[l.slice(2)]=e.target.checked; else ui[l]=e.target.checked; store.set("rr2-ui",ui); render();});
+document.addEventListener("click",e=>{const b=$("layersBox"); if(b.open&&!b.contains(e.target)) b.open=false;});
+function setFocus(a,b,label){ focus={from:Math.min(a,b),to:Math.max(a,b),label}; $("wholeTrip").hidden=false; $("focusNote").textContent="Showing "+label; render(); $("map").scrollIntoView({behavior:"smooth",block:"center"}); }
+$("wholeTrip").addEventListener("click",()=>{focus=null;$("wholeTrip").hidden=true;$("focusNote").textContent="";window._refit=true;render();});
+const inFocus=p=>!focus||(p.km>=focus.from-1&&p.km<=focus.to+1);
 $("poiMax").addEventListener("change",e=>{ui.max=e.target.value;store.set("rr2-ui",ui);render();});
 function shownPois(){
-  return pois.filter(p=>ui.types[p.kind]).sort((a,b)=>a.off-b.off).slice(0,+ui.max).sort((a,b)=>a.km-b.km);
+  return pois.filter(p=>ui.types[p.kind]&&inFocus(p)).sort((a,b)=>a.off-b.off).slice(0,+ui.max).sort((a,b)=>a.km-b.km);
 }
 function renderPois(){
   if(!pois.length&&!fuelStations.length){return;}
@@ -663,16 +711,21 @@ function drawMap(fp){
   if(!map){map=L.map("map",{scrollWheelZoom:false});L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:17,attribution:"© OpenStreetMap contributors"}).addTo(map);}
   const first=!layer; if(layer) layer.remove(); layer=L.layerGroup().addTo(map);
   const cols=["#0B6E4F","#2F5BA8","#9A6A33","#6B4E9B","#B3261E"];
-  plan.rs.forEach((r,i)=>L.polyline(r.geom.map(g=>[g.lat,g.lon]),{color:cols[i%cols.length],weight:5,opacity:.85}).addTo(layer));
+  plan.rs.forEach((r,i)=>L.polyline(r.geom.map(g=>[g.lat,g.lon]),{color:cols[i%cols.length],weight:focus?3:5,opacity:focus?.45:.85}).addTo(layer));
+  let seg=null;
+  if(focus){ seg=plan.geom.filter((g,i)=>plan.cum[i]>=focus.from&&plan.cum[i]<=focus.to); if(seg.length>1) L.polyline(seg.map(g=>[g.lat,g.lon]),{color:"#B26A00",weight:7,opacity:.95}).addTo(layer); }
   const dot=(c,sz,sq)=>L.divIcon({className:"",html:`<div style="width:${sz}px;height:${sz}px;background:${c};border:2px solid #18201C;border-radius:${sq?"2px":"50%"}"></div>`,iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]});
-  trip.stops.filter(s=>s.lat!=null).forEach((s,i)=>L.marker([s.lat,s.lon],{icon:dot(s.type==="sleep"?"#2F5BA8":"#18201C",14)}).bindTooltip(s.name).addTo(layer));
-  if(settings.fuelMode==="suggest") fp.fills.forEach(f=>L.marker([f.lat,f.lon],{icon:dot("#0B6E4F",12,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
-  fuelStations.filter(s=>!fp.fills.some(f=>f.id===s.id)).forEach(f=>L.marker([f.lat,f.lon],{icon:dot("#ffffff",9,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
+  trip.stops.filter(s=>s.lat!=null).forEach(s=>L.marker([s.lat,s.lon],{icon:dot(s.type==="sleep"?"#2F5BA8":s.type==="fuel"?"#0B6E4F":"#18201C",14,s.type==="fuel")}).bindTooltip(s.name).addTo(layer));
+  if(settings.fuelMode==="suggest"&&ui.fuelSugg) fp.fills.filter(f=>!f.mine&&inFocus(f)).forEach(f=>L.marker([f.lat,f.lon],{icon:dot("#0B6E4F",12,true)}).bindTooltip("Suggested fuel: "+f.name).addTo(layer));
+  if(ui.fuelAll) fuelStations.filter(s=>inFocus(s)&&!(ui.fuelSugg&&fp.fills.some(f=>f.id===s.id))).forEach(f=>L.marker([f.lat,f.lon],{icon:dot("#ffffff",9,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
+  if(ui.sleep) stays.forEach(st=>st.places.forEach(p=>{ if(focus&&!(st.night&&p.km!=null&&inFocus(p))) return;
+    L.marker([p.lat,p.lon],{icon:dot("#2F5BA8",10)}).bindPopup(`<b>${esc(p.name)}</b><br>${esc((p.tags.tourism||"").replace("_"," "))}${p.tags.phone?"<br>"+esc(p.tags.phone):""}`).addTo(layer);}));
   shownPois().forEach(p=>{const t=TYPES.find(x=>x.id===p.kind);
     const m=L.marker([p.lat,p.lon],{icon:dot(t.c,11)}).addTo(layer);
     m.bindPopup(`<b>${esc(p.name)}</b><br>${t.n}<br><button class="btn small" type="button" onclick="addPoi('${p.id}')">Add to route</button>`);
   });
-  if(first||window._refit){map.fitBounds(L.latLngBounds(plan.geom.map(g=>[g.lat,g.lon])),{padding:[20,20]});window._refit=false;}
+  if(focus&&seg&&seg.length>1) map.fitBounds(L.latLngBounds(seg.map(g=>[g.lat,g.lon])),{padding:[30,30]});
+  else if(first||window._refit){map.fitBounds(L.latLngBounds(plan.geom.map(g=>[g.lat,g.lon])),{padding:[20,20]});window._refit=false;}
 }
 
 /* ---------- GPX ---------- */
@@ -713,7 +766,7 @@ $("settings").addEventListener("close",()=>{
 
 const STYLE_TEXT={rough:"<b>Road less travelled.</b> Back roads and gravel first, often the shortest and toughest way. Not for every bike or rider. Change it in Settings.",mixed:"<b>Mixed.</b> Gravel where it saves time, tar where it doesn't. Change it in Settings.",tar:"<b>Tar.</b> Main roads and highways. Change it in Settings."};
 function showStyle(){ $("styleBanner").innerHTML=STYLE_TEXT[settings.style]||STYLE_TEXT.rough; }
-function changed(){ window._refit=true; renderStops(); $("roundTrip").checked=!!trip.round; recalc(); }
+function changed(){ window._refit=true; focus=null; $("wholeTrip").hidden=true; $("focusNote").textContent=""; renderStops(); $("roundTrip").checked=!!trip.round; recalc(); }
 renderTypes(); renderStops(); setGpx(false); showStyle(); recalc();
 </script>
 </body>
