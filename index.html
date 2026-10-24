@@ -56,7 +56,7 @@ input[type=text],input[type=number],input[type=time],input[type=date],select{bac
 .sugg button{display:block;width:100%;text-align:left;border:0;background:none;padding:8px 10px;cursor:pointer;border-bottom:1px solid var(--line)}
 .sugg button:hover,.sugg button:focus{background:var(--chip)}
 .dayhdr{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;border-top:2px solid var(--ink);padding-top:6px;margin-top:4px;font-family:var(--f-display);font-weight:700;font-size:1.05rem}
-.leg{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-left:30px;padding:4px 0 4px 10px;border-left:2px dashed var(--line);font-size:.8rem}
+
 .leg select{width:auto;padding:3px 6px;font-size:.8rem}
 .stype{margin-top:4px;padding:4px 6px!important;font-size:.82rem}
 .chk{display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--muted)}
@@ -108,7 +108,27 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 .badge.legb{border-color:var(--line);color:var(--ink);background:var(--bg)}
 .namerow{display:flex;gap:6px;align-items:center}
 .namerow input{flex:1;min-width:0}
-.listdlg{width:min(640px,calc(100vw - 24px));max-height:min(80vh,760px);padding:0}
+.sheet{position:fixed;z-index:1500;left:max(14px,calc((100vw - 1240px)/2 + 14px));top:80px;width:380px;max-height:calc(100vh - 100px);overflow:auto;background:var(--panel);border:1px solid var(--line);border-radius:8px;box-shadow:0 12px 40px rgba(0,0,0,.25)}
+@media (max-width:900px){.sheet{left:0;right:0;top:auto;bottom:0;width:auto;max-height:58vh;border-radius:12px 12px 0 0;padding-bottom:env(safe-area-inset-bottom,0px)}}
+.tabs{display:flex;gap:4px;padding:8px 12px 0;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{display:inline-flex;align-items:center;gap:5px;border:0;border-bottom:3px solid transparent;background:none;padding:6px 8px;cursor:pointer;font-weight:600;white-space:nowrap}
+.tab svg{width:15px;height:15px}
+.tab.on{border-bottom-color:var(--ink)}
+.stopcard{display:flex;flex-direction:column;gap:6px;padding:4px 0 10px;border-bottom:1px solid var(--line)}
+.strip{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin-left:30px}
+.strip .stype{margin-top:0;width:auto}
+.chip2{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);background:var(--bg);border-radius:999px;padding:3px 9px;font-size:.8rem;font-weight:600;cursor:pointer;color:var(--ink)}
+.chip2 svg{width:14px;height:14px}
+.chip2.warn{border-color:var(--warn);color:var(--warn);background:color-mix(in srgb,var(--warn) 12%,transparent)}
+.chip2.bad{border-color:var(--bad);color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,transparent)}
+.legopts{position:relative}
+.legopts summary{list-style:none;width:28px;height:28px;font-weight:700}
+.legopts summary::-webkit-details-marker{display:none}
+.legmenu{position:absolute;z-index:1200;right:0;top:calc(100% + 4px);background:var(--panel);border:1px solid var(--line);border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:10px;display:flex;flex-direction:column;gap:8px;min-width:240px}
+.legmenu select{width:auto;padding:3px 6px}
+.fwarn{display:flex;gap:6px;align-items:flex-start;margin-left:30px;font-weight:600;font-size:.82rem}
+.fwarn svg{width:16px;height:16px;flex:none;margin-top:1px}
+.fwarn.warn{color:var(--warn)} .fwarn.bad{color:var(--bad)}
 .dlghead{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;padding:14px 16px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--panel)}
 .dlgbody{padding:10px 16px 16px;display:flex;flex-direction:column;gap:8px}
 .item{border:1px solid var(--line);border-radius:6px;padding:10px;display:flex;justify-content:space-between;gap:10px;align-items:flex-start;background:var(--bg);overflow-wrap:anywhere}
@@ -136,7 +156,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
   <div class="verdict v-ok" id="styleBanner" style="font-weight:500"></div>
   <div class="grid">
     <aside class="panel" aria-label="Trip">
-      <div style="display:flex;justify-content:space-between;align-items:baseline"><h2>Trip</h2><span class="note">Set a stop to "Sleep here" to end a day</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><h2>Trip</h2><span class="note">Tap an icon for fuel, places to stay, food and sights</span></div>
       <div class="field"><label class="lbl" for="tripDate">First day</label><input id="tripDate" type="date"></div>
       <div class="stops" id="stops"></div>
       <div class="btns">
@@ -171,7 +191,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 
 </div>
 
-<dialog id="listDlg" class="listdlg"><div class="dlghead"><div><h2 id="dlgTitle"></h2><div class="note" id="dlgSub"></div></div><button class="icon" type="button" id="dlgClose" aria-label="Close">✕</button></div><div id="dlgBody" class="dlgbody"></div></dialog>
+<aside id="panel" class="sheet" hidden aria-label="Stop details"><div class="dlghead"><div><h2 id="pTitle"></h2><div class="note" id="pSub"></div></div><button class="icon" type="button" id="pClose" aria-label="Close">✕</button></div><div class="tabs" id="pTabs"></div><div id="pBody" class="dlgbody"></div></aside>
 <div id="peek" class="peek" hidden></div>
 
 <dialog id="settings">
@@ -245,6 +265,13 @@ function dayDate(di){const b=new Date(($("tripDate").value||tomorrow)+"T12:00:00
 const fmtDate=d=>d.toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"});
 
 /* ---------- stops UI ---------- */
+const ICON={
+  fuel:`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 3h9a1 1 0 0 1 1 1v8h1.5A2.5 2.5 0 0 1 18 14.5V18a1 1 0 0 0 2 0V9.4l-2.7-2.7 1.4-1.4 3 3c.2.2.3.5.3.7V18a3 3 0 0 1-6 0v-3.5a.5.5 0 0 0-.5-.5H14v7h1v2H2v-2h1V4a1 1 0 0 1 1-1zm1 2v5h7V5H5z"/></svg>`,
+  stay:`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5h2v8h6V8h7a3 3 0 0 1 3 3v8h-2v-3H5v3H3V5zm4 3.5a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/></svg>`,
+  food:`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2h2v7a2 2 0 0 1-1 1.7V22H6V10.7A2 2 0 0 1 5 9V2h2v6h0V2zm9 0c2 0 3 2.5 3 6s-1 4.5-2 5v9h-2V2h1z"/></svg>`,
+  sight:`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2l2.9 6.3 6.9.7-5.2 4.6 1.5 6.8L12 17l-6.1 3.4 1.5-6.8L2.2 9l6.9-.7z"/></svg>`
+};
+const TABS={fuel:"Fuel",stay:"Stay",food:"Food",sight:"Sights"};
 function renderStops(){
   const box=$("stops"); box.innerHTML="";
   const n=trip.stops.length; let day=0;
@@ -258,45 +285,45 @@ function renderStops(){
       box.appendChild(h); day++;
     };
     if(first) header();
-    const row=document.createElement("div"); row.className="stop";
     const label=first?"Start":last?"Finish":"Stop";
     const locked=last&&trip.round;
-    row.innerHTML=`<div class="pin ${st.type==="sleep"&&!last?"night":""}">${first?"S":last?"F":i}</div>
+    const prev=trip.stops[i-1], lg=prev?(prev.leg||{}):{}, info=prev?legInfo.get(prev):null, lf=prev?legFuel.get(prev):null;
+    const c=counts(i);
+    const chip=(tab,num,cls,title)=>`<button class="chip2 ${cls||""}" type="button" data-panel="${i}:${tab}" title="${title}">${ICON[tab]}<span>${num}</span></button>`;
+    const row=document.createElement("div"); row.className="stopcard";
+    row.innerHTML=`<div class="stop">
+      <div class="pin ${st.type==="sleep"&&!last?"night":""}">${first?"S":last?"F":i}</div>
       <div class="ac">
-        <div class="namerow"><input type="text" id="stop-${i}" value="${esc(st.name)}" placeholder="${label}: town or place" autocomplete="off" aria-label="${label}">${isSleep(st,i,n)&&stayFor(st)?`<button class="badge" type="button" data-stay="${i}">Stay · ${stayFor(st).places.length}</button>`:""}</div>
+        <input type="text" id="stop-${i}" value="${esc(st.name)}" placeholder="${label}: town or place" autocomplete="off" aria-label="${label}">
         <div class="sugg" hidden></div>
         ${locked?`<div class="note" style="margin-top:3px">Same as start. Type here to finish somewhere else.</div>`:""}
-        ${!first&&!last?`<select class="stype" data-stype="${i}" aria-label="Stop type">${Object.entries(STOP_TYPES).map(([k,v])=>`<option value="${k}" ${st.type===k?"selected":""}>${v.n}</option>`).join("")}</select>`:""}
       </div>
-      <div class="tools">
-        ${!first&&!last?`<button class="icon" type="button" title="Move up" data-up="${i}">↑</button><button class="icon" type="button" title="Remove" data-del="${i}">✕</button>`:""}
-      </div>`;
+      <div class="tools">${!first&&!last?`<button class="icon" type="button" title="Move up" data-up="${i}">↑</button><button class="icon" type="button" title="Remove" data-del="${i}">✕</button>`:""}</div>
+    </div>
+    <div class="strip">
+      ${!first&&!last?`<select class="stype" data-stype="${i}" aria-label="Stop type">${Object.entries(STOP_TYPES).map(([k,v])=>`<option value="${k}" ${st.type===k?"selected":""}>${v.n}</option>`).join("")}</select>`:""}
+      ${!first?`<span class="mono legkm" data-focusleg="${i-1}" title="Show the leg into ${esc(st.name)} on the map">${info?Math.round(info.km)+" km · "+fmtDur(info.min):"…"}</span>`:""}
+      ${chip("fuel",c?c.fuel:"…",lf&&lf.level?lf.level:"",lf&&lf.level?lf.text:"Fuel on the way in and in town")}
+      ${chip("stay",c?c.stay:"…","","Places to stay within 15 km")}
+      ${ui.types.food?chip("food",c?c.food:"…","","Food on the way in and in town"):""}
+      ${chip("sight",c?c.sight:"…","","Viewpoints, passes and sights on the way in")}
+      ${!first?`<details class="legopts"><summary class="icon" title="Leg options">⋯</summary><div class="legmenu">
+        <label class="chk"><input type="checkbox" data-fast="${i-1}" ${lg.fast?"checked":""}> Get me there fast</label>
+        ${info&&info.n>1&&!lg.track?`<label class="chk">Way <select data-alt="${i-1}">${Array.from({length:info.n},(_,k)=>`<option value="${k}" ${(lg.alt||0)===k?"selected":""}>Way ${k+1}${info.alts?" · "+Math.round(info.alts[k])+" km":""}</option>`).join("")}</select></label>`:`<span class="note">${lg.track?"":"No other ways found for this leg."}</span>`}
+        ${lg.track?`<span class="note">Own track: ${esc(lg.trackName||"GPX")}</span><button class="btn small ghost" type="button" data-untrack="${i-1}">Remove track</button>`
+          :`<label class="btn small ghost" style="cursor:pointer;align-self:flex-start">Use my GPX for this leg<input type="file" accept=".gpx,application/gpx+xml" data-track="${i-1}" hidden></label>`}
+      </div></details>`:""}
+    </div>
+    ${lf&&lf.level?`<div class="fwarn ${lf.level}">${ICON.fuel}<span>You won't make ${esc(st.name)} on ${lf.level==="warn"?"your reserve":"one tank"}: ${esc(lf.text)}</span></div>`:""}`;
     box.appendChild(row);
     wireSearch(row.querySelector("input"),row.querySelector(".sugg"),i);
     if(isSleep(st,i,n)) header();
-    if(!last){
-      const lg=st.leg||{}, info=legInfo.get(st);
-      const leg=document.createElement("div"); leg.className="leg";
-      const lf=legFuel.get(st);
-      const PUMP=`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 3h9a1 1 0 0 1 1 1v8h1.5A2.5 2.5 0 0 1 18 14.5V18a1 1 0 0 0 2 0V9.4l-2.7-2.7 1.4-1.4 3 3c.2.2.3.5.3.7V18a3 3 0 0 1-6 0v-3.5a.5.5 0 0 0-.5-.5H14v7h1v2H2v-2h1V4a1 1 0 0 1 1-1zm1 2v5h7V5H5z"/></svg>`;
-      const fuelHtml=lf&&lf.level?`<span class="flight ${lf.level}" title="Fuel warning">${PUMP}${esc(lf.text)}</span><button class="linkbtn" type="button" data-findfuel="${i}">Find fuel nearby</button>`:"";
-      const lp=legPoiCount(i);
-      leg.innerHTML=`<span class="mono legkm" data-focusleg="${i}" title="Show this leg on the map">${info?Math.round(info.km)+" km · "+fmtDur(info.min):"…"}</span>${fuelHtml}${lp?`<button class="badge legb" type="button" data-legpois="${i}">On this leg · ${lp}</button>`:""}
-        <label class="chk"><input type="checkbox" data-fast="${i}" ${lg.fast?"checked":""}> Get me there fast</label>
-        ${info&&info.n>1&&!lg.track?`<select data-alt="${i}" aria-label="Way">${Array.from({length:info.n},(_,k)=>`<option value="${k}" ${(lg.alt||0)===k?"selected":""}>Way ${k+1}${info.alts?" · "+Math.round(info.alts[k])+" km":""}</option>`).join("")}</select>`:""}
-        ${lg.track?`<span class="note">Own track: ${esc(lg.trackName||"GPX")}</span><button class="btn small ghost" type="button" data-untrack="${i}">Remove track</button>`
-          :`<label class="btn small ghost" style="cursor:pointer">Use my GPX<input type="file" accept=".gpx,application/gpx+xml" data-track="${i}" hidden></label>`}`;
-      box.appendChild(leg);
-    }
   });
 }
 $("stops").addEventListener("click",e=>{
   const up=e.target.closest("[data-up]"),del=e.target.closest("[data-del]"),un=e.target.closest("[data-untrack]");
-  const fl=e.target.closest("[data-focusleg]"),fd=e.target.closest("[data-focusday]");
-  const sb=e.target.closest("[data-stay]"),ff=e.target.closest("[data-findfuel]"),lpb=e.target.closest("[data-legpois]");
-  if(sb){hidePeek();openStay(+sb.dataset.stay);return;}
-  if(ff){openFuel(+ff.dataset.findfuel);return;}
-  if(lpb){openLegPois(+lpb.dataset.legpois);return;}
+  const fl=e.target.closest("[data-focusleg]"),fd=e.target.closest("[data-focusday]"),pn=e.target.closest("[data-panel]");
+  if(pn){hidePeek();const [i,tab]=pn.dataset.panel.split(":");openPanel(+i,tab);return;}
   if(fl&&plan){const i=+fl.dataset.focusleg,sk=stopKms(),a=sk.get(trip.stops[i]),b=sk.get(trip.stops[i+1]); if(a!=null&&b!=null) setFocus(a,b,`${trip.stops[i].name} → ${trip.stops[i+1].name}`);}
   if(fd&&plan){const di=+fd.dataset.focusday,s0=plan.dayStart[di].km,s1=di<plan.ds.length-1?plan.dayStart[di+1].km:plan.total; setFocus(s0,s1,`Day ${di+1}`);}
   if(up){const i=+up.dataset.up; if(i>1){[trip.stops[i-1],trip.stops[i]]=[trip.stops[i],trip.stops[i-1]];changed();}}
@@ -528,10 +555,10 @@ async function loadLocal(my){
   const corridor=Math.max(1,+settings.corridor); let all=[];
   for(const k of ["view","pass","sight","food","camp"]){ const rows=await localKind(k,ccs); if(rows) all.push(...nearRoute(rows,k,corridor)); }
   pois=all.filter(p=>p.off<=corridor+0.5);
-  const nights=plan.ds.slice(0,-1).map(d=>d[d.length-1]);
+  const nights=trip.stops.filter(x=>x.lat!=null&&!(trip.round&&x===trip.stops[trip.stops.length-1]));
   if(nights.length){
     const sl=[...(await localKind("sleep",ccs)||[]),...(await localKind("camp",ccs)||[]).map(r=>[r[0],r[1],r[2],"camp_site",r[4],r[5],r[6]])];
-    stays=nights.map((nt,i)=>({night:nt,day:i+1,places:sl.map((r,j)=>({id:"s"+j,lat:r[0],lon:r[1],name:r[2],kind:"sleep",tags:{tourism:r[3],phone:r[4],website:r[5],email:r[6]}})).filter(p=>hav(p,nt)<=15).map(p=>Object.assign(p,{dist:hav(p,nt)},locate(p,plan.geom,plan.cum))).sort((a,b)=>a.dist-b.dist).slice(0,12)}));
+    stays=nights.map((nt,i)=>({night:nt,day:i+1,places:sl.map((r,j)=>({id:"s"+j,lat:r[0],lon:r[1],name:r[2],kind:"sleep",tags:{tourism:r[3],phone:r[4],website:r[5],email:r[6]}})).filter(p=>hav(p,nt)<=15).map(p=>Object.assign(p,{dist:hav(p,nt)},locate(p,plan.geom,plan.cum))).sort((a,b)=>a.dist-b.dist).slice(0,25)}));
   } else stays=[];
   return true;
 }
@@ -672,6 +699,7 @@ function render(){
   }
   $("dataDate").textContent=placesOk&&dataDate?`Fuel stations as of ${dataDate}. `:"";
   if(!document.activeElement||!document.activeElement.closest("#stops")) renderStops();
+  if(panel) renderPanel();
   drawMap(fp);
 }
 
@@ -697,62 +725,95 @@ function addPoi(id){
   trip.stops.splice(idx,0,{name:p.name,lat:p.lat,lon:p.lon,type:p.kind==="food"?"lunch":"sight"});
   $("status").textContent=`Added ${p.name}.`; changed();
 }
-/* ---------- lists in a dialog ---------- */
+/* ---------- stop panel: fuel, stay, food, sights for the way in and the town ---------- */
 function stayFor(st){ return stays.find(x=>x.night===st); }
-function legRange(i){ const sk=plan?stopKms():null; if(!sk) return null; const a=sk.get(trip.stops[i]),b=sk.get(trip.stops[i+1]); return a==null||b==null?null:[a,b]; }
-function legPoiCount(i){ const r=legRange(i); if(!r) return 0; return pois.filter(p=>ui.types[p.kind]&&p.km>=r[0]-0.5&&p.km<=r[1]+0.5).length; }
-function openDlg(title,sub,html){ $("dlgTitle").textContent=title; $("dlgSub").textContent=sub||""; $("dlgBody").innerHTML=html; if(!$("listDlg").open) $("listDlg").showModal(); }
-$("dlgClose").addEventListener("click",()=>$("listDlg").close());
-$("listDlg").addEventListener("click",e=>{ if(e.target===$("listDlg")) $("listDlg").close(); });
+let panel=null; // {i,tab}
+function scope(i){
+  if(!plan) return null; const sk=stopKms(), st=trip.stops[i], b=sk.get(st); if(b==null) return null;
+  const a=i>0?sk.get(trip.stops[i-1]):b; return {a,b,st};
+}
+function nearTown(p,st,km){ return hav(p,st)<=km; }
+function panelItems(i,tab){
+  const sc=scope(i); if(!sc) return [];
+  const {a,b,st}=sc, inLeg=p=>p.km!=null&&p.km>=a-0.5&&p.km<=b+0.5;
+  if(tab==="fuel") return fuelAll.filter(f=>inLeg(f)||nearTown(f,st,5)).filter((f,k,arr)=>arr.findIndex(x=>x.id===f.id)===k).sort((x,y)=>x.km-y.km);
+  if(tab==="stay") return (stayFor(st)?.places||[]);
+  if(tab==="food") return pois.filter(p=>p.kind==="food"&&(inLeg(p)||nearTown(p,st,5))).sort((x,y)=>x.km-y.km);
+  return pois.filter(p=>p.kind!=="food"&&ui.types[p.kind]&&(inLeg(p)||nearTown(p,st,5))).sort((x,y)=>x.km-y.km);
+}
+function counts(i){ if(!plan||!placesOk) return null; return {fuel:panelItems(i,"fuel").length,stay:panelItems(i,"stay").length,food:panelItems(i,"food").length,sight:panelItems(i,"sight").length}; }
 function contactHtml(t,place,town){
   const phone=t.phone||t["contact:phone"],web=t.website||t["contact:website"],mail=t.email||t["contact:email"];
   return `${phone?`<a href="tel:${esc(String(phone).replace(/\s/g,""))}" class="mono">${esc(phone)}</a>`:""}${mail?`<a href="mailto:${esc(mail)}">${esc(mail)}</a>`:""}
     <span class="note">${web?`<a href="${esc(web)}" target="_blank" rel="noopener">Website</a> · `:""}<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place+" "+town)}" target="_blank" rel="noopener">Reviews</a></span>`;
 }
-function openStay(i){
-  const st=trip.stops[i], sf=stayFor(st); if(!sf) return;
-  openDlg(`Places to stay near ${st.name}`,`${sf.places.length} within 15 km, from OpenStreetMap. Prices aren't listed, so phone or check the website.`,
-    sf.places.length?sf.places.map((p,k)=>`<div class="item"><div class="meta"><b>${esc(p.name)}</b><span class="note">${esc((p.tags.tourism||"").replace("_"," "))} · ${p.dist.toFixed(1)} km away</span>${contactHtml(p.tags,p.name,st.name)}</div><button class="btn small" type="button" data-choose="${i}:${k}">Stay here</button></div>`).join(""):`<div class="note">Nothing listed within 15 km.</div>`);
-  if(map){ ui.sleep=true; renderTypes(); drawMap(fuelPlan()); map.setView([st.lat,st.lon],12); }
+function openPanel(i,tab){ panel={i,tab}; renderPanel(); $("panel").hidden=false; drawMap(fuelPlan()); if(window.innerWidth<=900) $("map").scrollIntoView({behavior:"smooth",block:"start"}); }
+function closePanel(){ panel=null; $("panel").hidden=true; window._refit=true; if(plan) drawMap(fuelPlan()); }
+function renderPanel(){
+  if(!panel) return; const {i,tab}=panel, st=trip.stops[i], first=i===0, last=i===trip.stops.length-1;
+  const items=panelItems(i,tab), lf=i>0?legFuel.get(trip.stops[i-1]):null;
+  $("pTitle").textContent=st.name; $("pSub").textContent=first?"In and around town":`On the way in from ${trip.stops[i-1].name}, and in town`;
+  $("pTabs").innerHTML=Object.entries(TABS).filter(([k])=>k!=="food"||ui.types.food).map(([k,v])=>`<button type="button" class="tab ${k===tab?"on":""}" data-tab="${k}">${ICON[k]}${v} <span class="note">${panelItems(i,k).length}</span></button>`).join("");
+  let html="";
+  if(tab==="fuel"&&lf&&lf.level) html+=`<div class="fwarn ${lf.level}">${ICON.fuel}<span>${esc(lf.text)}</span></div>`;
+  if(tab==="stay") html+=`<div class="note">Within 15 km of ${esc(st.name)}, from OpenStreetMap. Prices aren't listed, so phone or check the website.</div>`;
+  html+=items.length?items.map(p=>{
+    const where=tab==="stay"?`${esc((p.tags.tourism||"").replace("_"," "))} · ${p.dist.toFixed(1)} km from town`:p.km!=null?`km ${Math.round(p.km)} · ${p.off<0.3?"on the route":p.off.toFixed(1)+" km off"}`:"";
+    const kindTxt=tab==="sight"?(TYPES.find(t=>t.id===p.kind)?.n||"")+" · ":"";
+    const act=tab==="fuel"?`<button class="btn small" type="button" data-pfuel="${p.id}">Fuel stop here</button>`
+      :tab==="stay"?(first||last?"":`<button class="btn small" type="button" data-pstay="${p.id}">Stay here</button>`)
+      :`<button class="btn small" type="button" data-padd="${p.id}">Add to route</button>`;
+    return `<div class="item"><div class="meta"><b>${esc(p.name&&p.name!=="Fuel"?p.name:tab==="fuel"?"Fuel station":p.name)}</b><span class="note">${kindTxt}${where}</span>${p.note?`<span class="note">${esc(p.note)}</span>`:""}${tab==="stay"||tab==="food"?contactHtml(p.tags||{},p.name,st.name):""}</div>${act}</div>`;
+  }).join(""):`<div class="note">${tab==="fuel"?"No stations known here. Carry extra fuel, or if you know a town has fuel, set it as a Fuel stop.":"Nothing listed here."}</div>`;
+  $("pBody").innerHTML=html;
 }
-function openFuel(i){
-  const r=legRange(i); if(!r) return;
-  setFocus(r[0],r[1],`${trip.stops[i].name} → ${trip.stops[i+1].name}`);
-  const list=fuelAll.filter(f=>f.km>=r[0]-15&&f.km<=r[1]+5).sort((a,b)=>a.km-b.km);
-  openDlg("Fuel near this leg",`${trip.stops[i].name} → ${trip.stops[i+1].name}. Stations up to 10 km off the route.`,
-    list.length?list.map(f=>`<div class="item"><div class="meta"><b>${esc(f.name&&f.name!=="Fuel"?f.name:"Fuel station")}</b><span class="note">km ${Math.round(f.km)} · ${f.off<0.3?"on the route":f.off.toFixed(1)+" km off"}</span>${f.note?`<span class="note">${esc(f.note)}</span>`:""}</div><button class="btn small" type="button" data-addfuelstop="${f.id}">Add as fuel stop</button></div>`).join(""):`<div class="note">No stations known near this leg. Carry extra fuel, or mark one you know by adding the town as a Fuel stop.</div>`);
-}
-function openLegPois(i){
-  const r=legRange(i); if(!r) return;
-  setFocus(r[0],r[1],`${trip.stops[i].name} → ${trip.stops[i+1].name}`);
-  const list=pois.filter(p=>ui.types[p.kind]&&p.km>=r[0]-0.5&&p.km<=r[1]+0.5).sort((a,b)=>a.km-b.km);
-  openDlg("On this leg",`${trip.stops[i].name} → ${trip.stops[i+1].name}`,list.map(p=>{const t=TYPES.find(x=>x.id===p.kind);return `<div class="item"><div class="meta"><span><span class="dot" style="background:${t.c}"></span> <b>${esc(p.name)}</b></span><span class="note">${t.n} · km ${Math.round(p.km)} · ${p.off<0.3?"on the route":p.off.toFixed(1)+" km off"}</span></div><button class="btn small" type="button" data-add="${p.id}">Add to route</button></div>`;}).join(""));
-}
-$("dlgBody").addEventListener("click",e=>{
-  const ch=e.target.closest("[data-choose]"),af=e.target.closest("[data-addfuelstop]"),ad=e.target.closest("[data-add]");
-  if(ch){const [i,k]=ch.dataset.choose.split(":").map(Number),st=trip.stops[i],p=stayFor(st).places[k];
-    Object.assign(st,{name:p.name,lat:p.lat,lon:p.lon,type:"sleep"}); $("listDlg").close(); $("status").textContent=`Night stop set to ${p.name}.`; changed();}
-  if(af){const f=fuelAll.find(x=>x.id===af.dataset.addfuelstop); if(!f) return; const sk=stopKms(); let idx=trip.stops.length-1;
-    for(let i=1;i<trip.stops.length;i++){const k=sk.get(trip.stops[i]); if(k!=null&&k>f.km){idx=i;break;}}
-    trip.stops.splice(idx,0,{name:f.name&&f.name!=="Fuel"?f.name:"Fuel stop",lat:f.lat,lon:f.lon,type:"fuel"}); $("listDlg").close(); $("status").textContent="Fuel stop added."; changed();}
-  if(ad){$("listDlg").close(); addPoi(ad.dataset.add);}
+$("pTabs").addEventListener("click",e=>{const t=e.target.closest("[data-tab]"); if(t&&panel){panel.tab=t.dataset.tab; renderPanel(); drawMap(fuelPlan());}});
+$("pClose").addEventListener("click",closePanel);
+document.addEventListener("keydown",e=>{ if(e.key==="Escape"&&panel) closePanel(); });
+function insertBefore(i,stop){ trip.stops.splice(Math.max(1,i),0,stop); }
+$("pBody").addEventListener("click",e=>{
+  if(!panel) return; const i=panel.i;
+  const f=e.target.closest("[data-pfuel]"),sy=e.target.closest("[data-pstay]"),ad=e.target.closest("[data-padd]");
+  if(f){const x=fuelAll.find(q=>q.id===f.dataset.pfuel); if(!x) return; const nm=x.name&&x.name!=="Fuel"?x.name:"Fuel stop";
+    if(i===0) trip.stops.splice(1,0,{name:nm,lat:x.lat,lon:x.lon,type:"fuel"}); else insertBefore(i,{name:nm,lat:x.lat,lon:x.lon,type:"fuel"});
+    closePanel(); $("status").textContent=`Fuel stop added: ${nm}.`; changed();}
+  if(sy){const st=trip.stops[i],p=(stayFor(st)?.places||[]).find(q=>q.id===sy.dataset.pstay); if(!p) return;
+    Object.assign(st,{name:p.name,lat:p.lat,lon:p.lon,type:"sleep"}); closePanel(); $("status").textContent=`Night stop set to ${p.name}.`; changed();}
+  if(ad){const p=pois.find(q=>q.id===ad.dataset.padd); if(!p) return; const stop={name:p.name,lat:p.lat,lon:p.lon,type:p.kind==="food"?"lunch":"sight"};
+    if(i===0) trip.stops.splice(1,0,stop); else insertBefore(i,stop); closePanel(); $("status").textContent=`Added ${p.name}.`; changed();}
 });
 /* hover preview of places to stay (mouse only) */
 const canHover=window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 function hidePeek(){ $("peek").hidden=true; }
 $("stops").addEventListener("mouseover",e=>{
-  if(!canHover) return; const b=e.target.closest("[data-stay]"); if(!b) return;
-  const st=trip.stops[+b.dataset.stay], sf=stayFor(st); if(!sf) return;
+  if(!canHover) return; const b=e.target.closest('[data-panel$=":stay"]'); if(!b) return;
+  const st=trip.stops[+b.dataset.panel.split(":")[0]], sf=stayFor(st); if(!sf||!sf.places.length) return;
   const r=b.getBoundingClientRect(), pk=$("peek");
-  pk.innerHTML=`<b>Places to stay near ${esc(st.name)}</b>`+sf.places.slice(0,6).map(p=>`<div><b>${esc(p.name)}</b><br><span class="note">${esc((p.tags.tourism||"").replace("_"," "))} · ${p.dist.toFixed(1)} km${p.tags.phone?" · "+esc(p.tags.phone):""}</span></div>`).join("")+(sf.places.length>6?`<span class="note">Click for all ${sf.places.length}</span>`:`<span class="note">Click to choose</span>`);
+  pk.innerHTML=`<b>Places to stay near ${esc(st.name)}</b>`+sf.places.slice(0,6).map(p=>`<div><b>${esc(p.name)}</b><br><span class="note">${esc((p.tags.tourism||"").replace("_"," "))} · ${p.dist.toFixed(1)} km${p.tags.phone?" · "+esc(p.tags.phone):""}</span></div>`).join("")+`<span class="note">Click for all ${sf.places.length}</span>`;
   pk.hidden=false; pk.style.left=Math.min(r.left,innerWidth-300)+"px"; pk.style.top=(r.bottom+6)+"px";
 });
-$("stops").addEventListener("mouseout",e=>{ if(e.target.closest("[data-stay]")) hidePeek(); });
+$("stops").addEventListener("mouseout",e=>{ if(e.target.closest('[data-panel$=":stay"]')) hidePeek(); });
 
 /* ---------- map ---------- */
+function drawPanelMap(){
+  if(!map){map=L.map("map",{scrollWheelZoom:false});L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:17,attribution:"© OpenStreetMap contributors"}).addTo(map);}
+  if(layer) layer.remove(); layer=L.layerGroup().addTo(map);
+  const {i,tab}=panel, sc=scope(i); if(!sc) return;
+  plan.rs.forEach(r=>L.polyline(r.geom.map(g=>[g.lat,g.lon]),{color:"#5C6660",weight:3,opacity:.35}).addTo(layer));
+  const seg=i>0?plan.geom.filter((g,k)=>plan.cum[k]>=sc.a&&plan.cum[k]<=sc.b):[];
+  if(seg.length>1) L.polyline(seg.map(g=>[g.lat,g.lon]),{color:"#B26A00",weight:7,opacity:.95}).addTo(layer);
+  const dot=(c,sz,sq)=>L.divIcon({className:"",html:`<div style="width:${sz}px;height:${sz}px;background:${c};border:2px solid #18201C;border-radius:${sq?"2px":"50%"}"></div>`,iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]});
+  const st=trip.stops[i]; L.marker([st.lat,st.lon],{icon:dot("#18201C",16)}).bindTooltip(st.name).addTo(layer);
+  if(i>0){const pv=trip.stops[i-1]; L.marker([pv.lat,pv.lon],{icon:dot("#18201C",12)}).bindTooltip(pv.name).addTo(layer);}
+  const items=panelItems(i,tab), col={fuel:"#0B6E4F",stay:"#2F5BA8",food:"#B3261E",sight:"#9A6A33"}[tab];
+  items.forEach(p=>L.marker([p.lat,p.lon],{icon:dot(tab==="sight"?(TYPES.find(t=>t.id===p.kind)?.c||col):col,11,tab==="fuel")}).bindTooltip(p.name||"Fuel").addTo(layer));
+  const pts=[...seg,...items,st].map(p=>[p.lat,p.lon]);
+  if(tab==="stay"||i===0) map.setView([st.lat,st.lon],12); else if(pts.length>1) map.fitBounds(L.latLngBounds(pts),{padding:[30,30]});
+}
 let map,layer;
 function drawMap(fp){
   if(!window.L) return;
+  if(panel) return drawPanelMap();
   if(!map){map=L.map("map",{scrollWheelZoom:false});L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:17,attribution:"© OpenStreetMap contributors"}).addTo(map);}
   const first=!layer; if(layer) layer.remove(); layer=L.layerGroup().addTo(map);
   const cols=["#0B6E4F","#2F5BA8","#9A6A33","#6B4E9B","#B3261E"];
@@ -761,7 +822,7 @@ function drawMap(fp){
   if(focus){ seg=plan.geom.filter((g,i)=>plan.cum[i]>=focus.from&&plan.cum[i]<=focus.to); if(seg.length>1) L.polyline(seg.map(g=>[g.lat,g.lon]),{color:"#B26A00",weight:7,opacity:.95}).addTo(layer); }
   const dot=(c,sz,sq)=>L.divIcon({className:"",html:`<div style="width:${sz}px;height:${sz}px;background:${c};border:2px solid #18201C;border-radius:${sq?"2px":"50%"}"></div>`,iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]});
   trip.stops.forEach((s,i)=>{ if(s.lat==null) return; const m=L.marker([s.lat,s.lon],{icon:dot(s.type==="sleep"?"#2F5BA8":s.type==="fuel"?"#0B6E4F":"#18201C",14,s.type==="fuel")}).bindTooltip(s.name+(isSleep(s,i,trip.stops.length)&&stayFor(s)?` · ${stayFor(s).places.length} places to stay`:"")).addTo(layer);
-    if(isSleep(s,i,trip.stops.length)) m.on("click",()=>openStay(i)); });
+    m.on("click",()=>openPanel(i,isSleep(s,i,trip.stops.length)?"stay":"fuel")); });
   if(settings.fuelMode==="suggest"&&ui.fuelSugg&&!focus) fp.fills.filter(f=>!f.mine&&inFocus(f)).forEach(f=>L.marker([f.lat,f.lon],{icon:dot("#0B6E4F",12,true)}).bindTooltip("Suggested fuel: "+f.name).addTo(layer));
   if(ui.fuelAll||focus) (focus?fuelAll:fuelStations).filter(s=>inFocus(s)&&!(!focus&&ui.fuelSugg&&fp.fills.some(f=>f.id===s.id))).forEach(f=>L.marker([f.lat,f.lon],{icon:dot("#ffffff",9,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
   if(ui.sleep) stays.forEach(st=>st.places.forEach(p=>{ if(focus&&!(st.night&&p.km!=null&&inFocus(p))) return;
