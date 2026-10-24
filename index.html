@@ -55,6 +55,10 @@ input[type=text],input[type=number],input[type=time],input[type=date],select{bac
 .sugg{position:absolute;z-index:1000;left:0;right:0;top:100%;background:var(--panel);border:1px solid var(--line);border-radius:4px;box-shadow:0 6px 20px rgba(0,0,0,.15);max-height:260px;overflow:auto}
 .sugg button{display:block;width:100%;text-align:left;border:0;background:none;padding:8px 10px;cursor:pointer;border-bottom:1px solid var(--line)}
 .sugg button:hover,.sugg button:focus{background:var(--chip)}
+.dayhdr{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;border-top:2px solid var(--ink);padding-top:6px;margin-top:4px;font-family:var(--f-display);font-weight:700;font-size:1.05rem}
+.leg{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;margin-left:30px;padding:4px 0 4px 10px;border-left:2px dashed var(--line);font-size:.8rem}
+.leg select{width:auto;padding:3px 6px;font-size:.8rem}
+.stype{margin-top:4px;padding:4px 6px!important;font-size:.82rem}
 .chk{display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--muted)}
 .chk input{accent-color:var(--back)}
 .days{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
@@ -108,7 +112,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
   <div class="verdict v-ok" id="styleBanner" style="font-weight:500"></div>
   <div class="grid">
     <aside class="panel" aria-label="Trip">
-      <div style="display:flex;justify-content:space-between;align-items:baseline"><h2>Trip</h2><span class="note">Tick a stop to sleep there</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><h2>Trip</h2><span class="note">Set a stop to "Sleep here" to end a day</span></div>
       <div class="field"><label class="lbl" for="tripDate">First day</label><input id="tripDate" type="date"></div>
       <div class="stops" id="stops"></div>
       <div class="btns">
@@ -167,6 +171,10 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
       <div class="field"><label class="lbl" for="pace">Slower than normal by (%)</label><input id="pace" type="number" min="0" max="100" step="5" value="0"></div>
     </div>
     <div class="field"><label class="lbl" for="style">Route style</label><select id="style"><option value="rough">Road less travelled: back roads and gravel first</option><option value="mixed">Mixed: gravel when it saves time</option><option value="tar">Tar: main roads and highways</option></select><span class="note">Road less travelled is often the shortest and toughest way. Check your bike, tyres and skills match it.</span></div>
+    <div class="row2">
+      <div class="field"><label class="lbl" for="fuelMode">Fuel</label><select id="fuelMode"><option value="suggest">Suggest fuel stops and warn</option><option value="warn">Warn only</option><option value="off">Off</option></select></div>
+      <div class="field"><label class="lbl" for="maxHours">Longest riding day (hours)</label><input id="maxHours" type="number" min="2" max="16" step="0.5" value="8"></div>
+    </div>
     <div class="field"><label class="lbl" for="corridor">Show places up to (km) off the route</label><input id="corridor" type="number" min="1" max="20" step="1" value="5"></div>
     <div class="btns" style="justify-content:flex-end"><button class="btn" value="ok">Done</button></div>
   </form>
@@ -195,57 +203,102 @@ const fmtDur=m=>{m=Math.round(m);return Math.floor(m/60)+"h"+String(m%60).padSta
 const toMin=t=>{const [h,m]=(t||"0:0").split(":").map(Number);return h*60+m;};
 
 /* ---------- state ---------- */
+const STOP_TYPES={pass:{n:"Pass through",min:0},fuel:{n:"Fuel stop",min:10},lunch:{n:"Lunch stop",min:45},sight:{n:"Sight",min:30},sleep:{n:"Sleep here",min:0}};
 const DEFAULT_TRIP={stops:[
   {name:"Malmesbury",lat:-33.461,lon:18.727},
-  {name:"Ceres",lat:-33.369052,lon:19.310031},
-  {name:"Cederberg Oasis",lat:-32.550504,lon:19.360797,night:true},
-  {name:"Citrusdal",lat:-32.589,lon:19.015},
+  {name:"Ceres",lat:-33.369052,lon:19.310031,type:"fuel"},
+  {name:"Cederberg Oasis",lat:-32.550504,lon:19.360797,type:"sleep"},
+  {name:"Citrusdal",lat:-32.589,lon:19.015,type:"fuel"},
   {name:"Malmesbury",lat:-33.461,lon:18.727}],round:true};
 const trip=store.get("rr2-trip")||DEFAULT_TRIP;
-const SET_FIELDS=["range","reserve","leave","pace","corridor","style"];
-const settings=Object.assign({range:200,reserve:30,leave:"08:00",pace:0,corridor:5,style:"rough"},store.get("rr2-settings")||{});
+trip.stops.forEach(st=>{ if(st.night){st.type="sleep";delete st.night;} if(!st.type) st.type="pass"; });
+const SET_FIELDS=["range","reserve","leave","pace","corridor","style","fuelMode","maxHours"];
+const settings=Object.assign({range:200,reserve:30,leave:"08:00",pace:0,corridor:5,style:"rough",fuelMode:"suggest",maxHours:8},store.get("rr2-settings")||{});
 const ui=Object.assign({types:Object.fromEntries(TYPES.map(t=>[t.id,t.on])),max:"10"},store.get("rr2-ui")||{});
 const tomorrow=new Date(Date.now()+86400000).toISOString().slice(0,10);
 $("tripDate").value=trip.date||tomorrow;
 let plan=null, pois=[], fuelStations=[], stays=[], placesOk=false;
+const legInfo=new Map(); // stop object -> {km,min,n}
 
 function saveTrip(){trip.date=$("tripDate").value;store.set("rr2-trip",trip);}
+const isSleep=(st,i,n)=>i>0&&i<n-1&&st.type==="sleep";
+function dayDate(di){const b=new Date(($("tripDate").value||tomorrow)+"T12:00:00");return new Date(b.getTime()+di*86400000);}
+const fmtDate=d=>d.toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"});
 
 /* ---------- stops UI ---------- */
 function renderStops(){
   const box=$("stops"); box.innerHTML="";
-  const n=trip.stops.length;
-  trip.stops.forEach((s,i)=>{
-    const last=i===n-1, first=i===0, mirrored=last&&trip.round;
+  const n=trip.stops.length; let day=0;
+  trip.stops.forEach((st,i)=>{
+    const last=i===n-1, first=i===0;
+    if(first||isSleep(trip.stops[i-1],i-1,n)){
+      let j=i+1; while(j<n-1&&trip.stops[j].type!=="sleep") j++;
+      const end=trip.stops[Math.min(j,n-1)];
+      const h=document.createElement("div"); h.className="dayhdr";
+      h.innerHTML=`<span>Day ${day+1} · ${esc(fmtDate(dayDate(day)))}</span><span class="note">${esc(st.name||"Start")} → ${esc(end.name||"…")}</span>`;
+      box.appendChild(h); day++;
+    }
     const row=document.createElement("div"); row.className="stop";
     const label=first?"Start":last?"Finish":"Stop";
-    row.innerHTML=`<div class="pin ${s.night?"night":""}">${first?"S":last?"F":i}</div>
+    const locked=last&&trip.round;
+    row.innerHTML=`<div class="pin ${st.type==="sleep"&&!last?"night":""}">${first?"S":last?"F":i}</div>
       <div class="ac">
-        <input type="text" id="stop-${i}" value="${esc(s.name)}" placeholder="${label}: town or place" autocomplete="off" ${mirrored?"disabled":""} aria-label="${label}">
+        <input type="text" id="stop-${i}" value="${esc(st.name)}" placeholder="${label}: town or place" autocomplete="off" aria-label="${label}">
         <div class="sugg" hidden></div>
-        ${!first&&!last?`<label class="chk" style="margin-top:4px"><input type="checkbox" ${s.night?"checked":""} data-night="${i}"> Sleep here</label>`:""}
+        ${locked?`<div class="note" style="margin-top:3px">Same as start. Type here to finish somewhere else.</div>`:""}
+        ${!first&&!last?`<select class="stype" data-stype="${i}" aria-label="Stop type">${Object.entries(STOP_TYPES).map(([k,v])=>`<option value="${k}" ${st.type===k?"selected":""}>${v.n}</option>`).join("")}</select>`:""}
       </div>
       <div class="tools">
         ${!first&&!last?`<button class="icon" type="button" title="Move up" data-up="${i}">↑</button><button class="icon" type="button" title="Remove" data-del="${i}">✕</button>`:""}
       </div>`;
     box.appendChild(row);
-    if(!mirrored) wireSearch(row.querySelector("input"),row.querySelector(".sugg"),i);
+    wireSearch(row.querySelector("input"),row.querySelector(".sugg"),i);
+    if(!last){
+      const lg=st.leg||{}, info=legInfo.get(st);
+      const leg=document.createElement("div"); leg.className="leg";
+      leg.innerHTML=`<span class="mono">${info?Math.round(info.km)+" km · "+fmtDur(info.min):"…"}</span>
+        <label class="chk"><input type="checkbox" data-fast="${i}" ${lg.fast?"checked":""}> Get me there fast</label>
+        ${info&&info.n>1&&!lg.track?`<select data-alt="${i}" aria-label="Way">${Array.from({length:info.n},(_,k)=>`<option value="${k}" ${(lg.alt||0)===k?"selected":""}>Way ${k+1}${info.alts?" · "+Math.round(info.alts[k])+" km":""}</option>`).join("")}</select>`:""}
+        ${lg.track?`<span class="note">Own track: ${esc(lg.trackName||"GPX")}</span><button class="btn small ghost" type="button" data-untrack="${i}">Remove track</button>`
+          :`<label class="btn small ghost" style="cursor:pointer">Use my GPX<input type="file" accept=".gpx,application/gpx+xml" data-track="${i}" hidden></label>`}`;
+      box.appendChild(leg);
+    }
   });
 }
 $("stops").addEventListener("click",e=>{
-  const up=e.target.closest("[data-up]"),del=e.target.closest("[data-del]");
+  const up=e.target.closest("[data-up]"),del=e.target.closest("[data-del]"),un=e.target.closest("[data-untrack]");
   if(up){const i=+up.dataset.up; if(i>1){[trip.stops[i-1],trip.stops[i]]=[trip.stops[i],trip.stops[i-1]];changed();}}
   if(del){trip.stops.splice(+del.dataset.del,1);changed();}
+  if(un){const st=trip.stops[+un.dataset.untrack]; delete st.leg.track; delete st.leg.trackName; changed();}
 });
-$("stops").addEventListener("change",e=>{const n=e.target.dataset.night; if(n!==undefined){trip.stops[+n].night=e.target.checked;changed();}});
+$("stops").addEventListener("change",async e=>{
+  const t=e.target;
+  if(t.dataset.stype!==undefined){trip.stops[+t.dataset.stype].type=t.value;changed();}
+  if(t.dataset.fast!==undefined){const st=trip.stops[+t.dataset.fast];st.leg=Object.assign({},st.leg,{fast:t.checked,alt:0});changed();}
+  if(t.dataset.alt!==undefined){const st=trip.stops[+t.dataset.alt];st.leg=Object.assign({},st.leg,{alt:+t.value});changed();}
+  if(t.dataset.track!==undefined&&t.files[0]){
+    const i=+t.dataset.track, f=t.files[0];
+    try{
+      const pts=parseGpx(await f.text()); if(pts.length<2) throw new Error();
+      const a=trip.stops[i],b=trip.stops[i+1]; let tr=pts;
+      if(a.lat!=null&&b.lat!=null&&hav(pts[0],b)+hav(pts[pts.length-1],a)<hav(pts[0],a)+hav(pts[pts.length-1],b)) tr=pts.slice().reverse();
+      a.leg=Object.assign({},a.leg,{track:simplify(tr,8).map(p=>[+p.lat.toFixed(5),+p.lon.toFixed(5)]),trackName:f.name});
+      $("status").textContent=`Using ${f.name} for this leg.`; changed();
+    }catch(err){ $("status").textContent="That file has no track or route points."; }
+  }
+});
+function parseGpx(text){
+  const doc=new DOMParser().parseFromString(text,"application/xml");
+  let nodes=[...doc.getElementsByTagName("trkpt")]; if(!nodes.length) nodes=[...doc.getElementsByTagName("rtept")];
+  return nodes.map(n=>({lat:+n.getAttribute("lat"),lon:+n.getAttribute("lon")})).filter(p=>isFinite(p.lat)&&isFinite(p.lon));
+}
 $("addStop").addEventListener("click",()=>{
-  const a=trip.stops[trip.stops.length-2],b=trip.stops[trip.stops.length-1];
-  trip.stops.splice(trip.stops.length-1,0,{name:"",lat:null,lon:null}); renderStops();
+  trip.stops.splice(trip.stops.length-1,0,{name:"",lat:null,lon:null,type:"pass"}); renderStops();
   document.getElementById("stop-"+(trip.stops.length-2)).focus();
 });
 $("roundTrip").checked=!!trip.round;
-$("roundTrip").addEventListener("change",e=>{trip.round=e.target.checked; if(trip.round) trip.stops[trip.stops.length-1]=Object.assign({},trip.stops[0]); changed();});
-$("tripDate").addEventListener("change",()=>{saveTrip(); if(plan) render();});
+$("roundTrip").addEventListener("change",e=>{trip.round=e.target.checked; if(trip.round) trip.stops[trip.stops.length-1]=Object.assign({},trip.stops[0],{type:"pass",leg:undefined}); changed();});
+$("tripDate").addEventListener("change",()=>{saveTrip(); renderStops(); if(plan) render();});
 
 /* place search: our own town list first (typo-tolerant), then the worldwide search */
 const norm=x=>String(x||"").toLowerCase().normalize("NFD").replace(/[^a-z]/g,"");
@@ -286,7 +339,8 @@ function wireSearch(input,list,i){
         list.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
           const h=hits[+b.dataset.k];
           trip.stops[i]=Object.assign({},trip.stops[i],{name:h.name,lat:h.lat,lon:h.lon});
-          if(i===0&&trip.round) trip.stops[trip.stops.length-1]=Object.assign({},trip.stops[0],{night:false});
+          if(i===trip.stops.length-1&&trip.round) trip.round=false;
+          if(i===0&&trip.round) trip.stops[trip.stops.length-1]=Object.assign({},trip.stops[0],{type:"pass",leg:undefined});
           list.hidden=true; changed();
         }));
       }catch(e){}
@@ -306,33 +360,43 @@ $("useLoc").addEventListener("click",()=>{
 
 /* ---------- planning ---------- */
 function days(){
-  const st=trip.stops.filter(s=>s.lat!=null); const out=[]; let cur=[st[0]];
-  for(let i=1;i<st.length;i++){cur.push(st[i]); if(st[i].night&&i<st.length-1){out.push(cur);cur=[st[i]];}}
+  const st=trip.stops.filter(x=>x.lat!=null); const out=[]; let cur=[st[0]];
+  for(let i=1;i<st.length;i++){cur.push(st[i]); if(st[i].type==="sleep"&&i<st.length-1){out.push(cur);cur=[st[i]];}}
   out.push(cur); return out.filter(d=>d.length>1);
 }
 const cache=new Map();
 function decode6(str){let i=0,lat=0,lon=0;const out=[];while(i<str.length){let b,sh=0,r=0;do{b=str.charCodeAt(i++)-63;r|=(b&31)<<sh;sh+=5;}while(b>=32);lat+=r&1?~(r>>1):r>>1;sh=0;r=0;do{b=str.charCodeAt(i++)-63;r|=(b&31)<<sh;sh+=5;}while(b>=32);lon+=r&1?~(r>>1):r>>1;out.push({lat:lat/1e6,lon:lon/1e6});}return out;}
-/* motorcycle routing that can use gravel and rough tracks; falls back to car routing */
-async function route(list){
-  const STYLE={rough:{use_highways:0,use_primary:0.2,use_trails:1},mixed:{use_highways:0.5,use_primary:0.5,use_trails:0.5},tar:{use_highways:1,use_primary:1,use_trails:0}};
-  const opts=STYLE[settings.style]||STYLE.rough;
-  const key=settings.style+"|"+list.map(p=>p.lon.toFixed(5)+","+p.lat.toFixed(5)).join(";");
+const STYLE={rough:{use_highways:0,use_primary:0.2,use_trails:1},mixed:{use_highways:0.5,use_primary:0.5,use_trails:0.5},tar:{use_highways:1,use_primary:1,use_trails:0}};
+const lineKm=g=>{let k=0;for(let i=1;i<g.length;i++)k+=hav(g[i-1],g[i]);return k;};
+/* one leg: own GPX track, or motorcycle routing with up to 3 ways; falls back to car routing */
+async function routeLeg(a,b,lg){
+  if(lg&&lg.track){const geom=lg.track.map(([la,lo])=>({lat:la,lon:lo}));const km=lineKm(geom);return [{km,min:km/30*60,geom}];}
+  const style=lg&&lg.fast?"tar":settings.style;
+  const key=style+"|"+[a,b].map(p=>p.lon.toFixed(5)+","+p.lat.toFixed(5)).join(";");
   if(cache.has(key)) return cache.get(key);
-  let o=null;
+  let out;
   try{
-    const body={locations:list.map(p=>({lat:p.lat,lon:p.lon,type:"break"})),costing:"motorcycle",costing_options:{motorcycle:opts},units:"kilometers",directions_type:"none"};
+    const body={locations:[a,b].map(p=>({lat:p.lat,lon:p.lon,type:"break"})),costing:"motorcycle",costing_options:{motorcycle:STYLE[style]||STYLE.rough},alternates:2,units:"kilometers",directions_type:"none"};
     const ctl=new AbortController(); setTimeout(()=>ctl.abort(),25000);
     const r=await fetch(VALHALLA+"?json="+encodeURIComponent(JSON.stringify(body)),{signal:ctl.signal});
     const j=await r.json(); if(!j.trip) throw new Error(j.error||"no route");
-    const geom=[]; j.trip.legs.forEach((l,i)=>{const g=decode6(l.shape); geom.push(...(i?g.slice(1):g));});
-    o={km:j.trip.summary.length,min:j.trip.summary.time/60,legs:j.trip.legs.map(l=>({km:l.summary.length,min:l.summary.time/60})),geom};
+    out=[j.trip,...(j.alternates||[]).map(x=>x.trip)].map(t=>({km:t.summary.length,min:t.summary.time/60,geom:decode6(t.legs[0].shape)}));
   }catch(e){
-    const k2=list.map(p=>p.lon.toFixed(5)+","+p.lat.toFixed(5)).join(";");
-    const r=await fetch(OSRM+k2+"?overview=full&geometries=geojson"); if(!r.ok) throw new Error("route");
+    const r=await fetch(OSRM+[a,b].map(p=>p.lon.toFixed(5)+","+p.lat.toFixed(5)).join(";")+"?overview=full&geometries=geojson&alternatives=2"); if(!r.ok) throw new Error("route");
     const j=await r.json(); if(j.code!=="Ok") throw new Error(j.code);
-    o={km:j.routes[0].distance/1000,min:j.routes[0].duration/60,legs:j.routes[0].legs.map(l=>({km:l.distance/1000,min:l.duration/60})),geom:j.routes[0].geometry.coordinates.map(([lo,la])=>({lat:la,lon:lo}))};
+    out=j.routes.map(x=>({km:x.distance/1000,min:x.duration/60,geom:x.geometry.coordinates.map(([lo,la])=>({lat:la,lon:lo}))}));
   }
-  cache.set(key,o); return o;
+  cache.set(key,out); return out;
+}
+async function route(list){
+  const legs=await Promise.all(list.slice(0,-1).map((a,i)=>routeLeg(a,list[i+1],a.leg)));
+  const geom=[],L=[];
+  legs.forEach((opts,i)=>{
+    const lg=list[i].leg||{}, k=Math.min(lg.alt||0,opts.length-1), o=opts[k];
+    legInfo.set(list[i],{km:o.km,min:o.min,n:opts.length,alts:opts.map(x=>x.km)});
+    L.push({km:o.km,min:o.min}); geom.push(...(i?o.geom.slice(1):o.geom));
+  });
+  return {km:L.reduce((t,x)=>t+x.km,0),min:L.reduce((t,x)=>t+x.min,0),legs:L,geom};
 }
 function simplify(pts,eps){
   if(pts.length<3) return pts;
@@ -357,6 +421,7 @@ async function recalc(){
     const geom=[],cum=[],dayStart=[]; let acc=0;
     rs.forEach((r,d)=>{dayStart.push({km:acc,idx:geom.length}); r.geom.forEach((g,i)=>{if(geom.length&&i>0)acc+=hav(geom[geom.length-1],g); else if(geom.length&&i===0){} geom.push(g);cum.push(acc);});});
     plan={ds,rs,geom,cum,dayStart,total:acc};
+    if(!document.activeElement||!document.activeElement.closest("#stops")) renderStops();
     $("status").textContent="Finding fuel and places along the way…";
     render(); setGpx(true);
     const ok=await loadPlaces(my); if(my!==seq) return;
@@ -463,17 +528,27 @@ async function loadRemote(my){
 }
 
 /* fuel: fill at the furthest station you can reach with the reserve intact */
+function stopKms(){
+  const out=new Map();
+  plan.ds.forEach((d,di)=>{let k=plan.dayStart[di].km;d.forEach((st,i)=>{if(i)k+=plan.rs[di].legs[i-1].km;out.set(st,k);});});
+  return out;
+}
 function fuelPlan(){
   const range=+settings.range,reserve=+settings.reserve,total=plan.total;
-  const st=fuelStations.filter((s,i,a)=>!a.slice(0,i).some(o=>Math.abs(o.km-s.km)<1));
-  let pos=0,tank=range; const fills=[],gaps=[];
-  let guard=0;
-  while(pos+tank-reserve<total && guard++<200){
+  const sk=stopKms();
+  const mine=trip.stops.filter(st=>st.type==="fuel"&&sk.has(st)).map(st=>({id:"me"+sk.get(st),lat:st.lat,lon:st.lon,name:st.name,km:sk.get(st),mine:true}));
+  const st=[...mine,...fuelStations].sort((a,b)=>a.km-b.km).filter((x,i,a)=>!a.slice(0,i).some(o=>Math.abs(o.km-x.km)<1));
+  let pos=0,tank=range; const fills=[],gaps=[]; let guard=0;
+  const use=s=>{tank-=s.km-pos; fills.push(Object.assign({},s,{arrive:tank})); pos=s.km; tank=range;};
+  while(pos<total && guard++<300){
+    const nextMine=mine.find(m=>m.km>pos+0.3&&m.km<=pos+tank);
+    if(pos+tank-reserve>=total&&!nextMine) break;
+    if(nextMine&&!st.some(s=>s.km>pos+0.3&&s.km<nextMine.km&&nextMine.km>pos+tank-reserve)){ use(nextMine); continue; }
     const reach=st.filter(s=>s.km>pos+0.3&&s.km<=pos+tank-reserve);
-    if(reach.length){const s=reach[reach.length-1]; tank-=s.km-pos; fills.push(Object.assign({},s,{arrive:tank})); pos=s.km; tank=range; continue;}
+    if(reach.length){ use(reach[reach.length-1]); continue; }
     const next=st.find(s=>s.km>pos+0.3);
-    if(!next||next.km>pos+tank){ gaps.push({from:pos,to:next?next.km:total,short:(next?next.km:total)-pos-tank+reserve}); if(!next) break; }
-    tank-=next.km-pos; fills.push(Object.assign({},next,{arrive:tank,tight:true})); pos=next.km; tank=range;
+    if(!next||next.km>pos+tank){ gaps.push({from:pos,to:next?next.km:total}); if(!next) break; }
+    use(Object.assign({},next,{tight:true}));
   }
   return {fills,gaps,tankAt:km=>{let p=0,t=range;for(const f of fills){if(f.km>km)break;t-=f.km-p;p=f.km;t=range;}return t-(km-p);}};
 }
@@ -500,42 +575,46 @@ function render(){
   plan.ds.forEach((d,di)=>{
     const r=plan.rs[di], s0=plan.dayStart[di].km, s1=di<plan.ds.length-1?plan.dayStart[di+1].km:plan.total;
     const dayFills=fp.fills.filter(f=>f.km>s0&&f.km<=s1);
-    const dayStops=d.slice(1,-1).length;
-    const mins=r.min*pace+dayFills.length*10+dayStops*20;
+    const fm=settings.fuelMode;
+    const stopMin=d.slice(1,-1).reduce((t,st)=>t+(STOP_TYPES[st.type]?.min||0),0);
+    const autoFills=fm==="suggest"?dayFills.filter(f=>!f.mine).length:0;
+    const mins=r.min*pace+stopMin+autoFills*10;
     const leave=toMin(settings.leave), arrive=leave+mins;
     const end=d[d.length-1], date=new Date(base.getTime()+di*86400000);
     const ss=sunset(date,end.lat,end.lon), ssMin=ss.getHours()*60+ss.getMinutes();
     let worst=Infinity; for(let k=s0;k<=s1;k+=1) worst=Math.min(worst,fp.tankAt(k)); worst=Math.min(worst,fp.tankAt(s1));
     const msgs=[];
     const gap=fp.gaps.find(g=>g.from>=s0-0.5&&g.from<s1-0.5);
-    if(!placesOk) msgs.push(["v-warn","Fuel stations not loaded yet, so fuel can't be checked."]);
+    if(fm==="off"){}
+    else if(!placesOk) msgs.push(["v-warn","Fuel stations not loaded yet, so fuel can't be checked."]);
     else if(gap) msgs.push(["v-bad",`No fuel for ${Math.round(gap.to-gap.from)} km from km ${Math.round(gap.from)}. Carry extra or add a fuel stop.`]);
     else if(worst<reserve) msgs.push(["v-warn",`Tight: down to ${Math.round(worst)} km of fuel at worst.`]);
     else msgs.push(["v-ok",`Fuel fine: never below ${Math.round(worst)} km left.`]);
-    if(placesOk&&di<plan.ds.length-1) msgs.push(["v-warn",`Arrive with about ${Math.round(fp.tankAt(s1))} km in the tank. Fill up before ${esc(end.name)} if it has no fuel.`]);
+    if(fm!=="off"&&placesOk&&di<plan.ds.length-1) msgs.push(["v-warn",`Arrive with about ${Math.round(fp.tankAt(s1))} km in the tank. Fill up before ${esc(end.name)} if it has no fuel.`]);
+    if(mins>+settings.maxHours*60) msgs.push(["v-warn",`Long day: ${fmtDur(mins)} of riding. Add a night stop.`]);
     if(ssMin-arrive<60) msgs.push([ssMin<arrive?"v-bad":"v-warn",ssMin<arrive?`Arrives after dark (${fmtT(arrive)}, sunset ${fmtT(ssMin)}). Leave earlier.`:`Arrives ${fmtT(arrive)}, under an hour before sunset (${fmtT(ssMin)}).`]);
     const dateTxt=date.toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"});
     html+=`<div class="day"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><h3>Day ${di+1}</h3><span class="note">${esc(dateTxt)}</span></div>
-      <div class="note">${esc(d[0].name)} → ${esc(end.name)}</div>
+      <div class="note"><b>${esc(d[0].name)}</b> → <b>${esc(end.name)}</b></div>
       <div class="stats">
         <div class="stat"><div class="lbl">Distance</div><div class="v">${Math.round(r.km)} km</div></div>
         <div class="stat"><div class="lbl">Riding</div><div class="v">${fmtDur(mins)}</div></div>
-        <div class="stat"><div class="lbl">Fuel stops</div><div class="v">${dayFills.length}</div></div>
+        <div class="stat"><div class="lbl">Fuel stops</div><div class="v">${fm==="off"?"–":dayFills.length}</div></div>
         <div class="stat"><div class="lbl">Leave</div><div class="v">${fmtT(leave)}</div></div>
         <div class="stat"><div class="lbl">Arrive</div><div class="v">${fmtT(arrive)}</div></div>
         <div class="stat"><div class="lbl">Sunset</div><div class="v">${fmtT(ssMin)}</div></div>
       </div>${msgs.map(([c,t])=>`<div class="verdict ${c}">${t}</div>`).join("")}</div>`;
     // roadbook rows: stops + fills in order
     const rows=[];
-    let legKm=0; d.forEach((s,i)=>{ if(i) legKm+=r.legs[i-1].km; rows.push({km:s0+legKm,n:s.name,k:i===0?"":(s.night||i===d.length-1)?"night":"stop"}); });
-    dayFills.forEach(f=>rows.push({km:f.km,n:f.name,k:"fuel",f}));
+    let legKm=0; d.forEach((s,i)=>{ if(i) legKm+=r.legs[i-1].km; if(s.type==="fuel"&&i>0&&i<d.length-1&&fm==="suggest") return; rows.push({km:s0+legKm,n:s.name,k:i===0?"":(s.type==="sleep"||i===d.length-1)?"night":"stop",t:s.type}); });
+    if(fm==="suggest") dayFills.forEach(f=>rows.push({km:f.km,n:f.name,k:"fuel",f}));
     rows.sort((a,b)=>a.km-b.km);
     rb+=`<tr class="dayhead"><td colspan="4">Day ${di+1}: ${esc(d[0].name)} → ${esc(end.name)}</td></tr>`;
     let prev=s0;
     rows.forEach((x,i)=>{
       const t=fp.tankAt(x.km), col=t<0?"var(--bad)":t<reserve?"var(--warn)":"var(--ok)";
-      const tag=x.k==="fuel"?`<span class="kind fuel">Fuel${x.f.tight?" · tight":""}</span>`:x.k==="night"?`<span class="kind night">${di===plan.ds.length-1&&i===rows.length-1?"Finish":"Sleep"}</span>`:x.k==="stop"?`<span class="kind">Stop</span>`:"";
-      rb+=`<tr><td class="n">${Math.round(x.km)}</td><td><b>${esc(x.n)}</b> ${tag}</td><td class="n">${i?Math.round(x.km-prev)+" km":""}</td><td class="n" style="color:${placesOk?col:"var(--muted)"}">${placesOk?Math.round(x.k==="fuel"?x.f.arrive:t):"–"}</td></tr>`;
+      const tag=x.k==="fuel"?`<span class="kind fuel">Fuel${x.f.tight?" · tight":""}</span>`:x.k==="night"?`<span class="kind night">${di===plan.ds.length-1&&i===rows.length-1?"Finish":"Sleep"}</span>`:x.k==="stop"?`<span class="kind">${esc(STOP_TYPES[x.t]?.n||"Stop")}</span>`:"";
+      rb+=`<tr><td class="n">${Math.round(x.km)}</td><td><b>${esc(x.n)}</b> ${tag}</td><td class="n">${i?Math.round(x.km-prev)+" km":""}</td><td class="n" style="color:${placesOk?col:"var(--muted)"}">${placesOk&&fm!=="off"?Math.round(x.k==="fuel"?x.f.arrive:t):"–"}</td></tr>`;
       prev=x.km;
     });
   });
@@ -561,12 +640,9 @@ function renderPois(){
 $("pois").addEventListener("click",e=>{const b=e.target.closest("[data-add]");if(b) addPoi(b.dataset.add);});
 function addPoi(id){
   const p=pois.find(x=>x.id===id)||stays.flatMap(s=>s.places).find(x=>x.id===id); if(!p) return;
-  // insert before the first stop that sits further along the trip
-  let acc=0,idx=trip.stops.length-1; const flat=[];
-  plan.ds.forEach((d,di)=>{let k=plan.dayStart[di].km;d.forEach((s,i)=>{if(i)k+=plan.rs[di].legs[i-1].km; if(di===0||i>0) flat.push({s,km:k});});});
-  for(let i=1;i<flat.length;i++){ if(flat[i].km>p.km){ idx=trip.stops.indexOf(flat[i].s); break; } }
-  if(idx<1) idx=trip.stops.length-1;
-  trip.stops.splice(idx,0,{name:p.name,lat:p.lat,lon:p.lon});
+  const sk=stopKms(); let idx=trip.stops.length-1;
+  for(let i=1;i<trip.stops.length;i++){ const k=sk.get(trip.stops[i]); if(k!=null&&k>p.km){ idx=i; break; } }
+  trip.stops.splice(idx,0,{name:p.name,lat:p.lat,lon:p.lon,type:p.kind==="food"?"lunch":"sight"});
   $("status").textContent=`Added ${p.name}.`; changed();
 }
 function renderStays(){
@@ -587,8 +663,8 @@ function drawMap(fp){
   const cols=["#0B6E4F","#2F5BA8","#9A6A33","#6B4E9B","#B3261E"];
   plan.rs.forEach((r,i)=>L.polyline(r.geom.map(g=>[g.lat,g.lon]),{color:cols[i%cols.length],weight:5,opacity:.85}).addTo(layer));
   const dot=(c,sz,sq)=>L.divIcon({className:"",html:`<div style="width:${sz}px;height:${sz}px;background:${c};border:2px solid #18201C;border-radius:${sq?"2px":"50%"}"></div>`,iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]});
-  trip.stops.filter(s=>s.lat!=null).forEach((s,i)=>L.marker([s.lat,s.lon],{icon:dot(s.night?"#2F5BA8":"#18201C",14)}).bindTooltip(s.name).addTo(layer));
-  fp.fills.forEach(f=>L.marker([f.lat,f.lon],{icon:dot("#0B6E4F",12,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
+  trip.stops.filter(s=>s.lat!=null).forEach((s,i)=>L.marker([s.lat,s.lon],{icon:dot(s.type==="sleep"?"#2F5BA8":"#18201C",14)}).bindTooltip(s.name).addTo(layer));
+  if(settings.fuelMode==="suggest") fp.fills.forEach(f=>L.marker([f.lat,f.lon],{icon:dot("#0B6E4F",12,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
   fuelStations.filter(s=>!fp.fills.some(f=>f.id===s.id)).forEach(f=>L.marker([f.lat,f.lon],{icon:dot("#ffffff",9,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
   shownPois().forEach(p=>{const t=TYPES.find(x=>x.id===p.kind);
     const m=L.marker([p.lat,p.lon],{icon:dot(t.c,11)}).addTo(layer);
