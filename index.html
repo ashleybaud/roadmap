@@ -182,13 +182,29 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 .maplbl::before{display:none}
 .toast{font-size:.85rem;background:var(--ink);color:var(--bg);padding:4px 10px;border-radius:5px}
 .linkbtn{background:none;border:0;color:inherit;text-decoration:underline;cursor:pointer;font:inherit;font-weight:700}
+.testtag{font-family:var(--f-mono);font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;background:var(--warn);color:var(--onfill);padding:2px 6px;border-radius:4px;vertical-align:middle}
+a.btn{text-decoration:none;display:inline-flex;align-items:center}
+.print{display:none}
+@media print{
+  body>*:not(.print){display:none!important}
+  .print{display:block!important;color:#000;background:#fff;font:10.5pt/1.4 system-ui,sans-serif}
+  .print h1{font-size:17pt;margin:0 0 2mm}
+  .print h2{font-size:12pt;margin:0 0 1.5mm}
+  .print p{margin:0 0 1.5mm}
+  .print .pmeta{color:#444}
+  .print .psketch{border:1px solid #bbb;margin:3mm 0 4mm}
+  .print .pday{break-inside:avoid;border-top:1px solid #999;padding:3mm 0}
+  .print .pwarn{margin:0 0 1.5mm;padding-left:5mm}
+  .print .pwarn .bad{color:#B3261E;font-weight:600}.print .pwarn .warn{color:#8A5200;font-weight:600}.print .pwarn .info{color:#444}
+  @page{margin:14mm}
+}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div><h1>Route and Range</h1><div class="note">Plan the ride, the fuel and the night stops.</div></div>
-    <div class="btns"><span class="lbl mono" id="hdrSummary"></span><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
+    <div><h1>Route and Range <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="note">Plan the ride, the fuel and the night stops. Trips are saved on this device only.</div></div>
+    <div class="btns"><span class="lbl mono" id="hdrSummary"></span><a class="btn ghost" id="feedback" href="#" hidden>Send feedback</a><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
   </header>
 
   <div class="banner" id="styleBanner"></div>
@@ -210,6 +226,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 
 <aside id="panel" class="sheet" hidden aria-label="Stop details"><div class="dlghead"><div><h2 id="pTitle"></h2><div class="note" id="pSub"></div></div><button class="icon" type="button" id="pClose" aria-label="Close">✕</button></div><div class="ptabs" id="pTabs"></div><div id="pBody" class="dlgbody"></div></aside>
 <div id="peek" class="peek" hidden></div>
+<div id="print" class="print"></div>
 <div hidden id="tbHold">
   <section class="tripbar" aria-label="Trip">
     <div class="field"><label class="lbl" for="startDate">Leave</label><input id="startDate" type="date"></div>
@@ -782,6 +799,60 @@ function riskHtml(r,k){
 function timePill(k,km,mins,attrs){ const long=mins>+settings.maxHours*60; return `<span class="pill dist ${long?"long":""}" ${attrs||""} title="${long?`Travel time over your ${settings.maxHours}h setting. `:""}Show on the map">${Math.round(km)} km · ${fmtDur(mins)}</span>`; }
 function wxShort(w){ if(!w) return ""; if(w.none) return `<span class="note">Forecast from ${esc(fmtDate(new Date(w.opens+"T12:00:00")))}</span>`; return `<span class="note">${esc(WXW(w.code))} ${Math.round(w.tmin)}–${Math.round(w.tmax)}°C</span>`; }
 
+
+/* ---------- printable trip summary (Save as PDF) ---------- */
+const FEEDBACK_EMAIL="";
+function routeSketch(){
+  const g=plan.geom; let s=90,w=180,n=-90,e=-180; g.forEach(p=>{s=Math.min(s,p.lat);n=Math.max(n,p.lat);w=Math.min(w,p.lon);e=Math.max(e,p.lon);});
+  const kx=Math.cos(rad((s+n)/2)), W=680, H=Math.max(220,Math.min(520,W*(n-s)/Math.max(1e-6,(e-w)*kx))), pad=40;
+  const sc=Math.min((W-2*pad)/Math.max(1e-6,(e-w)*kx),(H-2*pad)/Math.max(1e-6,n-s));
+  const X=lon=>pad+(lon-w)*kx*sc, Y=lat=>pad+(n-lat)*sc;
+  let svg=`<svg viewBox="0 0 ${W} ${H}" width="100%" style="max-height:110mm">`;
+  plan.days.forEach((d,k)=>{ if(!d) return; const pts=seg(d.a,d.b).filter((p,i,a)=>i%3===0||i===a.length-1);
+    svg+=`<polyline fill="none" stroke="${DAYCOL[k%DAYCOL.length]}" stroke-width="3" points="${pts.map(p=>X(p.lon).toFixed(1)+","+Y(p.lat).toFixed(1)).join(" ")}"/>`; });
+  const labels=[trip.start,...trip.days.slice(0,-1).map(d=>d.to),endPt()].filter((p,i,a)=>p&&p.lat!=null&&a.indexOf(p)===i);
+  labels.forEach(p=>{svg+=`<circle cx="${X(p.lon).toFixed(1)}" cy="${Y(p.lat).toFixed(1)}" r="5" fill="#fff" stroke="#18201C" stroke-width="2"/><text x="${(X(p.lon)+8).toFixed(1)}" y="${(Y(p.lat)+4).toFixed(1)}" font-size="12" font-weight="700" fill="#18201C">${esc(p.name)}</text>`;});
+  return svg+`</svg>`;
+}
+function printHtml(){
+  const tot=plan.days.reduce((t,d)=>t+(d?d.km:0),0);
+  let h=`<h1>${esc(trip.start.name)} → ${esc(trip.round?trip.start.name:endPt().name)}</h1>
+    <p class="pmeta">${esc(dayLong(0))} to ${esc(dayLong(nDays()-1))} · ${nDays()} day${nDays()>1?"s":""} · ${Math.round(tot)} km · range ${settings.range} km, reserve ${settings.reserve} km</p>
+    <div class="psketch">${routeSketch()}</div>`;
+  plan.days.forEach((d,k)=>{
+    if(!d) return;
+    const from=d.pts[0], to=d.pts[d.pts.length-1], last=k===nDays()-1, mins=dayMinutes(k), w=dayWx(k), s=sunMin(k), r=dayRisk(k), m=dayMed(k);
+    const fills=fp?fp.fills.filter(f=>f.km>d.a+0.3&&f.km<=d.b+0.3):[], gaps=fp?fp.gaps.filter(g=>g.from<d.b&&g.to>d.a):[];
+    const vias=d.pts.slice(1,-1);
+    h+=`<section class="pday"><h2>${esc(dayLong(k))}: ${esc(from.name)} → ${esc(to.name)}</h2>
+      <p><b>${Math.round(d.km)} km</b> · travel time about ${fmtDur(mins)}${trip.days[k].style==="fast"?" · Liaison (quickest way)":""} · sunset ${s!=null?fmtT(s):"?"}${w?` · ${esc(wxText(w))}`:""}</p>`;
+    if(vias.length) h+=`<p><b>Stops:</b> ${vias.map(v=>`${esc(v.name)}${v.type&&v.type!=="pass"?` (${esc(STOP_TYPES[v.type]?.n||"")})`:""}`).join(" · ")}</p>`;
+    h+=`<p><b>Fuel:</b> ${fills.length?fills.map(f=>`km ${Math.round(f.km-d.a)} ${esc(f.name&&f.name!=="Fuel"?f.name:"fuel station")}`).join(" · "):"no stop needed"}</p>`;
+    const warn=r?r.reasons:[];
+    if(warn.length||gaps.length) h+=`<ul class="pwarn">${warn.map(x=>`<li class="${x.lvl}">${esc(x.text)}</li>`).join("")}</ul>`;
+    if(!last){ const sf=stayFor(to); const pl=sf?sf.places.slice(0,3):[];
+      h+=`<p><b>Night: ${esc(to.name)}.</b> ${pl.length?"Nearby: "+pl.map(p=>`${esc(p.name)} (${esc((p.tags.tourism||"").replace("_"," "))}${p.tags.phone?", "+esc(p.tags.phone):""})`).join(" · "):"No places to stay listed nearby."}</p>`; }
+    if(m){ const hs=m.near.slice().sort((a,b)=>(a.type==="hospital"?0:1)-(b.type==="hospital"?0:1)).slice(0,4);
+      h+=`<p><b>Medical:</b> ${hs.length?hs.map(x=>`${esc(x.name||(x.type==="hospital"?"Hospital":"Clinic"))}${x.phone?" "+esc(x.phone):""}`).join(" · "):"none within 25 km of the route"}. Furthest point from a hospital: ${fmtFar(m.far)} km.</p>`; }
+    h+=`</section>`;
+  });
+  h+=`<section class="pkey"><h2>Notes</h2><p>Every day is assumed to start with a full tank where a fuel station is within 5 km of the night stop, or where "Fill up here tonight" is ticked. Fuel, places to stay and hospitals come from OpenStreetMap and can be wrong. Phone ahead on remote legs. Emergency from a mobile: 112.</p>
+    <p class="pmeta">Route and Range · routeandrange.pages.dev · printed ${esc(new Date().toLocaleDateString(undefined,{day:"numeric",month:"long",year:"numeric"}))}</p></section>`;
+  return h;
+}
+function printTrip(){
+  if(!plan){ $("status").textContent="Plan the trip first."; return; }
+  $("print").innerHTML=printHtml();
+  const title=document.title; document.title=`Trip ${trip.startDate} ${trip.start.name}`;
+  setTimeout(()=>{ window.print(); document.title=title; },50);
+}
+function feedbackLink(){
+  if(!FEEDBACK_EMAIL) return "";
+  const nights=trip.days.slice(0,-1).map(d=>d.to?d.to.name:"?").join(", ");
+  const body=`What worked:\n\nWhat didn't:\n\nPhone or computer:\n\n---\nTrip: ${trip.start?.name||"?"} → ${trip.round?"same as start":trip.end?.name||"?"}, ${trip.startDate} to ${trip.endDate}. Nights: ${nights||"none"}.`;
+  return `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent("Route and Range feedback")}&body=${encodeURIComponent(body)}`;
+}
+
 function overviewHtml(){
   let h=`<div class="tbslot"></div><div><h2>Days</h2>${nDays()===1?`<div class="note">A day ride. Set a later "Back" date to add nights.</div>`:""}</div><div>`;
   trip.days.forEach((d,k)=>{
@@ -798,7 +869,7 @@ function overviewHtml(){
   if(plan){
     const tot=plan.days.reduce((t,d)=>t+(d?d.km:0),0);
     h+=`<div class="sumrow"><div class="stat"><span class="lbl">Total</span><span class="v">${Math.round(tot)} km</span></div><div class="stat"><span class="lbl">Days</span><span class="v">${nDays()}</span></div></div>`;
-    h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px">${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">${esc(dayName(k))} GPX</button>`:"").join("")}</div></div>`;
+    h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px">${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">${esc(dayName(k))} GPX</button>`:"").join("")}<button class="btn small ghost" type="button" data-print>Save as PDF</button></div></div>`;
   }
   if(placesOk&&dataDate) h+=`<div class="note">Map data from OpenStreetMap, as of ${esc(dataDate)}. Weather from Open-Meteo. Phone ahead on remote legs.</div>`;
   return h;
@@ -863,6 +934,7 @@ $("details").addEventListener("click",e=>{
   const go=t.closest("[data-gotoday]"); if(go&&!t.closest("button,input,a")){ui.tab=+go.dataset.gotoday;saveUi();renderAll();return;}
   const pn=t.closest("[data-panel]"); if(pn){hidePeek();const [dk,j,tab]=pn.dataset.panel.split(":");openPanel(+dk,j==="last"?"last":+j,tab);return;}
   const rb=t.closest("[data-risk]"); if(rb){const k2=+rb.dataset.risk; riskOpen.has(k2)?riskOpen.delete(k2):riskOpen.add(k2); renderDetails(); return;}
+  if(t.closest("[data-print]")){printTrip();return;}
   const g=t.closest("[data-gpx]"); if(g){downloadGpx(+g.dataset.gpx);return;}
   const sty=t.closest("[data-style]"); if(sty&&k!=="ov"){trip.days[k].style=sty.dataset.style;trip.days[k].legs=(trip.days[k].legs||[]).map(x=>x&&x.track?{track:x.track,trackName:x.trackName}:{});changed();return;}
   const fl=t.closest("[data-focusleg]"); if(fl&&plan&&k!=="ov"){const L=plan.days[k].legs[+fl.dataset.focusleg-1]; focusRange(L.a,L.b); return;}
@@ -1029,5 +1101,6 @@ function renderAll(){
 }
 function changed(){ window._refit=true; focusR=null; recalc(); }
 $("keyDlg").innerHTML=$("keyDlg").innerHTML.replace("STYLE_FAST",STYLE_ICON.fast).replace("STYLE_ROUGH",STYLE_ICON.default).replaceAll("FUEL",ICON.fuel);
+{const fb=$("feedback"); const set=()=>{const l=feedbackLink(); fb.hidden=!l; if(l) fb.href=l;}; set(); fb.addEventListener("click",set);}
 renderLayers(); showStyle(); syncDays(); renderAll(); recalc();
 </script></body></html>
