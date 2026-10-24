@@ -35,7 +35,13 @@ async function query(q) {
           headers: { "Content-Type": "application/x-www-form-urlencoded", "User-Agent": "RouteAndRange-data/1.0 (+https://routeandrange.pages.dev)" },
         });
         const text = await r.text();
-        if (r.ok && text.trim().startsWith("{")) return JSON.parse(text).elements || [];
+        if (r.ok && text.trim().startsWith("{")) {
+          const j = JSON.parse(text);
+          if (j.remark && /error|timed out|out of memory/i.test(j.remark)) { console.log(`  ${url} -> ${j.remark.slice(0, 80)}`); continue; }
+          if ((j.elements || []).length) return j.elements;
+          console.log(`  ${url} -> empty answer`);
+          continue;
+        }
         console.log(`  ${url} -> ${r.status}`);
       } catch (e) {
         console.log(`  ${url} -> ${e.name}`);
