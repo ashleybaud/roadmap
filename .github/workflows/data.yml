@@ -3,6 +3,11 @@ on:
   schedule:
     - cron: "17 2 1 * *"
   workflow_dispatch:
+    inputs:
+      only:
+        description: "Only these sets, comma separated (blank = all)"
+        required: false
+        default: ""
   push:
     paths:
       - scripts/fetch-data.mjs
@@ -19,6 +24,8 @@ jobs:
         with:
           node-version: 20
       - run: node scripts/fetch-data.mjs
+        env:
+          ONLY: ${{ github.event.inputs.only || (github.event_name == 'push' && 'med,ford' || '') }}
       - name: Save data
         run: |
           git config user.name "route-and-range-bot"

@@ -3,6 +3,8 @@
 import { mkdir, writeFile } from "node:fs/promises";
 
 const COUNTRIES = { za: "ZA", na: "NA" };
+// ONLY=med,ford limits a run to those sets (others keep their previous copies)
+const ONLY = (process.env.ONLY || "").split(",").filter(Boolean);
 const SERVERS = [
   "https://overpass-api.de/api/interpreter",
   "https://overpass.kumi.systems/api/interpreter",
@@ -18,6 +20,8 @@ const KINDS = {
   food:  `nwr[amenity~"^(restaurant|cafe|pub)$"][name]`,
   camp:  `nwr[tourism=camp_site][name]`,
   sleep: `nwr[tourism~"^(hotel|guest_house|hostel|chalet|motel|apartment)$"][name]`,
+  med:   `nwr[amenity~"^(hospital|clinic)$"]`,
+  ford:  `nwr[ford=yes]`,
 };
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -63,6 +67,7 @@ function row(e, kind) {
   if (kind === "sleep" || kind === "camp" || kind === "food") {
     out.push(t.tourism || t.amenity || "", t.phone || t["contact:phone"] || "", t.website || t["contact:website"] || "", t.email || t["contact:email"] || "");
   }
+  if (kind === "med") out.push(t.amenity || "", t.phone || t["contact:phone"] || "");
   return out;
 }
 
@@ -70,6 +75,7 @@ let failed = 0;
 for (const [cc, iso] of Object.entries(COUNTRIES)) {
   await mkdir(`data/${cc}`, { recursive: true });
   for (const [kind, sel] of Object.entries(KINDS)) {
+    if (ONLY.length && !ONLY.includes(kind)) continue;
     const parts = sel.split(";").map((s) => `${s}(area.a);`).join("");
     const q = `[out:json][timeout:280];area["ISO3166-1"="${iso}"][admin_level=2]->.a;(${parts});out center tags;`;
     console.log(`${cc} ${kind}`);

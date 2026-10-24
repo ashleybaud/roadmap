@@ -48,8 +48,7 @@ input[type=text],input[type=number],input[type=time],input[type=date],select{bac
 .banner{font-size:.85rem;padding:6px 10px;border-left:4px solid var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);border-radius:4px}
 
 /* trip bar */
-.tripbar{display:grid;grid-template-columns:150px 150px minmax(0,1fr) minmax(0,1fr) auto;gap:10px;align-items:end}
-@media (max-width:1000px){.tripbar{grid-template-columns:1fr 1fr}.tripbar .wide{grid-column:1/-1}}
+.tripbar{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:end;padding-bottom:12px;border-bottom:1px solid var(--line)}.tripbar .wide{grid-column:1/-1}
 .ac{position:relative}
 .sugg{position:absolute;z-index:1600;left:0;right:0;top:100%;background:var(--panel);border:1px solid var(--line);border-radius:4px;box-shadow:0 6px 20px rgba(0,0,0,.15);max-height:260px;overflow:auto}
 .sugg button{display:block;width:100%;text-align:left;border:0;background:none;padding:8px 10px;cursor:pointer;border-bottom:1px solid var(--line)}
@@ -60,7 +59,7 @@ input[type=text],input[type=number],input[type=time],input[type=date],select{bac
 @media (max-width:1000px){.work{grid-template-columns:minmax(0,1fr)}}
 .mapcol{position:sticky;top:10px;display:flex;flex-direction:column;gap:8px}
 @media (max-width:1000px){.mapcol{position:static}}
-#map{height:calc(100vh - 230px);min-height:420px;border-radius:6px;border:1px solid var(--line)}
+#map{height:calc(100vh - 170px);min-height:420px;border-radius:6px;border:1px solid var(--line)}
 @media (max-width:1000px){#map{height:380px;min-height:0}}
 .mapbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .layers{position:relative}
@@ -143,6 +142,14 @@ dialog{border:1px solid var(--line);border-radius:8px;background:var(--panel);co
 dialog::backdrop{background:rgba(0,0,0,.4)}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 @media (prefers-reduced-motion:reduce){*{scroll-behavior:auto!important}}
+.dayline .bits{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center;flex-basis:100%}
+.ovhead{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.ovhead .legmenu{right:0;left:auto}
+.safety{display:flex;flex-direction:column;gap:6px}
+.wxbox{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:baseline;font-size:.88rem}
+.wxbox a,.medbox a{color:var(--accent)}
+.medbox summary{cursor:pointer;font-size:.88rem}
+.medbox .item{padding:6px 0}
 </style>
 </head>
 <body>
@@ -152,13 +159,6 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
     <div class="btns"><span class="lbl mono" id="hdrSummary"></span><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
   </header>
 
-  <section class="panel tripbar" aria-label="Trip">
-    <div class="field"><label class="lbl" for="startDate">Leave</label><input id="startDate" type="date"></div>
-    <div class="field"><label class="lbl" for="endDate">Back</label><input id="endDate" type="date"></div>
-    <div class="field ac wide"><label class="lbl" for="startPlace">Start</label><input id="startPlace" type="text" autocomplete="off" placeholder="Town or place"><div class="sugg" hidden></div></div>
-    <div class="field ac wide"><label class="lbl" for="endPlace">Finish</label><input id="endPlace" type="text" autocomplete="off" placeholder="Town or place"><div class="sugg" hidden></div></div>
-    <div class="field"><label class="chk"><input type="checkbox" id="roundTrip"> Finish where I started</label><button class="btn ghost small" id="useLoc" type="button">Start from my location</button></div>
-  </section>
   <div class="banner" id="styleBanner"></div>
 
   <div class="work">
@@ -178,6 +178,15 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 
 <aside id="panel" class="sheet" hidden aria-label="Stop details"><div class="dlghead"><div><h2 id="pTitle"></h2><div class="note" id="pSub"></div></div><button class="icon" type="button" id="pClose" aria-label="Close">✕</button></div><div class="ptabs" id="pTabs"></div><div id="pBody" class="dlgbody"></div></aside>
 <div id="peek" class="peek" hidden></div>
+<div hidden>
+  <section class="tripbar" aria-label="Trip">
+    <div class="field"><label class="lbl" for="startDate">Leave</label><input id="startDate" type="date"></div>
+    <div class="field"><label class="lbl" for="endDate">Back</label><input id="endDate" type="date"></div>
+    <div class="field ac wide"><label class="lbl" for="startPlace">Start</label><input id="startPlace" type="text" autocomplete="off" placeholder="Town or place"><div class="sugg" hidden></div></div>
+    <div class="field ac wide"><label class="lbl" for="endPlace">Finish</label><input id="endPlace" type="text" autocomplete="off" placeholder="Town or place"><div class="sugg" hidden></div></div>
+    <div class="field"><label class="chk"><input type="checkbox" id="roundTrip"> Finish where I started</label><button class="btn ghost small" id="useLoc" type="button">Start from my location</button></div>
+  </section>
+</div>
 
 <dialog id="settings">
   <form method="dialog" style="display:flex;flex-direction:column;gap:12px">
@@ -365,6 +374,8 @@ async function loadLocal(my){
   const corridor=Math.max(1,+settings.corridor); let all=[];
   for(const k of ["view","pass","sight","food","camp"]){ const rows=await localKind(k,ccs); if(rows) all.push(...nearRoute(rows,k,corridor)); }
   pois=all.filter(p=>p.off<=corridor+0.5);
+  const med=await localKind("med",ccs); meds=med?nearRoute(med,"med",160).map(p=>Object.assign(p,{type:p.tags.tourism,phone:p.tags.phone})):null;
+  const fd=await localKind("ford",ccs); fords=fd?nearRoute(fd,"ford",0.5).filter(p=>p.off<=0.1).filter((p,i,a)=>!a.slice(0,i).some(o=>Math.abs(o.km-p.km)<0.5)):null;
   const nights=townPoints();
   if(nights.length){
     const sl=[...(await localKind("sleep",ccs)||[]),...(await localKind("camp",ccs)||[]).map(r=>[r[0],r[1],r[2],"camp_site",r[4],r[5],r[6]])];
@@ -377,6 +388,7 @@ async function loadPlaces(my){
   return loadRemote(my);
 }
 async function loadRemote(my){
+  meds=null; fords=null;
   const nights=townPoints();
   const fb=boxes(2.5), pb=boxes(Math.max(1,+settings.corridor));
   // 1. fuel first: it decides whether the ride works
@@ -490,6 +502,7 @@ async function recalc(){
     plan={days,geom,cum,total:acc,ptKm};
     $("status").textContent="Finding fuel and places…";
     renderAll();
+    loadWeather(my).then(()=>{if(my===seq) renderAll();}).catch(()=>{wx=null;});
     const ok=await loadPlaces(my); if(my!==seq) return;
     $("status").textContent=ok===false?"Fuel stations couldn't load. Checking your own fuel stops only.":ok==="partial"?"Points of interest couldn't load.":"";
     renderAll();
@@ -581,28 +594,140 @@ $("useLoc").addEventListener("click",()=>{
 function renderTabs(){
   const tabs=[`<button class="dtab ${ui.tab==="ov"?"on":""}" data-day="ov" role="tab"><b>Overview</b><span class="note">${nDays()} day${nDays()>1?"s":""}</span></button>`];
   trip.days.forEach((d,k)=>{
-    const f=plan&&plan.days[k]?rangeFuel(plan.days[k].a,plan.days[k].b):null, to=dayTo(k);
-    tabs.push(`<button class="dtab ${ui.tab===k?"on":""}" data-day="${k}" role="tab"><b>Day ${k+1}${f&&f.level?`<span class="tdot" style="background:var(--${f.level==="bad"?"bad":"warn"})"></span>`:""}</b><span class="note">${esc(fmtDate(dayDate(k)))}</span><span class="note">→ ${esc(to?to.name:"pick a night stop")}</span></button>`);
+    const f=plan&&plan.days[k]?dayRisk(k):null, to=dayTo(k);
+    tabs.push(`<button class="dtab ${ui.tab===k?"on":""}" data-day="${k}" role="tab"><b>Day ${k+1}${f&&f.level!=="ok"?`<span class="tdot" style="background:var(--${f.level==="bad"?"bad":"warn"})"></span>`:""}</b><span class="note">${esc(fmtDate(dayDate(k)))}</span><span class="note">→ ${esc(to?to.name:"pick a night stop")}</span></button>`);
   });
   $("dayTabs").innerHTML=tabs.join("");
 }
 $("dayTabs").addEventListener("click",e=>{const b=e.target.closest("[data-day]"); if(!b) return; ui.tab=b.dataset.day==="ov"?"ov":+b.dataset.day; saveUi(); closePanel(true); renderAll(); if(window.innerWidth<=1000) $("details").scrollIntoView({behavior:"smooth",block:"start"});});
 
 /* ---------- details ---------- */
-function renderDetails(){ $("details").innerHTML=ui.tab==="ov"?overviewHtml():dayHtml(ui.tab); wireDetails(); }
+const TB=document.querySelector(".tripbar");
+function renderDetails(){ TB.remove(); $("details").innerHTML=ui.tab==="ov"?overviewHtml():dayHtml(ui.tab); const slot=$("details").querySelector(".tbslot"); if(slot) slot.replaceWith(TB); wireDetails(); }
+
+/* ---------- weather, time zones (Open-Meteo, no key) ---------- */
+let wx=null, meds=null, fords=null;
+function pointAt(km){ let i=plan.cum.findIndex(c=>c>=km); if(i<0) i=plan.geom.length-1; return plan.geom[i]; }
+async function loadWeather(my){
+  const q=[];
+  plan.days.forEach((d,k)=>{ if(!d) return; const s=d.pts[0], e=d.pts[d.pts.length-1];
+    [["from",s],["mid",pointAt((d.a+d.b)/2)],["to",e]].forEach(([role,p])=>{ if(p.name!=="My location") q.push({k,role,lat:+p.lat.toFixed(2),lon:+p.lon.toFixed(2)}); }); });
+  if(!q.length){wx=null;return;}
+  const url=`https://api.open-meteo.com/v1/forecast?latitude=${q.map(x=>x.lat).join(",")}&longitude=${q.map(x=>x.lon).join(",")}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,wind_gusts_10m_max,sunset&timezone=auto&forecast_days=16`;
+  const ctl=new AbortController(); setTimeout(()=>ctl.abort(),20000);
+  const r=await fetch(url,{signal:ctl.signal}); if(!r.ok) throw new Error("weather "+r.status);
+  const j=await r.json(), arr=Array.isArray(j)?j:[j];
+  if(my!==seq) return;
+  wx=q.map((x,i)=>Object.assign(x,{tz:arr[i]?.utc_offset_seconds,tzName:arr[i]?.timezone,daily:arr[i]?.daily}));
+}
+const WXW=c=>c==null?"":c>=95?"Thunderstorms":c>=85?"Snow showers":c>=80?"Showers":c>=71?"Snow":c>=61?"Rain":c>=51?"Drizzle":c>=45?"Fog":c>=3?"Overcast":c>=1?"Partly cloudy":"Clear";
+function dayWx(k){
+  if(!wx) return null;
+  const date=addDays(trip.startDate,k), rows=wx.filter(x=>x.k===k&&x.daily);
+  if(!rows.length) return null;
+  const hits=rows.map(x=>{const i=x.daily.time.indexOf(date); return i<0?null:{role:x.role,code:x.daily.weather_code[i],tmax:x.daily.temperature_2m_max[i],tmin:x.daily.temperature_2m_min[i],rain:x.daily.precipitation_sum[i],prob:x.daily.precipitation_probability_max[i],gust:x.daily.wind_gusts_10m_max[i],sunset:x.daily.sunset[i]};}).filter(Boolean);
+  const from=rows.find(x=>x.role==="from"), to=rows.find(x=>x.role==="to");
+  const tz=from&&to&&from.tz!=null&&to.tz!=null&&from.tz!==to.tz?{from:from.tz,to:to.tz}:null;
+  if(!hits.length) return {none:true,opens:addDays(date,-15),tz};
+  const mx=f=>Math.max(...hits.map(h=>h[f]??-99)), mn=f=>Math.min(...hits.map(h=>h[f]??99));
+  const toH=hits.find(h=>h.role==="to");
+  return {code:mx("code"),tmax:mx("tmax"),tmin:mn("tmin"),rain:mx("rain"),prob:mx("prob"),gust:mx("gust"),sunset:toH&&toH.sunset,tz};
+}
+const utc=s=>`UTC${s>=0?"+":"−"}${Math.abs(s/3600)}`;
+function wxText(w){
+  if(!w) return "";
+  if(w.none) return `Forecast from ${fmtDate(new Date(w.opens+"T12:00:00"))}`;
+  return `${WXW(w.code)} · ${Math.round(w.tmin)}–${Math.round(w.tmax)}°C · rain ${w.rain<0.5?"none":Math.round(w.rain)+" mm"}${w.prob>=20?` (${w.prob}%)`:""} · gusts ${Math.round(w.gust)} km/h`;
+}
+const windyLink=p=>`<a href="https://www.windy.com/?${p.lat.toFixed(2)},${p.lon.toFixed(2)},9" target="_blank" rel="noopener">Forecast for the area ↗</a>`;
+
+/* ---------- medical + river crossings (own map data) ---------- */
+function dayMed(k){
+  const pd=plan&&plan.days[k]; if(!pd||!meds) return null;
+  const hosp=meds.filter(m=>m.type==="hospital"), samples=[];
+  for(let km=pd.a;km<=pd.b;km+=10) samples.push(pointAt(km));
+  let far=0; samples.forEach(s=>{let best=999; hosp.forEach(h=>{const d=hav(s,h); if(d<best)best=d;}); far=Math.max(far,best);});
+  const near=meds.filter(m=>m.km!=null&&m.km>=pd.a-1&&m.km<=pd.b+1&&m.off<=25).sort((a,b)=>a.km-b.km);
+  return {far,near};
+}
+function dayFords(k){ const pd=plan&&plan.days[k]; if(!pd||!fords) return null; return fords.filter(f=>f.km>=pd.a&&f.km<=pd.b).length; }
+
+/* ---------- safety light: one per day, worst three reasons ---------- */
+const fmtFar=f=>f>150?"over 150":String(Math.round(f));
+const RANK_L={bad:2,warn:1,info:0};
+function dayRisk(k){
+  const pd=plan&&plan.days[k]; if(!pd) return null;
+  const r=[], add=(lvl,text,kind)=>r.push({lvl,text,kind});
+  const f=rangeFuel(pd.a,pd.b); if(f&&f.level) add(f.level,f.text,"fuel");
+  const mins=dayMinutes(k), arrive=toMin(settings.leave)+mins, s=sunMin(k);
+  if(s!=null){ if(s<arrive) add("bad",`Arrives after dark: ${fmtT(arrive)}, sunset ${fmtT(s)}.`,"dark"); else if(s-arrive<60) add("warn",`Arrives ${fmtT(arrive)}, under an hour before sunset.`,"dark"); }
+  if(mins>+settings.maxHours*60) add("warn",`Long day: ${fmtDur(mins)} of riding.`,"long");
+  const w=dayWx(k);
+  if(w&&!w.none){
+    if(w.code>=95) add("warn","Thunderstorms forecast.","wx");
+    if(w.gust>=80) add("bad",`Wind gusts to ${Math.round(w.gust)} km/h.`,"wx"); else if(w.gust>=60) add("warn",`Strong wind, gusts to ${Math.round(w.gust)} km/h.`,"wx");
+    if(w.tmax>=42) add("bad",`Extreme heat: ${Math.round(w.tmax)}°C.`,"wx"); else if(w.tmax>=37) add("warn",`Hot: ${Math.round(w.tmax)}°C. Carry extra water.`,"wx");
+    if(w.tmin<=2) add("warn",`Near freezing: ${Math.round(w.tmin)}°C. Watch for ice early.`,"wx");
+    if(w.rain>=25) add("bad",`Heavy rain: ${Math.round(w.rain)} mm.`,"wx"); else if(w.rain>=8&&w.prob>=50) add("warn",`Rain likely: ${Math.round(w.rain)} mm.`,"wx");
+  }
+  const fd=dayFords(k);
+  if(fd) add(w&&!w.none&&w.rain>=5?"warn":"info",`${fd} river crossing${fd>1?"s":""} on the route${w&&!w.none&&w.rain>=5?", and rain forecast":""}.`,"ford");
+  const m=dayMed(k); if(m&&m.far>100) add("warn",`Remote: up to ${fmtFar(m.far)} km from a hospital.`,"med");
+  if(w&&w.tz) add("info",`Clocks change: ${utc(w.tz.from)} to ${utc(w.tz.to)}.`,"tz");
+  r.sort((a,b)=>RANK_L[b.lvl]-RANK_L[a.lvl]);
+  const top=r.length?r[0].lvl:"info";
+  return {level:top==="bad"?"bad":top==="warn"?"warn":"ok",reasons:r};
+}
+function sunMin(k){
+  const w=dayWx(k); if(w&&!w.none&&w.sunset){const t=w.sunset.split("T")[1]; return toMin(t);}
+  const to=dayTo(k); if(!to) return null; const ss=sunset(dayDate(k),to.lat,to.lon); return ss.getHours()*60+ss.getMinutes();
+}
+const LIGHT_TXT={ok:"Clear",warn:"Take care",bad:"Problem"};
+function lightPill(r){ if(!r) return ""; return `<span class="pill ${r.level==="bad"?"fbad":r.level==="warn"?"fwarn":"fok"}" title="${esc(r.reasons.filter(x=>x.lvl!=="info").map(x=>x.text).join(" "))}">● ${LIGHT_TXT[r.level]}</span>`; }
+function riskHtml(r){
+  if(!r) return "";
+  const shown=r.reasons.filter(x=>x.lvl!=="info"), info=r.reasons.filter(x=>x.lvl==="info");
+  let h=`<div class="safety"><div class="sumrow">${lightPill(r)}${shown.length?"":`<span class="note">Nothing flagged for this day.</span>`}</div>`;
+  h+=shown.slice(0,3).map(x=>`<div class="verdict ${x.lvl==="bad"?"v-bad":"v-warn"}">${esc(x.text)}</div>`).join("");
+  if(shown.length>3) h+=`<details><summary class="note">${shown.length-3} more</summary>${shown.slice(3).map(x=>`<div class="verdict ${x.lvl==="bad"?"v-bad":"v-warn"}">${esc(x.text)}</div>`).join("")}</details>`;
+  h+=info.map(x=>`<div class="note">${esc(x.text)}</div>`).join("");
+  return h+`</div>`;
+}
+
+const OV_ITEMS={dist:"Distance and riding time",fuel:"Fuel",safety:"Safety light",wx:"Weather",sun:"Arrival and sunset",stay:"Places to stay",med:"Hospitals",tz:"Time zone changes"};
+let ovOpen=false;
+function ovPick(){ return Object.assign({dist:true,fuel:true,safety:true,wx:true,sun:false,stay:true,med:false,tz:true},ui.ov||{}); }
 function overviewHtml(){
-  let h=`<div><h2>Night stops</h2><div class="note">One per night. Pick the town; the beds there often decide it.</div></div><div>`;
+  const pick=ovPick();
+  let h=`<div class="tbslot"></div>`;
+  if(plan){
+    const all=[]; plan.days.forEach((d,k)=>{const r=dayRisk(k); if(r) r.reasons.filter(x=>x.lvl!=="info").forEach(x=>all.push({k,...x}));});
+    all.sort((a,b)=>RANK_L[b.lvl]-RANK_L[a.lvl]||a.k-b.k);
+    h+=`<div><h2>Warnings</h2>${all.length?all.map(x=>`<div class="verdict ${x.lvl==="bad"?"v-bad":"v-warn"}" data-gotoday="${x.k}" style="cursor:pointer">Day ${x.k+1}: ${esc(x.text)}</div>`).join(""):`<div class="note">Nothing flagged. Check again closer to the date for weather.</div>`}</div>`;
+  }
+  h+=`<div><h2>Night stops</h2><div class="note">One per night. Pick the town; the beds there often decide it.</div></div><div>`;
   if(nDays()===1) h+=`<div class="note">A day ride. Set a later "Back" date to add nights.</div>`;
   trip.days.slice(0,-1).forEach((d,k)=>{
     const c=d.to&&placesOk?(stayFor(d.to)?.places.length||0):null;
     h+=`<div class="nightrow"><span class="when"><b>Night ${k+1}</b><br><span class="note">${esc(fmtDate(dayDate(k)))}</span></span>${searchBox("night-"+k,d.to?d.to.name:"","Town or place to sleep")}
       ${d.to?`<button class="chip2 stay" type="button" data-panel="${k}:last:stay" title="Places to stay">${ICON.stay}<span>${c==null?"…":c}</span></button>`:`<span></span>`}</div>`;
   });
-  h+=`</div><div><h2>Days</h2></div><div>`;
+  h+=`</div><div class="ovhead"><h2>Days</h2><details class="legopts" ${ovOpen?"open":""}><summary class="btn ghost small">Choose what shows</summary><div class="legmenu">${Object.entries(OV_ITEMS).map(([x,n])=>`<label class="chk"><input type="checkbox" data-ov="${x}" ${pick[x]?"checked":""}> ${n}</label>`).join("")}</div></details></div><div>`;
   trip.days.forEach((d,k)=>{
     const pd=plan&&plan.days[k], from=dayFrom(k), to=dayTo(k);
-    h+=`<div class="dayline" data-gotoday="${k}"><b>Day ${k+1}</b><span class="note">${esc(fmtDate(dayDate(k)))}</span><span>${esc(from?from.name:"?")} → ${esc(to?to.name:"?")}</span>
-      ${pd?distPill(pd.km,dayMinutes(k))+fuelPill(rangeFuel(pd.a,pd.b)):`<span class="note">${to?"No route yet":"Pick the night stop"}</span>`}${d.style==="fast"?`<span class="note">Liaison</span>`:""}</div>`;
+    let bits="";
+    if(pd){
+      const r=dayRisk(k), w=dayWx(k);
+      if(pick.safety) bits+=lightPill(r);
+      if(pick.dist) bits+=distPill(pd.km,dayMinutes(k));
+      if(pick.fuel) bits+=fuelPill(rangeFuel(pd.a,pd.b));
+      if(pick.sun){const s=sunMin(k); bits+=`<span class="note">Arrive ${fmtT(toMin(settings.leave)+dayMinutes(k))} · sunset ${s!=null?fmtT(s):"?"}</span>`;}
+      if(pick.stay&&k<nDays()-1&&d.to&&placesOk) bits+=`<span class="note">${stayFor(d.to)?.places.length||0} places to stay</span>`;
+      if(pick.med){const m=dayMed(k); if(m) bits+=`<span class="note">Up to ${fmtFar(m.far)} km from a hospital</span>`;}
+      if(pick.wx&&w) bits+=`<span class="note wxline">${esc(wxText(w))}</span>`;
+      if(pick.tz&&w&&w.tz) bits+=`<span class="note">Clocks: ${utc(w.tz.from)} → ${utc(w.tz.to)}</span>`;
+    } else bits=`<span class="note">${to?"No route yet":"Pick the night stop"}</span>`;
+    h+=`<div class="dayline" data-gotoday="${k}"><b>Day ${k+1}</b><span class="note">${esc(fmtDate(dayDate(k)))}</span><span>${esc(from?from.name:"?")} → ${esc(to?to.name:"?")}</span>${d.style==="fast"?`<span class="note">Liaison</span>`:""}<div class="bits">${bits}</div></div>`;
   });
   h+=`</div>`;
   if(plan){
@@ -610,7 +735,7 @@ function overviewHtml(){
     h+=`<div class="sumrow"><div class="stat"><span class="lbl">Total</span><span class="v">${Math.round(tot)} km</span></div><div class="stat"><span class="lbl">Days</span><span class="v">${nDays()}</span></div></div>`;
     h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px">${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">Day ${k+1} GPX</button>`:"").join("")}</div></div>`;
   }
-  if(placesOk&&dataDate) h+=`<div class="note">Fuel stations as of ${esc(dataDate)}, from OpenStreetMap. Phone ahead on remote legs.</div>`;
+  if(placesOk&&dataDate) h+=`<div class="note">Fuel, hospitals and river crossings from OpenStreetMap, as of ${esc(dataDate)}. Weather from Open-Meteo. Phone ahead on remote legs.</div>`;
   return h;
 }
 function dayHtml(k){
@@ -619,15 +744,15 @@ function dayHtml(k){
     <div class="seg" role="group" aria-label="Day style"><button type="button" data-style="default" class="${d.style!=="fast"?"on":""}">${esc(styleName())}</button><button type="button" data-style="fast" class="${d.style==="fast"?"on":""}">Liaison: get me there fast</button></div>`;
   if(!last&&!d.to) h+=`<div class="nightrow" style="border-top:0"><span class="when"><b>Sleep at</b></span>${searchBox("night-"+k,"","Town or place to sleep")}<span></span></div>`;
   if(!pd) return h+`<div class="note">${to?"No route yet. Check your connection.":"Pick where you sleep tonight to see this day."}</div>`;
-  const mins=dayMinutes(k), leave=toMin(settings.leave), arrive=leave+mins, ss=sunset(dayDate(k),to.lat,to.lon), ssMin=ss.getHours()*60+ss.getMinutes();
-  const df=rangeFuel(pd.a,pd.b), msgs=[];
-  if(df&&df.level) msgs.push([df.level==="bad"?"v-bad":"v-warn",df.text]);
-  if(!placesOk&&settings.fuelMode!=="off") msgs.push(["v-warn","Station data isn't loaded. Fuel is checked against your own fuel stops only."]);
-  if(mins>+settings.maxHours*60) msgs.push(["v-warn",`Long day: ${fmtDur(mins)} of riding. Add a night stop.`]);
-  if(ssMin-arrive<60) msgs.push([ssMin<arrive?"v-bad":"v-warn",ssMin<arrive?`Arrives after dark (${fmtT(arrive)}, sunset ${fmtT(ssMin)}). Leave earlier.`:`Arrives ${fmtT(arrive)}, under an hour before sunset (${fmtT(ssMin)}).`]);
+  const mins=dayMinutes(k), leave=toMin(settings.leave), arrive=leave+mins, ssMin=sunMin(k), df=rangeFuel(pd.a,pd.b), w=dayWx(k), m=dayMed(k);
   h+=`<div class="sumrow">${distPill(pd.km,mins,`data-focusday="${k}"`)}${fuelPill(df)}
-    <div class="stat"><span class="lbl">Leave</span><span class="v">${fmtT(leave)}</span></div><div class="stat"><span class="lbl">Arrive</span><span class="v">${fmtT(arrive)}</span></div><div class="stat"><span class="lbl">Sunset</span><span class="v">${fmtT(ssMin)}</span></div></div>`;
-  h+=msgs.map(([c,t])=>`<div class="verdict ${c}">${esc(t)}</div>`).join("");
+    <div class="stat"><span class="lbl">Leave</span><span class="v">${fmtT(leave)}</span></div><div class="stat"><span class="lbl">Arrive</span><span class="v">${fmtT(arrive)}</span></div><div class="stat"><span class="lbl">Sunset</span><span class="v">${ssMin!=null?fmtT(ssMin):"?"}</span></div></div>`;
+  h+=riskHtml(dayRisk(k));
+  if(!placesOk&&settings.fuelMode!=="off") h+=`<div class="verdict v-warn">Station data isn't loaded. Fuel is checked against your own fuel stops only.</div>`;
+  h+=`<div class="wxbox"><span class="lbl">Weather</span><span>${w?esc(wxText(w)):"Loading…"}</span>${windyLink(to)}</div>`;
+  if(m) h+=`<details class="medbox"><summary><span class="lbl">Medical</span> ${m.near.length} hospital${m.near.length===1?"":"s"} and clinics near the route · furthest point ${fmtFar(m.far)} km from a hospital</summary>
+    ${m.near.map(x=>`<div class="item"><div class="meta"><b>${esc(x.name||(x.type==="hospital"?"Hospital":"Clinic"))}</b><span class="note">${x.type==="hospital"?"Hospital":"Clinic"} · km ${Math.round(x.km-pd.a)} · ${x.off<0.5?"on the route":x.off.toFixed(1)+" km off"}${x.phone?` · <a href="tel:${esc(x.phone.replace(/[^\d+]/g,""))}">${esc(x.phone)}</a>`:""}</span></div></div>`).join("")||`<div class="note">None listed within 25 km of the route.</div>`}
+    <div class="note">Emergency from a mobile: 112. Check the local numbers before you go.</div></details>`;
   h+=`<div class="rlist">`;
   pd.pts.forEach((p,j)=>{
     const isFrom=j===0, isTo=j===pd.pts.length-1, vi=j-1, L=j>0?pd.legs[j-1]:null;
@@ -682,7 +807,9 @@ $("details").addEventListener("click",e=>{
   const as=t.closest("[data-addsugg]"); if(as&&k!=="ov"){const f=fp.fills.find(x=>x.id===as.dataset.addsugg); if(f){trip.days[k].vias.splice(Math.max(0,+as.dataset.at-1),0,pt(f.name&&f.name!=="Fuel"?f.name:"Fuel stop",f.lat,f.lon,{type:"fuel"}));trip.days[k].legs=[];changed();} return;}
 });
 $("details").addEventListener("change",async e=>{
-  const t=e.target, k=ui.tab; if(k==="ov") return; const d=trip.days[k];
+  const t=e.target, k=ui.tab;
+  if(t.dataset.ov!==undefined){ovOpen=true;ui.ov=Object.assign(ovPick(),{[t.dataset.ov]:t.checked});saveUi();renderAll();ovOpen=false;return;}
+  if(k==="ov") return; const d=trip.days[k];
   if(t.dataset.vtype!==undefined){d.vias[+t.dataset.vtype].type=t.value;changed();}
   if(t.dataset.alt!==undefined){const j=+t.dataset.alt; d.legs[j]=Object.assign({},d.legs[j],{alt:+t.value}); changed();}
   if(t.dataset.track!==undefined&&t.files[0]){
@@ -831,7 +958,7 @@ function render(){ renderAll(); }
 function renderAll(){
   fp=plan?fuelPlan():null;
   renderTripBar(); renderTabs();
-  const ae=document.activeElement; if(!(ae&&ae.closest&&ae.closest("#details")&&ae.tagName==="INPUT")) renderDetails();
+  const ae=document.activeElement; if(!(ae&&ae.closest&&ae.closest("#details")&&ae.tagName==="INPUT"&&ae.type==="text")) renderDetails();
   if(panel) renderPanel();
   drawMap();
   const tot=plan?plan.days.reduce((t,d)=>t+(d?d.km:0),0):0;
