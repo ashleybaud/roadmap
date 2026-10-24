@@ -174,7 +174,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 <script>
 const OSRM="https://router.project-osrm.org/route/v1/driving/";
 const PHOTON="https://photon.komoot.io/api/";
-const OVERPASS="https://overpass-api.de/api/interpreter";
+const OVERPASS="/api/places";
 const TYPES=[
   {id:"view",n:"Viewpoints",c:"#2F5BA8",on:true},
   {id:"pass",n:"Mountain passes",c:"#6B4E9B",on:true},
@@ -204,7 +204,7 @@ const settings=Object.assign({range:200,reserve:30,leave:"08:00",pace:10,corrido
 const ui=Object.assign({types:Object.fromEntries(TYPES.map(t=>[t.id,t.on])),max:"10"},store.get("rr2-ui")||{});
 const tomorrow=new Date(Date.now()+86400000).toISOString().slice(0,10);
 $("tripDate").value=trip.date||tomorrow;
-let plan=null, pois=[], fuelStations=[], stays=[];
+let plan=null, pois=[], fuelStations=[], stays=[], placesOk=false;
 
 function saveTrip(){trip.date=$("tripDate").value;store.set("rr2-trip",trip);}
 
@@ -318,8 +318,8 @@ async function recalc(){
     plan={ds,rs,geom,cum,dayStart,total:acc};
     $("status").textContent="Finding fuel and places along the way…";
     render(); setGpx(true);
-    await loadPlaces(my); if(my!==seq) return;
-    $("status").textContent=""; render();
+    const ok=await loadPlaces(my); if(my!==seq) return;
+    $("status").textContent=ok===false?"Fuel stations and places couldn't load. Try again in a minute.":""; render();
   }catch(e){ if(my===seq) $("status").textContent="Couldn't get a route. Check each stop is a real place on a road, and your connection."; }
 }
 
@@ -351,7 +351,7 @@ nwr(around:${R},${line})[tourism=camp_site][name];
 ${nights.map(n=>`nwr(around:15000,${n.lat},${n.lon})[tourism~"^(hotel|guest_house|hostel|chalet|motel|camp_site|apartment)$"][name];`).join("\n")}
 );out center tags;`;
   let els=[];
-  try{ els=await overpass(q); }catch(e){ $("status").textContent="Places service is busy. Route and fuel maths still work; try again in a minute."; return; }
+  try{ els=await overpass(q); placesOk=true; }catch(e){ placesOk=false; return false; }
   if(my!==seq) return;
   const seen=new Set(); const all=[];
   els.forEach(e=>{
@@ -411,10 +411,11 @@ function render(){
     let worst=Infinity; for(let k=s0;k<=s1;k+=1) worst=Math.min(worst,fp.tankAt(k)); worst=Math.min(worst,fp.tankAt(s1));
     const msgs=[];
     const gap=fp.gaps.find(g=>g.to>s0&&g.from<s1);
-    if(gap) msgs.push(["v-bad",`No fuel for ${Math.round(gap.to-gap.from)} km from km ${Math.round(gap.from)}. Carry extra or add a fuel stop.`]);
+    if(!placesOk) msgs.push(["v-warn","Fuel stations not loaded yet, so fuel can't be checked."]);
+    else if(gap) msgs.push(["v-bad",`No fuel for ${Math.round(gap.to-gap.from)} km from km ${Math.round(gap.from)}. Carry extra or add a fuel stop.`]);
     else if(worst<reserve) msgs.push(["v-warn",`Tight: down to ${Math.round(worst)} km of fuel at worst.`]);
     else msgs.push(["v-ok",`Fuel fine: never below ${Math.round(worst)} km left.`]);
-    if(di<plan.ds.length-1) msgs.push(["v-warn",`Arrive with about ${Math.round(fp.tankAt(s1))} km in the tank. Fill up before ${esc(end.name)} if it has no fuel.`]);
+    if(placesOk&&di<plan.ds.length-1) msgs.push(["v-warn",`Arrive with about ${Math.round(fp.tankAt(s1))} km in the tank. Fill up before ${esc(end.name)} if it has no fuel.`]);
     if(ssMin-arrive<60) msgs.push([ssMin<arrive?"v-bad":"v-warn",ssMin<arrive?`Arrives after dark (${fmtT(arrive)}, sunset ${fmtT(ssMin)}). Leave earlier.`:`Arrives ${fmtT(arrive)}, under an hour before sunset (${fmtT(ssMin)}).`]);
     const dateTxt=date.toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"});
     html+=`<div class="day"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><h3>Day ${di+1}</h3><span class="note">${esc(dateTxt)}</span></div>
@@ -437,7 +438,7 @@ function render(){
     rows.forEach((x,i)=>{
       const t=fp.tankAt(x.km), col=t<0?"var(--bad)":t<reserve?"var(--warn)":"var(--ok)";
       const tag=x.k==="fuel"?`<span class="kind fuel">Fuel${x.f.tight?" · tight":""}</span>`:x.k==="night"?`<span class="kind night">${di===plan.ds.length-1&&i===rows.length-1?"Finish":"Sleep"}</span>`:x.k==="stop"?`<span class="kind">Stop</span>`:"";
-      rb+=`<tr><td class="n">${Math.round(x.km)}</td><td><b>${esc(x.n)}</b> ${tag}</td><td class="n">${i?Math.round(x.km-prev)+" km":""}</td><td class="n" style="color:${col}">${Math.round(x.k==="fuel"?x.f.arrive:t)}</td></tr>`;
+      rb+=`<tr><td class="n">${Math.round(x.km)}</td><td><b>${esc(x.n)}</b> ${tag}</td><td class="n">${i?Math.round(x.km-prev)+" km":""}</td><td class="n" style="color:${placesOk?col:"var(--muted)"}">${placesOk?Math.round(x.k==="fuel"?x.f.arrive:t):"–"}</td></tr>`;
       prev=x.km;
     });
   });
