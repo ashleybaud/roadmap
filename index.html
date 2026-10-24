@@ -150,6 +150,10 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 .wxbox a,.medbox a{color:var(--accent)}
 .medbox summary{cursor:pointer;font-size:.88rem}
 .medbox .item{padding:6px 0}
+.risklist{display:flex;flex-direction:column;gap:4px;font-size:.86rem;padding:8px 10px;border:1px solid var(--line);border-radius:6px}
+.risklist .rbad{color:var(--bad);font-weight:600}
+.risklist .rwarn{color:var(--warn);font-weight:600}
+.risklist .rinfo{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -533,7 +537,7 @@ function rangeFuel(a,b){
   if(settings.fuelMode==="off"||!fp) return null;
   let min=Infinity; for(let k=a;k<b;k+=1) min=Math.min(min,fp.tankAt(k)); min=Math.min(min,fp.tankAt(Math.max(a,b-0.01)));
   const gap=fp.gaps.find(g=>g.from<b&&g.to>a);
-  if(min<0) return {level:"bad",short:gap?`No fuel ${Math.round(gap.to-gap.from)} km`:"Runs dry",text:gap?`${Math.round(gap.to-gap.from)} km with no fuel known. Range ${settings.range} km.`:"Runs dry before the end of this stretch."};
+  if(min<0) return {level:"bad",short:gap?`No fuel ${Math.round(gap.to-gap.from)} km`:"Runs dry",text:gap?`${Math.round(gap.to-gap.from)} km with no fuel known.`:"Runs dry before the end of this stretch."};
   if(min<+settings.reserve) return {level:"warn",short:`Reserve: ${Math.round(min)} km`,text:`Down to ${Math.round(min)} km of fuel, below your ${settings.reserve} km reserve.`};
   return {level:"",short:"Fuel OK",text:`Never below ${Math.round(min)} km of fuel.`};
 }
@@ -603,7 +607,7 @@ $("dayTabs").addEventListener("click",e=>{const b=e.target.closest("[data-day]")
 
 /* ---------- details ---------- */
 const TB=document.querySelector(".tripbar");
-function renderDetails(){ $("tbHold").append(TB); $("details").innerHTML=ui.tab==="ov"?overviewHtml():dayHtml(ui.tab); const slot=$("details").querySelector(".tbslot"); if(slot) slot.replaceWith(TB); wireDetails(); }
+function renderDetails(){ hidePeek(); $("tbHold").append(TB); $("details").innerHTML=ui.tab==="ov"?overviewHtml():dayHtml(ui.tab); const slot=$("details").querySelector(".tbslot"); if(slot) slot.replaceWith(TB); wireDetails(); }
 
 /* ---------- weather, time zones (Open-Meteo, no key) ---------- */
 let wx=null, meds=null, fords=null;
@@ -683,15 +687,13 @@ function sunMin(k){
   const to=dayTo(k); if(!to) return null; const ss=sunset(dayDate(k),to.lat,to.lon); return ss.getHours()*60+ss.getMinutes();
 }
 const LIGHT_TXT={ok:"Clear",warn:"Take care",bad:"Problem"};
-function lightPill(r){ if(!r) return ""; return `<span class="pill ${r.level==="bad"?"fbad":r.level==="warn"?"fwarn":"fok"}" title="${esc(r.reasons.filter(x=>x.lvl!=="info").map(x=>x.text).join(" "))}">● ${LIGHT_TXT[r.level]}</span>`; }
-function riskHtml(r){
-  if(!r) return "";
-  const shown=r.reasons.filter(x=>x.lvl!=="info"), info=r.reasons.filter(x=>x.lvl==="info");
-  let h=`<div class="safety"><div class="sumrow">${lightPill(r)}${shown.length?"":`<span class="note">Nothing flagged for this day.</span>`}</div>`;
-  h+=shown.slice(0,3).map(x=>`<div class="verdict ${x.lvl==="bad"?"v-bad":"v-warn"}">${esc(x.text)}</div>`).join("");
-  if(shown.length>3) h+=`<details><summary class="note">${shown.length-3} more</summary>${shown.slice(3).map(x=>`<div class="verdict ${x.lvl==="bad"?"v-bad":"v-warn"}">${esc(x.text)}</div>`).join("")}</details>`;
-  h+=info.map(x=>`<div class="note">${esc(x.text)}</div>`).join("");
-  return h+`</div>`;
+function lightPill(r,k){ if(!r) return ""; const n=r.reasons.filter(x=>x.lvl!=="info").length;
+  const tag=k!=null?"button":"span";
+  return `<${tag} ${k!=null?`type="button" data-risk="${k}"`:""} class="pill btnlike ${r.level==="bad"?"fbad":r.level==="warn"?"fwarn":"fok"}" title="${esc(r.reasons.map(x=>x.text).join("\n")||"Nothing flagged")}">● ${LIGHT_TXT[r.level]}${n?" · "+n:""}</${tag}>`; }
+const riskOpen=new Set();
+function riskHtml(r,k){
+  if(!r||!riskOpen.has(k)) return "";
+  return `<div class="risklist">${r.reasons.map(x=>`<div class="${x.lvl==="bad"?"rbad":x.lvl==="warn"?"rwarn":"rinfo"}">${esc(x.text)}</div>`).join("")||`<div class="rinfo">Nothing flagged for this day.</div>`}</div>`;
 }
 
 const OV_ITEMS={dist:"Distance and riding time",fuel:"Fuel",safety:"Safety light",wx:"Weather",sun:"Arrival and sunset",stay:"Places to stay",med:"Hospitals",tz:"Time zone changes"};
@@ -744,9 +746,10 @@ function dayHtml(k){
   if(!last&&!d.to) h+=`<div class="nightrow" style="border-top:0"><span class="when"><b>Sleep at</b></span>${searchBox("night-"+k,"","Town or place to sleep")}<span></span></div>`;
   if(!pd) return h+`<div class="note">${to?"No route yet. Check your connection.":"Pick where you sleep tonight to see this day."}</div>`;
   const mins=dayMinutes(k), leave=toMin(settings.leave), arrive=leave+mins, ssMin=sunMin(k), df=rangeFuel(pd.a,pd.b), w=dayWx(k), m=dayMed(k);
-  h+=`<div class="sumrow">${distPill(pd.km,mins,`data-focusday="${k}"`)}${fuelPill(df)}
-    <div class="stat"><span class="lbl">Leave</span><span class="v">${fmtT(leave)}</span></div><div class="stat"><span class="lbl">Arrive</span><span class="v">${fmtT(arrive)}</span></div><div class="stat"><span class="lbl">Sunset</span><span class="v">${ssMin!=null?fmtT(ssMin):"?"}</span></div></div>`;
-  h+=riskHtml(dayRisk(k));
+  const rk=dayRisk(k), arrTxt=fmtT(arrive)+(arrive>=1440?` +${Math.floor(arrive/1440)}d`:"");
+  h+=`<div class="sumrow">${distPill(pd.km,mins,`data-focusday="${k}"`)}${fuelPill(df)}${lightPill(rk,k)}
+    <div class="stat"><span class="lbl">Leave</span><span class="v">${fmtT(leave)}</span></div><div class="stat"><span class="lbl">Arrive</span><span class="v">${arrTxt}</span></div><div class="stat"><span class="lbl">Sunset</span><span class="v">${ssMin!=null?fmtT(ssMin):"?"}</span></div></div>`;
+  h+=riskHtml(rk,k);
   if(!placesOk&&settings.fuelMode!=="off") h+=`<div class="verdict v-warn">Station data isn't loaded. Fuel is checked against your own fuel stops only.</div>`;
   h+=`<div class="wxbox"><span class="lbl">Weather</span><span>${w?esc(wxText(w)):"Loading…"}</span>${windyLink(to)}</div>`;
   if(m) h+=`<details class="medbox"><summary><span class="lbl">Medical</span> ${m.near.length} hospital${m.near.length===1?"":"s"} and clinics near the route · furthest point ${fmtFar(m.far)} km from a hospital</summary>
@@ -762,7 +765,7 @@ function dayHtml(k){
     if(isFrom) name=`<span class="fixed">${esc(p.name)}</span>`;
     else if(isTo) name=last?`<span class="fixed">${esc(p.name)}</span>`:searchBox("night-"+k,p.name,"Town or place to sleep");
     else name=searchBox(`via-${k}-${vi}`,p.name,"Stop")+`<button class="icon" type="button" title="Move up" data-vup="${vi}">↑</button><button class="icon" type="button" title="Remove" data-vdel="${vi}">✕</button>`;
-    const chips=`${chip(k,j,"fuel",c?c.fuel:"…")}${chip(k,j,"stay",c?c.stay:"…")}${ui.types.food?chip(k,j,"food",c?c.food:"…"):""}${chip(k,j,"sight",c?c.sight:"…")}`;
+    const chips=`${chip(k,j,"fuel",c?c.fuel:"…")}${isFrom?"":chip(k,j,"stay",c?c.stay:"…")}${ui.types.food?chip(k,j,"food",c?c.food:"…"):""}${chip(k,j,"sight",c?c.sight:"…")}`;
     const opts=j>0?`<details class="legopts"><summary class="icon" title="Options for the way in">⋯</summary><div class="legmenu">
         ${L.n>1&&!lg.track?`<label class="chk">Way <select data-alt="${j-1}">${L.alts.map((km,x)=>`<option value="${x}" ${(lg.alt||0)===x?"selected":""}>Way ${x+1} · ${Math.round(km)} km</option>`).join("")}</select></label>`:`<span class="note">${lg.track?"":"No other ways found for this stretch."}</span>`}
         ${lg.track?`<span class="note">Own track: ${esc(lg.trackName||"GPX")}</span><button class="btn small ghost" type="button" data-untrack="${j-1}">Remove track</button>`
@@ -796,6 +799,7 @@ $("details").addEventListener("click",e=>{
   const t=e.target, k=ui.tab;
   const go=t.closest("[data-gotoday]"); if(go&&!t.closest("button,input,a")){ui.tab=+go.dataset.gotoday;saveUi();renderAll();return;}
   const pn=t.closest("[data-panel]"); if(pn){hidePeek();const [dk,j,tab]=pn.dataset.panel.split(":");openPanel(+dk,j==="last"?"last":+j,tab);return;}
+  const rb=t.closest("[data-risk]"); if(rb&&!rb.closest("[data-gotoday]")){const k2=+rb.dataset.risk; riskOpen.has(k2)?riskOpen.delete(k2):riskOpen.add(k2); renderDetails(); return;}
   const g=t.closest("[data-gpx]"); if(g){downloadGpx(+g.dataset.gpx);return;}
   const sty=t.closest("[data-style]"); if(sty&&k!=="ov"){trip.days[k].style=sty.dataset.style;trip.days[k].legs=(trip.days[k].legs||[]).map(x=>x&&x.track?{track:x.track,trackName:x.trackName}:{});changed();return;}
   const fl=t.closest("[data-focusleg]"); if(fl&&plan&&k!=="ov"){const L=plan.days[k].legs[+fl.dataset.focusleg-1]; focusRange(L.a,L.b); return;}
@@ -867,13 +871,15 @@ $("pBody").addEventListener("click",e=>{
 const canHover=window.matchMedia("(hover: hover) and (pointer: fine)").matches;
 function hidePeek(){ $("peek").hidden=true; }
 $("details").addEventListener("mouseover",e=>{
-  if(!canHover) return; const b=e.target.closest('[data-panel$=":stay"]'); if(!b) return;
+  if(!canHover) return; const b=e.target.closest('[data-panel$=":stay"]'); if(!b){hidePeek();return;}
   const [k,j]=b.dataset.panel.split(":"), sc=scope(+k,j==="last"?"last":+j); if(!sc) return; const sf=stayFor(sc.p); if(!sf||!sf.places.length) return;
   const r=b.getBoundingClientRect(), pk=$("peek");
   pk.innerHTML=`<b>Places to stay near ${esc(sc.p.name)}</b>`+sf.places.slice(0,6).map(p=>`<div><b>${esc(p.name)}</b><br><span class="note">${esc((p.tags.tourism||"").replace("_"," "))} · ${p.dist.toFixed(1)} km${p.tags.phone?" · "+esc(p.tags.phone):""}</span></div>`).join("")+`<span class="note">Click for all ${sf.places.length}</span>`;
   pk.hidden=false; pk.style.left=Math.max(8,Math.min(r.left,innerWidth-300))+"px"; pk.style.top=(r.bottom+6)+"px";
 });
-$("details").addEventListener("mouseout",e=>{if(e.target.closest('[data-panel$=":stay"]')) hidePeek();});
+$("details").addEventListener("mouseout",e=>{const b=e.target.closest('[data-panel$=":stay"]'); if(b&&!b.contains(e.relatedTarget)) hidePeek();});
+$("details").addEventListener("mouseleave",hidePeek);
+window.addEventListener("scroll",hidePeek,{passive:true});
 
 /* ---------- map ---------- */
 let map,layer,focusR=null,lastSel=null;
