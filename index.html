@@ -653,7 +653,7 @@ function dayMed(k){
 function dayFords(k){ const pd=plan&&plan.days[k]; if(!pd||!fords) return null; return fords.filter(f=>f.km>=pd.a&&f.km<=pd.b).length; }
 
 /* ---------- safety light: one per day, worst three reasons ---------- */
-const fmtFar=f=>f>150?"over 150":String(Math.round(f));
+const fmtFar=f=>f>150?"150+":String(Math.round(f));
 const RANK_L={bad:2,warn:1,info:0};
 function dayRisk(k){
   const pd=plan&&plan.days[k]; if(!pd) return null;
@@ -672,7 +672,7 @@ function dayRisk(k){
   }
   const fd=dayFords(k);
   if(fd) add(w&&!w.none&&w.rain>=5?"warn":"info",`${fd} river crossing${fd>1?"s":""} on the route${w&&!w.none&&w.rain>=5?", and rain forecast":""}.`,"ford",`${fd} river crossing${fd>1?"s":""}`);
-  const m=dayMed(k); if(m&&m.far>100) add("warn",`Remote: up to ${fmtFar(m.far)} km from a hospital.`,"med","Remote");
+  const m=dayMed(k); if(m&&m.far>120) add("warn",`Remote: up to ${fmtFar(m.far)} km from a hospital.`,"med","Remote");
   if(w&&w.tz) add("info",`Clocks change: ${utc(w.tz.from)} to ${utc(w.tz.to)}.`,"tz");
   r.sort((a,b)=>RANK_L[b.lvl]-RANK_L[a.lvl]);
   const top=r.length?r[0].lvl:"info";
