@@ -1,0 +1,512 @@
+<title>RoadMap</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: roadbook strip — controls rail left, schematic map + leg-by-leg roadbook right; stacks on phone */
+:root{
+  --bg:#EEF0EA; --panel:#FFFFFF; --ink:#18201C; --muted:#5C6660; --line:#D3D8CF;
+  --accent:#0B6E4F; --back:#2F5BA8; --gravel:#9A6A33; --tar:#3A4048;
+  --ok:#2E7D32; --warn:#B26A00; --bad:#B3261E; --chip:#E3E7DE;
+  --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#121614; --panel:#1B201D; --ink:#E6EAE4; --muted:#9AA49D; --line:#2E3631;
+  --accent:#3FB48A; --back:#7EA3E6; --gravel:#D29B5C; --tar:#AEB5BC;
+  --ok:#6CC070; --warn:#E5A33A; --bad:#F07167; --chip:#252B27; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#121614; --panel:#1B201D; --ink:#E6EAE4; --muted:#9AA49D; --line:#2E3631;
+  --accent:#3FB48A; --back:#7EA3E6; --gravel:#D29B5C; --tar:#AEB5BC;
+  --ok:#6CC070; --warn:#E5A33A; --bad:#F07167; --chip:#252B27; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:.01em}
+h1{font-size:2.4rem;font-weight:700;line-height:1}
+h2{font-size:1.45rem;font-weight:700}
+h3{font-size:1.15rem;font-weight:600}
+.lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:12px}
+header p{margin:4px 0 0;color:var(--muted)}
+.tag{display:inline-block;font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:3px;background:var(--chip);color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
+.grid{display:grid;grid-template-columns:320px minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.field{display:flex;flex-direction:column;gap:4px}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+input,select,textarea,button{font:inherit;color:inherit}
+input[type=number],input[type=time],select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:7px 9px;width:100%;box-sizing:border-box}
+textarea{resize:vertical;min-height:60px}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.opts{display:flex;flex-direction:column;gap:6px}
+.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:5px;padding:9px 10px;cursor:pointer;background:var(--bg)}
+.opt input{margin-top:4px;accent-color:var(--accent)}
+.opt.sel{border-color:var(--ink)}
+.opt b{display:block;font-weight:600}
+.opt small{color:var(--muted)}
+.swatch{display:inline-block;width:18px;height:4px;border-radius:2px;vertical-align:middle;margin-right:6px}
+.btn{border:1px solid var(--ink);background:var(--ink);color:var(--bg);border-radius:4px;padding:8px 12px;font-weight:600;cursor:pointer}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn:disabled{opacity:.5;cursor:default}
+.btns{display:flex;flex-wrap:wrap;gap:8px}
+.mapbox{overflow-x:auto}
+.mapbox svg{display:block;width:100%;max-width:520px;height:auto;margin:0 auto}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.8rem;color:var(--muted)}
+.days{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.day{border:1px solid var(--line);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--bg)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat .v{font-family:var(--f-mono);font-size:1.05rem;font-weight:500}
+.verdict{font-weight:600;font-size:.9rem;padding:6px 9px;border-radius:4px;border-left:4px solid}
+.v-ok{border-color:var(--ok);color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,transparent)}
+.v-warn{border-color:var(--warn);color:var(--warn);background:color-mix(in srgb,var(--warn) 12%,transparent)}
+.v-bad{border-color:var(--bad);color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,transparent)}
+.tbl{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:.88rem;min-width:560px}
+th{text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line)}
+td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+td.n{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.dayhead td{background:var(--chip);font-family:var(--f-display);font-weight:700;font-size:1rem;letter-spacing:.02em}
+.surf{font-size:.7rem;font-weight:600;padding:1px 6px;border-radius:3px;white-space:nowrap}
+.s-tar{background:var(--chip);color:var(--tar)}
+.s-gravel{background:color-mix(in srgb,var(--gravel) 18%,transparent);color:var(--gravel)}
+.tank{display:flex;align-items:center;gap:6px;justify-content:flex-end}
+.bar{width:54px;height:7px;border-radius:4px;background:var(--chip);overflow:hidden}
+.bar i{display:block;height:100%}
+.kind{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.k-fuel{color:var(--accent)} .k-poi{color:var(--muted)} .k-dest{color:var(--ink)}
+.note{color:var(--muted);font-size:.8rem}
+.rep{font-size:.78rem;margin-top:2px}
+.stays{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
+.stay{border:1px solid var(--line);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:6px;background:var(--bg);min-width:0}
+.stay .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.price{font-family:var(--f-mono);font-size:.9rem}
+.contact{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-family:var(--f-mono);font-size:.84rem}
+.contact span{user-select:all}
+.copy{font-size:.72rem;border:1px solid var(--line);background:var(--panel);border-radius:3px;padding:1px 6px;cursor:pointer}
+a{color:var(--accent)}
+.pois{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
+.poi{border-top:2px solid var(--line);padding-top:8px}
+.poi b{display:block}
+.reports{display:flex;flex-direction:column;gap:8px}
+.report{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;border-bottom:1px solid var(--line);padding-bottom:8px}
+.report .when{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);white-space:nowrap}
+.report.old{opacity:.55}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.empty{color:var(--muted);font-size:.9rem;border:1px dashed var(--line);border-radius:6px;padding:14px}
+.gpxout{font-family:var(--f-mono);font-size:.75rem;width:100%;min-height:120px}
+.toast{font-size:.85rem;color:var(--accent);min-height:1.2em}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+  <header>
+    <div>
+      <span class="tag">Proof of concept · test trip</span>
+      <h1 style="margin-top:6px">Home ⇄ Cederberg Oasis</h1>
+      <p>Two days, one overnight. Pick a way out and a way back, set your bike, and the roadbook redoes the fuel and daylight maths.</p>
+    </div>
+    <div class="lbl" id="hdrSummary"></div>
+  </header>
+
+  <div class="grid">
+    <aside class="panel" aria-label="Trip settings">
+      <h2>Bike</h2>
+      <div class="row2">
+        <div class="field"><label class="lbl" for="range">Range on a full tank (km)</label><input id="range" type="number" min="80" max="900" step="5" value="200"></div>
+        <div class="field"><label class="lbl" for="reserve">Arrive with at least (km)</label><input id="reserve" type="number" min="0" max="200" step="5" value="30"></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label class="lbl" for="spdTar">Avg on tar (km/h)</label><input id="spdTar" type="number" min="30" max="140" step="5" value="85"></div>
+        <div class="field"><label class="lbl" for="spdGravel">Avg on gravel (km/h)</label><input id="spdGravel" type="number" min="15" max="100" step="5" value="45"></div>
+      </div>
+      <h2>Daylight</h2>
+      <div class="row2">
+        <div class="field"><label class="lbl" for="start1">Day 1 leave</label><input id="start1" type="time" value="08:00"></div>
+        <div class="field"><label class="lbl" for="start2">Day 2 leave</label><input id="start2" type="time" value="09:00"></div>
+      </div>
+      <div class="field"><label class="lbl" for="sunset">Sunset</label><input id="sunset" type="time" value="19:25"><span class="note">Late October in the Cederberg. Plan to be off the gravel an hour before.</span></div>
+      <h2>Way out</h2>
+      <div class="opts" id="optsOut"></div>
+      <h2>Way back</h2>
+      <div class="opts" id="optsBack"></div>
+      <h2>Ride files</h2>
+      <p class="note" style="margin:0">One GPX per day, for the Ducati Link app. Check the route on the phone before you ride.</p>
+      <div class="btns">
+        <button class="btn" id="gpx1" type="button">Day 1 GPX</button>
+        <button class="btn" id="gpx2" type="button">Day 2 GPX</button>
+      </div>
+      <div class="toast" id="gpxToast" role="status"></div>
+      <textarea class="gpxout" id="gpxText" hidden readonly aria-label="GPX file text"></textarea>
+    </aside>
+
+    <main class="panel" style="gap:18px">
+      <div class="days" id="days"></div>
+      <div>
+        <div class="mapbox"><svg id="map" viewBox="0 0 440 650" role="img" aria-label="Schematic map of the route options"></svg></div>
+        <div class="legend">
+          <span><i class="swatch" style="background:var(--accent)"></i>Way out</span>
+          <span><i class="swatch" style="background:var(--back)"></i>Way back</span>
+          <span>Solid = tar · dotted = gravel</span>
+          <span>Square = fuel</span>
+        </div>
+      </div>
+      <div>
+        <h2 style="margin-bottom:8px">Roadbook</h2>
+        <div class="tbl"><table>
+          <thead><tr><th style="text-align:right">Km</th><th>Point</th><th>Leg</th><th style="text-align:right">Tank left</th></tr></thead>
+          <tbody id="roadbook"></tbody>
+        </table></div>
+        <p class="note">Distances are estimates for the proof of concept. Real routing comes next.</p>
+      </div>
+    </main>
+  </div>
+
+  <section class="panel">
+    <h2>Where to stay near the Oasis</h2>
+    <p class="note" style="margin:0">No cell signal in most of these. Phone ahead from town. Prices come from dated listings, so confirm before you go.</p>
+    <div class="stays" id="stays"></div>
+  </section>
+
+  <section class="panel">
+    <h2>Worth stopping for</h2>
+    <div class="pois" id="pois"></div>
+  </section>
+
+  <section class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px">
+      <h2>Rider reports</h2>
+      <span class="note">Newest first. Anything older than 30 days is greyed out.</span>
+    </div>
+    <form id="repForm" class="panel" style="background:var(--bg);padding:12px">
+      <div class="row2">
+        <div class="field"><label class="lbl" for="repPlace">Where</label><select id="repPlace"></select></div>
+        <div class="field"><label class="lbl" for="repStatus">What you found</label><select id="repStatus"></select></div>
+      </div>
+      <div class="field"><label class="lbl" for="repNote">Detail</label><textarea id="repNote" maxlength="400" placeholder="e.g. 95 only, no 93. Corrugations bad after the river crossing."></textarea></div>
+      <div class="btns"><button class="btn" id="repSend" type="submit">Post report</button><span class="toast" id="repToast" role="status"></span></div>
+    </form>
+    <div class="reports" id="reports"><div class="empty">No reports yet. When you ride it, post what you find: fuel in stock or not, road condition, hazards.</div></div>
+  </section>
+</div>
+
+<script>
+/* ---------- data ---------- */
+const P = {
+  home:{n:"Home",d:"Kleindassenberg Rd",lat:-33.60,lon:18.60,k:"start"},
+  well:{n:"Wellington",lat:-33.640,lon:19.011,k:"fuel"},
+  bain:{n:"Bain's Kloof Pass",lat:-33.588,lon:19.120,k:"poi"},
+  wols:{n:"Wolseley",lat:-33.416,lon:19.199,k:"fuel"},
+  ceres:{n:"Ceres",lat:-33.369,lon:19.310,k:"fuel"},
+  pah:{n:"Prince Alfred Hamlet",lat:-33.290,lon:19.326,k:"via"},
+  gydo:{n:"Gydo Pass",lat:-33.245,lon:19.335,k:"poi"},
+  odb:{n:"Op-die-Berg",lat:-32.990,lon:19.310,k:"fuel",d:"Last fuel on the Ceres side"},
+  grvS:{n:"Gravel starts",lat:-32.955,lon:19.330,k:"via"},
+  mced:{n:"Mount Ceder",lat:-32.646,lon:19.409,k:"poi"},
+  oasis:{n:"Cederberg Oasis",lat:-32.5505,lon:19.3609,k:"dest",d:"No fuel. No signal."},
+  malm:{n:"Malmesbury",lat:-33.461,lon:18.727,k:"fuel"},
+  pike:{n:"Piketberg",lat:-32.904,lon:18.757,k:"fuel"},
+  piek:{n:"Piekenierskloof Pass",lat:-32.640,lon:18.960,k:"poi"},
+  citr:{n:"Citrusdal",lat:-32.589,lon:19.015,k:"fuel",d:"Last fuel on the N7 side"},
+  algT:{n:"Algeria turn-off (N7)",lat:-32.385,lon:18.995,k:"via"},
+  nieu:{n:"Nieuwoudt's Pass",lat:-32.380,lon:19.030,k:"poi"},
+  alg:{n:"Algeria",lat:-32.373,lon:19.058,k:"poi"},
+  uitk:{n:"Uitkyk Pass",lat:-32.405,lon:19.095,k:"poi"},
+  sand:{n:"Sanddrif / Cederberg Wines",lat:-32.503,lon:19.258,k:"poi"},
+  groot:{n:"Grootrivierhoogte",lat:-32.590,lon:19.380,k:"via"},
+  blink:{n:"Blinkberg Pass",lat:-32.700,lon:19.330,k:"poi"},
+  r303:{n:"R303 junction",lat:-32.880,lon:19.300,k:"via"},
+  odbT:{n:"Op-die-Berg turn-off",lat:-32.975,lon:19.300,k:"fuel",d:"Fuel is a short detour into town"},
+  midd:{n:"Middelberg Pass",lat:-32.640,lon:19.090,k:"poi"}
+};
+/* each step: [pointId, kmFromPrev, surface of that leg] */
+const ROUTES = {
+  A:{dir:"out",name:"Bain's Kloof, Ceres & Op-die-Berg",blurb:"Best gravel. 48 km of it at the end.",steps:[
+    ["home",0],["well",65,"tar"],["bain",15,"tar"],["wols",20,"tar"],["ceres",20,"tar"],["pah",10,"tar"],["gydo",8,"tar"],["odb",37,"tar"],["grvS",5,"tar"],["mced",25,"gravel"],["oasis",23,"gravel"]]},
+  B:{dir:"out",name:"N7, Algeria & Uitkyk Pass",blurb:"More scenic, rougher. 62 km of gravel over two passes.",steps:[
+    ["home",0],["malm",25,"tar"],["pike",60,"tar"],["piek",35,"tar"],["citr",20,"tar"],["algT",28,"tar"],["nieu",8,"gravel"],["alg",6,"gravel"],["uitk",8,"gravel"],["sand",22,"gravel"],["oasis",18,"gravel"]]},
+  C:{dir:"back",name:"Op-die-Berg & Ceres",blurb:"Way out A in reverse. Shortest run to fuel.",steps:[
+    ["oasis",0],["mced",23,"gravel"],["grvS",25,"gravel"],["odb",5,"tar"],["gydo",37,"tar"],["pah",8,"tar"],["ceres",10,"tar"],["wols",20,"tar"],["bain",20,"tar"],["well",15,"tar"],["home",65,"tar"]]},
+  D:{dir:"back",name:"Blinkberg & Middelberg passes",blurb:"Two gravel passes into Citrusdal, then the N7.",steps:[
+    ["oasis",0],["groot",7,"gravel"],["blink",18,"gravel"],["r303",23,"gravel"],["odbT",17,"tar"],["midd",50,"tar"],["citr",20,"gravel"],["piek",20,"tar"],["pike",35,"tar"],["malm",60,"tar"],["home",25,"tar"]]},
+  E:{dir:"back",name:"Uitkyk, Algeria & the N7",blurb:"Way out B in reverse.",steps:[
+    ["oasis",0],["sand",18,"gravel"],["uitk",22,"gravel"],["alg",8,"gravel"],["nieu",6,"gravel"],["algT",8,"gravel"],["citr",28,"tar"],["piek",20,"tar"],["pike",35,"tar"],["malm",60,"tar"],["home",25,"tar"]]}
+};
+const STAYS = [
+  {n:"Cederberg Oasis",what:"Biker and backpacker base. Rooms, camping, restaurant and bar. Kitchen closes 20:00.",km:"0 km",price:"From R250 per unit",asof:"older listing",phones:["+27 27 482 2819","+27 87 550 1360"],web:"https://www.cederbergoasis.co.za",signal:"No signal"},
+  {n:"Sanddrif Holiday Resort",what:"Self-catering cottages and camping at Cederberg Wines, on the Dwars River.",km:"18 km",price:"R1,360 per cottage, up to 4",asof:"2021 rate",phones:["+27 27 482 2825"],email:"sanddrif@cederbergwine.com",web:"https://www.cederbergwine.com/sanddrif-holiday-resort/",signal:"No signal"},
+  {n:"Kromrivier Cederberg Park",what:"Chalets and tented camp on a working farm. Restaurant and own beer. 2-night minimum on some listings.",km:"≈15 km",price:"From R1,520 per room for 2",asof:"current listing",phones:["+27 27 482 2807"],web:"https://www.cederbergpark.com",score:"4.4 / 5 from 23 reviews (LekkeSlaap)"},
+  {n:"Mount Ceder",what:"Self-catering houses and a restaurant, on the Op-die-Berg gravel road in.",km:"≈23 km",price:"Ask",asof:"no price found",phones:[],web:"",signal:"Wi-Fi at reception only"},
+  {n:"Jamaka",what:"Camping and cottages in the Olifants River valley, Algeria side.",km:"≈55 km",price:"From R240 per unit",asof:"2020 listing",phones:["+27 27 482 2805","+27 82 466 4331"],web:"",signal:"Good signal"}
+];
+const POIS = [
+  {n:"Stadsaal caves & rock art",r:"All routes",t:"At Matjiesrivier, minutes from the Oasis. Permit needed."},
+  {n:"Uitkyk Pass viewpoint",r:"Way out B · back E",t:"Best view in the central Cederberg. Steep, loose switchbacks."},
+  {n:"Cederberg Wines & Brewery",r:"Way out B · back E",t:"Tasting and cold craft beer at Dwarsrivier. Small farm shop."},
+  {n:"Wolfberg Cracks & Arch",r:"From Sanddrif",t:"Half-day hike. Park at Sanddrif."},
+  {n:"Bain's Kloof Pass",r:"Way out A · back C",t:"Classic stone-walled tar pass above Wellington."},
+  {n:"Gydo Pass",r:"Way out A · back C",t:"Fast tar sweepers with the Koue Bokkeveld below."},
+  {n:"Algeria",r:"Way out B · back E",t:"Shade and river at the CapeNature camp. Good lunch stop."},
+  {n:"Cederberg Observatory",r:"Near Sanddrif",t:"Saturday evenings only."},
+  {n:"Blinkberg & Middelberg passes",r:"Way back D",t:"Quiet gravel passes. Middelberg drops you into Citrusdal."}
+];
+const REPORT_PLACES = [
+  ["odb","Op-die-Berg fuel"],["ceres","Ceres fuel"],["citr","Citrusdal fuel"],["pike","Piketberg fuel"],["oasis","Cederberg Oasis"],
+  ["road-odb","Gravel: Op-die-Berg ⇄ Oasis"],["road-alg","Gravel: Algeria ⇄ Oasis (Uitkyk)"],["road-blink","Gravel: Blinkberg ⇄ R303"],["road-midd","Gravel: Middelberg Pass"]
+];
+const STATUSES = [["ok","Fuel available / road good"],["low","Fuel limited / road rough"],["none","No fuel / road closed"],["info","Info only"]];
+const STATUS_COLOR = {ok:"var(--ok)",low:"var(--warn)",none:"var(--bad)",info:"var(--muted)"};
+
+/* ---------- state ---------- */
+const st = {out:"A",back:"C"};
+let reports = [];
+let db = null, myId = null;
+const $ = id => document.getElementById(id);
+const store = { get(k){try{return localStorage.getItem(k)}catch(e){return null}}, set(k,v){try{localStorage.setItem(k,v)}catch(e){}} };
+["range","reserve","spdTar","spdGravel","start1","start2","sunset"].forEach(id=>{const v=store.get("rm-"+id); if(v) $(id).value=v;});
+if(store.get("rm-out")) st.out=store.get("rm-out"); if(store.get("rm-back")) st.back=store.get("rm-back");
+
+const num = id => Math.max(0, parseFloat($(id).value)||0);
+const toMin = t => {const [h,m]=(t||"0:0").split(":").map(Number); return h*60+m;};
+const fmtT = m => {m=Math.round(m); const h=Math.floor(m/60)%24, mm=m%60; return String(h).padStart(2,"0")+":"+String(mm).padStart(2,"0");};
+const fmtDur = m => {m=Math.round(m); return Math.floor(m/60)+"h"+String(m%60).padStart(2,"0");};
+const esc = s => String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------- maths ---------- */
+function computeDay(route, tankStart){
+  const range=num("range"), reserve=num("reserve"), vT=num("spdTar")||1, vG=num("spdGravel")||1;
+  let tank=tankStart, km=0, tar=0, gravel=0, mins=0, worst=Infinity, fuelStops=0;
+  const rows=[];
+  route.steps.forEach(([pid,leg,surf],i)=>{
+    const p=P[pid];
+    if(i>0){ km+=leg; tank-=leg; if(surf==="gravel"){gravel+=leg; mins+=leg/vG*60} else {tar+=leg; mins+=leg/vT*60} }
+    const arriveTank=tank;
+    if(i>0) worst=Math.min(worst,arriveTank);
+    let refuel=false;
+    if(p.k==="fuel" && i<route.steps.length-1){ tank=range; refuel=true; fuelStops++; mins+=10; }
+    rows.push({pid,p,leg,surf,km,arriveTank,refuel,i});
+  });
+  let level="ok";
+  if(worst<0) level="bad"; else if(worst<reserve) level="warn";
+  return {rows,km,tar,gravel,mins,endTank:tank,worst,level,fuelStops};
+}
+function lastFuelBeforeEnd(route){
+  for(let i=route.steps.length-2;i>=0;i--) if(P[route.steps[i][0]].k==="fuel") return P[route.steps[i][0]].n;
+  return "home";
+}
+
+/* ---------- render ---------- */
+function renderOpts(){
+  for(const dir of ["out","back"]){
+    const box=$(dir==="out"?"optsOut":"optsBack"); box.innerHTML="";
+    Object.entries(ROUTES).filter(([,r])=>r.dir===dir).forEach(([key,r])=>{
+      const d=computeDay(r, num("range"));
+      const lab=document.createElement("label");
+      lab.className="opt"+(st[dir]===key?" sel":"");
+      lab.innerHTML=`<input type="radio" name="r-${dir}" id="r-${key}" value="${key}" ${st[dir]===key?"checked":""}>
+        <span><b>${key}. ${esc(r.name)}</b><small class="mono">${d.km} km · ${d.gravel} km gravel</small><br><small>${esc(r.blurb)}</small></span>`;
+      lab.querySelector("input").addEventListener("change",()=>{st[dir]=key; store.set("rm-"+dir,key); renderAll();});
+      box.appendChild(lab);
+    });
+  }
+}
+
+function latestReport(placeKey){
+  return reports.find(r=>r.place===placeKey);
+}
+function ago(iso){
+  const d=(Date.now()-new Date(iso).getTime())/86400000;
+  if(d<1/24) return "just now"; if(d<1) return Math.round(d*24)+"h ago"; return Math.round(d)+"d ago";
+}
+
+function renderAll(){
+  renderOpts();
+  const range=num("range"), reserve=num("reserve"), sunset=toMin($("sunset").value);
+  const rOut=ROUTES[st.out], rBack=ROUTES[st.back];
+  const d1=computeDay(rOut, range);
+  const d2=computeDay(rBack, d1.endTank);
+  const days=[{d:d1,r:rOut,start:toMin($("start1").value),label:"Day 1 · out",key:st.out},{d:d2,r:rBack,start:toMin($("start2").value),label:"Day 2 · back",key:st.back}];
+
+  // day cards
+  $("days").innerHTML=days.map(({d,r,start,label,key},idx)=>{
+    const arrive=start+d.mins, spare=sunset-arrive;
+    let msgs=[];
+    if(d.level==="bad") msgs.push(["v-bad",`Runs dry: ${Math.abs(Math.round(d.worst))} km short on the worst leg.`]);
+    else if(d.level==="warn") msgs.push(["v-warn",`Tight: only ${Math.round(d.worst)} km left on the worst leg.`]);
+    else msgs.push(["v-ok",`Fuel fine: never below ${Math.round(d.worst)} km left.`]);
+    if(idx===0) msgs.push(["v-warn",`Arrive with ${Math.round(d.endTank)} km in the tank. No fuel at the Oasis, so day 2 starts with that. Fill up at ${lastFuelBeforeEnd(r)}.`]);
+    if(spare<60) msgs.push([spare<0?"v-bad":"v-warn",spare<0?`Arrives after dark (${fmtT(arrive)}). Leave earlier.`:`Arrives ${fmtT(arrive)}, under an hour before sunset.`]);
+    const tp=d.km?Math.round(d.gravel/d.km*100):0;
+    return `<div class="day">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><h3>${label}</h3><span class="tag">${key}</span></div>
+      <div class="note">${esc(r.name)}</div>
+      <div class="stats">
+        <div class="stat"><div class="lbl">Distance</div><div class="v">${d.km} km</div></div>
+        <div class="stat"><div class="lbl">Gravel</div><div class="v">${tp}%</div></div>
+        <div class="stat"><div class="lbl">Riding</div><div class="v">${fmtDur(d.mins)}</div></div>
+        <div class="stat"><div class="lbl">Leave</div><div class="v">${fmtT(start)}</div></div>
+        <div class="stat"><div class="lbl">Arrive</div><div class="v">${fmtT(arrive)}</div></div>
+        <div class="stat"><div class="lbl">Fuel stops</div><div class="v">${d.fuelStops}</div></div>
+      </div>
+      ${msgs.map(([c,t])=>`<div class="verdict ${c}">${esc(t)}</div>`).join("")}
+    </div>`;
+  }).join("");
+  $("hdrSummary").textContent=`${d1.km+d2.km} km round trip · ${d1.gravel+d2.gravel} km gravel`;
+
+  // roadbook
+  const rb=[];
+  days.forEach(({d,label,r})=>{
+    rb.push(`<tr class="dayhead"><td colspan="4">${label}: ${esc(r.name)}</td></tr>`);
+    d.rows.forEach(row=>{
+      const p=row.p, pct=Math.max(0,Math.min(1,row.arriveTank/range));
+      const col=row.arriveTank<0?"var(--bad)":row.arriveTank<reserve?"var(--warn)":"var(--ok)";
+      const rep=latestReport(row.pid);
+      const repHtml=rep?`<div class="rep"><span class="dot" style="background:${STATUS_COLOR[rep.status]||"var(--muted)"}"></span>${esc(labelStatus(rep.status))} · ${ago(rep.at)}</div>`:"";
+      const kind=p.k==="fuel"?`<span class="kind k-fuel">Fuel${row.refuel?" · fill up":""}</span>`:p.k==="poi"?`<span class="kind k-poi">Stop</span>`:p.k==="dest"?`<span class="kind k-dest">Overnight</span>`:"";
+      rb.push(`<tr>
+        <td class="n">${row.km}</td>
+        <td><b>${esc(p.n)}</b> ${kind}${p.d?`<div class="note">${esc(p.d)}</div>`:""}${repHtml}</td>
+        <td>${row.i?`<span class="mono">${row.leg} km</span> <span class="surf s-${row.surf}">${row.surf}</span>`:`<span class="note">${row.i===0&&label.startsWith("Day 2")?"Start with "+Math.round(row.arriveTank)+" km in the tank":"Start full"}</span>`}</td>
+        <td class="n"><div class="tank"><span>${Math.round(row.arriveTank)}</span><span class="bar"><i style="width:${pct*100}%;background:${col}"></i></span></div></td>
+      </tr>`);
+    });
+  });
+  $("roadbook").innerHTML=rb.join("");
+  drawMap();
+  ["range","reserve","spdTar","spdGravel","start1","start2","sunset"].forEach(id=>store.set("rm-"+id,$(id).value));
+}
+
+/* ---------- map ---------- */
+const PAD=40, K=430, LAT0=-32.32, LON0=18.52;
+const xy = p => [PAD+(p.lon-LON0)*0.84*K, PAD+(LAT0-p.lat)*K];
+function drawMap(){
+  const svg=$("map"); const parts=[];
+  parts.push(`<rect x="0" y="0" width="440" height="650" fill="var(--panel)"/>`);
+  // faint graticule
+  for(let lat=-32.5;lat>=-33.5;lat-=0.5){const y=PAD+(LAT0-lat)*K; parts.push(`<line x1="0" x2="440" y1="${y}" y2="${y}" stroke="var(--line)" stroke-width="1"/><text x="6" y="${y-4}" font-size="9" fill="var(--muted)" font-family="IBM Plex Mono,monospace">${Math.abs(lat).toFixed(1)}°S</text>`);}
+  const drawRoute=(key,color,w,op)=>{
+    ROUTES[key].steps.forEach(([pid,leg,surf],i)=>{
+      if(!i) return;
+      const a=xy(P[ROUTES[key].steps[i-1][0]]), b=xy(P[pid]);
+      parts.push(`<line x1="${a[0]}" y1="${a[1]}" x2="${b[0]}" y2="${b[1]}" stroke="${color}" stroke-width="${w}" stroke-linecap="round" ${surf==="gravel"?`stroke-dasharray="1 ${w+3}"`:""} opacity="${op}"/>`);
+    });
+  };
+  Object.keys(ROUTES).forEach(k=>{ if(k!==st.out && k!==st.back) drawRoute(k,"var(--muted)",2,0.35); });
+  drawRoute(st.back,"var(--back)",4,0.95);
+  drawRoute(st.out,"var(--accent)",4,0.95);
+  const used=new Set([...ROUTES[st.out].steps,...ROUTES[st.back].steps].map(s=>s[0]));
+  const labelLeft=new Set(["well","malm","pike","piek","citr","algT","nieu","home","midd","alg"]);
+  Object.entries(P).forEach(([id,p])=>{
+    const [x,y]=xy(p); const on=used.has(id);
+    if(!on && p.k==="via") return;
+    let mark;
+    if(p.k==="fuel") mark=`<rect x="${x-5}" y="${y-5}" width="10" height="10" fill="${on?"var(--ink)":"var(--panel)"}" stroke="var(--ink)" stroke-width="1.5"/>`;
+    else if(p.k==="dest") mark=`<circle cx="${x}" cy="${y}" r="8" fill="var(--ink)"/><circle cx="${x}" cy="${y}" r="3.5" fill="var(--panel)"/>`;
+    else if(p.k==="start") mark=`<path d="M${x-7} ${y+6}V${y-1}L${x} ${y-7}L${x+7} ${y-1}V${y+6}Z" fill="var(--ink)"/>`;
+    else if(p.k==="poi") mark=`<circle cx="${x}" cy="${y}" r="4" fill="var(--panel)" stroke="var(--ink)" stroke-width="1.5"/>`;
+    else mark=`<circle cx="${x}" cy="${y}" r="2.5" fill="var(--muted)"/>`;
+    const left=labelLeft.has(id);
+    const bold=p.k==="dest"||p.k==="start";
+    const show=on||p.k==="fuel";
+    parts.push(`<g opacity="${on?1:0.5}">${mark}${show?`<text x="${left?x-10:x+10}" y="${y+4}" text-anchor="${left?"end":"start"}" font-size="${bold?13:11}" font-weight="${bold?700:500}" fill="var(--ink)" font-family="IBM Plex Sans,system-ui,sans-serif" paint-order="stroke" stroke="var(--panel)" stroke-width="3">${esc(p.n.replace(" / Cederberg Wines",""))}</text>`:""}</g>`);
+  });
+  // scale bar 20 km
+  const s=20/111*K; parts.push(`<line x1="300" x2="${300+s}" y1="630" y2="630" stroke="var(--ink)" stroke-width="2"/><text x="${300+s/2}" y="624" text-anchor="middle" font-size="10" fill="var(--muted)" font-family="IBM Plex Mono,monospace">20 km</text><text x="420" y="24" text-anchor="end" font-size="12" font-weight="700" fill="var(--muted)" font-family="IBM Plex Sans,sans-serif">N ↑</text>`);
+  svg.innerHTML=parts.join("");
+}
+
+/* ---------- stays & pois ---------- */
+function renderStatic(){
+  $("stays").innerHTML=STAYS.map((s,i)=>`<div class="stay">
+    <div class="top"><h3>${esc(s.n)}</h3><span class="tag">${esc(s.km)}</span></div>
+    <div class="note">${esc(s.what)}</div>
+    <div><span class="price">${esc(s.price)}</span> <span class="note">(${esc(s.asof)})</span></div>
+    ${s.phones.map((ph,j)=>`<div class="contact"><span id="ph-${i}-${j}">${esc(ph)}</span><button class="copy" type="button" data-copy="${esc(ph)}">Copy</button></div>`).join("")}
+    ${s.email?`<div class="contact"><span>${esc(s.email)}</span><button class="copy" type="button" data-copy="${esc(s.email)}">Copy</button></div>`:""}
+    ${!s.phones.length&&!s.email?`<div class="note">Contact not confirmed yet.</div>`:""}
+    <div class="note">${s.signal?esc(s.signal)+" · ":""}${s.score?esc(s.score)+" · ":""}
+      ${s.web?`<a href="${s.web}" target="_blank" rel="noopener">Website</a> · `:""}<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.n+" Cederberg")}" target="_blank" rel="noopener">Reviews</a></div>
+  </div>`).join("");
+  $("pois").innerHTML=POIS.map(p=>`<div class="poi"><b>${esc(p.n)}</b><span class="lbl">${esc(p.r)}</span><div class="note">${esc(p.t)}</div></div>`).join("");
+  document.addEventListener("click",e=>{
+    const b=e.target.closest("[data-copy]"); if(!b) return;
+    const t=b.getAttribute("data-copy");
+    const done=()=>{b.textContent="Copied"; setTimeout(()=>b.textContent="Copy",1500);};
+    try{ navigator.clipboard.writeText(t).then(done,()=>selectText(b.previousElementSibling)); }catch(err){ selectText(b.previousElementSibling); }
+  });
+  $("repPlace").innerHTML=REPORT_PLACES.map(([v,l])=>`<option value="${v}">${esc(l)}</option>`).join("");
+  $("repStatus").innerHTML=STATUSES.map(([v,l])=>`<option value="${v}">${esc(l)}</option>`).join("");
+}
+function selectText(el){ if(!el) return; const r=document.createRange(); r.selectNodeContents(el); const s=getSelection(); s.removeAllRanges(); s.addRange(r); }
+const labelStatus = v => (STATUSES.find(s=>s[0]===v)||["","Report"])[1];
+const placeLabel = v => (REPORT_PLACES.find(s=>s[0]===v)||["",v])[1];
+
+/* ---------- GPX ---------- */
+function gpxFor(route,title){
+  const pts=route.steps.map(([pid])=>P[pid]);
+  const rte=pts.map(p=>`    <rtept lat="${p.lat.toFixed(5)}" lon="${p.lon.toFixed(5)}"><name>${esc(p.n)}</name></rtept>`).join("\n");
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="RoadMap proof of concept" xmlns="http://www.topografix.com/GPX/1/1">
+  <metadata><name>${esc(title)}</name><desc>Shaping points only. Check the calculated route before riding.</desc></metadata>
+  <rte>
+    <name>${esc(title)}</name>
+${rte}
+  </rte>
+</gpx>
+`;
+}
+async function saveGpx(day){
+  const route=day===1?ROUTES[st.out]:ROUTES[st.back];
+  const title=(day===1?"Day 1 Home to Cederberg Oasis via ":"Day 2 Cederberg Oasis to Home via ")+route.name;
+  const text=gpxFor(route,title);
+  const file=(day===1?"day1-out-":"day2-back-")+(day===1?st.out:st.back)+".gpx";
+  let dl=null;
+  try{ dl = window.claude?.use ? await window.claude.use("downloads") : null; }catch(e){ dl=null; }
+  if(dl){
+    try{ const r=await dl.save({filename:file,data:new Blob([text],{type:"application/gpx+xml"})}); $("gpxToast").textContent=r&&r.status==="saved"?`Saved ${file}`:`Sent ${file}`; $("gpxText").hidden=true; return; }
+    catch(e){ if(e&&e.code==="declined"){ $("gpxToast").textContent="Save cancelled."; return; } }
+  }
+  $("gpxText").hidden=false; $("gpxText").value=text; $("gpxToast").textContent=`Saving isn't available here. Copy the text below into a file named ${file}.`;
+}
+
+/* ---------- rider reports ---------- */
+function renderReports(){
+  if(!reports.length){ $("reports").innerHTML=`<div class="empty">No reports yet. When you ride it, post what you find: fuel in stock or not, road condition, hazards.</div>`; return; }
+  $("reports").innerHTML=reports.map(r=>{
+    const old=(Date.now()-new Date(r.at).getTime())>30*86400000;
+    return `<div class="report${old?" old":""}"><span class="when">${ago(r.at)}</span>
+      <div><span class="dot" style="background:${STATUS_COLOR[r.status]||"var(--muted)"}"></span><b>${esc(placeLabel(r.place))}</b> · ${esc(labelStatus(r.status))}${r.by&&r.by===myId?` <span class="tag">you</span>`:""}
+      ${r.note?`<div class="note">${esc(r.note)}</div>`:""}</div></div>`;
+  }).join("");
+}
+$("repForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  if(!db){ $("repToast").textContent="Reports need you signed in to claude.ai on this page."; return; }
+  const body={place:$("repPlace").value,status:$("repStatus").value,note:$("repNote").value.trim().slice(0,400),at:new Date().toISOString(),by:myId||""};
+  $("repSend").disabled=true;
+  try{ await db.collection("reports").add(body); $("repNote").value=""; $("repToast").textContent="Posted."; }
+  catch(err){ $("repToast").textContent= err&&err.code==="invalid_argument"?"You can read reports here but not post them.":"Couldn't post. Try again in a moment."; }
+  $("repSend").disabled=false;
+});
+
+/* ---------- wire up ---------- */
+["range","reserve","spdTar","spdGravel","start1","start2","sunset"].forEach(id=>$(id).addEventListener("input",renderAll));
+$("gpx1").addEventListener("click",()=>saveGpx(1));
+$("gpx2").addEventListener("click",()=>saveGpx(2));
+renderStatic(); renderAll();
+
+(async()=>{
+  if(!window.claude?.use) return;
+  try{
+    const user=await window.claude.use("user");
+    if(user){ try{ myId=await user.id(); }catch(e){} }
+    db=await window.claude.use("db");
+    if(!db){ $("repToast").textContent="Sign in to claude.ai to read and post reports."; $("repSend").disabled=true; return; }
+    db.collection("reports").orderBy("at","desc").limit(200).onSnapshot(s=>{
+      reports=s.docs.map(d=>Object.assign({id:d.id},d.data())); renderReports(); renderAll();
+    },()=>{ $("repToast").textContent="Reports are offline right now."; });
+  }catch(e){}
+})();
+</script>
