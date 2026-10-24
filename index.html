@@ -178,7 +178,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 
 <aside id="panel" class="sheet" hidden aria-label="Stop details"><div class="dlghead"><div><h2 id="pTitle"></h2><div class="note" id="pSub"></div></div><button class="icon" type="button" id="pClose" aria-label="Close">✕</button></div><div class="ptabs" id="pTabs"></div><div id="pBody" class="dlgbody"></div></aside>
 <div id="peek" class="peek" hidden></div>
-<div hidden>
+<div hidden id="tbHold">
   <section class="tripbar" aria-label="Trip">
     <div class="field"><label class="lbl" for="startDate">Leave</label><input id="startDate" type="date"></div>
     <div class="field"><label class="lbl" for="endDate">Back</label><input id="endDate" type="date"></div>
@@ -603,7 +603,7 @@ $("dayTabs").addEventListener("click",e=>{const b=e.target.closest("[data-day]")
 
 /* ---------- details ---------- */
 const TB=document.querySelector(".tripbar");
-function renderDetails(){ TB.remove(); $("details").innerHTML=ui.tab==="ov"?overviewHtml():dayHtml(ui.tab); const slot=$("details").querySelector(".tbslot"); if(slot) slot.replaceWith(TB); wireDetails(); }
+function renderDetails(){ $("tbHold").append(TB); $("details").innerHTML=ui.tab==="ov"?overviewHtml():dayHtml(ui.tab); const slot=$("details").querySelector(".tbslot"); if(slot) slot.replaceWith(TB); wireDetails(); }
 
 /* ---------- weather, time zones (Open-Meteo, no key) ---------- */
 let wx=null, meds=null, fords=null;
