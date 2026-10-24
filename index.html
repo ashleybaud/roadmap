@@ -231,13 +231,14 @@ function renderStops(){
   const n=trip.stops.length; let day=0;
   trip.stops.forEach((st,i)=>{
     const last=i===n-1, first=i===0;
-    if(first||isSleep(trip.stops[i-1],i-1,n)){
+    const header=()=>{
       let j=i+1; while(j<n-1&&trip.stops[j].type!=="sleep") j++;
       const end=trip.stops[Math.min(j,n-1)];
       const h=document.createElement("div"); h.className="dayhdr";
       h.innerHTML=`<span>Day ${day+1} · ${esc(fmtDate(dayDate(day)))}</span><span class="note">${esc(st.name||"Start")} → ${esc(end.name||"…")}</span>`;
       box.appendChild(h); day++;
-    }
+    };
+    if(first) header();
     const row=document.createElement("div"); row.className="stop";
     const label=first?"Start":last?"Finish":"Stop";
     const locked=last&&trip.round;
@@ -253,6 +254,7 @@ function renderStops(){
       </div>`;
     box.appendChild(row);
     wireSearch(row.querySelector("input"),row.querySelector(".sugg"),i);
+    if(isSleep(st,i,n)) header();
     if(!last){
       const lg=st.leg||{}, info=legInfo.get(st);
       const leg=document.createElement("div"); leg.className="leg";
