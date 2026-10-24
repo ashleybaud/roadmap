@@ -105,7 +105,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 .flight.warn{color:var(--warn)} .flight.bad{color:var(--bad)}
 .linkbtn{border:0;background:none;padding:0;color:var(--accent);text-decoration:underline;cursor:pointer;font:inherit;font-size:.8rem}
 .badge{border:1px solid var(--back);color:var(--back);background:color-mix(in srgb,var(--back) 10%,transparent);border-radius:999px;padding:2px 9px;font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap}
-.badge.leg{border-color:var(--line);color:var(--ink);background:var(--bg)}
+.badge.legb{border-color:var(--line);color:var(--ink);background:var(--bg)}
 .namerow{display:flex;gap:6px;align-items:center}
 .namerow input{flex:1;min-width:0}
 .listdlg{width:min(640px,calc(100vw - 24px));max-height:min(80vh,760px);padding:0}
@@ -281,7 +281,7 @@ function renderStops(){
       const PUMP=`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 3h9a1 1 0 0 1 1 1v8h1.5A2.5 2.5 0 0 1 18 14.5V18a1 1 0 0 0 2 0V9.4l-2.7-2.7 1.4-1.4 3 3c.2.2.3.5.3.7V18a3 3 0 0 1-6 0v-3.5a.5.5 0 0 0-.5-.5H14v7h1v2H2v-2h1V4a1 1 0 0 1 1-1zm1 2v5h7V5H5z"/></svg>`;
       const fuelHtml=lf&&lf.level?`<span class="flight ${lf.level}" title="Fuel warning">${PUMP}${esc(lf.text)}</span><button class="linkbtn" type="button" data-findfuel="${i}">Find fuel nearby</button>`:"";
       const lp=legPoiCount(i);
-      leg.innerHTML=`<span class="mono legkm" data-focusleg="${i}" title="Show this leg on the map">${info?Math.round(info.km)+" km · "+fmtDur(info.min):"…"}</span>${fuelHtml}${lp?`<button class="badge leg" type="button" data-legpois="${i}">On this leg · ${lp}</button>`:""}
+      leg.innerHTML=`<span class="mono legkm" data-focusleg="${i}" title="Show this leg on the map">${info?Math.round(info.km)+" km · "+fmtDur(info.min):"…"}</span>${fuelHtml}${lp?`<button class="badge legb" type="button" data-legpois="${i}">On this leg · ${lp}</button>`:""}
         <label class="chk"><input type="checkbox" data-fast="${i}" ${lg.fast?"checked":""}> Get me there fast</label>
         ${info&&info.n>1&&!lg.track?`<select data-alt="${i}" aria-label="Way">${Array.from({length:info.n},(_,k)=>`<option value="${k}" ${(lg.alt||0)===k?"selected":""}>Way ${k+1}${info.alts?" · "+Math.round(info.alts[k])+" km":""}</option>`).join("")}</select>`:""}
         ${lg.track?`<span class="note">Own track: ${esc(lg.trackName||"GPX")}</span><button class="btn small ghost" type="button" data-untrack="${i}">Remove track</button>`
@@ -662,7 +662,7 @@ function render(){
       const nx=trip.stops[i+1]; if(!nx||!sk.has(st)||!sk.has(nx)) return;
       const a=sk.get(st),b=sk.get(nx);
       let min=Infinity; for(let k=a;k<b;k+=1) min=Math.min(min,fp.tankAt(k)); min=Math.min(min,fp.tankAt(b-0.01));
-      const gap=fp.gaps.find(g=>g.from>=a-0.5&&g.from<b-0.5);
+      const gap=fp.gaps.find(g=>g.from+2>=a&&g.from+2<b);
       let level="",text="";
       if(gap){level="bad";text=`${Math.round(gap.to-gap.from)} km with no fuel known. Range ${settings.range} km.`;}
       else if(min<0){level="bad";text=`You'll run dry on this leg.`;}
