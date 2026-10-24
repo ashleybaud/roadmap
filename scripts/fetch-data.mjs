@@ -11,6 +11,7 @@ const SERVERS = [
 ];
 const KINDS = {
   fuel:  `nwr[amenity=fuel]`,
+  towns: `node[place~"^(city|town|village|hamlet)$"][name]`,
   view:  `nwr[tourism=viewpoint][name]`,
   pass:  `node[mountain_pass=yes][name]`,
   sight: `nwr[tourism~"^(attraction|museum)$"][name];nwr[historic~"^(monument|ruins|archaeological_site|memorial|castle|fort)$"][name]`,
@@ -52,6 +53,7 @@ function row(e, kind) {
   if (lat == null) return null;
   const t = e.tags || {};
   const out = [+lat.toFixed(5), +lon.toFixed(5), t.name || t.brand || ""];
+  if (kind === "towns") out.push(t.place || "", t["is_in:state"] || t["addr:state"] || "");
   if (kind === "sleep" || kind === "camp" || kind === "food") {
     out.push(t.tourism || t.amenity || "", t.phone || t["contact:phone"] || "", t.website || t["contact:website"] || "", t.email || t["contact:email"] || "");
   }
