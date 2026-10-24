@@ -105,6 +105,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
     </div>
   </header>
 
+  <div class="verdict v-ok" id="styleBanner" style="font-weight:500"></div>
   <div class="grid">
     <aside class="panel" aria-label="Trip">
       <div style="display:flex;justify-content:space-between;align-items:baseline"><h2>Trip</h2><span class="note">Tick a stop to sleep there</span></div>
@@ -165,7 +166,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
       <div class="field"><label class="lbl" for="leave">Leave each day at</label><input id="leave" type="time" value="08:00"></div>
       <div class="field"><label class="lbl" for="pace">Slower than normal by (%)</label><input id="pace" type="number" min="0" max="100" step="5" value="0"></div>
     </div>
-    <div class="field"><label class="lbl" for="trails">Rough tracks and jeep trails</label><select id="trails"><option value="0">Avoid</option><option value="0.5">Allow</option><option value="1">Prefer</option></select></div>
+    <div class="field"><label class="lbl" for="style">Route style</label><select id="style"><option value="rough">Road less travelled: back roads and gravel first</option><option value="mixed">Mixed: gravel when it saves time</option><option value="tar">Tar: main roads and highways</option></select><span class="note">Road less travelled is often the shortest and toughest way. Check your bike, tyres and skills match it.</span></div>
     <div class="field"><label class="lbl" for="corridor">Show places up to (km) off the route</label><input id="corridor" type="number" min="1" max="20" step="1" value="5"></div>
     <div class="btns" style="justify-content:flex-end"><button class="btn" value="ok">Done</button></div>
   </form>
@@ -201,8 +202,8 @@ const DEFAULT_TRIP={stops:[
   {name:"Citrusdal",lat:-32.589,lon:19.015},
   {name:"Malmesbury",lat:-33.461,lon:18.727}],round:true};
 const trip=store.get("rr2-trip")||DEFAULT_TRIP;
-const SET_FIELDS=["range","reserve","leave","pace","corridor","trails"];
-const settings=Object.assign({range:200,reserve:30,leave:"08:00",pace:0,corridor:5,trails:"0.5"},store.get("rr2-settings")||{});
+const SET_FIELDS=["range","reserve","leave","pace","corridor","style"];
+const settings=Object.assign({range:200,reserve:30,leave:"08:00",pace:0,corridor:5,style:"rough"},store.get("rr2-settings")||{});
 const ui=Object.assign({types:Object.fromEntries(TYPES.map(t=>[t.id,t.on])),max:"10"},store.get("rr2-ui")||{});
 const tomorrow=new Date(Date.now()+86400000).toISOString().slice(0,10);
 $("tripDate").value=trip.date||tomorrow;
@@ -313,12 +314,13 @@ const cache=new Map();
 function decode6(str){let i=0,lat=0,lon=0;const out=[];while(i<str.length){let b,sh=0,r=0;do{b=str.charCodeAt(i++)-63;r|=(b&31)<<sh;sh+=5;}while(b>=32);lat+=r&1?~(r>>1):r>>1;sh=0;r=0;do{b=str.charCodeAt(i++)-63;r|=(b&31)<<sh;sh+=5;}while(b>=32);lon+=r&1?~(r>>1):r>>1;out.push({lat:lat/1e6,lon:lon/1e6});}return out;}
 /* motorcycle routing that can use gravel and rough tracks; falls back to car routing */
 async function route(list){
-  const trails=+settings.trails;
-  const key=trails+"|"+list.map(p=>p.lon.toFixed(5)+","+p.lat.toFixed(5)).join(";");
+  const STYLE={rough:{use_highways:0,use_primary:0.2,use_trails:1},mixed:{use_highways:0.5,use_primary:0.5,use_trails:0.5},tar:{use_highways:1,use_primary:1,use_trails:0}};
+  const opts=STYLE[settings.style]||STYLE.rough;
+  const key=settings.style+"|"+list.map(p=>p.lon.toFixed(5)+","+p.lat.toFixed(5)).join(";");
   if(cache.has(key)) return cache.get(key);
   let o=null;
   try{
-    const body={locations:list.map(p=>({lat:p.lat,lon:p.lon,type:"break"})),costing:"motorcycle",costing_options:{motorcycle:{use_trails:trails,use_highways:0.5}},units:"kilometers",directions_type:"none"};
+    const body={locations:list.map(p=>({lat:p.lat,lon:p.lon,type:"break"})),costing:"motorcycle",costing_options:{motorcycle:opts},units:"kilometers",directions_type:"none"};
     const ctl=new AbortController(); setTimeout(()=>ctl.abort(),25000);
     const r=await fetch(VALHALLA+"?json="+encodeURIComponent(JSON.stringify(body)),{signal:ctl.signal});
     const j=await r.json(); if(!j.trip) throw new Error(j.error||"no route");
@@ -626,13 +628,15 @@ ${simplify(r.geom,20).map(g=>`      <trkpt lat="${g.lat.toFixed(5)}" lon="${g.lo
 SET_FIELDS.forEach(id=>$(id).value=settings[id]);
 $("openSettings").addEventListener("click",()=>$("settings").showModal());
 $("settings").addEventListener("close",()=>{
-  const corridorChanged=+$("corridor").value!==+settings.corridor||$("trails").value!==String(settings.trails);
+  const corridorChanged=+$("corridor").value!==+settings.corridor||$("style").value!==settings.style;
   SET_FIELDS.forEach(id=>settings[id]=$(id).value); store.set("rr2-settings",settings);
-  corridorChanged?recalc():render();
+  showStyle(); corridorChanged?recalc():render();
 });
 
+const STYLE_TEXT={rough:"<b>Road less travelled.</b> Back roads and gravel first, often the shortest and toughest way. Not for every bike or rider. Change it in Settings.",mixed:"<b>Mixed.</b> Gravel where it saves time, tar where it doesn't. Change it in Settings.",tar:"<b>Tar.</b> Main roads and highways. Change it in Settings."};
+function showStyle(){ $("styleBanner").innerHTML=STYLE_TEXT[settings.style]||STYLE_TEXT.rough; }
 function changed(){ window._refit=true; renderStops(); $("roundTrip").checked=!!trip.round; recalc(); }
-renderTypes(); renderStops(); setGpx(false); recalc();
+renderTypes(); renderStops(); setGpx(false); showStyle(); recalc();
 </script>
 </body>
 </html>
