@@ -314,7 +314,7 @@ function renderStops(){
           :`<label class="btn small ghost" style="cursor:pointer;align-self:flex-start">Use my GPX for this leg<input type="file" accept=".gpx,application/gpx+xml" data-track="${i-1}" hidden></label>`}
       </div></details>`:""}
     </div>
-    ${lf&&lf.level?`<div class="fwarn ${lf.level}">${ICON.fuel}<span>You won't make ${esc(st.name)} on ${lf.level==="warn"?"your reserve":"one tank"}: ${esc(lf.text)}</span></div>`:""}`;
+    ${lf&&lf.level?`<div class="fwarn ${lf.level}">${ICON.fuel}<span>${lf.level==="bad"?`You won't make ${esc(st.name)}.`:`Below your reserve before ${esc(st.name)}.`} ${esc(lf.text)}</span></div>`:""}`;
     box.appendChild(row);
     wireSearch(row.querySelector("input"),row.querySelector(".sugg"),i);
     if(isSleep(st,i,n)) header();
@@ -689,10 +689,9 @@ function render(){
       const nx=trip.stops[i+1]; if(!nx||!sk.has(st)||!sk.has(nx)) return;
       const a=sk.get(st),b=sk.get(nx);
       let min=Infinity; for(let k=a;k<b;k+=1) min=Math.min(min,fp.tankAt(k)); min=Math.min(min,fp.tankAt(b-0.01));
-      const gap=fp.gaps.find(g=>g.from+2>=a&&g.from+2<b);
+      const gap=fp.gaps.find(g=>g.from<b&&g.to>a);
       let level="",text="";
-      if(gap){level="bad";text=`${Math.round(gap.to-gap.from)} km with no fuel known. Range ${settings.range} km.`;}
-      else if(min<0){level="bad";text=`You'll run dry on this leg.`;}
+      if(min<0){level="bad";text=gap?`${Math.round(gap.to-gap.from)} km with no fuel known. Range ${settings.range} km.`:`Runs dry before you get there.`;}
       else if(min<reserve){level="warn";text=`Down to ${Math.round(min)} km of fuel.`;}
       legFuel.set(st,{level,text});
     });
