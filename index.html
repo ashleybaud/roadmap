@@ -7,438 +7,536 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
-*{box-sizing:border-box}
-/* Layout: roadbook strip — controls rail left, schematic map + leg-by-leg roadbook right; stacks on phone */
+/* Layout: trip builder rail left, map + day cards + roadbook right; one column on phones */
 :root{
   --bg:#EEF0EA; --panel:#FFFFFF; --ink:#18201C; --muted:#5C6660; --line:#D3D8CF;
-  --accent:#0B6E4F; --back:#2F5BA8; --gravel:#9A6A33; --tar:#3A4048;
-  --ok:#2E7D32; --warn:#B26A00; --bad:#B3261E; --chip:#E3E7DE;
+  --accent:#0B6E4F; --back:#2F5BA8; --ok:#2E7D32; --warn:#B26A00; --bad:#B3261E; --chip:#E3E7DE;
   --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
   --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
 }
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+@media (prefers-color-scheme: dark){:root{
   --bg:#121614; --panel:#1B201D; --ink:#E6EAE4; --muted:#9AA49D; --line:#2E3631;
-  --accent:#3FB48A; --back:#7EA3E6; --gravel:#D29B5C; --tar:#AEB5BC;
-  --ok:#6CC070; --warn:#E5A33A; --bad:#F07167; --chip:#252B27; color-scheme:dark}}
-:root[data-theme="dark"]{
-  --bg:#121614; --panel:#1B201D; --ink:#E6EAE4; --muted:#9AA49D; --line:#2E3631;
-  --accent:#3FB48A; --back:#7EA3E6; --gravel:#D29B5C; --tar:#AEB5BC;
-  --ok:#6CC070; --warn:#E5A33A; --bad:#F07167; --chip:#252B27; color-scheme:dark}
+  --accent:#3FB48A; --back:#7EA3E6; --ok:#6CC070; --warn:#E5A33A; --bad:#F07167; --chip:#252B27; color-scheme:dark}}
+*{box-sizing:border-box}
+html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;
-  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:20px 48px}
-.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:20px}
-h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance;letter-spacing:.01em}
-h1{font-size:2.4rem;font-weight:700;line-height:1}
-h2{font-size:1.45rem;font-weight:700}
-h3{font-size:1.15rem;font-weight:600}
-.lbl{font-size:.72rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+  padding-left:max(14px,env(safe-area-inset-left,0px));padding-right:max(14px,env(safe-area-inset-right,0px));padding-block:14px 48px}
+.wrap{max-width:1240px;margin:0 auto;display:flex;flex-direction:column;gap:16px}
+h1,h2,h3{font-family:var(--f-display);margin:0;letter-spacing:.01em;text-wrap:balance}
+h1{font-size:1.9rem;font-weight:700;line-height:1}
+h2{font-size:1.3rem;font-weight:700}
+h3{font-size:1.1rem;font-weight:600}
+.lbl{font-size:.7rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.note{color:var(--muted);font-size:.82rem}
 .mono{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
-header{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:12px;border-bottom:2px solid var(--ink);padding-bottom:12px}
-header p{margin:4px 0 0;color:var(--muted)}
-.tag{display:inline-block;font-size:.72rem;font-weight:600;padding:2px 8px;border-radius:3px;background:var(--chip);color:var(--muted);letter-spacing:.04em;text-transform:uppercase}
-.grid{display:grid;grid-template-columns:320px minmax(0,1fr);gap:20px;align-items:start}
-@media (max-width:860px){.grid{grid-template-columns:minmax(0,1fr)}}
-.panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px;display:flex;flex-direction:column;gap:14px;min-width:0}
+header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;border-bottom:2px solid var(--ink);padding-bottom:10px}
+.grid{display:grid;grid-template-columns:380px minmax(0,1fr);gap:16px;align-items:start}
+@media (max-width:900px){.grid{grid-template-columns:minmax(0,1fr)}}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:14px;display:flex;flex-direction:column;gap:12px;min-width:0}
+input,select,button{font:inherit;color:inherit}
+input[type=text],input[type=number],input[type=time],input[type=date],select{background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:8px 9px;width:100%}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.btn{border:1px solid var(--ink);background:var(--ink);color:var(--bg);border-radius:4px;padding:8px 12px;font-weight:600;cursor:pointer;white-space:nowrap}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.small{padding:4px 8px;font-size:.8rem}
+.btn:disabled{opacity:.45;cursor:default}
+.icon{border:1px solid var(--line);background:var(--panel);border-radius:4px;width:32px;height:32px;cursor:pointer;display:inline-grid;place-items:center;flex:none}
+.btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .field{display:flex;flex-direction:column;gap:4px}
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-input,select,textarea,button{font:inherit;color:inherit}
-input[type=number],input[type=time],select,textarea{background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:7px 9px;width:100%;box-sizing:border-box}
-textarea{resize:vertical;min-height:60px}
-:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
-.opts{display:flex;flex-direction:column;gap:6px}
-.opt{display:flex;gap:10px;align-items:flex-start;border:1px solid var(--line);border-radius:5px;padding:9px 10px;cursor:pointer;background:var(--bg)}
-.opt input{margin-top:4px;accent-color:var(--accent)}
-.opt.sel{border-color:var(--ink)}
-.opt b{display:block;font-weight:600}
-.opt small{color:var(--muted)}
-.swatch{display:inline-block;width:18px;height:4px;border-radius:2px;vertical-align:middle;margin-right:6px}
-.btn{border:1px solid var(--ink);background:var(--ink);color:var(--bg);border-radius:4px;padding:8px 12px;font-weight:600;cursor:pointer}
-.btn.ghost{background:transparent;color:var(--ink)}
-.btn:disabled{opacity:.5;cursor:default}
-.btns{display:flex;flex-wrap:wrap;gap:8px}
-.mapbox{overflow-x:auto}
-.mapbox svg{display:block;width:100%;max-width:520px;height:auto;margin:0 auto}
-.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.8rem;color:var(--muted)}
-.days{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.stops{display:flex;flex-direction:column;gap:8px}
+.stop{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;align-items:start}
+.pin{width:22px;height:22px;border-radius:50%;background:var(--ink);color:var(--bg);font:600 .7rem var(--f-mono);display:grid;place-items:center;margin-top:7px}
+.pin.night{background:var(--back)}
+.stop .tools{display:flex;gap:4px}
+.ac{position:relative}
+.sugg{position:absolute;z-index:1000;left:0;right:0;top:100%;background:var(--panel);border:1px solid var(--line);border-radius:4px;box-shadow:0 6px 20px rgba(0,0,0,.15);max-height:260px;overflow:auto}
+.sugg button{display:block;width:100%;text-align:left;border:0;background:none;padding:8px 10px;cursor:pointer;border-bottom:1px solid var(--line)}
+.sugg button:hover,.sugg button:focus{background:var(--chip)}
+.chk{display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--muted)}
+.chk input{accent-color:var(--back)}
+.days{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
 .day{border:1px solid var(--line);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:8px;background:var(--bg)}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.stat .v{font-family:var(--f-mono);font-size:1.05rem;font-weight:500}
-.verdict{font-weight:600;font-size:.9rem;padding:6px 9px;border-radius:4px;border-left:4px solid}
+.stat .v{font-family:var(--f-mono);font-size:1rem;font-weight:500}
+.verdict{font-weight:600;font-size:.86rem;padding:6px 9px;border-radius:4px;border-left:4px solid}
 .v-ok{border-color:var(--ok);color:var(--ok);background:color-mix(in srgb,var(--ok) 10%,transparent)}
 .v-warn{border-color:var(--warn);color:var(--warn);background:color-mix(in srgb,var(--warn) 12%,transparent)}
 .v-bad{border-color:var(--bad);color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,transparent)}
+#map{height:460px;border-radius:6px;border:1px solid var(--line)}
+@media (max-width:600px){#map{height:360px}}
 .tbl{overflow-x:auto}
-table{border-collapse:collapse;width:100%;font-size:.88rem;min-width:560px}
-th{text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line)}
+table{border-collapse:collapse;width:100%;font-size:.86rem;min-width:520px}
+th{text-align:left;font-size:.68rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;padding:6px 8px;border-bottom:1px solid var(--line)}
 td{padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top}
-td.n{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
-tr.dayhead td{background:var(--chip);font-family:var(--f-display);font-weight:700;font-size:1rem;letter-spacing:.02em}
-.surf{font-size:.7rem;font-weight:600;padding:1px 6px;border-radius:3px;white-space:nowrap}
-.s-tar{background:var(--chip);color:var(--tar)}
-.s-gravel{background:color-mix(in srgb,var(--gravel) 18%,transparent);color:var(--gravel)}
-.tank{display:flex;align-items:center;gap:6px;justify-content:flex-end}
-.bar{width:54px;height:7px;border-radius:4px;background:var(--chip);overflow:hidden}
-.bar i{display:block;height:100%}
-.kind{font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
-.k-fuel{color:var(--accent)} .k-poi{color:var(--muted)} .k-dest{color:var(--ink)}
-.note{color:var(--muted);font-size:.8rem}
-.rep{font-size:.78rem;margin-top:2px}
-.stays{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px}
-.stay{border:1px solid var(--line);border-radius:6px;padding:12px;display:flex;flex-direction:column;gap:6px;background:var(--bg);min-width:0}
-.stay .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
-.price{font-family:var(--f-mono);font-size:.9rem}
-.contact{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-family:var(--f-mono);font-size:.84rem}
-.contact span{user-select:all}
-.copy{font-size:.72rem;border:1px solid var(--line);background:var(--panel);border-radius:3px;padding:1px 6px;cursor:pointer}
+td.n{text-align:right;font-family:var(--f-mono);white-space:nowrap}
+tr.dayhead td{background:var(--chip);font-family:var(--f-display);font-weight:700;font-size:1rem}
+.kind{font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted)}
+.kind.fuel{color:var(--accent)} .kind.night{color:var(--back)}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:999px;padding:4px 10px;font-size:.82rem;cursor:pointer;background:var(--bg)}
+.chip input{accent-color:var(--accent);margin:0}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%}
+.poilist{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
+.poi{border:1px solid var(--line);border-radius:6px;padding:9px 10px;display:flex;justify-content:space-between;gap:8px;align-items:flex-start;background:var(--bg);min-width:0}
+.poi b{display:block;overflow-wrap:anywhere}
+.stays{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:8px}
+.stay{border:1px solid var(--line);border-radius:6px;padding:10px;background:var(--bg);display:flex;flex-direction:column;gap:4px;min-width:0;overflow-wrap:anywhere}
 a{color:var(--accent)}
-.pois{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px}
-.poi{border-top:2px solid var(--line);padding-top:8px}
-.poi b{display:block}
-.reports{display:flex;flex-direction:column;gap:8px}
-.report{display:grid;grid-template-columns:auto minmax(0,1fr);gap:4px 10px;border-bottom:1px solid var(--line);padding-bottom:8px}
-.report .when{font-family:var(--f-mono);font-size:.78rem;color:var(--muted);white-space:nowrap}
-.report.old{opacity:.55}
-.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
-.empty{color:var(--muted);font-size:.9rem;border:1px dashed var(--line);border-radius:6px;padding:14px}
-.gpxout{font-family:var(--f-mono);font-size:.75rem;width:100%;min-height:120px}
-.toast{font-size:.85rem;color:var(--accent);min-height:1.2em}
-@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.status{font-size:.85rem;color:var(--accent);min-height:1.2em}
+dialog{border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);padding:18px;width:min(420px,calc(100vw - 32px))}
+dialog::backdrop{background:rgba(0,0,0,.4)}
 .leaflet-container{font:inherit}
+.mk{border:2px solid #18201C;background:#fff}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <div>
-      <span class="tag">Proof of concept · test trip</span>
-      <h1 style="margin-top:6px">Home ⇄ Cederberg Oasis</h1>
-      <p>Pick a way out and a way back, tick the stops you want, and the route, fuel and ride files update.</p>
+      <h1>Route and Range</h1>
+      <div class="note">Plan the ride, the fuel and the night stops.</div>
     </div>
-    <div class="lbl" id="hdrSummary"></div>
+    <div class="btns">
+      <span class="lbl mono" id="hdrSummary"></span>
+      <button class="btn ghost" id="openSettings" type="button" aria-label="Settings">Settings</button>
+    </div>
   </header>
 
   <div class="grid">
-    <aside class="panel" aria-label="Trip settings">
-      <h2>Start</h2>
+    <aside class="panel" aria-label="Trip">
+      <div style="display:flex;justify-content:space-between;align-items:baseline"><h2>Trip</h2><span class="note">Tick a stop to sleep there</span></div>
+      <div class="field"><label class="lbl" for="tripDate">First day</label><input id="tripDate" type="date"></div>
+      <div class="stops" id="stops"></div>
       <div class="btns">
+        <button class="btn ghost" id="addStop" type="button">+ Add stop</button>
         <button class="btn ghost" id="useLoc" type="button">Start from my location</button>
-        <button class="btn ghost" id="clearLoc" type="button" hidden>Clear</button>
       </div>
-      <p class="note" id="locNote" style="margin:0">Routes start at the first town. Tap the button to start and finish at home instead.</p>
-
-      <h2>Bike</h2>
-      <div class="row2">
-        <div class="field"><label class="lbl" for="range">Range on a full tank (km)</label><input id="range" type="number" min="80" max="900" step="5" value="200"></div>
-        <div class="field"><label class="lbl" for="reserve">Arrive with at least (km)</label><input id="reserve" type="number" min="0" max="200" step="5" value="30"></div>
-      </div>
-      <div class="row2">
-        <div class="field"><label class="lbl" for="spdTar">Avg on tar (km/h)</label><input id="spdTar" type="number" min="30" max="140" step="5" value="85"></div>
-        <div class="field"><label class="lbl" for="spdGravel">Avg on gravel (km/h)</label><input id="spdGravel" type="number" min="15" max="100" step="5" value="45"></div>
-      </div>
-      <h2>Daylight</h2>
-      <div class="row2">
-        <div class="field"><label class="lbl" for="start1">Day 1 leave</label><input id="start1" type="time" value="08:00"></div>
-        <div class="field"><label class="lbl" for="start2">Day 2 leave</label><input id="start2" type="time" value="09:00"></div>
-      </div>
-      <div class="field"><label class="lbl" for="sunset">Sunset</label><input id="sunset" type="time" value="19:25"><span class="note">Plan to be off the gravel an hour before.</span></div>
-      <h2>Way out</h2>
-      <div class="opts" id="optsOut"></div>
-      <h2>Way back</h2>
-      <div class="opts" id="optsBack"></div>
+      <label class="chk"><input type="checkbox" id="roundTrip"> Finish where I started</label>
       <h2>Ride files</h2>
-      <p class="note" style="margin:0">One file per day for Ducati Link. Tap, then share the file to Ducati Link.</p>
-      <div class="btns">
-        <button class="btn" id="gpx1" type="button" disabled>Day 1 GPX</button>
-        <button class="btn" id="gpx2" type="button" disabled>Day 2 GPX</button>
-      </div>
-      <div class="toast" id="status" role="status"></div>
+      <p class="note" style="margin:0">One GPX per day. Download, then share it to your bike's app.</p>
+      <div class="btns" id="gpxBtns"></div>
+      <div class="status" id="status" role="status"></div>
     </aside>
 
-    <main class="panel" style="gap:18px">
+    <main class="panel" style="gap:16px">
       <div class="days" id="days"></div>
-      <div id="map" style="height:460px;border-radius:6px;border:1px solid var(--line)"></div>
-      <div class="legend">
-        <span><i class="swatch" style="background:var(--accent)"></i>Day 1</span>
-        <span><i class="swatch" style="background:var(--back)"></i>Day 2</span>
-        <span>Square = fuel · round = stop</span>
-      </div>
+      <div id="map"></div>
       <div>
         <h2 style="margin-bottom:8px">Roadbook</h2>
         <div class="tbl"><table>
-          <thead><tr><th style="text-align:right">Km</th><th>Point</th><th>Leg</th><th style="text-align:right">Tank left</th></tr></thead>
+          <thead><tr><th style="text-align:right">Km</th><th>Point</th><th style="text-align:right">Leg</th><th style="text-align:right">Tank left</th></tr></thead>
           <tbody id="roadbook"></tbody>
         </table></div>
-        <p class="note">Distances come from live road routing. The gravel share is an estimate per route.</p>
+        <p class="note">Fuel stations come from OpenStreetMap. A station can close or run dry, so check rider reports or phone ahead on remote legs.</p>
       </div>
     </main>
   </div>
 
   <section class="panel">
-    <h2>Stops</h2>
-    <p class="note" style="margin:0">Tick a stop to route through it. It goes into the ride file too.</p>
-    <div class="pois" id="pois"></div>
+    <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px">
+      <h2>Along the way</h2>
+      <div class="btns">
+        <label class="lbl" for="poiMax">Show</label>
+        <select id="poiMax" style="width:auto"><option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="1000">All</option></select>
+      </div>
+    </div>
+    <div class="chips" id="poiTypes"></div>
+    <div class="poilist" id="pois"><div class="note">Points of interest load once the route is ready.</div></div>
   </section>
 
   <section class="panel">
-    <h2>Where to stay near the Oasis</h2>
-    <p class="note" style="margin:0">No cell signal at most of these. Phone ahead from town. Prices come from dated listings, so confirm before you go.</p>
-    <div class="stays" id="stays"></div>
+    <h2>Where to sleep</h2>
+    <p class="note" style="margin:0">Places within 15 km of each night stop, from OpenStreetMap. Prices aren't listed there, so phone or check the website.</p>
+    <div id="stays"><div class="note">Tick "Sleep here" on a stop to see places to stay.</div></div>
   </section>
 </div>
+
+<dialog id="settings">
+  <form method="dialog" style="display:flex;flex-direction:column;gap:12px">
+    <h2>Settings</h2>
+    <div class="row2">
+      <div class="field"><label class="lbl" for="range">Range on a full tank (km)</label><input id="range" type="number" min="60" max="1200" step="5" value="200"></div>
+      <div class="field"><label class="lbl" for="reserve">Arrive with at least (km)</label><input id="reserve" type="number" min="0" max="300" step="5" value="30"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label class="lbl" for="leave">Leave each day at</label><input id="leave" type="time" value="08:00"></div>
+      <div class="field"><label class="lbl" for="pace">Slower than car times by (%)</label><input id="pace" type="number" min="0" max="100" step="5" value="10"></div>
+    </div>
+    <div class="field"><label class="lbl" for="corridor">Show places up to (km) off the route</label><input id="corridor" type="number" min="1" max="20" step="1" value="5"></div>
+    <div class="btns" style="justify-content:flex-end"><button class="btn" value="ok">Done</button></div>
+  </form>
+</dialog>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 const OSRM="https://router.project-osrm.org/route/v1/driving/";
-const PTS={
-  well:{n:"Wellington",lat:-33.63997,lon:19.01098,fuel:true},
-  bain:{n:"Bain's Kloof Pass",lat:-33.59101,lon:19.12660},
-  ceres:{n:"Ceres",lat:-33.369052,lon:19.310031,fuel:true},
-  odb:{n:"Op-die-Berg",lat:-32.99038,lon:19.31155,fuel:true},
-  mced:{n:"Mount Ceder",lat:-32.646552,lon:19.407341},
-  oasis:{n:"Cederberg Oasis",lat:-32.550504,lon:19.360797,dest:true,d:"No fuel. No signal."},
-  malm:{n:"Malmesbury",lat:-33.461,lon:18.727,fuel:true},
-  pike:{n:"Piketberg",lat:-32.904,lon:18.757,fuel:true},
-  citr:{n:"Citrusdal",lat:-32.589,lon:19.015,fuel:true,d:"Last fuel on the N7 side"},
-  alg:{n:"Algeria",lat:-32.3735,lon:19.0597},
-  sand:{n:"Sanddrif / Cederberg Wines",lat:-32.5033,lon:19.2578}
-};
-const ROUTES={
-  A:{dir:"out",name:"Bain's Kloof, Ceres & the Koue Bokkeveld",blurb:"Best gravel, about 50 km of it at the end.",gravel:50,pts:["well","bain","ceres","mced","oasis"]},
-  B:{dir:"out",name:"N7, Algeria & Uitkyk Pass",blurb:"More scenic, rougher. About 62 km of gravel over two passes.",gravel:62,pts:["malm","pike","citr","alg","sand","oasis"]},
-  C:{dir:"back",name:"Koue Bokkeveld, Ceres & Bain's Kloof",blurb:"Way out A in reverse, with fuel at Op-die-Berg.",gravel:50,pts:["oasis","mced","odb","ceres","bain","well"]},
-  D:{dir:"back",name:"Op-die-Berg, Middelberg Pass & the N7",blurb:"Fuel at Op-die-Berg, gravel pass into Citrusdal.",gravel:70,pts:["oasis","odb","citr","pike","malm"]},
-  E:{dir:"back",name:"Uitkyk, Algeria & the N7",blurb:"Way out B in reverse.",gravel:62,pts:["oasis","sand","alg","citr","pike","malm"]}
-};
-const POIS=[
-  {id:"stad",n:"Stadsaal caves & rock art",lat:-32.5195,lon:19.3215,t:"Minutes from the Oasis. Permit needed."},
-  {id:"cwine",n:"Cederberg Wines & Brewery",lat:-32.5033,lon:19.2578,t:"Tasting and cold craft beer at Dwarsrivier."},
-  {id:"krom",n:"Kromrivier",lat:-32.5381,lon:19.2836,t:"Farm restaurant and own beer. Good lunch stop."},
-  {id:"alg",n:"Algeria",lat:-32.3735,lon:19.0597,t:"Shade and river at the CapeNature camp."},
-  {id:"mced",n:"Mount Ceder",lat:-32.646552,lon:19.407341,t:"Restaurant on the gravel road in."}
+const PHOTON="https://photon.komoot.io/api/";
+const OVERPASS="https://overpass-api.de/api/interpreter";
+const TYPES=[
+  {id:"view",n:"Viewpoints",c:"#2F5BA8",on:true},
+  {id:"pass",n:"Mountain passes",c:"#6B4E9B",on:true},
+  {id:"sight",n:"Sights & history",c:"#9A6A33",on:true},
+  {id:"food",n:"Food & coffee",c:"#B3261E",on:false},
+  {id:"camp",n:"Campsites",c:"#0B6E4F",on:false}
 ];
-const STAYS=[
-  {n:"Cederberg Oasis",what:"Biker and backpacker base. Rooms, camping, restaurant and bar. Kitchen closes 20:00.",km:"0 km",price:"From R250 per unit",asof:"older listing",phones:["+27 27 482 2819","+27 87 550 1360"],web:"https://www.cederbergoasis.co.za",signal:"No signal"},
-  {n:"Sanddrif Holiday Resort",what:"Self-catering cottages and camping at Cederberg Wines, on the Dwars River.",km:"18 km",price:"R1,360 per cottage, up to 4",asof:"2021 rate",phones:["+27 27 482 2825"],email:"sanddrif@cederbergwine.com",web:"https://www.cederbergwine.com/sanddrif-holiday-resort/",signal:"No signal"},
-  {n:"Kromrivier Cederberg Park",what:"Chalets and tented camp on a working farm. Restaurant and own beer.",km:"≈15 km",price:"From R1,520 per room for 2",asof:"current listing",phones:["+27 27 482 2807"],web:"https://www.cederbergpark.com",score:"4.4 / 5 from 23 reviews (LekkeSlaap)"},
-  {n:"Mount Ceder",what:"Self-catering houses and a restaurant, on the Op-die-Berg gravel road in.",km:"≈13 km",price:"Ask",asof:"no price found",phones:[],web:"",signal:"Wi-Fi at reception only"},
-  {n:"Jamaka",what:"Camping and cottages in the Olifants River valley, Algeria side.",km:"≈55 km",price:"From R240 per unit",asof:"2020 listing",phones:["+27 27 482 2805","+27 82 466 4331"],web:"",signal:"Good signal"}
-];
-
-/* state */
 const $=id=>document.getElementById(id);
-const store={get(k){try{return localStorage.getItem(k)}catch(e){return null}},set(k,v){try{localStorage.setItem(k,v)}catch(e){}},del(k){try{localStorage.removeItem(k)}catch(e){}}};
-const FIELDS=["range","reserve","spdTar","spdGravel","start1","start2","sunset"];
-FIELDS.forEach(id=>{const v=store.get("rr-"+id); if(v) $(id).value=v;});
-const st={out:store.get("rr-out")||"A",back:store.get("rr-back")||"C",pois:new Set(JSON.parse(store.get("rr-pois")||"[]")),home:JSON.parse(store.get("rr-home")||"null")};
-const res={1:null,2:null};
-const num=id=>Math.max(0,parseFloat($(id).value)||0);
-const toMin=t=>{const [h,m]=(t||"0:0").split(":").map(Number);return h*60+m;};
-const fmtT=m=>{m=Math.round(m);return String(Math.floor(m/60)%24).padStart(2,"0")+":"+String(m%60).padStart(2,"0");};
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const rad=d=>d*Math.PI/180;
+const hav=(a,b)=>{const dl=rad(b.lat-a.lat),dn=rad(b.lon-a.lon);const h=Math.sin(dl/2)**2+Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dn/2)**2;return 12742*Math.asin(Math.sqrt(h));};
+const fmtT=m=>{m=Math.round(m);return String(Math.floor(m/60)%24).padStart(2,"0")+":"+String(((m%60)+60)%60).padStart(2,"0");};
 const fmtDur=m=>{m=Math.round(m);return Math.floor(m/60)+"h"+String(m%60).padStart(2,"0");};
-const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
-const R=6371, rad=d=>d*Math.PI/180;
-const hav=(a,b)=>{const dl=rad(b.lat-a.lat),dn=rad(b.lon-a.lon);const h=Math.sin(dl/2)**2+Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dn/2)**2;return 2*R*Math.asin(Math.sqrt(h));};
+const toMin=t=>{const [h,m]=(t||"0:0").split(":").map(Number);return h*60+m;};
 
-/* build the ordered stop list for a day: base points, chosen stops inserted where they add least distance, home at the ends */
-function stopsFor(day){
-  const key=day===1?st.out:st.back;
-  let list=ROUTES[key].pts.map(id=>Object.assign({id},PTS[id]));
-  POIS.filter(p=>st.pois.has(p.id)).forEach(p=>{
-    if(list.some(x=>x.id===p.id)) return;
-    // only insert stops into the day that passes closest
-    let best=1,cost=Infinity;
-    for(let i=1;i<list.length;i++){const c=hav(list[i-1],p)+hav(p,list[i])-hav(list[i-1],list[i]); if(c<cost){cost=c;best=i;}}
-    list.splice(best,0,Object.assign({poi:true},p));
-  });
-  if(st.home){ const h={id:"home",n:"Home",lat:st.home.lat,lon:st.home.lon}; if(day===1) list.unshift(h); else list.push(h); }
-  return list;
-}
-/* each ticked stop goes on the day whose route passes nearer to it */
-function assignPois(){
-  const out=new Set(),back=new Set();
-  POIS.filter(p=>st.pois.has(p.id)).forEach(p=>{
-    const d=k=>Math.min(...ROUTES[k].pts.map(id=>hav(PTS[id],p)));
-    (d(st.out)<=d(st.back)?out:back).add(p.id);
-  });
-  return {1:out,2:back};
-}
-function stopsForDay(day,assigned){
-  const keep=st.pois; st.pois=assigned[day]; const l=stopsFor(day); st.pois=keep; return l;
-}
+/* ---------- state ---------- */
+const DEFAULT_TRIP={stops:[
+  {name:"Malmesbury",lat:-33.461,lon:18.727},
+  {name:"Ceres",lat:-33.369052,lon:19.310031},
+  {name:"Cederberg Oasis",lat:-32.550504,lon:19.360797,night:true},
+  {name:"Citrusdal",lat:-32.589,lon:19.015},
+  {name:"Malmesbury",lat:-33.461,lon:18.727}],round:true};
+const trip=store.get("rr2-trip")||DEFAULT_TRIP;
+const SET_FIELDS=["range","reserve","leave","pace","corridor"];
+const settings=Object.assign({range:200,reserve:30,leave:"08:00",pace:10,corridor:5},store.get("rr2-settings")||{});
+const ui=Object.assign({types:Object.fromEntries(TYPES.map(t=>[t.id,t.on])),max:"10"},store.get("rr2-ui")||{});
+const tomorrow=new Date(Date.now()+86400000).toISOString().slice(0,10);
+$("tripDate").value=trip.date||tomorrow;
+let plan=null, pois=[], fuelStations=[], stays=[];
 
-const cache=new Map();
-async function routeOSRM(list){
-  const coords=list.map(p=>p.lon.toFixed(5)+","+p.lat.toFixed(5)).join(";");
-  if(cache.has(coords)) return cache.get(coords);
-  const r=await fetch(OSRM+coords+"?overview=full&geometries=geojson");
-  if(!r.ok) throw new Error("routing "+r.status);
-  const j=await r.json(); if(j.code!=="Ok") throw new Error(j.code);
-  const out={km:j.routes[0].distance/1000,legs:j.routes[0].legs.map(l=>l.distance/1000),geom:j.routes[0].geometry.coordinates};
-  cache.set(coords,out); return out;
-}
+function saveTrip(){trip.date=$("tripDate").value;store.set("rr2-trip",trip);}
 
-/* tank maths over real legs */
-function tankRows(list,legs,tankStart){
-  const range=num("range"); let tank=tankStart,km=0,worst=Infinity,fuelStops=0; const rows=[];
-  list.forEach((p,i)=>{
-    const leg=i?legs[i-1]:0; km+=leg; tank-=leg; if(i) worst=Math.min(worst,tank);
-    const at=tank; let refuel=false;
-    if(p.fuel && i<list.length-1){tank=range;refuel=true;fuelStops++;}
-    rows.push({p,leg,km,at,refuel,i});
-  });
-  return {rows,end:tank,worst,fuelStops};
-}
-
-let seq=0;
-async function recalc(){
-  const my=++seq; $("status").textContent="Working out the routes…"; $("gpx1").disabled=$("gpx2").disabled=true;
-  const assigned=assignPois();
-  const l1=stopsForDay(1,assigned), l2=stopsForDay(2,assigned);
-  try{
-    const [r1,r2]=await Promise.all([routeOSRM(l1),routeOSRM(l2)]);
-    if(my!==seq) return;
-    res[1]={list:l1,r:r1,key:st.out}; res[2]={list:l2,r:r2,key:st.back};
-    $("status").textContent=""; $("gpx1").disabled=$("gpx2").disabled=false;
-    render();
-  }catch(e){ if(my===seq) $("status").textContent="Routing service didn't answer. Check your connection and try again."; }
-}
-
-function render(){
-  renderOpts();
-  const range=num("range"),reserve=num("reserve"),vT=num("spdTar")||1,vG=num("spdGravel")||1,sunset=toMin($("sunset").value);
-  const d1=tankRows(res[1].list,res[1].r.legs,range);
-  const d2=tankRows(res[2].list,res[2].r.legs,d1.end);
-  const days=[{d:d1,x:res[1],start:toMin($("start1").value),label:"Day 1 · out"},{d:d2,x:res[2],start:toMin($("start2").value),label:"Day 2 · back"}];
-  $("days").innerHTML=days.map(({d,x,start,label},idx)=>{
-    const route=ROUTES[x.key], km=x.r.km, gravel=Math.min(route.gravel,km), tar=km-gravel;
-    const mins=tar/vT*60+gravel/vG*60+d.fuelStops*10+x.list.filter(p=>p.poi).length*30;
-    const arrive=start+mins, spare=sunset-arrive, msgs=[];
-    if(d.worst<0) msgs.push(["v-bad",`Runs dry: ${Math.abs(Math.round(d.worst))} km short on the worst leg.`]);
-    else if(d.worst<reserve) msgs.push(["v-warn",`Tight: only ${Math.round(d.worst)} km left on the worst leg.`]);
-    else msgs.push(["v-ok",`Fuel fine: never below ${Math.round(d.worst)} km left.`]);
-    if(idx===0) msgs.push(["v-warn",`Arrive with ${Math.round(d.end)} km in the tank. No fuel at the Oasis, so day 2 starts with that.`]);
-    if(spare<60) msgs.push([spare<0?"v-bad":"v-warn",spare<0?`Arrives after dark (${fmtT(arrive)}). Leave earlier.`:`Arrives ${fmtT(arrive)}, under an hour before sunset.`]);
-    return `<div class="day">
-      <div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><h3>${label}</h3><span class="tag">${x.key}</span></div>
-      <div class="note">${esc(route.name)}</div>
-      <div class="stats">
-        <div class="stat"><div class="lbl">Distance</div><div class="v">${Math.round(km)} km</div></div>
-        <div class="stat"><div class="lbl">Gravel</div><div class="v">≈${Math.round(gravel)} km</div></div>
-        <div class="stat"><div class="lbl">Riding</div><div class="v">${fmtDur(mins)}</div></div>
-        <div class="stat"><div class="lbl">Leave</div><div class="v">${fmtT(start)}</div></div>
-        <div class="stat"><div class="lbl">Arrive</div><div class="v">${fmtT(arrive)}</div></div>
-        <div class="stat"><div class="lbl">Fuel stops</div><div class="v">${d.fuelStops}</div></div>
+/* ---------- stops UI ---------- */
+function renderStops(){
+  const box=$("stops"); box.innerHTML="";
+  const n=trip.stops.length;
+  trip.stops.forEach((s,i)=>{
+    const last=i===n-1, first=i===0, mirrored=last&&trip.round;
+    const row=document.createElement("div"); row.className="stop";
+    const label=first?"Start":last?"Finish":"Stop";
+    row.innerHTML=`<div class="pin ${s.night?"night":""}">${first?"S":last?"F":i}</div>
+      <div class="ac">
+        <input type="text" id="stop-${i}" value="${esc(s.name)}" placeholder="${label}: town or place" autocomplete="off" ${mirrored?"disabled":""} aria-label="${label}">
+        <div class="sugg" hidden></div>
+        ${!first&&!last?`<label class="chk" style="margin-top:4px"><input type="checkbox" ${s.night?"checked":""} data-night="${i}"> Sleep here</label>`:""}
       </div>
-      ${msgs.map(([c,t])=>`<div class="verdict ${c}">${esc(t)}</div>`).join("")}
-    </div>`;
-  }).join("");
-  $("hdrSummary").textContent=`${Math.round(res[1].r.km+res[2].r.km)} km round trip`;
-  const rb=[];
-  days.forEach(({d,label,x})=>{
-    rb.push(`<tr class="dayhead"><td colspan="4">${label}: ${esc(ROUTES[x.key].name)}</td></tr>`);
-    d.rows.forEach(row=>{
-      const p=row.p,pct=Math.max(0,Math.min(1,row.at/range)),col=row.at<0?"var(--bad)":row.at<reserve?"var(--warn)":"var(--ok)";
-      const kind=p.fuel?`<span class="kind k-fuel">Fuel${row.refuel?" · fill up":""}</span>`:p.poi?`<span class="kind k-poi">Stop</span>`:p.dest?`<span class="kind k-dest">Overnight</span>`:"";
-      rb.push(`<tr><td class="n">${Math.round(row.km)}</td><td><b>${esc(p.n)}</b> ${kind}${p.d?`<div class="note">${esc(p.d)}</div>`:""}</td>
-        <td>${row.i?`<span class="mono">${Math.round(row.leg)} km</span>`:`<span class="note">${label.startsWith("Day 2")?"Start with "+Math.round(row.at)+" km in the tank":"Start full"}</span>`}</td>
-        <td class="n"><div class="tank"><span>${Math.round(row.at)}</span><span class="bar"><i style="width:${pct*100}%;background:${col}"></i></span></div></td></tr>`);
-    });
+      <div class="tools">
+        ${!first&&!last?`<button class="icon" type="button" title="Move up" data-up="${i}">↑</button><button class="icon" type="button" title="Remove" data-del="${i}">✕</button>`:""}
+      </div>`;
+    box.appendChild(row);
+    if(!mirrored) wireSearch(row.querySelector("input"),row.querySelector(".sugg"),i);
   });
-  $("roadbook").innerHTML=rb.join("");
-  drawMap();
-  FIELDS.forEach(id=>store.set("rr-"+id,$(id).value));
 }
+$("stops").addEventListener("click",e=>{
+  const up=e.target.closest("[data-up]"),del=e.target.closest("[data-del]");
+  if(up){const i=+up.dataset.up; if(i>1){[trip.stops[i-1],trip.stops[i]]=[trip.stops[i],trip.stops[i-1]];changed();}}
+  if(del){trip.stops.splice(+del.dataset.del,1);changed();}
+});
+$("stops").addEventListener("change",e=>{const n=e.target.dataset.night; if(n!==undefined){trip.stops[+n].night=e.target.checked;changed();}});
+$("addStop").addEventListener("click",()=>{
+  const a=trip.stops[trip.stops.length-2],b=trip.stops[trip.stops.length-1];
+  trip.stops.splice(trip.stops.length-1,0,{name:"",lat:null,lon:null}); renderStops();
+  document.getElementById("stop-"+(trip.stops.length-2)).focus();
+});
+$("roundTrip").checked=!!trip.round;
+$("roundTrip").addEventListener("change",e=>{trip.round=e.target.checked; if(trip.round) trip.stops[trip.stops.length-1]=Object.assign({},trip.stops[0]); changed();});
+$("tripDate").addEventListener("change",()=>{saveTrip(); if(plan) render();});
 
-function renderOpts(){
-  for(const dir of ["out","back"]){
-    const box=$(dir==="out"?"optsOut":"optsBack"); box.innerHTML="";
-    Object.entries(ROUTES).filter(([,r])=>r.dir===dir).forEach(([key,r])=>{
-      const lab=document.createElement("label"); lab.className="opt"+(st[dir]===key?" sel":"");
-      lab.innerHTML=`<input type="radio" name="r-${dir}" id="r-${key}" value="${key}" ${st[dir]===key?"checked":""}><span><b>${key}. ${esc(r.name)}</b><small>${esc(r.blurb)}</small></span>`;
-      lab.querySelector("input").addEventListener("change",()=>{st[dir]=key;store.set("rr-"+dir,key);recalc();});
-      box.appendChild(lab);
-    });
-  }
-}
-
-/* map */
-let map,layer;
-function drawMap(){
-  if(!window.L) return;
-  if(!map){ map=L.map("map",{scrollWheelZoom:false}); L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:17,attribution:"© OpenStreetMap contributors"}).addTo(map); }
-  if(layer) layer.remove(); layer=L.layerGroup().addTo(map);
-  const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
-  [[2,css("--back")],[1,css("--accent")]].forEach(([d,c])=>{
-    L.polyline(res[d].r.geom.map(([lo,la])=>[la,lo]),{color:c,weight:5,opacity:.85}).addTo(layer);
+function wireSearch(input,list,i){
+  let t,ctl;
+  input.addEventListener("input",()=>{
+    clearTimeout(t); const q=input.value.trim(); if(q.length<3){list.hidden=true;return;}
+    t=setTimeout(async()=>{
+      ctl?.abort(); ctl=new AbortController();
+      const c=map?map.getCenter():{lat:-33,lng:19};
+      try{
+        const r=await fetch(`${PHOTON}?q=${encodeURIComponent(q)}&limit=6&lat=${c.lat.toFixed(3)}&lon=${c.lng.toFixed(3)}`,{signal:ctl.signal});
+        const j=await r.json();
+        list.innerHTML=j.features.map((f,k)=>{const p=f.properties;const sub=[p.city||p.county,p.state,p.country].filter(x=>x&&x!==p.name).join(", ");
+          return `<button type="button" data-k="${k}"><b>${esc(p.name||p.street||q)}</b><br><span class="note">${esc(sub)}</span></button>`;}).join("")||`<div class="note" style="padding:8px">No match. Try a nearby town.</div>`;
+        list.hidden=false;
+        list.querySelectorAll("button").forEach(b=>b.addEventListener("click",()=>{
+          const f=j.features[+b.dataset.k]; const [lon,lat]=f.geometry.coordinates;
+          trip.stops[i]=Object.assign({},trip.stops[i],{name:f.properties.name||q,lat,lon});
+          if(i===0&&trip.round) trip.stops[trip.stops.length-1]=Object.assign({},trip.stops[0],{night:false});
+          list.hidden=true; changed();
+        }));
+      }catch(e){}
+    },300);
   });
-  const seen=new Set();
-  [...res[1].list,...res[2].list].forEach(p=>{
-    if(seen.has(p.id)) return; seen.add(p.id);
-    const icon=L.divIcon({className:"",html:`<div style="width:${p.dest?16:12}px;height:${p.dest?16:12}px;background:${p.fuel||p.dest?"#18201C":"#fff"};border:2px solid #18201C;border-radius:${p.fuel?"2px":"50%"}"></div>`,iconSize:[16,16],iconAnchor:[8,8]});
-    L.marker([p.lat,p.lon],{icon,title:p.n}).bindTooltip(p.n).addTo(layer);
-  });
-  const all=[...res[1].r.geom,...res[2].r.geom].map(([lo,la])=>[la,lo]);
-  map.fitBounds(L.latLngBounds(all),{padding:[20,20]});
+  input.addEventListener("blur",()=>setTimeout(()=>list.hidden=true,200));
 }
+$("useLoc").addEventListener("click",()=>{
+  if(!navigator.geolocation){$("status").textContent="This browser can't share your location.";return;}
+  $("status").textContent="Getting your location…";
+  navigator.geolocation.getCurrentPosition(p=>{
+    trip.stops[0]={name:"My location",lat:+p.coords.latitude.toFixed(5),lon:+p.coords.longitude.toFixed(5)};
+    if(trip.round) trip.stops[trip.stops.length-1]=Object.assign({},trip.stops[0]);
+    changed();
+  },()=>{$("status").textContent="Location not shared. Allow location for this site and try again.";},{enableHighAccuracy:true,timeout:15000});
+});
 
-/* GPX: road-following track, simplified */
+/* ---------- planning ---------- */
+function days(){
+  const st=trip.stops.filter(s=>s.lat!=null); const out=[]; let cur=[st[0]];
+  for(let i=1;i<st.length;i++){cur.push(st[i]); if(st[i].night&&i<st.length-1){out.push(cur);cur=[st[i]];}}
+  out.push(cur); return out.filter(d=>d.length>1);
+}
+const cache=new Map();
+async function route(list){
+  const key=list.map(p=>p.lon.toFixed(5)+","+p.lat.toFixed(5)).join(";");
+  if(cache.has(key)) return cache.get(key);
+  const r=await fetch(OSRM+key+"?overview=full&geometries=geojson"); if(!r.ok) throw new Error("route");
+  const j=await r.json(); if(j.code!=="Ok") throw new Error(j.code);
+  const o={km:j.routes[0].distance/1000,min:j.routes[0].duration/60,legs:j.routes[0].legs.map(l=>({km:l.distance/1000,min:l.duration/60})),geom:j.routes[0].geometry.coordinates.map(([lo,la])=>({lat:la,lon:lo}))};
+  cache.set(key,o); return o;
+}
 function simplify(pts,eps){
-  const perp=(p,a,b)=>{const k=Math.cos(rad(a[1]))*111320,x=q=>[(q[0]-a[0])*k,(q[1]-a[1])*110540];const P=x(p),B=x(b),L=Math.hypot(B[0],B[1])||1;return Math.abs(P[0]*B[1]-P[1]*B[0])/L;};
-  const keep=new Uint8Array(pts.length); keep[0]=keep[pts.length-1]=1; const stack=[[0,pts.length-1]];
-  while(stack.length){const [s,e]=stack.pop();let mi=-1,md=0;for(let i=s+1;i<e;i++){const d=perp(pts[i],pts[s],pts[e]);if(d>md){md=d;mi=i;}} if(md>eps){keep[mi]=1;stack.push([s,mi],[mi,e]);}}
+  if(pts.length<3) return pts;
+  const perp=(p,a,b)=>{const k=Math.cos(rad(a.lat))*111320,x=q=>[(q.lon-a.lon)*k,(q.lat-a.lat)*110540];const P=x(p),B=x(b),L=Math.hypot(B[0],B[1])||1;return Math.abs(P[0]*B[1]-P[1]*B[0])/L;};
+  const keep=new Uint8Array(pts.length);keep[0]=keep[pts.length-1]=1;const st=[[0,pts.length-1]];
+  while(st.length){const [s,e]=st.pop();let mi=-1,md=0;for(let i=s+1;i<e;i++){const d=perp(pts[i],pts[s],pts[e]);if(d>md){md=d;mi=i;}}if(md>eps){keep[mi]=1;st.push([s,mi],[mi,e]);}}
   return pts.filter((_,i)=>keep[i]);
 }
-function gpx(day){
-  const x=res[day]; const name=(day===1?"Day 1 Oasis via ":"Day 2 Home via ")+ROUTES[x.key].name;
-  const wpts=x.list.filter(p=>p.fuel||p.poi||p.dest).map(p=>`  <wpt lat="${p.lat.toFixed(5)}" lon="${p.lon.toFixed(5)}"><name>${esc(p.n)}</name></wpt>`).join("\n");
-  const trk=simplify(x.r.geom,20).map(([lo,la])=>`      <trkpt lat="${la.toFixed(5)}" lon="${lo.toFixed(5)}"/>`).join("\n");
-  return {name,file:(day===1?"Day1-":"Day2-")+x.key+".gpx",text:`<?xml version="1.0" encoding="UTF-8"?>
+/* where along the whole trip (km) a point sits, and how far off the route it is */
+function locate(p,geom,cum){
+  let bi=0,bd=Infinity; for(let i=0;i<geom.length;i+=2){const d=hav(p,geom[i]);if(d<bd){bd=d;bi=i;}}
+  return {km:cum[bi],off:bd};
+}
+let seq=0;
+async function recalc(){
+  const my=++seq; saveTrip();
+  const ds=days();
+  if(!ds.length){$("status").textContent="Add a start and a finish.";return;}
+  $("status").textContent="Working out the route…"; setGpx(false);
+  try{
+    const rs=await Promise.all(ds.map(route)); if(my!==seq) return;
+    const geom=[],cum=[],dayStart=[]; let acc=0;
+    rs.forEach((r,d)=>{dayStart.push({km:acc,idx:geom.length}); r.geom.forEach((g,i)=>{if(geom.length&&i>0)acc+=hav(geom[geom.length-1],g); else if(geom.length&&i===0){} geom.push(g);cum.push(acc);});});
+    plan={ds,rs,geom,cum,dayStart,total:acc};
+    $("status").textContent="Finding fuel and places along the way…";
+    render(); setGpx(true);
+    await loadPlaces(my); if(my!==seq) return;
+    $("status").textContent=""; render();
+  }catch(e){ if(my===seq) $("status").textContent="Couldn't get a route. Check each stop is a real place on a road, and your connection."; }
+}
+
+async function overpass(q){
+  const r=await fetch(OVERPASS,{method:"POST",body:"data="+encodeURIComponent(q),headers:{"Content-Type":"application/x-www-form-urlencoded"}});
+  if(!r.ok) throw new Error("overpass "+r.status); return (await r.json()).elements||[];
+}
+function kindOf(t){
+  if(t.amenity==="fuel") return "fuel";
+  if(t.tourism==="viewpoint") return "view";
+  if(t.mountain_pass==="yes") return "pass";
+  if(t.tourism==="camp_site") return "camp";
+  if(/^(restaurant|cafe|pub|fast_food)$/.test(t.amenity||"")) return "food";
+  if(/^(hotel|guest_house|hostel|chalet|motel|apartment)$/.test(t.tourism||"")) return "sleep";
+  return "sight";
+}
+async function loadPlaces(my){
+  const line=simplify(plan.geom,400).map(p=>p.lat.toFixed(4)+","+p.lon.toFixed(4)).join(",");
+  const R=Math.round(Math.max(1,+settings.corridor)*1000);
+  const nights=plan.ds.slice(0,-1).map(d=>d[d.length-1]);
+  const q=`[out:json][timeout:40];(
+nwr(around:2000,${line})[amenity=fuel];
+nwr(around:${R},${line})[tourism=viewpoint][name];
+node(around:${R},${line})[mountain_pass=yes][name];
+nwr(around:${R},${line})[tourism~"^(attraction|museum)$"][name];
+nwr(around:${R},${line})[historic~"^(monument|ruins|archaeological_site|memorial|castle|fort)$"][name];
+nwr(around:${R},${line})[amenity~"^(restaurant|cafe|pub)$"][name];
+nwr(around:${R},${line})[tourism=camp_site][name];
+${nights.map(n=>`nwr(around:15000,${n.lat},${n.lon})[tourism~"^(hotel|guest_house|hostel|chalet|motel|camp_site|apartment)$"][name];`).join("\n")}
+);out center tags;`;
+  let els=[];
+  try{ els=await overpass(q); }catch(e){ $("status").textContent="Places service is busy. Route and fuel maths still work; try again in a minute."; return; }
+  if(my!==seq) return;
+  const seen=new Set(); const all=[];
+  els.forEach(e=>{
+    const lat=e.lat??e.center?.lat, lon=e.lon??e.center?.lon; if(lat==null) return;
+    const t=e.tags||{}; const k=kindOf(t); const id=e.type+e.id; if(seen.has(id)) return; seen.add(id);
+    const p={id,lat,lon,name:t.name||t.brand||(k==="fuel"?"Fuel":""),kind:k,tags:t};
+    Object.assign(p,locate(p,plan.geom,plan.cum)); all.push(p);
+  });
+  fuelStations=all.filter(p=>p.kind==="fuel"&&p.off<=2.5).sort((a,b)=>a.km-b.km);
+  pois=all.filter(p=>p.kind!=="fuel"&&p.kind!=="sleep"&&p.off<=+settings.corridor+0.5);
+  stays=nights.map((n,i)=>({night:n,day:i+1,places:all.filter(p=>(p.kind==="sleep"||p.kind==="camp")&&hav(p,n)<=15).map(p=>Object.assign({},p,{dist:hav(p,n)})).sort((a,b)=>a.dist-b.dist).slice(0,12)}));
+}
+
+/* fuel: fill at the furthest station you can reach with the reserve intact */
+function fuelPlan(){
+  const range=+settings.range,reserve=+settings.reserve,total=plan.total;
+  const st=fuelStations.filter((s,i,a)=>!a.slice(0,i).some(o=>Math.abs(o.km-s.km)<1));
+  let pos=0,tank=range; const fills=[],gaps=[];
+  let guard=0;
+  while(pos+tank-reserve<total && guard++<200){
+    const reach=st.filter(s=>s.km>pos+0.3&&s.km<=pos+tank-reserve);
+    if(reach.length){const s=reach[reach.length-1]; tank-=s.km-pos; fills.push(Object.assign({},s,{arrive:tank})); pos=s.km; tank=range; continue;}
+    const next=st.find(s=>s.km>pos+0.3);
+    if(!next||next.km>pos+tank){ gaps.push({from:pos,to:next?next.km:total,short:(next?next.km:total)-pos-tank+reserve}); if(!next) break; }
+    tank-=next.km-pos; fills.push(Object.assign({},next,{arrive:tank,tight:true})); pos=next.km; tank=range;
+  }
+  return {fills,gaps,tankAt:km=>{let p=0,t=range;for(const f of fills){if(f.km>km)break;t-=f.km-p;p=f.km;t=range;}return t-(km-p);}};
+}
+
+/* ---------- sunset (SunCalc method) ---------- */
+function sunset(date,lat,lng){
+  const dayMs=86400000,J1970=2440588,J2000=2451545,e=rad(23.4397),J0=0.0009;
+  const toDays=d=>d.valueOf()/dayMs-0.5+J1970-J2000;
+  const M=d=>rad(357.5291+0.98560028*d);
+  const L=m=>m+rad(1.9148*Math.sin(m)+0.02*Math.sin(2*m)+0.0003*Math.sin(3*m))+rad(102.9372)+Math.PI;
+  const lw=rad(-lng),phi=rad(lat),d=toDays(date),n=Math.round(d-J0-lw/(2*Math.PI));
+  const ds=J0+lw/(2*Math.PI)+n,m=M(ds),l=L(m),dec=Math.asin(Math.sin(e)*Math.sin(l));
+  const w=Math.acos((Math.sin(rad(-0.833))-Math.sin(phi)*Math.sin(dec))/(Math.cos(phi)*Math.cos(dec)));
+  const a=J0+(w+lw)/(2*Math.PI)+n, Jset=J2000+a+0.0053*Math.sin(m)-0.0069*Math.sin(2*l);
+  return new Date((Jset+0.5-J1970)*dayMs);
+}
+
+/* ---------- render ---------- */
+function render(){
+  if(!plan) return;
+  const fp=fuelPlan(), pace=1+(+settings.pace||0)/100, reserve=+settings.reserve, range=+settings.range;
+  const base=new Date(($("tripDate").value||tomorrow)+"T12:00:00");
+  let html="",rb="";
+  plan.ds.forEach((d,di)=>{
+    const r=plan.rs[di], s0=plan.dayStart[di].km, s1=s0+r.km;
+    const dayFills=fp.fills.filter(f=>f.km>s0&&f.km<=s1);
+    const dayStops=d.slice(1,-1).length;
+    const mins=r.min*pace+dayFills.length*10+dayStops*20;
+    const leave=toMin(settings.leave), arrive=leave+mins;
+    const end=d[d.length-1], date=new Date(base.getTime()+di*86400000);
+    const ss=sunset(date,end.lat,end.lon), ssMin=ss.getHours()*60+ss.getMinutes();
+    let worst=Infinity; for(let k=s0;k<=s1;k+=1) worst=Math.min(worst,fp.tankAt(k)); worst=Math.min(worst,fp.tankAt(s1));
+    const msgs=[];
+    const gap=fp.gaps.find(g=>g.to>s0&&g.from<s1);
+    if(gap) msgs.push(["v-bad",`No fuel for ${Math.round(gap.to-gap.from)} km from km ${Math.round(gap.from)}. Carry extra or add a fuel stop.`]);
+    else if(worst<reserve) msgs.push(["v-warn",`Tight: down to ${Math.round(worst)} km of fuel at worst.`]);
+    else msgs.push(["v-ok",`Fuel fine: never below ${Math.round(worst)} km left.`]);
+    if(di<plan.ds.length-1) msgs.push(["v-warn",`Arrive with about ${Math.round(fp.tankAt(s1))} km in the tank. Fill up before ${esc(end.name)} if it has no fuel.`]);
+    if(ssMin-arrive<60) msgs.push([ssMin<arrive?"v-bad":"v-warn",ssMin<arrive?`Arrives after dark (${fmtT(arrive)}, sunset ${fmtT(ssMin)}). Leave earlier.`:`Arrives ${fmtT(arrive)}, under an hour before sunset (${fmtT(ssMin)}).`]);
+    const dateTxt=date.toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"});
+    html+=`<div class="day"><div style="display:flex;justify-content:space-between;align-items:baseline;gap:8px"><h3>Day ${di+1}</h3><span class="note">${esc(dateTxt)}</span></div>
+      <div class="note">${esc(d[0].name)} → ${esc(end.name)}</div>
+      <div class="stats">
+        <div class="stat"><div class="lbl">Distance</div><div class="v">${Math.round(r.km)} km</div></div>
+        <div class="stat"><div class="lbl">Riding</div><div class="v">${fmtDur(mins)}</div></div>
+        <div class="stat"><div class="lbl">Fuel stops</div><div class="v">${dayFills.length}</div></div>
+        <div class="stat"><div class="lbl">Leave</div><div class="v">${fmtT(leave)}</div></div>
+        <div class="stat"><div class="lbl">Arrive</div><div class="v">${fmtT(arrive)}</div></div>
+        <div class="stat"><div class="lbl">Sunset</div><div class="v">${fmtT(ssMin)}</div></div>
+      </div>${msgs.map(([c,t])=>`<div class="verdict ${c}">${t}</div>`).join("")}</div>`;
+    // roadbook rows: stops + fills in order
+    const rows=[];
+    let legKm=0; d.forEach((s,i)=>{ if(i) legKm+=r.legs[i-1].km; rows.push({km:s0+legKm,n:s.name,k:i===0?"":(s.night||i===d.length-1)?"night":"stop"}); });
+    dayFills.forEach(f=>rows.push({km:f.km,n:f.name,k:"fuel",f}));
+    rows.sort((a,b)=>a.km-b.km);
+    rb+=`<tr class="dayhead"><td colspan="4">Day ${di+1}: ${esc(d[0].name)} → ${esc(end.name)}</td></tr>`;
+    let prev=s0;
+    rows.forEach((x,i)=>{
+      const t=fp.tankAt(x.km), col=t<0?"var(--bad)":t<reserve?"var(--warn)":"var(--ok)";
+      const tag=x.k==="fuel"?`<span class="kind fuel">Fuel${x.f.tight?" · tight":""}</span>`:x.k==="night"?`<span class="kind night">${di===plan.ds.length-1&&i===rows.length-1?"Finish":"Sleep"}</span>`:x.k==="stop"?`<span class="kind">Stop</span>`:"";
+      rb+=`<tr><td class="n">${Math.round(x.km)}</td><td><b>${esc(x.n)}</b> ${tag}</td><td class="n">${i?Math.round(x.km-prev)+" km":""}</td><td class="n" style="color:${col}">${Math.round(x.k==="fuel"?x.f.arrive:t)}</td></tr>`;
+      prev=x.km;
+    });
+  });
+  $("days").innerHTML=html; $("roadbook").innerHTML=rb;
+  $("hdrSummary").textContent=`${Math.round(plan.total)} km · ${plan.ds.length} day${plan.ds.length>1?"s":""}`;
+  renderPois(); renderStays(); drawMap(fp);
+}
+
+function renderTypes(){
+  $("poiTypes").innerHTML=TYPES.map(t=>`<label class="chip"><input type="checkbox" id="type-${t.id}" data-type="${t.id}" ${ui.types[t.id]?"checked":""}><span class="dot" style="background:${t.c}"></span>${t.n}</label>`).join("");
+  $("poiMax").value=ui.max;
+}
+$("poiTypes").addEventListener("change",e=>{const t=e.target.dataset.type;if(!t)return;ui.types[t]=e.target.checked;store.set("rr2-ui",ui);render();});
+$("poiMax").addEventListener("change",e=>{ui.max=e.target.value;store.set("rr2-ui",ui);render();});
+function shownPois(){
+  return pois.filter(p=>ui.types[p.kind]).sort((a,b)=>a.off-b.off).slice(0,+ui.max).sort((a,b)=>a.km-b.km);
+}
+function renderPois(){
+  if(!pois.length&&!fuelStations.length){return;}
+  const list=shownPois();
+  $("pois").innerHTML=list.length?list.map(p=>{const t=TYPES.find(x=>x.id===p.kind);return `<div class="poi"><div style="min-width:0"><span class="dot" style="background:${t.c}"></span> <b style="display:inline">${esc(p.name)}</b><div class="note">${t.n} · km ${Math.round(p.km)} · ${p.off<0.3?"on the route":p.off.toFixed(1)+" km off"}</div></div><button class="btn small ghost" type="button" data-add="${p.id}">Add to route</button></div>`;}).join(""):`<div class="note">Nothing of these types within ${settings.corridor} km of the route.</div>`;
+}
+$("pois").addEventListener("click",e=>{const b=e.target.closest("[data-add]");if(b) addPoi(b.dataset.add);});
+function addPoi(id){
+  const p=pois.find(x=>x.id===id)||stays.flatMap(s=>s.places).find(x=>x.id===id); if(!p) return;
+  // insert before the first stop that sits further along the trip
+  let acc=0,idx=trip.stops.length-1; const flat=[];
+  plan.ds.forEach((d,di)=>{let k=plan.dayStart[di].km;d.forEach((s,i)=>{if(i)k+=plan.rs[di].legs[i-1].km; if(di===0||i>0) flat.push({s,km:k});});});
+  for(let i=1;i<flat.length;i++){ if(flat[i].km>p.km){ idx=trip.stops.indexOf(flat[i].s); break; } }
+  if(idx<1) idx=trip.stops.length-1;
+  trip.stops.splice(idx,0,{name:p.name,lat:p.lat,lon:p.lon});
+  $("status").textContent=`Added ${p.name}.`; changed();
+}
+function renderStays(){
+  if(!stays.length){ $("stays").innerHTML=`<div class="note">Tick "Sleep here" on a stop to see places to stay.</div>`; return; }
+  $("stays").innerHTML=stays.map(s=>`<h3 style="margin:8px 0 6px">Night ${s.day}: ${esc(s.night.name)}</h3>`+(s.places.length?`<div class="stays">`+s.places.map(p=>{const t=p.tags;const phone=t.phone||t["contact:phone"];const web=t.website||t["contact:website"];const mail=t.email||t["contact:email"];
+    return `<div class="stay"><b>${esc(p.name)}</b><span class="note">${esc((t.tourism||"").replace("_"," "))} · ${p.dist.toFixed(1)} km away</span>
+      ${phone?`<a href="tel:${esc(phone.replace(/\s/g,""))}" class="mono">${esc(phone)}</a>`:""}
+      ${mail?`<a href="mailto:${esc(mail)}">${esc(mail)}</a>`:""}
+      <span class="note">${web?`<a href="${esc(web)}" target="_blank" rel="noopener">Website</a> · `:""}<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name+" "+s.night.name)}" target="_blank" rel="noopener">Reviews</a></span></div>`;}).join("")+`</div>`:`<div class="note">Nothing listed within 15 km.</div>`)).join("");
+}
+
+/* ---------- map ---------- */
+let map,layer;
+function drawMap(fp){
+  if(!window.L) return;
+  if(!map){map=L.map("map",{scrollWheelZoom:false});L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:17,attribution:"© OpenStreetMap contributors"}).addTo(map);}
+  const first=!layer; if(layer) layer.remove(); layer=L.layerGroup().addTo(map);
+  const cols=["#0B6E4F","#2F5BA8","#9A6A33","#6B4E9B","#B3261E"];
+  plan.rs.forEach((r,i)=>L.polyline(r.geom.map(g=>[g.lat,g.lon]),{color:cols[i%cols.length],weight:5,opacity:.85}).addTo(layer));
+  const dot=(c,sz,sq)=>L.divIcon({className:"",html:`<div style="width:${sz}px;height:${sz}px;background:${c};border:2px solid #18201C;border-radius:${sq?"2px":"50%"}"></div>`,iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]});
+  trip.stops.filter(s=>s.lat!=null).forEach((s,i)=>L.marker([s.lat,s.lon],{icon:dot(s.night?"#2F5BA8":"#18201C",14)}).bindTooltip(s.name).addTo(layer));
+  fp.fills.forEach(f=>L.marker([f.lat,f.lon],{icon:dot("#0B6E4F",12,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
+  fuelStations.filter(s=>!fp.fills.some(f=>f.id===s.id)).forEach(f=>L.marker([f.lat,f.lon],{icon:dot("#ffffff",9,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
+  shownPois().forEach(p=>{const t=TYPES.find(x=>x.id===p.kind);
+    const m=L.marker([p.lat,p.lon],{icon:dot(t.c,11)}).addTo(layer);
+    m.bindPopup(`<b>${esc(p.name)}</b><br>${t.n}<br><button class="btn small" type="button" onclick="addPoi('${p.id}')">Add to route</button>`);
+  });
+  if(first||window._refit){map.fitBounds(L.latLngBounds(plan.geom.map(g=>[g.lat,g.lon])),{padding:[20,20]});window._refit=false;}
+}
+
+/* ---------- GPX ---------- */
+function setGpx(on){
+  const n=plan?plan.ds.length:0;
+  $("gpxBtns").innerHTML=Array.from({length:n},(_,i)=>`<button class="btn" type="button" data-gpx="${i}" ${on?"":"disabled"}>Day ${i+1} GPX</button>`).join("")||`<span class="note">Ready once the route is.</span>`;
+}
+$("gpxBtns").addEventListener("click",e=>{const b=e.target.closest("[data-gpx]");if(b) downloadGpx(+b.dataset.gpx);});
+function downloadGpx(di){
+  const d=plan.ds[di],r=plan.rs[di],fp=fuelPlan(),s0=plan.dayStart[di].km,s1=s0+r.km;
+  const name=`Day ${di+1} ${d[0].name} to ${d[d.length-1].name}`;
+  const w=[...d.slice(1).map(s=>({lat:s.lat,lon:s.lon,n:s.name})),...fp.fills.filter(f=>f.km>s0&&f.km<=s1).map(f=>({lat:f.lat,lon:f.lon,n:"Fuel "+f.name}))];
+  const text=`<?xml version="1.0" encoding="UTF-8"?>
 <gpx version="1.1" creator="Route and Range" xmlns="http://www.topografix.com/GPX/1/1">
-${wpts}
+${w.map(p=>`  <wpt lat="${p.lat.toFixed(5)}" lon="${p.lon.toFixed(5)}"><name>${esc(p.n)}</name></wpt>`).join("\n")}
   <trk>
     <name>${esc(name)}</name>
     <trkseg>
-${trk}
+${simplify(r.geom,20).map(g=>`      <trkpt lat="${g.lat.toFixed(5)}" lon="${g.lon.toFixed(5)}"/>`).join("\n")}
     </trkseg>
   </trk>
 </gpx>
-`};
-}
-function download(day){
-  const g=gpx(day); const blob=new Blob([g.text],{type:"application/gpx+xml"});
-  const a=document.createElement("a"); a.href=URL.createObjectURL(blob); a.download=g.file; document.body.appendChild(a); a.click();
+`;
+  const file=name.replace(/[^\w]+/g,"-").replace(/-+$/,"")+".gpx";
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([text],{type:"application/gpx+xml"}));a.download=file;document.body.appendChild(a);a.click();
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);
-  $("status").textContent=`Saved ${g.file}. Open it from your downloads and share it to Ducati Link.`;
+  $("status").textContent=`Saved ${file}. Open it from your downloads and share it to your bike's app.`;
 }
 
-/* static sections */
-function renderStatic(){
-  $("pois").innerHTML=POIS.map(p=>`<label class="opt" style="background:var(--panel)"><input type="checkbox" id="poi-${p.id}" ${st.pois.has(p.id)?"checked":""} data-poi="${p.id}"><span><b>${esc(p.n)}</b><small>${esc(p.t)}</small></span></label>`).join("");
-  $("pois").addEventListener("change",e=>{const id=e.target.dataset.poi;if(!id)return; e.target.checked?st.pois.add(id):st.pois.delete(id); store.set("rr-pois",JSON.stringify([...st.pois])); recalc();});
-  $("stays").innerHTML=STAYS.map(s=>`<div class="stay">
-    <div class="top"><h3>${esc(s.n)}</h3><span class="tag">${esc(s.km)}</span></div>
-    <div class="note">${esc(s.what)}</div>
-    <div><span class="price">${esc(s.price)}</span> <span class="note">(${esc(s.asof)})</span></div>
-    ${s.phones.map(ph=>`<div class="contact"><a href="tel:${ph.replace(/\s/g,"")}">${esc(ph)}</a></div>`).join("")}
-    ${s.email?`<div class="contact"><a href="mailto:${s.email}">${esc(s.email)}</a></div>`:""}
-    ${!s.phones.length&&!s.email?`<div class="note">Contact not confirmed yet.</div>`:""}
-    <div class="note">${s.signal?esc(s.signal)+" · ":""}${s.score?esc(s.score)+" · ":""}${s.web?`<a href="${s.web}" target="_blank" rel="noopener">Website</a> · `:""}<a href="https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(s.n+" Cederberg")}" target="_blank" rel="noopener">Reviews</a></div>
-  </div>`).join("");
-}
-
-function syncHomeUi(){ $("clearLoc").hidden=!st.home; $("locNote").textContent=st.home?"Starting and finishing at your saved location.":"Routes start at the first town. Tap the button to start and finish at home instead."; }
-$("useLoc").addEventListener("click",()=>{
-  if(!navigator.geolocation){$("locNote").textContent="This browser can't share your location.";return;}
-  $("locNote").textContent="Getting your location…";
-  navigator.geolocation.getCurrentPosition(p=>{st.home={lat:+p.coords.latitude.toFixed(5),lon:+p.coords.longitude.toFixed(5)};store.set("rr-home",JSON.stringify(st.home));syncHomeUi();recalc();},
-    ()=>{$("locNote").textContent="Location not shared. Allow location for this site and try again.";},{enableHighAccuracy:true,timeout:15000});
+/* ---------- settings ---------- */
+SET_FIELDS.forEach(id=>$(id).value=settings[id]);
+$("openSettings").addEventListener("click",()=>$("settings").showModal());
+$("settings").addEventListener("close",()=>{
+  const corridorChanged=+$("corridor").value!==+settings.corridor;
+  SET_FIELDS.forEach(id=>settings[id]=$(id).value); store.set("rr2-settings",settings);
+  corridorChanged?recalc():render();
 });
-$("clearLoc").addEventListener("click",()=>{st.home=null;store.del("rr-home");syncHomeUi();recalc();});
-let t; FIELDS.forEach(id=>$(id).addEventListener("input",()=>{clearTimeout(t);t=setTimeout(()=>{if(res[1])render();},150);}));
-$("gpx1").addEventListener("click",()=>download(1));
-$("gpx2").addEventListener("click",()=>download(2));
-renderStatic(); syncHomeUi(); renderOpts(); recalc();
+
+function changed(){ window._refit=true; renderStops(); $("roundTrip").checked=!!trip.round; recalc(); }
+renderTypes(); renderStops(); setGpx(false); recalc();
 </script>
 </body>
 </html>
