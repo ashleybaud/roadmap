@@ -48,7 +48,7 @@ input[type=text],input[type=number],input[type=time],input[type=date],select{bac
 .banner{font-size:.85rem;padding:6px 10px;border-left:4px solid var(--accent);background:color-mix(in srgb,var(--accent) 10%,transparent);border-radius:4px}
 
 /* trip bar */
-.tripbar{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:end;padding-bottom:12px;border-bottom:1px solid var(--line)}.tripbar .wide{grid-column:1/-1}
+.tripbar{display:grid;grid-template-columns:1fr 1fr;gap:10px;align-items:end;padding-bottom:12px;border-bottom:1px solid var(--line)}.tripbar input{width:100%;min-width:0}
 .ac{position:relative}
 .sugg{position:absolute;z-index:1600;left:0;right:0;top:100%;background:var(--panel);border:1px solid var(--line);border-radius:4px;box-shadow:0 6px 20px rgba(0,0,0,.15);max-height:260px;overflow:auto}
 .sugg button{display:block;width:100%;text-align:left;border:0;background:none;padding:8px 10px;cursor:pointer;border-bottom:1px solid var(--line)}
@@ -164,6 +164,20 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 .ovroute{display:flex;align-items:center;gap:8px}
 .ovroute .fromto{white-space:nowrap;font-size:.9rem}
 .ovbits{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.inbtn{position:relative}.inbtn input{padding-right:36px}.inbtn .icon{position:absolute;right:4px;top:50%;transform:translateY(-50%)}
+.dayhead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.seg2{display:inline-flex;gap:4px}
+.seg2 button{border:2px solid transparent;background:none;border-radius:6px;padding:2px;cursor:pointer;opacity:.45;line-height:0}
+.seg2 button.on{border-color:var(--ink);opacity:1}
+.seg2 svg,.sty svg{width:30px;height:30px}
+.sty{display:inline-flex;vertical-align:middle;line-height:0}.sty svg{width:20px;height:20px}
+.sun{font-family:var(--f-mono);font-size:.85rem;font-weight:600}
+.sun.swarn{color:var(--warn)}.sun.sbad{color:var(--bad)}
+.wxlink{font-size:.85rem;color:var(--ink);text-decoration:none;border-bottom:1px dotted var(--muted)}
+.dtab.keybtn{justify-content:center;align-items:center;font-weight:700;min-width:36px;margin-left:auto}
+.keylist{display:flex;flex-direction:column;gap:10px;font-size:.88rem}
+.keylist .pill,.keylist .flag{margin-right:4px}
+[hidden]{display:none!important}
 </style>
 </head>
 <body>
@@ -196,12 +210,29 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
   <section class="tripbar" aria-label="Trip">
     <div class="field"><label class="lbl" for="startDate">Leave</label><input id="startDate" type="date"></div>
     <div class="field"><label class="lbl" for="endDate">Back</label><input id="endDate" type="date"></div>
-    <div class="field ac wide"><label class="lbl" for="startPlace">Start</label><input id="startPlace" type="text" autocomplete="off" placeholder="Town or place"><div class="sugg" hidden></div></div>
-    <div class="field ac wide"><label class="lbl" for="endPlace">Finish</label><input id="endPlace" type="text" autocomplete="off" placeholder="Town or place"><div class="sugg" hidden></div></div>
-    <div class="field"><label class="chk"><input type="checkbox" id="roundTrip"> Finish where I started</label><button class="btn ghost small" id="useLoc" type="button">Start from my location</button></div>
+    <div class="field ac"><label class="lbl" for="startPlace">Start</label><div class="inbtn"><input id="startPlace" type="text" autocomplete="off" placeholder="My location or a town"><button class="icon" id="useLoc" type="button" title="Use my location" aria-label="Use my location">⌖</button></div><div class="sugg" hidden></div></div>
+    <div class="field ac"><label class="lbl" for="endPlace">Finish</label><div class="inbtn"><input id="endPlace" type="text" autocomplete="off" placeholder="Same as start"><button class="icon" id="sameStart" type="button" title="Finish where I started" aria-label="Finish where I started" hidden>✕</button></div><div class="sugg" hidden></div></div>
   </section>
 </div>
 
+<dialog id="keyDlg">
+  <form method="dialog" class="keylist">
+    <h2>What the icons mean</h2>
+    <div><span class="pill fok">FUEL</span> Fuel fine for the whole stretch.</div>
+    <div><span class="pill fwarn">FUEL 18 km</span> You'd dip into your reserve. The number is what's left in the tank.</div>
+    <div><span class="pill fbad">FUEL 313 km</span> A stretch with no fuel known. The number is how long it is.</div>
+    <div><span class="pill dist long">526 km · 9h30</span> Orange: more riding than your daily limit in Settings.</div>
+    <div><span class="sun swarn">☼ 19:02</span> Orange: you'd arrive within an hour of sunset. <span class="sun sbad">☼ 19:02</span> Red: after dark.</div>
+    <div><span class="flag fwarn">☂</span> Weather: storms, strong wind, heat, near freezing or rain. Red is serious.</div>
+    <div><span class="flag fwarn">≈</span> River crossings on the route, with rain forecast.</div>
+    <div><span class="flag fwarn">✚</span> Parts of the day are more than 120 km from a hospital.</div>
+    <div><span class="flag finfo">◷</span> The clocks change during the day.</div>
+    <div><span class="sty">STYLE_FAST</span> Get me there quickly. <span class="sty">STYLE_ROUGH</span> Road less travelled, or the style set in Settings.</div>
+    <div><span class="tdot" style="background:var(--warn)"></span> A dot on a day tab: something on that day needs a look.</div>
+    <p class="note">Every day is assumed to start with a full tank where a fuel station is within 5 km of the night stop, or where you've ticked "Fill up here tonight". Fuel, places and hospitals come from OpenStreetMap and can be wrong. Phone ahead on remote legs.</p>
+    <div class="btns"><button class="btn" value="close">Close</button></div>
+  </form>
+</dialog>
 <dialog id="settings">
   <form method="dialog" style="display:flex;flex-direction:column;gap:12px">
     <h2>Settings</h2>
@@ -465,7 +496,7 @@ function migrate(){
   const start=old.date||tomorrow, f=st[0], l=st[st.length-1];
   return {startDate:start,endDate:addDays(start,days.length-1),start:pt(f.name,f.lat,f.lon),end:pt(l.name,l.lat,l.lon),round:!!old.round,days};
 }
-const DEFAULT_TRIP={startDate:tomorrow,endDate:addDays(tomorrow,1),start:pt("Malmesbury",-33.461,18.727),end:pt("Malmesbury",-33.461,18.727),round:true,
+const DEFAULT_TRIP={startDate:tomorrow,endDate:addDays(tomorrow,1),start:pt("My location",null,null),end:null,round:true,
   days:[{to:pt("Cederberg Oasis",-32.550504,19.360797),style:"default",vias:[pt("Ceres",-33.369052,19.310031,{type:"fuel"})],legs:[]},{style:"default",vias:[pt("Citrusdal",-32.589,19.015,{type:"fuel"})],legs:[]}]};
 const trip=store.get("rr4-trip")||migrate()||DEFAULT_TRIP;
 if(trip.startDate<ymd(new Date())){const n=trip.days.length;trip.startDate=tomorrow;trip.endDate=addDays(tomorrow,n-1);}
@@ -497,7 +528,7 @@ const styleName=()=>({rough:"Road less travelled",mixed:"Mixed",tar:"Tar"})[sett
 /* ---------- planning ---------- */
 async function recalc(){
   const my=++seq; syncDays(); save();
-  if(!trip.start||trip.start.lat==null){$("status").textContent="Pick where you start.";renderAll();return;}
+  if(!trip.start||trip.start.lat==null){if(!/Getting|Tap/.test($("status").textContent))$("status").textContent="Pick where you start.";renderAll();return;}
   $("status").textContent="Working out the route…";
   try{
     const res=await Promise.all(trip.days.map((d,k)=>{const pts=dayPts(k); if(!pts) return null; const fast=d.style==="fast";
@@ -527,6 +558,9 @@ async function recalc(){
 function fuelPlan(){
   const range=+settings.range,reserve=+settings.reserve,total=plan.total;
   const mine=[]; plan.days.forEach(d=>{if(!d)return; d.pts.forEach(p=>{if(p.type==="fuel"&&plan.ptKm.has(p)) mine.push({id:"me"+mine.length,lat:p.lat,lon:p.lon,name:p.name,km:plan.ptKm.get(p),mine:true});});});
+  plan.days.forEach((d,k)=>{ if(!d||k>=nDays()-1) return; const nt=d.pts[d.pts.length-1], km=plan.ptKm.get(nt);
+    if(km!=null&&(nt.fill||fuelAll.some(f=>hav(f,nt)<=5))) mine.push({id:"night"+k,lat:nt.lat,lon:nt.lon,name:nt.name+" (overnight fill)",km,mine:true,night:true}); });
+  mine.sort((a,b)=>a.km-b.km);
   const st=[...mine,...(placesOk?fuelStations:[])].sort((a,b)=>a.km-b.km).filter((x,i,a)=>!a.slice(0,i).some(o=>Math.abs(o.km-x.km)<1));
   let pos=0,tank=range,guard=0; const fills=[],gaps=[];
   const use=s=>{tank-=s.km-pos; fills.push(Object.assign({},s,{arrive:tank})); pos=s.km; tank=range;};
@@ -547,13 +581,13 @@ function rangeFuel(a,b){
   if(settings.fuelMode==="off"||!fp) return null;
   let min=Infinity; for(let k=a;k<b;k+=1) min=Math.min(min,fp.tankAt(k)); min=Math.min(min,fp.tankAt(Math.max(a,b-0.01)));
   const gap=fp.gaps.find(g=>g.from<b&&g.to>a);
-  if(min<0) return {level:"bad",short:gap?`No fuel ${Math.round(gap.to-gap.from)} km`:"Runs dry",text:gap?`${Math.round(gap.to-gap.from)} km with no fuel known.`:"Runs dry before the end of this stretch."};
-  if(min<+settings.reserve) return {level:"warn",short:`Reserve: ${Math.round(min)} km`,text:`Down to ${Math.round(min)} km of fuel, below your ${settings.reserve} km reserve.`};
-  return {level:"",short:"Fuel OK",text:`Never below ${Math.round(min)} km of fuel.`};
+  if(min<0) return {level:"bad",short:gap?`${Math.round(gap.to-gap.from)} km`:"Dry",text:gap?`${Math.round(gap.to-gap.from)} km with no fuel known.`:"Runs dry before the end of this stretch."};
+  if(min<+settings.reserve) return {level:"warn",short:`${Math.round(min)} km`,text:`Down to ${Math.round(min)} km of fuel, below your ${settings.reserve} km reserve.`};
+  return {level:"",short:"",text:`Never below ${Math.round(min)} km of fuel.`};
 }
 function fuelPill(f){
   if(settings.fuelMode==="off") return "";
-  if(!f) return `<span class="pill foff">${ICON.fuel}Fuel …</span>`;
+  if(!f) return `<span class="pill foff" title="Checking fuel">${ICON.fuel}…</span>`;
   return `<span class="pill ${f.level==="bad"?"fbad":f.level==="warn"?"fwarn":"fok"}" title="${esc(f.text)}">${ICON.fuel}${esc(f.short)}</span>`;
 }
 const distPill=(km,min,attrs)=>`<span class="pill dist" ${attrs||""} title="Show on the map">${Math.round(km)} km · ${fmtDur(min)}</span>`;
@@ -588,21 +622,27 @@ function hook(id,onPick){const el=document.getElementById(id); if(el) wireSearch
 /* ---------- trip bar ---------- */
 function renderTripBar(){
   $("startDate").value=trip.startDate; $("endDate").value=trip.endDate; $("endDate").min=trip.startDate;
-  if(document.activeElement!==$("startPlace")) $("startPlace").value=trip.start?trip.start.name:"";
-  if(document.activeElement!==$("endPlace")) $("endPlace").value=trip.round?(trip.start?trip.start.name:""):(trip.end?trip.end.name:"");
-  $("endPlace").disabled=false; $("roundTrip").checked=!!trip.round;
+  if(document.activeElement!==$("startPlace")) $("startPlace").value=trip.start&&trip.start.lat!=null?trip.start.name:"";
+  if(document.activeElement!==$("endPlace")) $("endPlace").value=trip.round||!trip.end?"":trip.end.name;
+  $("sameStart").hidden=!!trip.round||!trip.end;
 }
 $("startDate").addEventListener("change",e=>{const n=nDays();trip.startDate=e.target.value||tomorrow;if(trip.endDate<trip.startDate)trip.endDate=addDays(trip.startDate,n-1);changed();});
 $("endDate").addEventListener("change",e=>{trip.endDate=e.target.value<trip.startDate?trip.startDate:e.target.value;changed();});
-wireSearch($("startPlace"),$("startPlace").nextElementSibling,p=>{trip.start=p;changed();});
-wireSearch($("endPlace"),$("endPlace").nextElementSibling,p=>{trip.end=p;trip.round=false;changed();});
-$("roundTrip").addEventListener("change",e=>{trip.round=e.target.checked;if(!trip.round&&!trip.end)trip.end=Object.assign({},trip.start);changed();});
-$("useLoc").addEventListener("click",()=>{
-  if(!navigator.geolocation){$("status").textContent="This browser can't share your location.";return;}
+wireSearch($("startPlace"),$("startPlace").parentElement.nextElementSibling,p=>{trip.start=p;changed();});
+wireSearch($("endPlace"),$("endPlace").parentElement.nextElementSibling,p=>{trip.end=p;trip.round=false;changed();});
+$("endPlace").addEventListener("change",e=>{ if(!e.target.value.trim()&&!trip.round){trip.round=true;changed();} });
+$("sameStart").addEventListener("click",()=>{trip.round=true;changed();});
+function useMyLocation(){
+  if(!navigator.geolocation){$("status").textContent="This browser can't share your location. Type a town.";return;}
   $("status").textContent="Getting your location…";
   navigator.geolocation.getCurrentPosition(p=>{trip.start=pt("My location",+p.coords.latitude.toFixed(5),+p.coords.longitude.toFixed(5));changed();},
-    ()=>{$("status").textContent="Location not shared. Allow location for this site and try again.";},{enableHighAccuracy:true,timeout:15000});
-});
+    ()=>{$("status").textContent="Location not shared. Type a start town instead.";},{enableHighAccuracy:true,timeout:15000});
+}
+$("useLoc").addEventListener("click",useMyLocation);
+if(trip.start&&trip.start.name==="My location"&&trip.start.lat==null){
+  $("status").textContent="Tap ⌖ to start from your location, or type a town.";
+  navigator.permissions?.query({name:"geolocation"}).then(r=>{if(r.state==="granted") useMyLocation();}).catch(()=>{});
+}
 
 /* ---------- day tabs ---------- */
 function renderTabs(){
@@ -611,9 +651,10 @@ function renderTabs(){
     const f=plan&&plan.days[k]?dayRisk(k):null, to=dayTo(k);
     tabs.push(`<button class="dtab ${ui.tab===k?"on":""}" data-day="${k}" role="tab"><b>Day ${k+1}${f&&f.level!=="ok"?`<span class="tdot" style="background:var(--${f.level==="bad"?"bad":"warn"})"></span>`:""}</b><span class="note">${esc(fmtDate(dayDate(k)))}</span><span class="note">→ ${esc(to?to.name:"pick a night stop")}</span></button>`);
   });
+  tabs.push(`<button class="dtab keybtn" type="button" data-key title="What the icons and colours mean">?</button>`);
   $("dayTabs").innerHTML=tabs.join("");
 }
-$("dayTabs").addEventListener("click",e=>{const b=e.target.closest("[data-day]"); if(!b) return; ui.tab=b.dataset.day==="ov"?"ov":+b.dataset.day; saveUi(); closePanel(true); renderAll(); if(window.innerWidth<=1000) $("details").scrollIntoView({behavior:"smooth",block:"start"});});
+$("dayTabs").addEventListener("click",e=>{if(e.target.closest("[data-key]")){$("keyDlg").showModal();return;} const b=e.target.closest("[data-day]"); if(!b) return; ui.tab=b.dataset.day==="ov"?"ov":+b.dataset.day; saveUi(); closePanel(true); renderAll(); if(window.innerWidth<=1000) $("details").scrollIntoView({behavior:"smooth",block:"start"});});
 
 /* ---------- details ---------- */
 const TB=document.querySelector(".tripbar");
@@ -697,7 +738,22 @@ function sunMin(k){
   const to=dayTo(k); if(!to) return null; const ss=sunset(dayDate(k),to.lat,to.lon); return ss.getHours()*60+ss.getMinutes();
 }
 const LIGHT_TXT={ok:"Clear",warn:"Take care",bad:"Problem"};
-const FLAG_ICON={dark:"☾",wx:"☂",ford:"≈",med:"✚",tz:"◷"};
+const FLAG_ICON={wx:"☂",ford:"≈",med:"✚",tz:"◷"};
+const STYLE_ICON={fast:`<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="1" width="22" height="22" rx="3" fill="#1D5BBF"/><rect x="4" y="5" width="16" height="2.6" fill="#fff"/><path d="M6 21 10.5 9.5M18 21 13.5 9.5" stroke="#fff" stroke-width="2.2" fill="none"/><path d="M12 20.5v-2.5M12 15.5v-2.5" stroke="#fff" stroke-width="1.6"/></svg>`,
+  default:`<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="1" width="22" height="22" rx="3" fill="#8A5A2B"/><path d="M8 22c0-5 8-4 8-9s-6-4-6-9" stroke="#fff" stroke-width="2.2" fill="none" stroke-dasharray="3 2.2"/></svg>`};
+const WXI=c=>c==null?"":c>=95?"⚡":c>=85?"❄":c>=80?"☂":c>=71?"❄":c>=51?"☂":c>=45?"≋":c>=3?"☁":c>=2?"⛅":"☀";
+function sunSpan(k){
+  const s=sunMin(k); if(s==null) return ""; const arrive=toMin(settings.leave)+dayMinutes(k);
+  const cls=s<arrive?"sbad":s-arrive<60?"swarn":"";
+  return `<span class="sun ${cls}" title="Sunset ${fmtT(s)}${cls?`. Arrive about ${fmtT(arrive)} if you leave at ${fmtT(toMin(settings.leave))}.`:""}">☼ ${fmtT(s)}</span>`;
+}
+function wxLink(k){
+  const w=dayWx(k), to=dayTo(k); if(!to) return "";
+  const href=`https://www.windy.com/?${to.lat.toFixed(2)},${to.lon.toFixed(2)},9`;
+  if(!w) return `<a class="wxlink" href="${href}" target="_blank" rel="noopener" title="Forecast for the area">☁ …</a>`;
+  if(w.none) return `<a class="wxlink" href="${href}" target="_blank" rel="noopener" title="Forecast for the area">☁ from ${esc(fmtDate(new Date(w.opens+"T12:00:00")))}</a>`;
+  return `<a class="wxlink" href="${href}" target="_blank" rel="noopener" title="${esc(wxText(w))}. Opens the forecast for the area.">${WXI(w.code)} ${Math.round(w.tmin)}–${Math.round(w.tmax)}°C</a>`;
+}
 /* fuel and travel time colour their own pills; everything else is a small coloured icon */
 function flagIcons(r,k){
   if(!r) return "";
@@ -719,10 +775,10 @@ function overviewHtml(){
     const pd=plan&&plan.days[k], from=dayFrom(k), to=dayTo(k), last=k===nDays()-1, r=pd?dayRisk(k):null;
     const c=!last&&d.to&&placesOk?(stayFor(d.to)?.places.length||0):null;
     h+=`<div class="ovday" data-gotoday="${k}">
-      <div class="ovtop"><b>Day ${k+1}</b><span class="note">${esc(fmtDate(dayDate(k)))}</span>${d.style==="fast"?`<span class="note">Liaison</span>`:""}<span class="flags">${flagIcons(r,k)}</span></div>
+      <div class="ovtop"><b>Day ${k+1}</b><span class="note">${esc(fmtDate(dayDate(k)))}</span>${d.style==="fast"?`<span class="sty" title="Get me there quickly">${STYLE_ICON.fast}</span>`:""}<span class="flags">${flagIcons(r,k)}</span></div>
       <div class="ovroute"><span class="fromto">${esc(from?from.name:"?")} →</span>${last?`<span class="fixed">${esc(to?to.name:"?")}</span>`:searchBox("night-"+k,d.to?d.to.name:"","Where you sleep")}
         ${!last&&d.to?`<button class="chip2 stay" type="button" data-panel="${k}:last:stay" title="Places to stay">${ICON.stay}<span>${c==null?"…":c}</span></button>`:""}</div>
-      <div class="ovbits">${pd?timePill(k,pd.km,dayMinutes(k))+fuelPill(rangeFuel(pd.a,pd.b))+wxShort(dayWx(k)):`<span class="note">${to?"No route yet":"Pick where you sleep"}</span>`}</div>
+      <div class="ovbits">${pd?timePill(k,pd.km,dayMinutes(k))+fuelPill(rangeFuel(pd.a,pd.b))+sunSpan(k)+wxLink(k):`<span class="note">${to?"No route yet":"Pick where you sleep"}</span>`}</div>
       ${riskHtml(r,k)}</div>`;
   });
   h+=`</div>`;
@@ -736,17 +792,15 @@ function overviewHtml(){
 }
 function dayHtml(k){
   const d=trip.days[k], pd=plan&&plan.days[k], from=dayFrom(k), to=dayTo(k), last=k===nDays()-1;
-  let h=`<div><h2>Day ${k+1} · ${esc(fmtDate(dayDate(k)))}</h2><div class="note">${esc(from?from.name:"?")} → ${esc(to?to.name:"pick a night stop")}</div></div>
-    <div class="seg" role="group" aria-label="Day style"><button type="button" data-style="default" class="${d.style!=="fast"?"on":""}">${esc(styleName())}</button><button type="button" data-style="fast" class="${d.style==="fast"?"on":""}">Liaison: get me there fast</button></div>`;
+  let h=`<div class="dayhead"><div><h2>Day ${k+1} · ${esc(fmtDate(dayDate(k)))}</h2><div class="note">${esc(from?from.name:"?")} → ${esc(to?to.name:"pick a night stop")}</div></div>
+    <div class="seg2" role="group" aria-label="Day style"><button type="button" data-style="default" class="${d.style!=="fast"?"on":""}" title="${esc(styleName())}" aria-label="${esc(styleName())}">${STYLE_ICON.default}</button><button type="button" data-style="fast" class="${d.style==="fast"?"on":""}" title="Get me there quickly" aria-label="Get me there quickly">${STYLE_ICON.fast}</button></div></div>`;
   if(!last&&!d.to) h+=`<div class="nightrow" style="border-top:0"><span class="when"><b>Sleep at</b></span>${searchBox("night-"+k,"","Town or place to sleep")}<span></span></div>`;
   if(!pd) return h+`<div class="note">${to?"No route yet. Check your connection.":"Pick where you sleep tonight to see this day."}</div>`;
   const mins=dayMinutes(k), leave=toMin(settings.leave), arrive=leave+mins, ssMin=sunMin(k), df=rangeFuel(pd.a,pd.b), w=dayWx(k), m=dayMed(k);
   const rk=dayRisk(k), arrTxt=fmtT(arrive)+(arrive>=1440?` +${Math.floor(arrive/1440)}d`:"");
-  h+=`<div class="sumrow">${timePill(k,pd.km,mins,`data-focusday="${k}"`)}${fuelPill(df)}<span class="flags">${flagIcons(rk,k)}</span>
-    <div class="stat"><span class="lbl">Leave</span><span class="v">${fmtT(leave)}</span></div><div class="stat"><span class="lbl">Arrive</span><span class="v">${arrTxt}</span></div><div class="stat"><span class="lbl">Sunset</span><span class="v">${ssMin!=null?fmtT(ssMin):"?"}</span></div></div>`;
+  h+=`<div class="sumrow">${timePill(k,pd.km,mins,`data-focusday="${k}"`)}${fuelPill(df)}${sunSpan(k)}${wxLink(k)}<span class="flags">${flagIcons(rk,k)}</span></div>`;
   h+=riskHtml(rk,k);
   if(!placesOk&&settings.fuelMode!=="off") h+=`<div class="verdict v-warn">Station data isn't loaded. Fuel is checked against your own fuel stops only.</div>`;
-  h+=`<div class="wxbox"><span class="lbl">Weather</span><span>${w?esc(wxText(w)):"Loading…"}</span>${windyLink(to)}</div>`;
   if(m) h+=`<details class="medbox"><summary><span class="lbl">Medical</span> ${m.near.length} hospital${m.near.length===1?"":"s"} and clinics near the route · furthest point ${fmtFar(m.far)} km from a hospital</summary>
     ${m.near.map(x=>`<div class="item"><div class="meta"><b>${esc(x.name||(x.type==="hospital"?"Hospital":"Clinic"))}</b><span class="note">${x.type==="hospital"?"Hospital":"Clinic"} · km ${Math.round(x.km-pd.a)} · ${x.off<0.5?"on the route":x.off.toFixed(1)+" km off"}${x.phone?` · <a href="tel:${esc(x.phone.replace(/[^\d+]/g,""))}">${esc(x.phone)}</a>`:""}</span></div></div>`).join("")||`<div class="note">None listed within 25 km of the route.</div>`}
     <div class="note">Emergency from a mobile: 112. Check the local numbers before you go.</div></details>`;
@@ -843,6 +897,9 @@ function renderPanel(){
   $("pTabs").innerHTML=Object.entries(TABS).filter(([x])=>x!=="food"||ui.types.food).map(([x,v])=>`<button type="button" class="tab ${x===tab?"on":""}" data-tab="${x}">${ICON[x]}${v} <span class="note">${panelItems(k,j,x).length}</span></button>`).join("");
   const items=panelItems(k,j,tab); let h="";
   if(tab==="fuel"&&sc.jj>0){const f=rangeFuel(sc.a,sc.b); if(f&&f.level) h+=`<div class="verdict ${f.level==="bad"?"v-bad":"v-warn"}">${esc(f.text)}</div>`;}
+  if(tab==="fuel"&&isNight){const auto=fuelAll.some(f=>hav(f,p)<=5);
+    h+=auto?`<div class="note">A station is within 5 km, so Day ${k+2} starts with a full tank.</div>`
+      :`<label class="chk"><input type="checkbox" data-pfill ${p.fill?"checked":""}> Fill up here tonight, so Day ${k+2} starts with a full tank</label>`;}
   if(tab==="stay") h+=`<div class="note">Within 15 km of ${esc(p.name)}, from OpenStreetMap. Prices aren't listed, so phone or check the website.</div>`;
   h+=items.length?items.map(x=>{
     const where=tab==="stay"?`${esc((x.tags.tourism||"").replace("_"," "))} · ${x.dist.toFixed(1)} km from town`:x.km!=null?`${x.off<0.3?"on the route":x.off.toFixed(1)+" km off"}`:"";
@@ -855,6 +912,7 @@ function renderPanel(){
 $("pTabs").addEventListener("click",e=>{const t=e.target.closest("[data-tab]"); if(t&&panel){panel.tab=t.dataset.tab;renderPanel();drawMap();}});
 $("pClose").addEventListener("click",()=>closePanel());
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&panel) closePanel();});
+$("pBody").addEventListener("change",e=>{ if(!panel||!e.target.matches("[data-pfill]")) return; const sc=scope(panel.k,panel.j); sc.p.fill=e.target.checked; changed(); });
 $("pBody").addEventListener("click",e=>{
   if(!panel) return; const {k,j}=panel, sc=scope(k,j), d=trip.days[k], at=Math.max(0,sc.jj-1);
   const f=e.target.closest("[data-pfuel]"),sy=e.target.closest("[data-pstay]"),ad=e.target.closest("[data-padd]");
@@ -955,5 +1013,6 @@ function renderAll(){
   $("hdrSummary").textContent=plan?`${Math.round(tot)} km · ${nDays()} day${nDays()>1?"s":""}`:"";
 }
 function changed(){ window._refit=true; focusR=null; recalc(); }
+$("keyDlg").innerHTML=$("keyDlg").innerHTML.replace("STYLE_FAST",STYLE_ICON.fast).replace("STYLE_ROUGH",STYLE_ICON.default).replaceAll("FUEL",ICON.fuel);
 renderLayers(); showStyle(); syncDays(); renderAll(); recalc();
 </script></body></html>
