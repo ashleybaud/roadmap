@@ -318,12 +318,14 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .tripbar>.field:nth-child(4){display:none}
 @media (max-width:560px){.tripbar{grid-template-columns:1fr 1fr!important}.tripbar>.field:nth-child(3){grid-column:1/-1}}
 .clearrow{justify-content:flex-end}
-.iconbar{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center}
-.ib{width:34px;height:30px;border:1px solid var(--line);border-radius:6px;background:var(--panel);cursor:pointer;font-size:1rem;opacity:.45;line-height:1}
-.ib.on{opacity:1;border-color:var(--ink);background:color-mix(in srgb,var(--accent) 14%,var(--panel))}
-.ib:disabled{cursor:not-allowed;opacity:.25}
-.ibmax{font-size:.8rem;display:inline-flex;align-items:center;gap:4px;margin-left:4px}
-.ibmax select{width:auto;padding:2px 4px;font-size:.8rem}
+.iconbar{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:10px 0 4px}
+.iconbar .iblbl{font-size:.75rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted,#5b6660);margin-right:2px}
+.ib{display:inline-flex;align-items:center;gap:6px;height:36px;padding:0 12px;border:2px solid var(--ink);border-radius:18px;background:transparent;color:var(--ink);cursor:pointer;font:600 .9rem/1 inherit;font-family:inherit;opacity:.55}
+.ib .e{font-size:1.05rem;line-height:1}
+.ib.on{opacity:1;background:var(--ink);color:var(--bg)}
+.ib:disabled{cursor:not-allowed;opacity:.3;border-style:dashed}
+.ib select{border:0;background:transparent;color:inherit;font:inherit;padding:0 0 0 2px;width:auto;cursor:pointer}
+.ib.on select option{color:#18201C}
 .fgrp summary{cursor:pointer}
 .fgrp .note{margin:2px 0 2px 14px}
 .legway svg{width:22px;height:22px}
@@ -345,13 +347,13 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
   <div class="work">
     <div class="mapcol">
       <div class="mapbar">
-        <div class="iconbar" id="iconbar" role="toolbar" aria-label="Show on map"></div>
         <span class="status" id="status" role="status"></span><span class="toast" id="toast" role="status" hidden></span>
       </div>
       <div id="map"></div>
     </div>
     <div class="panel" style="padding-top:8px">
       <div class="daytabs" id="dayTabs" role="tablist"></div>
+      <div class="iconbar" id="iconbar" role="toolbar" aria-label="Show on the map"></div>
       <div class="details" id="details"></div>
     </div>
   </div>
@@ -412,7 +414,9 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 <script>
 const OSRM="https://router.project-osrm.org/route/v1/driving/";
 const PHOTON="https://photon.komoot.io/api/";
-const VALHALLA="https://valhalla1.openstreetmap.de/route";
+/* routing and map tiles: Stadia Maps (paid, authorised by domain); free servers only as a fallback */
+const ROUTER="https://api.stadiamaps.com/route/v1";
+const TILES={url:"https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png",attribution:'© <a href="https://stadiamaps.com/">Stadia Maps</a> © <a href="https://openmaptiles.org/">OpenMapTiles</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',maxZoom:18};
 const OVERPASS="/api/places";
 const TYPES=[
   {id:"view",n:"Viewpoints",c:"#2F5BA8",on:true},
@@ -483,8 +487,8 @@ async function routeLeg(a,b,lg){
   let out;
   try{
     const body={locations:[a,b].map(p=>({lat:p.lat,lon:p.lon,type:"break"})),costing:"motorcycle",costing_options:{motorcycle:STYLE[style]||STYLE.rough},...(alts?{alternates:2}:{}),units:"kilometers",directions_type:"none"};
-    const ctl=new AbortController(); setTimeout(()=>ctl.abort(),25000);
-    const r=await fetch(VALHALLA+"?json="+encodeURIComponent(JSON.stringify(body)),{signal:ctl.signal});
+    const ctl=new AbortController(), tm=setTimeout(()=>ctl.abort(),alts?15000:10000);
+    const r=await fetch(ROUTER,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body),signal:ctl.signal}); clearTimeout(tm);
     const j=await r.json(); if(!j.trip) throw new Error(j.error||"no route");
     out=[j.trip,...(j.alternates||[]).map(x=>x.trip)].map(t=>({km:t.summary.length,min:t.summary.time/60,geom:decode6(t.legs[0].shape)}));
   }catch(e){
@@ -684,7 +688,7 @@ const freshTrip=()=>({startDate:tomorrow,endDate:tomorrow,start:pt("My location"
 const DEFAULT_TRIP_OLD={startDate:tomorrow,endDate:addDays(tomorrow,1),start:pt("My location",null,null),end:null,round:true,
   days:[{to:pt("Cederberg Oasis",-32.550504,19.360797),style:"default",vias:[pt("Ceres",-33.369052,19.310031,{type:"fuel"})],legs:[]},{style:"default",vias:[pt("Citrusdal",-32.589,19.015,{type:"fuel"})],legs:[]}]};
 const trip=store.get("rr4-trip")||migrate()||freshTrip();
-if(trip.sugV!==3){ (trip.days||[]).forEach(d=>{ d.fresh=true; }); trip.sugV=3; }
+if(trip.sugV!==4){ (trip.days||[]).forEach(d=>{ const n=(d.vias||[]).length; d.vias=(d.vias||[]).filter(v=>!v.auto); if(d.vias.length!==n) d.legs=[]; d.fresh=true; delete d.noMore; }); trip.sugV=4; }
 if(trip.startDate<ymd(new Date())){const n=trip.days.length;trip.startDate=tomorrow;trip.endDate=addDays(tomorrow,n-1);}
 
 const SET_FIELDS=["range","leave","pace","corridor","style","maxHours","breakMin"];
@@ -1260,7 +1264,7 @@ function dayHead(k){ return sumBox(k,true)+`<h3 class="detailh">Stops</h3>`; }
 
 /* ---------- fuel towns added for the rider (marked, removable, can be kept) ---------- */
 let autoRounds=0;
-const legFast=(d,j)=>{ const l=d.legs&&d.legs[j]; return l&&l.fast!=null?l.fast:d.style==="fast"; };
+const legFast=(d,j)=>{ const v=d.vias[j], f=v?v.fast:d.toFast; return f!=null?f:d.style==="fast"; };
 function stripAuto(){ trip.days.forEach(d=>{ const n=d.vias.length; d.vias=d.vias.filter(v=>!v.auto); if(d.vias.length!==n) d.legs=[]; }); }
 function autoFuel(){
   if(!plan||!placesOk||!townList||!(+settings.range>0)) return false;
@@ -1425,7 +1429,7 @@ $("details").addEventListener("click",e=>{
   const rb=t.closest("[data-risk]"); if(rb){const k2=+rb.dataset.risk; riskOpen.has(k2)?riskOpen.delete(k2):riskOpen.add(k2); renderDetails(); return;}
   if(t.closest("[data-print]")){printTrip();return;}
   const g=t.closest("[data-gpx]"); if(g){downloadGpx(+g.dataset.gpx);return;}
-  const ls=t.closest("[data-legsty]"); if(ls&&k!=null){ const [j2,f2]=ls.dataset.legsty.split(":"); const d2=trip.days[k], o=d2.legs[+j2]||{}; d2.legs[+j2]={fast:f2==="1",wantAlts:o.wantAlts}; changed(); return; }
+  const ls=t.closest("[data-legsty]"); if(ls&&k!=null){ const [j2,f2]=ls.dataset.legsty.split(":"); const d2=trip.days[k], v2=d2.vias[+j2]; if(v2) v2.fast=f2==="1"; else d2.toFast=f2==="1"; d2.legs[+j2]={wantAlts:(d2.legs[+j2]||{}).wantAlts}; changed(); return; }
   const sty=t.closest("[data-style]"); if(sty&&k!=null){trip.days[k].style=sty.dataset.style;trip.days[k].legs=(trip.days[k].legs||[]).map(x=>x&&x.track?{track:x.track,trackName:x.trackName}:{});changed();return;}
   const fl=t.closest("[data-focusleg]"); if(fl&&plan&&k!=null){const L=plan.days[k].legs[+fl.dataset.focusleg-1]; focusRange(L.a,L.b); return;}
   const fd=t.closest("[data-focusday]"); if(fd&&plan){const pd=plan.days[+fd.dataset.focusday]; focusRange(pd.a,pd.b); return;}
@@ -1514,7 +1518,7 @@ function townLabels(){ if(!map||!lblLayer||!townList) return; lblLayer.clearLaye
   const own=plan?townPoints():[];
   const used=own.map(p=>map.latLngToContainerPoint([p.lat,p.lon])); list.forEach(t=>{ const pnt=map.latLngToContainerPoint([t.lat,t.lon]); if(used.some(u=>Math.abs(u.x-pnt.x)<90&&Math.abs(u.y-pnt.y)<22)) return; used.push(pnt);
     L.marker([t.lat,t.lon],{interactive:false,keyboard:false,icon:L.divIcon({className:"townlbl"+(t.place==="city"?" city":""),html:`<span>${esc(t.name)}</span>`,iconSize:[0,0]})}).addTo(lblLayer); }); }
-function ensureMap(){ if(!map){map=L.map("map",{scrollWheelZoom:true});L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:17,attribution:"© OpenStreetMap contributors"}).addTo(map);map.setView([-31,20],5); lblLayer=L.layerGroup().addTo(map); map.on("moveend",townLabels); if(window.ResizeObserver) new ResizeObserver(()=>map.invalidateSize()).observe($("map"));} map.invalidateSize(); if(layer) layer.remove(); layer=L.layerGroup().addTo(map); }
+function ensureMap(){ if(!map){map=L.map("map",{scrollWheelZoom:true});L.tileLayer(TILES.url,{maxZoom:TILES.maxZoom,attribution:TILES.attribution}).addTo(map);map.setView([-31,20],5); lblLayer=L.layerGroup().addTo(map); map.on("moveend",townLabels); if(window.ResizeObserver) new ResizeObserver(()=>map.invalidateSize()).observe($("map"));} map.invalidateSize(); if(layer) layer.remove(); layer=L.layerGroup().addTo(map); }
 const seg=(a,b)=>plan.geom.filter((g,i)=>plan.cum[i]>=a-0.01&&plan.cum[i]<=b+0.01);
 function drawMap(){
   if(!window.L) return; ensureMap(); if(!plan) return; townLabels();
@@ -1558,13 +1562,12 @@ function drawPanelLayer(){
 }
 
 /* ---------- icon bar: what to show on the map ---------- */
-const LAY=[["fuel","⛽","Fuel: stations on the route and fuel towns nearby"],["stay","🛏","Places to stay at night stops"],["food","🍴","Food"],["sights","★","Sights, viewpoints and passes"],["med","🏥","Hospitals and clinics"],["road","🛣","Road type, tar to single track (coming next)"]];
+const LAY=[["fuel","⛽","Fuel","Fuel stations on the route"],["stay","🛏","Stay","Places to stay at night stops"],["food","🍴","Food","Places to eat"],["sights","★","Sights","Sights, viewpoints and passes"],["med","🏥","Medical","Hospitals and clinics"],["road","🛣","Road type","Tar to single track, coming next"]];
 ui.lay=Object.assign({fuel:true,stay:!!ui.sleep,food:!!ui.types.food,sights:true,med:false},ui.lay||{});
 function renderLayers(){
-  $("iconbar").innerHTML=LAY.map(([id,ic,t])=>`<button type="button" class="ib ${ui.lay[id]?"on":""}" data-lay="${id}" title="${esc(t)}" ${id==="road"?"disabled":""}>${ic}</button>`).join("")
-    +`<label class="ibmax" title="How many sights to show">★ <select data-max>${[["10","10"],["25","25"],["50","50"],["1000","All"]].map(([v,l])=>`<option value="${v}" ${ui.max===v?"selected":""}>${l}</option>`).join("")}</select></label>`;
+  $("iconbar").innerHTML=`<span class="iblbl">On the map</span>`+LAY.map(([id,ic,w,t])=>`<button type="button" class="ib ${ui.lay[id]?"on":""}" data-lay="${id}" title="${esc(t)}" aria-pressed="${!!ui.lay[id]}" ${id==="road"?"disabled":""}><span class="e">${ic}</span>${w}${id==="sights"&&ui.lay.sights?`<select data-max aria-label="How many sights">${[["10","10"],["25","25"],["50","50"],["1000","All"]].map(([v,l])=>`<option value="${v}" ${ui.max===v?"selected":""}>${l}</option>`).join("")}</select>`:""}</button>`).join("");
 }
-$("iconbar").addEventListener("click",e=>{ const b=e.target.closest("[data-lay]"); if(!b||b.disabled) return; const id=b.dataset.lay; ui.lay[id]=!ui.lay[id];
+$("iconbar").addEventListener("click",e=>{ if(e.target.closest("select")) return; const b=e.target.closest("[data-lay]"); if(!b||b.disabled) return; const id=b.dataset.lay; ui.lay[id]=!ui.lay[id];
   if(id==="food") ui.types.food=ui.lay.food; if(id==="sights") ["view","pass","sight"].forEach(t=>ui.types[t]=ui.lay.sights); if(id==="stay"){ ui.sleep=ui.lay.stay; ui.types.camp=ui.lay.stay; }
   saveUi(); renderLayers(); renderAll(); });
 $("iconbar").addEventListener("change",e=>{ if(e.target.dataset.max!==undefined){ ui.max=e.target.value; saveUi(); renderAll(); } });
@@ -1630,7 +1633,7 @@ function renderHist(){
 $("histList").addEventListener("click",e=>{ const b=e.target.closest("[data-restore]"); if(!b) return; const h=store.get("rr4-hist")||[], x=h[+b.dataset.restore]; if(!x) return; snapTrip(true); const t=JSON.parse(x.key); Object.keys(trip).forEach(k=>delete trip[k]); Object.assign(trip,t); ui.tab="ov"; $("settings").close(); changed(); });
 const daySig=k=>[dayFrom(k),dayTo(k)].map(p=>p&&p.lat!=null?p.lat.toFixed(3)+","+p.lon.toFixed(3):"-").join("|");
 function changed(){ window._refit=true; focusR=null; stopFocus=null; autoRounds=0;
-  syncDays(); trip.days.forEach((d,k)=>{ const s=daySig(k); if(d.sig&&d.sig!==s) d.fresh=true; d.sig=s; });
+  syncDays(); trip.days.forEach((d,k)=>{ const s=daySig(k); if(d.sig&&d.sig!==s){ d.fresh=true; delete d.noMore; const n=d.vias.length; d.vias=d.vias.filter(v=>!v.auto); if(d.vias.length!==n) d.legs=[]; } d.sig=s; });
   snapTrip(); recalc(); }
 $("keyDlg").innerHTML=$("keyDlg").innerHTML.replace("STYLE_FAST",STYLE_ICON.fast).replace("STYLE_ROUGH",STYLE_ICON.default).replaceAll("FUEL",ICON.fuel);
 {const fb=$("feedback"); const set=()=>{const l=feedbackLink(); fb.hidden=!l; if(l) fb.href=l;}; set(); fb.addEventListener("click",set);}
