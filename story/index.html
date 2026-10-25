@@ -731,7 +731,7 @@ function daySuggest(k){
     const next=cands.filter(t=>t.fuel&&t.km>win).sort((x,y)=>x.km-y.km)[0];
     const to=next&&next.km<pd.b?next:null;
     probs.push({from:pos,to:to?to.km:pd.b,fromName:posName,toName:to?to.name:pd.pts[pd.pts.length-1].name,towns:through.filter(t=>!t.fuel&&t.km>pos+3&&t.km<(to?to.km:pd.b)-3)});
-    if(!to) break; sugg.push(to); pos=to.km; posName=to.name;
+    if(!to) break; sugg.push(to.off>5?Object.assign({detour:true},to):to); pos=to.km; posName=to.name;
   }
   return {through,sugg,probs};
 }
