@@ -1095,7 +1095,7 @@ function fuelList(k){
   const tel=t=>t.phone?` · <a href="tel:${esc(String(t.phone).replace(/[^\d+]/g,""))}">${esc(t.phone)}</a>`:"";
   const one=f=>{const t=f.tags||{}, g=gradesTxt(t), off=fuelAll.find(x=>x.id===f.id)?.off; return `<b>${esc(f.name)}</b>${off>=1?` · ${off.toFixed(1)} km off the route`:""}${g?" · "+esc(g):""}${t.hours?` · <span class="note">${esc(t.hours)}</span>`:""}${tel(t)}`;};
   const groups=[]; st.forEach(f=>{ const tw=townList&&townList.filter(t=>Math.abs(t.lat-f.lat)<0.05&&hav(t,f)<=3).sort((x,y)=>hav(x,f)-hav(y,f))[0];
-    const gr=tw&&groups.find(g=>g.town===tw); if(gr) gr.st.push(f); else groups.push({town:tw||null,st:[f],km:f.km}); });
+    const gr=tw&&groups.find(g=>g.town&&g.town.name===tw.name&&Math.abs(g.km-f.km)<20); if(gr) gr.st.push(f); else groups.push({town:tw||null,st:[f],km:f.km}); });
   const h24=f=>/24\/7|00:00-24:00/.test((f.tags||{}).hours||""), dsl=f=>/D/.test(((f.tags||{}).extra||""))||/diesel/i.test(gradesTxt(f.tags||{})||"");
   h+=`<div class="rinfo"><b>Fuel on the way</b> ${groups.length} ${groups.length===1?"place":"places"}</div>`+(groups.length?groups.map(g=>{ const km=`km ${Math.max(0,Math.round(g.km-pd.a))}`;
     if(!g.town||g.st.length===1){ const f=g.st[0]; return `<div class="frow"><span>${km}: ${g.town&&g.town.name!==f.name?`<b>${esc(g.town.name)}</b> · `:""}${one(f)}</span><button class="btn small ghost" type="button" data-addfill="${f.id}" data-day="${k}">Add as a stop</button></div>`; }
