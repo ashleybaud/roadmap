@@ -864,7 +864,7 @@ function renderTabs(){
   });
   tabs.push(`<button class="dtab keybtn" type="button" data-key title="What the icons and colours mean">?</button>`);
   $("dayTabs").innerHTML=tabs.join("");
-  requestAnimationFrame(()=>{ const c=$("dayTabs"), on=c.querySelector(".dtab.on"); if(on&&c.scrollWidth>c.clientWidth) c.scrollTo({left:on.offsetLeft-c.offsetLeft-(c.clientWidth-on.offsetWidth)/2,behavior:"smooth"}); });
+  requestAnimationFrame(()=>{ const c=$("dayTabs"), on=c.querySelector(".dtab.on"); if(on&&c.scrollWidth>c.clientWidth) c.scrollTo({left:on.offsetLeft-c.offsetLeft-(c.clientWidth-on.offsetWidth)/2}); });
 }
 $("dayTabs").addEventListener("click",e=>{if(e.target.closest("[data-key]")){$("keyDlg").showModal();return;} const b=e.target.closest("[data-day]"); if(!b) return; ui.tab=b.dataset.day==="ov"?"ov":+b.dataset.day; stopFocus=null; saveUi(); closePanel(true); renderAll(); if(window.innerWidth<=1000) $("details").scrollIntoView({behavior:"smooth",block:"start"});});
 
