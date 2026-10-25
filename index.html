@@ -1002,7 +1002,7 @@ function stopList(k){
   h+=`<ol class="stops">`;
   pd.pts.forEach((p,j)=>{
     const isFrom=j===0, isTo=j===pd.pts.length-1, vi=j-1, L=j>0?pd.legs[j-1]:null, lg=j>0?(d.legs[j-1]||{}):{};
-    const open=stopFocus&&stopFocus.k===k&&stopFocus.j===j, km=Math.round((plan.ptKm.get(p)??pd.a)-pd.a);
+    const open=stopFocus&&stopFocus.k===k&&stopFocus.j===j, km=j>0?Math.round(pd.legs[j-1].b-pd.a):0;
     const lab=isFrom?"From":isTo?"To":`Stop ${j}`;
     const tools=!isFrom&&!isTo?`<select data-vtype="${vi}" aria-label="Stop type">${Object.entries(STOP_TYPES).map(([x,v])=>`<option value="${x}" ${p.type===x?"selected":""}>${v.n}</option>`).join("")}</select><button class="icon" type="button" title="Move up" data-vup="${vi}">↑</button><button class="icon" type="button" title="Remove" data-vdel="${vi}">✕</button>`:"";
     const opts=L?`<details class="legopts"><summary class="icon" title="Options for the way in">⋯</summary><div class="legmenu">
@@ -1119,8 +1119,8 @@ $("details").addEventListener("change",async e=>{
 function stayFor(p){ return stays.find(x=>x.night===p); }
 function panelPoint(k,j){ const pd=plan&&plan.days[k]; if(!pd) return null; return j==="last"?pd.pts[pd.pts.length-1]:pd.pts[j]; }
 function scope(k,j){
-  const pd=plan&&plan.days[k]; if(!pd) return null; const jj=j==="last"?pd.pts.length-1:j, p=pd.pts[jj];
-  const b=plan.ptKm.get(p); const a=jj>0?plan.ptKm.get(pd.pts[jj-1]):b; return {a,b,p,jj};
+  const pd=plan&&plan.days[k]; if(!pd) return null; const jj=j==="last"?pd.pts.length-1:j, p=pd.pts[jj]; if(!p) return null;
+  const b=jj>0?pd.legs[jj-1].b:pd.a, a=jj>0?pd.legs[jj-1].a:pd.a; return {a,b,p,jj};
 }
 function panelItems(k,j,tab){
   const sc=scope(k,j); if(!sc||sc.b==null) return [];
