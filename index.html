@@ -504,6 +504,22 @@ function locate(p,geom,cum){
   return {km:cum[bi],off:bd};
 }
 
+/* a road ridden on two days (out and back) passes the same towns twice: match a place to each day's own stretch */
+function locateDays(p,geom,cum,max){
+  const days=plan&&plan.days?plan.days.filter(Boolean):[];
+  if(days.length<2){ const r=locate(p,geom,cum); return [r]; }
+  if(!plan._dayIdx){ const bs=km=>{let lo=0,hi=cum.length-1; while(lo<hi){const m=(lo+hi)>>1; if(cum[m]<km) lo=m+1; else hi=m;} return lo;};
+    plan._dayIdx=days.map(d=>[bs(d.a),Math.max(bs(d.a),bs(d.b))]); }
+  let out=[];
+  plan._dayIdx.forEach(([lo,hi])=>{ const st=Math.max(2,Math.floor((hi-lo)/400)); let bi=lo,bd=Infinity;
+    for(let i=lo;i<=hi;i+=st){const d=hav(p,geom[i]);if(d<bd){bd=d;bi=i;}}
+    for(let i=Math.max(lo,bi-st);i<=Math.min(hi,bi+st);i++){const d=hav(p,geom[i]);if(d<bd){bd=d;bi=i;}}
+    out.push({km:cum[bi],off:bd}); });
+  const best=out.reduce((x,y)=>y.off<x.off?y:x);
+  out=out.filter(r=>r.off<=max).filter((r,i,a)=>!a.slice(0,i).some(o=>Math.abs(o.km-r.km)<1));
+  return out.length?out:[best];
+}
+
 async function overpass(q){
   const ctl=new AbortController(); setTimeout(()=>ctl.abort(),40000);
   const r=await fetch(OVERPASS,{method:"POST",signal:ctl.signal,body:"data="+encodeURIComponent(q),headers:{"Content-Type":"application/x-www-form-urlencoded"}});
@@ -555,7 +571,8 @@ function nearRoute(rows,kind,padKm){
     if(!bx.some(([s,w,n,e])=>lat>=s&&lat<=n&&lon>=w&&lon<=e)) return;
     const k=kind==="sleep"&&type==="camp_site"?"camp":kind;
     const p={id:kind+i,lat,lon,name:name||(kind==="fuel"?"Fuel":""),kind:k,tags:{tourism:type,phone,website:web,email,hours,extra}};
-    Object.assign(p,locate(p,plan.geom,plan.cum)); out.push(p);
+    if(kind==="fuel"||kind==="med") locateDays(p,plan.geom,plan.cum,padKm).forEach(r=>out.push(Object.assign({},p,r)));
+    else { Object.assign(p,locate(p,plan.geom,plan.cum)); out.push(p); }
   });
   return out;
 }
@@ -567,7 +584,7 @@ async function loadLocal(my){
   if(my!==seq) return;
   const extra=await fetch("/data/extra-fuel.json").then(r=>r.ok?r.json():[]).catch(()=>[]);
   fuelRowsAll=[...fuel.map(r=>({lat:r[0],lon:r[1]})),...extra.map(x=>({lat:x.lat,lon:x.lon}))];
-  fuelAll=[...nearRoute(fuel,"fuel",10),...extra.map((x,k)=>Object.assign({id:"x"+k,lat:x.lat,lon:x.lon,name:x.name,kind:"fuel",note:x.note,tags:{}},locate(x,plan.geom,plan.cum)))].filter(p=>p.off<=10);
+  fuelAll=[...nearRoute(fuel,"fuel",10),...extra.flatMap((x,k)=>locateDays(x,plan.geom,plan.cum,10).map(r=>Object.assign({id:"x"+k,lat:x.lat,lon:x.lon,name:x.name,kind:"fuel",note:x.note,tags:{}},r)))].filter(p=>p.off<=10);
   fuelStations=fuelAll.filter(p=>p.off<=5).sort((a,b)=>a.km-b.km); placesOk=true; render();
   const corridor=Math.max(1,+settings.corridor); let all=[];
   for(const k of ["view","pass","sight","food","camp"]){ const rows=await localKind(k,ccs); if(rows){ all.push(...nearRoute(rows,k,corridor)); if(k==="food") foodRowsAll=rows.map(r=>({lat:r[0],lon:r[1]})); } }
@@ -730,10 +747,9 @@ function stopTowns(){
   let s=90,w=180,n=-90,e=-180; g.forEach(p=>{s=Math.min(s,p.lat);n=Math.max(n,p.lat);w=Math.min(w,p.lon);e=Math.max(e,p.lon);});
   const fuelSrc=fuelRowsAll||fuelAll, foodSrc=foodRowsAll||pois.filter(x=>x.kind==="food");
   townList.forEach(t=>{ if(t.lat<s-0.6||t.lat>n+0.6||t.lon<w-0.7||t.lon>e+0.7) return;
-    let bd=99,bi=-1; for(let i=0;i<g.length;i+=step){const d=hav(t,g[i]); if(d<bd){bd=d;bi=i;}}
-    if(bi<0||bd>60) return;
+    const hits=locateDays(t,g,c,60).filter(r=>r.off<=60); if(!hits.length) return;
     const fuel=fuelSrc.some(f=>Math.abs(f.lat-t.lat)<0.04&&hav(f,t)<=3), food=foodSrc.some(f=>Math.abs(f.lat-t.lat)<0.03&&hav(f,t)<=2);
-    out.push({name:t.name,lat:t.lat,lon:t.lon,km:c[bi],off:bd,fuel,food,place:t.place}); });
+    hits.forEach(r=>out.push({name:t.name,lat:t.lat,lon:t.lon,km:r.km,off:r.off,fuel,food,place:t.place})); });
   out.sort((a,b)=>a.km-b.km); plan._cands=out.filter((t,i,a)=>!a.slice(0,i).some(o=>o.name===t.name&&Math.abs(o.km-t.km)<20)); return plan._cands;
 }
 function daySuggest(k,ignoreAuto){
@@ -768,8 +784,8 @@ function routeTowns(){
   if(plan._towns) return plan._towns;
   const g=plan.geom, c=plan.cum, step=Math.max(1,Math.floor(g.length/3000)), out=[];
   let s=90,w=180,n=-90,e=-180; g.forEach(p=>{s=Math.min(s,p.lat);n=Math.max(n,p.lat);w=Math.min(w,p.lon);e=Math.max(e,p.lon);});
-  townList.forEach(t=>{ if(t.lat<s-0.1||t.lat>n+0.1||t.lon<w-0.1||t.lon>e+0.1) return; let bd=9,bi=-1; for(let i=0;i<g.length;i+=step){const d=hav(t,g[i]); if(d<bd){bd=d;bi=i;}} if(bi>=0&&bd<=5) out.push({name:t.name,km:c[bi],lat:t.lat,lon:t.lon,off:bd}); });
-  out.sort((a,b)=>a.km-b.km); plan._towns=out.filter((t,i,a)=>!a.slice(0,i).some(o=>o.name===t.name)); return plan._towns;
+  townList.forEach(t=>{ if(t.lat<s-0.1||t.lat>n+0.1||t.lon<w-0.1||t.lon>e+0.1) return; locateDays(t,g,c,5).filter(r=>r.off<=5).forEach(r=>out.push({name:t.name,km:r.km,lat:t.lat,lon:t.lon,off:r.off})); });
+  out.sort((a,b)=>a.km-b.km); plan._towns=out.filter((t,i,a)=>!a.slice(0,i).some(o=>o.name===t.name&&Math.abs(o.km-t.km)<20)); return plan._towns;
 }
 const gapTowns=g=>(g.towns||[]).filter(t=>t.name!==g.fromName&&t.name!==g.toName);
 const townsTxt=g=>gapTowns(g).length?` Towns on the way that may have fuel: ${gapTowns(g).slice(0,6).map(t=>t.name).join(", ")}${gapTowns(g).length>6?` and ${gapTowns(g).length-6} more`:""}.`:"";
@@ -1218,7 +1234,7 @@ function sumBox(k,big){
   const warn=ds&&+settings.range>0?ds.probs.map(p=>`<div class="wmin">⚠ No town within reach: ${Math.round(p.to-p.from)} km, ${esc(p.fromName)} to ${esc(p.toName)}.</div>`).join(""):"";
   return `<div class="sumbox ${big?"big":""}">
     ${nDays()===1&&trip.round&&!trip.days[0].vias.length?`<div class="sumline"><span class="sdate">${esc(big?dayLong(k):dayName(k))}:</span> ${esc(from?from.name:"?")} <span class="arr">→</span> <span class="wherebox">${searchBox("whereto-0","","Where to?",true)}</span> <span class="arr">→</span> back home</div>`:`<div class="sumline"><span class="sdate">${esc(big?dayLong(k):dayName(k))}:</span> ${esc(from?from.name:"?")} <span class="arr">→</span> ${chain?chain+` <span class="arr">→</span> `:""}${toCell(k)}${d.style==="fast"?` <span class="sty" title="Get me there quickly">${STYLE_ICON.fast}</span>`:""}</div>`}
-    ${pd?`<div class="sicons"><span class="sl">${timePill(k,pd.km,dayMinutes(k),`data-focusday="${k}"`)+fuelBtn(k)}</span><span class="sr">${sunSpan(k)+wxLink(k)}<span class="flags">${flagIcons(r,k)}</span></span></div>${warn}${riskHtml(r,k)}${fuelList(k)}`:`<div class="note">${msg}</div>`}
+    ${pd?`<div class="sicons"><span class="sl">${timePill(k,pd.km,dayMinutes(k),`data-focusday="${k}"`)+fuelBtn(k)}</span><span class="sr">${sunSpan(k)+wxLink(k)}<span class="flags">${flagIcons(r,k)}</span></span></div>${big?warn:""}${riskHtml(r,k)}${big?fuelList(k):""}`:`<div class="note">${msg}</div>`}
   </div>`;
 }
 function dayHead(k){ return sumBox(k,true)+`<h3 class="detailh">Stops</h3>`; }
@@ -1377,7 +1393,7 @@ $("details").addEventListener("click",e=>{
   const cl=t.closest("[data-clear]"); if(cl){ const id=cl.dataset.clear, m=id.match(/^(night|finish|via)-(\d+)(?:-(\d+))?$/); if(!m) return;
     if(m[1]==="night"){trip.days[+m[2]].to=null;editTo.add(+m[2]);} else if(m[1]==="finish"){trip.round=true;} else {trip.days[+m[2]].vias.splice(+m[3],1);trip.days[+m[2]].legs=[];}
     changed(); return; }
-  const fk=t.closest("[data-fuelk]"); if(fk){const k2=+fk.dataset.fuelk; fuelOpen.has(k2)?fuelOpen.delete(k2):fuelOpen.add(k2); renderDetails(); return;}
+  const fk=t.closest("[data-fuelk]"); if(fk){const k2=+fk.dataset.fuelk; if(ui.tab==="ov"){ fuelOpen.add(k2); const tb=document.querySelector(`[data-day="${k2}"]`); if(tb){ tb.click(); return; } } fuelOpen.has(k2)?fuelOpen.delete(k2):fuelOpen.add(k2); renderDetails(); return;}
   const af=t.closest("[data-addfill]"); if(af){const f=fp.fills.find(x=>x.id===af.dataset.addfill); if(f){insertVia(+af.dataset.day,pt(f.name&&f.name!=="Fuel"?f.name:"Fuel stop",f.lat,f.lon,{fuelHere:true}));changed();} return;}
   const er=t.closest("[data-editroute]"); if(er){const k2=+er.dataset.editroute; editOpen.has(k2)?editOpen.delete(k2):editOpen.add(k2); renderDetails(); return;}
   const mo=t.closest("[data-more]"); if(mo){const key=mo.dataset.more; showAll.has(key)?showAll.delete(key):showAll.add(key); renderDetails(); return;}
@@ -1515,7 +1531,7 @@ function drawPanelLayer(){
 }
 
 /* ---------- icon bar: what to show on the map ---------- */
-const LAY=[["fuel","⛽","Fuel: stations on the route and fuel towns nearby"],["stay","🛏","Places to stay at night stops"],["food","🍴","Food"],["sights","★","Sights, viewpoints and passes"],["med","✚","Hospitals and clinics"],["road","🛣","Road type, tar to single track (coming next)"]];
+const LAY=[["fuel","⛽","Fuel: stations on the route and fuel towns nearby"],["stay","🛏","Places to stay at night stops"],["food","🍴","Food"],["sights","★","Sights, viewpoints and passes"],["med","🏥","Hospitals and clinics"],["road","🛣","Road type, tar to single track (coming next)"]];
 ui.lay=Object.assign({fuel:true,stay:!!ui.sleep,food:!!ui.types.food,sights:true,med:false},ui.lay||{});
 function renderLayers(){
   $("iconbar").innerHTML=LAY.map(([id,ic,t])=>`<button type="button" class="ib ${ui.lay[id]?"on":""}" data-lay="${id}" title="${esc(t)}" ${id==="road"?"disabled":""}>${ic}</button>`).join("")
