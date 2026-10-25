@@ -664,7 +664,6 @@ function contactHtml(t,place,town){
 
 
 /* ================= v4: plan by dates ================= */
-const STOP_TYPES={pass:{n:"Pass through",min:0},fuel:{n:"Fuel stop",min:10},lunch:{n:"Lunch stop",min:45},sight:{n:"Sight",min:30}};
 const TABS={fuel:"Fuel",stay:"Stay",food:"Food",sight:"Sights"};
 const DAYCOL=["#0B6E4F","#2F5BA8","#9A6A33","#6B4E9B","#B3261E","#00838F","#5D4037"];
 function ymd(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
@@ -685,15 +684,13 @@ function migrate(){
   return {startDate:start,endDate:addDays(start,days.length-1),start:pt(f.name,f.lat,f.lon),end:pt(l.name,l.lat,l.lon),round:!!old.round,days};
 }
 const freshTrip=()=>({startDate:tomorrow,endDate:tomorrow,start:pt("My location",null,null),end:null,round:true,days:[{to:null,style:"default",vias:[],legs:[]}]});
-const DEFAULT_TRIP_OLD={startDate:tomorrow,endDate:addDays(tomorrow,1),start:pt("My location",null,null),end:null,round:true,
-  days:[{to:pt("Cederberg Oasis",-32.550504,19.360797),style:"default",vias:[pt("Ceres",-33.369052,19.310031,{type:"fuel"})],legs:[]},{style:"default",vias:[pt("Citrusdal",-32.589,19.015,{type:"fuel"})],legs:[]}]};
 const trip=store.get("rr4-trip")||migrate()||freshTrip();
 if(trip.sugV!==4){ (trip.days||[]).forEach(d=>{ const n=(d.vias||[]).length; d.vias=(d.vias||[]).filter(v=>!v.auto); if(d.vias.length!==n) d.legs=[]; d.fresh=true; delete d.noMore; }); trip.sugV=4; }
 if(trip.startDate<ymd(new Date())){const n=trip.days.length;trip.startDate=tomorrow;trip.endDate=addDays(tomorrow,n-1);}
 
 const SET_FIELDS=["range","leave","pace","corridor","style","maxHours","breakMin"];
 const settings=Object.assign({range:200,reserve:30,leave:"08:00",pace:0,corridor:5,style:"rough",fuelMode:"suggest",maxHours:8,breakMin:20},store.get("rr2-settings")||{});
-const ui=Object.assign({types:Object.fromEntries(TYPES.map(t=>[t.id,t.on])),max:"10",fuelAll:false,fuelSugg:true,sleep:false},store.get("rr4-ui")||{});
+const ui=Object.assign({types:Object.fromEntries(TYPES.map(t=>[t.id,t.on])),max:"10",sleep:false},store.get("rr4-ui")||{});
 ui.tab=ui.tab??"ov"; delete ui._lastSel;
 let plan=null, pois=[], fuelStations=[], fuelAll=[], stays=[], placesOk=false, dataDate="", seq=0, panel=null, fp=null;
 fetch("/data/updated.json").then(r=>r.ok?r.json():null).then(j=>{if(j&&j.updated)dataDate=new Date(j.updated).toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"});}).catch(()=>{});
@@ -787,37 +784,19 @@ function daySuggest(k,ignoreAuto){
 }
 function fuelPlan(){
   const fills=(placesOk?fuelStations:[]).map(f=>({id:f.id,km:f.km,lat:f.lat,lon:f.lon,name:f.name&&f.name!=="Fuel"?f.name:"Fuel station",tags:f.tags,st:true}));
-  return {fills,gaps:[],days:plan.days.map((d,k)=>d?daySuggest(k):null)};
+  return {fills,days:plan.days.map((d,k)=>d?daySuggest(k):null)};
 }
 /* small towns within 5 km of the route, so a rider can judge a long stretch for themselves */
-function routeTowns(){
-  if(!plan||!townList) return [];
-  if(plan._towns) return plan._towns;
-  const g=plan.geom, c=plan.cum, step=Math.max(1,Math.floor(g.length/3000)), out=[];
-  let s=90,w=180,n=-90,e=-180; g.forEach(p=>{s=Math.min(s,p.lat);n=Math.max(n,p.lat);w=Math.min(w,p.lon);e=Math.max(e,p.lon);});
-  townList.forEach(t=>{ if(t.lat<s-0.1||t.lat>n+0.1||t.lon<w-0.1||t.lon>e+0.1) return; locateDays(t,g,c,5).filter(r=>r.off<=5).forEach(r=>out.push({name:t.name,km:r.km,lat:t.lat,lon:t.lon,off:r.off})); });
-  out.sort((a,b)=>a.km-b.km); plan._towns=out.filter((t,i,a)=>!a.slice(0,i).some(o=>o.name===t.name&&Math.abs(o.km-t.km)<20)); return plan._towns;
-}
-const gapTowns=g=>(g.towns||[]).filter(t=>t.name!==g.fromName&&t.name!==g.toName);
-const townsTxt=g=>gapTowns(g).length?` Towns on the way that may have fuel: ${gapTowns(g).slice(0,6).map(t=>t.name).join(", ")}${gapTowns(g).length>6?` and ${gapTowns(g).length-6} more`:""}.`:"";
-function gapText(g){ const len=Math.round(g.to-g.from); return `${len} km with no fuel on our map, ${g.fromName} to ${g.toName}. That's longer than your ${settings.range} km range.${townsTxt(g)} Check before you go.`; }
 function rangeFuel(a,b){
   if(!fp||!fp.days) return null;
   const k=plan.days.findIndex(d=>d&&Math.abs(d.a-a)<0.5&&Math.abs(d.b-b)<0.5); if(k<0) return null;
   const pr=fp.days[k]&&fp.days[k].probs[0]; if(!pr) return null; const len=Math.round(pr.to-pr.from);
   return {level:"warn",short:`No town within reach: ${len} km`,text:`No town within reach: ${len} km, ${pr.fromName} to ${pr.toName}`};
 }
-function rangeFuelOld(a,b){
-  if(!fp||!(+settings.range>0)) return null;
-  const g=fp.gaps.find(g=>g.from<b-0.1&&g.to>a+0.1); if(!g) return null;
-  const len=Math.round(g.to-g.from);
-  return {level:"bad",short:`${len} km`,text:gapText(g)};
-}
 function fuelPill(f){
   if(!f) return "";
   return `<span class="pill fwarn" title="${esc(f.text)}">${ICON.fuel}Check fuel</span>`;
 }
-const distPill=(km,min,attrs)=>`<span class="pill dist" ${attrs||""} title="Show on the map">${Math.round(km)} km · ${fmtDur(min)}</span>`;
 function dayMinutes(k){
   const d=plan&&plan.days[k]; if(!d) return 0;
   const pace=1+(+settings.pace||0)/100, stopMin=d.pts.slice(1,-1).reduce((t,p)=>t+breakOf(p),0);
@@ -933,7 +912,6 @@ function wxText(w){
   if(w.none) return `Forecast from ${fmtDate(new Date(w.opens+"T12:00:00"))}`;
   return `${WXW(w.code)} · ${Math.round(w.tmin)}–${Math.round(w.tmax)}°C · rain ${w.rain<0.5?"none":Math.round(w.rain)+" mm"}${w.prob>=20?` (${w.prob}%)`:""} · gusts ${Math.round(w.gust)} km/h`;
 }
-const windyLink=p=>`<a href="https://www.windy.com/?${p.lat.toFixed(2)},${p.lon.toFixed(2)},9" target="_blank" rel="noopener">Forecast for the area ↗</a>`;
 
 /* ---------- medical + river crossings (own map data) ---------- */
 function dayMed(k){
@@ -977,7 +955,6 @@ function sunMin(k){
   const w=dayWx(k); if(w&&!w.none&&w.sunset){const t=w.sunset.split("T")[1]; return toMin(t);}
   const to=dayTo(k); if(!to) return null; const ss=sunset(dayDate(k),to.lat,to.lon); return ss.getHours()*60+ss.getMinutes();
 }
-const LIGHT_TXT={ok:"Clear",warn:"Take care",bad:"Problem"};
 const FLAG_ICON={wx:"☂",ford:"≈",med:"✚",tz:"◷",stay:"⌂"};
 const STYLE_ICON={fast:`<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="1" width="22" height="22" rx="3" fill="#1D5BBF"/><rect x="4" y="5" width="16" height="2.6" fill="#fff"/><path d="M6 21 10.5 9.5M18 21 13.5 9.5" stroke="#fff" stroke-width="2.2" fill="none"/><path d="M12 20.5v-2.5M12 15.5v-2.5" stroke="#fff" stroke-width="1.6"/></svg>`,
   default:`<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="1" width="22" height="22" rx="3" fill="#8A5A2B"/><path d="M8 22c0-5 8-4 8-9s-6-4-6-9" stroke="#fff" stroke-width="2.2" fill="none" stroke-dasharray="3 2.2"/></svg>`};
@@ -1007,7 +984,6 @@ function riskHtml(r,k){
   return `<div class="risklist">${r.reasons.map(x=>`<div class="${x.lvl==="bad"?"rbad":x.lvl==="warn"?"rwarn":"rinfo"}">${esc(x.text)}</div>`).join("")||`<div class="rinfo">Nothing flagged for this day.</div>`}</div>`;
 }
 function timePill(k,km,mins,attrs){ const long=mins>+settings.maxHours*60; return `<span class="pill dist ${long?"long":""}" ${attrs||""} title="${long?`Travel time over your ${settings.maxHours}h setting. `:""}Show on the map">${Math.round(km)} km · ${fmtDur(mins)}</span>`; }
-function wxShort(w){ if(!w) return ""; if(w.none) return `<span class="note">Forecast from ${esc(fmtDate(new Date(w.opens+"T12:00:00")))}</span>`; return `<span class="note">${esc(WXW(w.code))} ${Math.round(w.tmin)}–${Math.round(w.tmax)}°C</span>`; }
 
 
 /* ---------- printable trip summary (Save as PDF) ---------- */
@@ -1052,8 +1028,6 @@ function printHtml(){
     h+=`</tbody></table>`;
     // fuel
     const ds=fp&&fp.days&&fp.days[k];
-    if(false) h+=`<h3>Suggested stops</h3><ul>${ds.sugg.map(t=>`<li><b>${esc(t.name)}</b>, km ${Math.max(0,Math.round(t.km-d.a))}${t.fuel?" · fuel":""}${t.food?" · food":""}${t.detour?` · ${Math.round(t.off)} km off the route`:""}</li>`).join("")}${ds.probs.map(p=>`<li class="warn">No town with fuel on our map between ${esc(p.fromName)} and ${esc(p.toName)} (${Math.round(p.to-p.from)} km). Ask locally or carry extra.</li>`).join("")}</ul>`;
-    if(false) h+=`<p><b>Through:</b> ${ds.through.map(t=>esc(t.name)).join(" · ")}</p>`;
     h+=`<h3>Fuel on the way</h3>`+(fills.length?`<ul>${fills.map(f=>{ const x=fuelAll.find(q=>hav(q,f)<0.3)||f, t=x.tags||{}, g=gradesTxt(t); return `<li>km ${Math.round(f.km-d.a)}: <b>${esc(f.name&&f.name!=="Fuel"?f.name:"Fuel station")}</b>${g?" · "+esc(g):""}${t.hours?" · "+esc(t.hours):""}${t.phone?" · "+esc(t.phone):""}</li>`; }).join("")}</ul>`:`<p>None known on the route.</p>`);
     // night
     if(!(last&&trip.round)){ const sf=stayFor(to), pl=sf?sf.places:[], chosen=pl.find(p=>hav(p,to)<0.2);
@@ -1086,9 +1060,6 @@ function feedbackLink(){
 const editOpen=new Set(), editTo=new Set(), fuelOpen=new Set(), showAll=new Set(); let tripEdit=false;
 const curDay=()=>ui.tab==="ov"?(nDays()===1?0:null):ui.tab;
 const viaOpen=new Set();
-function viaList(k,v,full){ if(!v.length) return ""; if(full||viaOpen.has(k)||v.length<=2) return `<b class="via">via</b> <b>${v.map(x=>esc(x.name)).join(", ")}</b> `;
-  return `<b class="via">via</b> <b>${v.slice(0,2).map(x=>esc(x.name)).join(", ")}</b> <button type="button" class="linkbtn morevia" data-morevias="${k}">+${v.length-2} more</button> `; }
-function viaText(k,full){ return viaList(k,trip.days[k].vias.filter(x=>x.lat!=null),full); }
 function toCell(k){
   const last=k===nDays()-1, d=trip.days[k], to=dayTo(k), id=(last?"finish-":"night-")+k, cur=last?(to?to.name:""):(d.to?d.to.name:"");
   if(editTo.has(k)||!cur) return searchBox(id,cur,last?"Pick where you finish":"Pick where you sleep");
@@ -1104,8 +1075,8 @@ function fuelGroups(st){
 }
 function fuelList(k){
   if(!fuelOpen.has(k)||!plan||!plan.days[k]||!fp) return "";
-  const pd=plan.days[k], gaps=fp.gaps.filter(g=>g.from<pd.b-0.1&&g.to>pd.a+0.1), st=fp.fills.filter(f=>f.km>=pd.a-0.3&&f.km<=pd.b+0.3);
-  let h=gaps.map(g=>`<div class="verdict v-bad">${esc(gapText(g))}</div>`).join("");
+  const pd=plan.days[k], st=fp.fills.filter(f=>f.km>=pd.a-0.3&&f.km<=pd.b+0.3);
+  let h="";
   const tel=t=>t.phone?` · <a href="tel:${esc(String(t.phone).replace(/[^\d+]/g,""))}">${esc(t.phone)}</a>`:"";
   const one=f=>{const t=f.tags||{}, g=gradesTxt(t), off=fuelAll.find(x=>x.id===f.id)?.off; return `<b>${esc(f.name)}</b>${off>=1?` · ${off.toFixed(1)} km off the route`:""}${g?" · "+esc(g):""}${t.hours?` · <span class="note">${esc(t.hours)}</span>`:""}${tel(t)}`;};
   const groups=fuelGroups(st);
@@ -1115,18 +1086,6 @@ function fuelList(k){
     const n=g.st.length, x=[g.st.some(h24)?"open 24h":"",g.st.some(dsl)?"Diesel":""].filter(Boolean).join(" · ");
     return `<div class="frow"><details class="fgrp"><summary>${km}: <b>${esc(g.town.name)}</b> · ${n} stations${x?" · "+x:""}</summary>${g.st.map(f=>`<div class="note">${one(f)}</div>`).join("")}</details><button class="btn small ghost" type="button" data-addtown="${k}|${esc(g.town.name)}|${g.town.lat}|${g.town.lon}">Add as a stop</button></div>`; }).join(""):`<div class="rinfo">None known on the route today.</div>`);
   return `<div class="risklist">${h}</div>`;
-}
-function storyLine(k,big){
-  const pd=plan&&plan.days[k], d=trip.days[k], r=pd?dayRisk(k):null;
-  const msg=!trip.start||trip.start.lat==null?"Pick where you start":!dayFrom(k)?"Pick the night stop before this day":!dayTo(k)?"Pick where you sleep":!dayPts(k)?"Add a stop or a finish":"Working out the route…";
-  return `<div class="story"><div class="sline">${big?`<h2 class="sdate">${esc(dayLong(k))}</h2>`:`<b class="sdate">${esc(dayName(k))}:</b>`} <span class="svia">${viaText(k,big)}→</span> ${toCell(k)}${dayPts(k)&&dayPts(k).slice(1).some((_,j)=>legFast(d,j))?` <span class="sty" title="Quick way on some or all of this day">${STYLE_ICON.fast}</span>`:""}</div>
-    <div class="sicons">${pd?`<span class="sl">${timePill(k,pd.km,dayMinutes(k),`data-focusday="${k}"`)+fuelBtn(k)}</span><span class="sr">${sunSpan(k)+wxLink(k)}<span class="flags">${flagIcons(r,k)}</span></span>`:`<span class="note">${msg}</span>`}</div>
-    ${riskHtml(r,k)}${fuelList(k)}</div>`;
-}
-function tripLine(){
-  const s=trip.start?trip.start.name:"?";
-  return `<div class="tripline"><span><span class="lbl">From</span> <b>${esc(s)}</b></span>
-    <button class="btn small ghost" type="button" data-tripedit>${tripEdit?"Done":"Edit"}</button></div>`;
 }
 function tripTotals(){
   if(!plan) return "";
@@ -1143,36 +1102,6 @@ function stayRows(k){
     :`<div class="note">${placesOk?"Nothing listed within 15 km. Phone the town's info office or check booking sites.":"Loading…"}</div>`;
   if(all.length>10) h+=`<button class="linkbtn" type="button" data-more="${key}">${showAll.has(key)?"Show fewer":`Show all ${all.length}`}</button>`;
   return h+`</section>`;
-}
-function alongRows(k){
-  const pd=plan.days[k]; const all=pois.filter(p=>ui.types[p.kind]&&p.km!=null&&p.km>=pd.a-1&&p.km<=pd.b+1).sort((a,b)=>a.km-b.km);
-  const key="poi-"+k, list=showAll.has(key)?all:all.slice(0,10);
-  let h=`<section class="dsec"><h3>Along the way <span class="note">${placesOk?all.length:"…"}</span></h3>`;
-  h+=list.length?`<div class="stable">${list.map(p=>`<div class="srow"><div><b>${esc(p.name)}</b><span class="note">${esc(TYPES.find(t=>t.id===p.kind)?.n||"")} · km ${Math.round(Math.max(0,p.km-pd.a))}${p.off>=0.3?` · ${p.off.toFixed(1)} km off`:""}</span></div>
-      <div class="sact"><button class="linkbtn" type="button" data-addpoi="${k}:${esc(p.id)}">Add to route</button></div></div>`).join("")}</div>`:`<div class="note">${placesOk?"Nothing listed near the route. Change what's shown under Show on map.":"Loading…"}</div>`;
-  if(all.length>10) h+=`<button class="linkbtn" type="button" data-more="${key}">${showAll.has(key)?"Show fewer":`Show all ${all.length}`}</button>`;
-  return h+`</section>`;
-}
-function routeEditor(k){
-  const d=trip.days[k], pd=plan&&plan.days[k], pts=pd?pd.pts:[dayFrom(k),...d.vias,dayTo(k)].filter(Boolean), hasVias=d.vias.length>0;
-  let h=`<div class="redit"><div class="rehead"><span class="lbl">Way</span><div class="seg2" role="group" aria-label="Day style"><button type="button" data-style="default" class="${d.style!=="fast"?"on":""}" title="${esc(styleName())}" aria-label="${esc(styleName())}">${STYLE_ICON.default}</button><button type="button" data-style="fast" class="${d.style==="fast"?"on":""}" title="Get me there quickly" aria-label="Get me there quickly">${STYLE_ICON.fast}</button></div></div><div class="rlist">`;
-  pts.forEach((p,j)=>{
-    const isFrom=j===0, isTo=j===pts.length-1, vi=j-1, L=pd&&j>0?pd.legs[j-1]:null, lg=j>0?(d.legs[j-1]||{}):{};
-    const lab=isFrom?"From":isTo?"To":`Stop ${j}`;
-    let name;
-    if(isFrom||isTo) name=`<span class="fixed">${esc(p?p.name:"?")}</span>`;
-    else name=searchBox(`via-${k}-${vi}`,p.name,"Stop")+`<button class="icon" type="button" title="Move up" data-vup="${vi}">↑</button>`;
-    let strip="";
-    if(!isFrom&&!isTo){ const c=counts(k,j); strip+=`<select data-vtype="${vi}" aria-label="Stop type">${Object.entries(STOP_TYPES).map(([x,v])=>`<option value="${x}" ${p.type===x?"selected":""}>${v.n}</option>`).join("")}</select>${chip(k,j,"fuel",c?c.fuel:"…")}${ui.types.food?chip(k,j,"food",c?c.food:"…"):""}${chip(k,j,"sight",c?c.sight:"…")}`; }
-    if(L&&hasVias) strip=distPill(L.km,L.min,`data-focusleg="${j}"`)+fuelPill(rangeFuel(L.a,L.b))+strip;
-    if(L) strip+=`<details class="legopts"><summary class="icon" title="Options for the way in">⋯</summary><div class="legmenu">
-        ${L.n>1&&!lg.track?`<label class="chk">Way <select data-alt="${j-1}">${L.alts.map((km,x)=>`<option value="${x}" ${(lg.alt||0)===x?"selected":""}>Way ${x+1} · ${Math.round(km)} km</option>`).join("")}</select></label>`:`<span class="note">${lg.track?"":"No other ways found for this stretch."}</span>`}
-        ${lg.track?`<span class="note">Own track: ${esc(lg.trackName||"GPX")}</span><button class="btn small ghost" type="button" data-untrack="${j-1}">Remove track</button>`
-          :`<label class="btn small ghost" style="cursor:pointer;align-self:flex-start">Use my GPX for this stretch<input type="file" accept=".gpx,application/gpx+xml" data-track="${j-1}" hidden></label>`}
-      </div></details>`;
-    h+=`<div class="rpt"><span class="rlab">${lab}</span><div class="rbody"><div class="rname">${name}</div>${strip?`<div class="strip">${strip}</div>`:""}</div></div>`;
-  });
-  return h+`</div><div class="rname"><span class="lbl" style="white-space:nowrap">Add a stop</span>${searchBox("addvia-"+k,"","Town, pass or place on this day",true)}</div></div>`;
 }
 
 /* ---------- what's at a stop: fuel, food, shop, toilets, cash, repair ---------- */
@@ -1227,24 +1156,7 @@ function hoursHtml(t,k,j){
 function gradesTxt(t){ const e=(t&&t.extra)||""; const g=[]; if(/\b93\b/.test(e)) g.push("93"); if(/\b95\b/.test(e)) g.push("95"); if(/\bD\b/.test(e)) g.push("Diesel"); return g.length?g.join(" · "):""; }
 
 
-function suggHtml(k){
-  if(!plan||!plan.days[k]) return "";
-  if(!placesOk) return `<div class="note">Checking fuel…</div>`;
-  const ds=fp&&fp.days&&fp.days[k]; if(!ds) return "";
-  const pd=plan.days[k], km=t=>Math.max(0,Math.round(t.km-pd.a));
-  const icons=t=>`${t.fuel?"⛽":""}${t.food?"🍴":""}`;
-  let h=`<div class="sugg2">`;
-  if(ds.through.length) h+=`<div class="thru"><span class="lbl">Through</span> ${ds.through.map(t=>`<span class="tw ${ds.sugg.includes(t)?"on":""}">${esc(t.name)} <span class="note">km ${km(t)}</span>${icons(t)}</span>`).join(" · ")}</div>`;
-  if(+settings.range>0){
-    if(ds.sugg.length) h+=`<div class="sgl"><span class="lbl">Suggested stops</span>${ds.sugg.map(t=>`<span class="sgi"><b>${esc(t.name)}</b> <span class="note">km ${km(t)}${t.detour?` · ${Math.round(t.off)} km off the route, adds about ${Math.round(t.off*2)} km`:""}</span> ${icons(t)} <button class="btn small ghost" type="button" data-sadd2="${k}:${esc(t.name)}">Add</button></span>`).join("")}</div>`;
-    else if(!ds.probs.length) h+=`<div class="note">Fuel towns are within ${esc(String(settings.range))} km all day. No extra stop needed.</div>`;
-    h+=ds.probs.map(p=>`<div class="verdict v-warn">No town with fuel on our map between ${esc(p.fromName)} and ${esc(p.toName)} (${Math.round(p.to-p.from)} km).${p.towns.length?` ${esc(p.towns.map(t=>t.name).join(", "))} on the way may have fuel.`:""} Ask locally or carry extra.</div>`).join("");
-  }
-  return h+`</div>`;
-}
 /* day view heading: named after where you sleep; departure underneath so the stops read top to bottom */
-function gapPill(g,prefix){ const len=Math.round(g.to-g.from); return `<span class="pill fbad" title="${esc(gapText(g))}">${ICON.fuel}${prefix||"Fuel unconfirmed, next"} ${len} km</span>`; }
-function gapsStarting(a,b){ return fp&&+settings.range>0?fp.gaps.filter(g=>g.from>=a-0.5&&g.from<b-0.5):[]; }
 /* ---------- summary box: one line per day, used on the Overview and the day view ---------- */
 function stopsChain(k){
   const d=trip.days[k], v=d.vias.filter(x=>x.lat!=null);
@@ -1265,7 +1177,6 @@ function dayHead(k){ return sumBox(k,true)+`<h3 class="detailh">Stops</h3>`; }
 /* ---------- fuel towns added for the rider (marked, removable, can be kept) ---------- */
 let autoRounds=0;
 const legFast=(d,j)=>{ const v=d.vias[j], f=v?v.fast:d.toFast; return f!=null?f:d.style==="fast"; };
-function stripAuto(){ trip.days.forEach(d=>{ const n=d.vias.length; d.vias=d.vias.filter(v=>!v.auto); if(d.vias.length!==n) d.legs=[]; }); }
 function autoFuel(){
   if(!plan||!placesOk||!townList||!(+settings.range>0)) return false;
   let added=false;
@@ -1329,7 +1240,6 @@ function stopList(k){
     if(j===0) return;
     const isFrom=j===0, isTo=j===pd.pts.length-1, vi=j-1, L=j>0?pd.legs[j-1]:null, lg=j>0?(d.legs[j-1]||{}):{};
     const open=stopFocus&&stopFocus.k===k&&stopFocus.j===j, km=j>0?Math.round(pd.legs[j-1].b-pd.a):0;
-    const nextL=pd.legs[j], gp=gapsStarting(L.b,nextL?nextL.b:L.b+1).map(g=>gapPill(g)).join("");
     const lab=isFrom?"From":isTo?(last?"Finish":"Night stop"):`Stop ${j}`;
     const av=placesOk?stopAvail(p):null;
     const icons=av?AV.filter(a=>av[a[0]].length).map(a=>`<button type="button" class="avi ${open&&stopFocus.cat===a[0]?"on":""}" data-av="${k}:${j}:${a[0]}" title="${esc(a[2])}: ${av[a[0]].length}">${a[1]}</button>`).join(""):"";
@@ -1342,7 +1252,7 @@ function stopList(k){
       </div></details>`:"";
     const autoTag=p.auto?`<span class="autotag">Suggested ⛽${p.detour?` · +${p.detour} km`:""}</span>`:"";
     h+=`<li class="stop ${open?"open":""} ${p.auto?"auto":""}"><div class="shead"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab">${lab}</span><b>${esc(p.name)}</b><span class="note">${isFrom?"":`km ${km}`}</span></button>${autoTag}
-      <span class="avail">${icons}</span>${gp}<span class="stools">${way}${tools}${opts}</span></div>${open&&plan?stopDetail(k,j,stopFocus.cat):""}</li>`;
+      <span class="avail">${icons}</span><span class="stools">${way}${tools}${opts}</span></div>${open&&plan?stopDetail(k,j,stopFocus.cat):""}</li>`;
   });
   h+=`</ol><div class="rname"><span class="lbl" style="white-space:nowrap">Add a stop</span>${searchBox("addvia-"+k,"","Town, pass or place on this day",true)}</div>`;
   return h;
@@ -1383,7 +1293,6 @@ function overviewHtml(){
 }
 function footNote(){ return placesOk&&dataDate?`<div class="note">Map data from OpenStreetMap, as of ${esc(dataDate)}. Weather from Open-Meteo. Phone ahead on remote legs.</div>`:""; }
 function dayHtml(k){ return dayHead(k)+dayBody(k); }
-function chip(k,j,tab,num){return `<button class="chip2 ${tab==="stay"?"stay":""}" type="button" data-panel="${k}:${j}:${tab}" title="${TABS[tab]}">${ICON[tab]}<span>${num}</span></button>`;}
 function wireDetails(){
   trip.days.forEach((d,k)=>hook("night-"+k,p=>{editTo.delete(k);trip.days[k].to=p;changed();}));
   hook("whereto-0",p=>{ trip.days[0].vias.push(p); trip.days[0].legs=[]; changed(); });
@@ -1430,13 +1339,11 @@ $("details").addEventListener("click",e=>{
   if(t.closest("[data-print]")){printTrip();return;}
   const g=t.closest("[data-gpx]"); if(g){downloadGpx(+g.dataset.gpx);return;}
   const ls=t.closest("[data-legsty]"); if(ls&&k!=null){ const [j2,f2]=ls.dataset.legsty.split(":"); const d2=trip.days[k], v2=d2.vias[+j2]; if(v2) v2.fast=f2==="1"; else d2.toFast=f2==="1"; d2.legs[+j2]={wantAlts:(d2.legs[+j2]||{}).wantAlts}; changed(); return; }
-  const sty=t.closest("[data-style]"); if(sty&&k!=null){trip.days[k].style=sty.dataset.style;trip.days[k].legs=(trip.days[k].legs||[]).map(x=>x&&x.track?{track:x.track,trackName:x.trackName}:{});changed();return;}
   const fl=t.closest("[data-focusleg]"); if(fl&&plan&&k!=null){const L=plan.days[k].legs[+fl.dataset.focusleg-1]; focusRange(L.a,L.b); return;}
   const fd=t.closest("[data-focusday]"); if(fd&&plan){const pd=plan.days[+fd.dataset.focusday]; focusRange(pd.a,pd.b); return;}
   const up=t.closest("[data-vup]"); if(up&&k!=null){const i=+up.dataset.vup,v=trip.days[k].vias; if(i>0){[v[i-1],v[i]]=[v[i],v[i-1]];trip.days[k].legs=[];changed();} return;}
   const del=t.closest("[data-vdel]"); if(del&&k!=null){ const d=trip.days[k], v=d.vias[+del.dataset.vdel]; if(v&&v.auto){ d.noAuto=[...(d.noAuto||[]),v.name]; d.noMore=true; } d.vias.splice(+del.dataset.vdel,1); d.legs=[]; changed(); return; }
   const wa=t.closest("[data-wantalts]"); if(wa&&k!=null){ const j2=+wa.dataset.wantalts; trip.days[k].legs[j2]=Object.assign({},trip.days[k].legs[j2],{wantAlts:true}); $("status").textContent="Looking for other ways…"; save(); recalc(); return; }
-  const kp=t.closest("[data-keep]"); if(kp&&k!=null){ const v=trip.days[k].vias[+kp.dataset.keep]; if(v){ delete v.auto; save(); renderAll(); } return; }
   const gs=t.closest("[data-gostop]"); if(gs){ const [k2,j2]=gs.dataset.gostop.split(":").map(Number); ui.tab=k2; stopFocus={k:k2,j:j2}; saveUi(); renderAll(); return; }
   const un=t.closest("[data-untrack]"); if(un&&k!=null){const L=trip.days[k].legs[+un.dataset.untrack]; if(L){delete L.track;delete L.trackName;} changed();return;}
   const as=t.closest("[data-addsugg]"); if(as&&k!=null){const f=fp.fills.find(x=>x.id===as.dataset.addsugg); if(f){if(!addStop(k,+as.dataset.at-1,pt(f.name&&f.name!=="Fuel"?f.name:"Fuel stop",f.lat,f.lon,{fuelHere:true}))) return;changed();} return;}
@@ -1461,7 +1368,6 @@ $("details").addEventListener("change",async e=>{
 
 /* ---------- stop panel: the way in plus the town ---------- */
 function stayFor(p){ return stays.find(x=>x.night===p); }
-function panelPoint(k,j){ const pd=plan&&plan.days[k]; if(!pd) return null; return j==="last"?pd.pts[pd.pts.length-1]:pd.pts[j]; }
 function scope(k,j){
   const pd=plan&&plan.days[k]; if(!pd) return null; const jj=j==="last"?pd.pts.length-1:j, p=pd.pts[jj]; if(!p) return null;
   const b=jj>0?pd.legs[jj-1].b:pd.a, a=jj>0?pd.legs[jj-1].a:pd.a; return {a,b,p,jj};
@@ -1474,7 +1380,6 @@ function panelItems(k,j,tab){
   if(tab==="food") return pois.filter(x=>x.kind==="food"&&(inLeg(x)||near(x))).sort((x,y)=>x.km-y.km);
   return pois.filter(x=>x.kind!=="food"&&ui.types[x.kind]&&(inLeg(x)||near(x))).sort((x,y)=>x.km-y.km);
 }
-function counts(k,j){ if(!plan||!placesOk) return null; return {fuel:panelItems(k,j,"fuel").length,stay:panelItems(k,j,"stay").length,food:panelItems(k,j,"food").length,sight:panelItems(k,j,"sight").length}; }
 function openPanel(k,j,tab){ if(!plan||!plan.days[k]) return; panel={k,j,tab}; renderPanel(); $("panel").hidden=false; drawMap(); if(window.innerWidth<=1000) $("map").scrollIntoView({behavior:"smooth",block:"start"}); }
 function closePanel(silent){ if(!panel) return; panel=null; $("panel").hidden=true; if(!silent&&plan) drawMap(); }
 function renderPanel(){
@@ -1544,8 +1449,6 @@ function drawMap(){
         .bindPopup(`<b>${esc(t.name)}</b><br>${Math.round(t.off)} km off the route${t.food?" · food":""}<br><button class="btn small" type="button" data-addtown="${k}|${esc(t.name)}|${t.lat}|${t.lon}">Add as a stop</button>`).addTo(layer); });
   }
   if(ui.lay.med&&meds) meds.filter(m=>m.off<=25&&inR(m)).forEach(m=>L.marker([m.lat,m.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:#B3261E">🏥</div>`,iconSize:[22,22],iconAnchor:[11,11]})}).bindTooltip(`${m.name||(m.type==="hospital"?"Hospital":"Clinic")}${m.phone?" · "+m.phone:""}`).addTo(layer));
-  if(false) fp.days[ui.tab].sugg.forEach(t=>L.marker([t.lat,t.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:#0B6E4F">⛽</div>`,iconSize:[22,22],iconAnchor:[11,11]})}).bindTooltip(`Suggested stop: ${t.name}`,{permanent:true,direction:"right",offset:[12,0],className:"maplbl"}).addTo(layer));
-  if(fp&&sel) fp.gaps.filter(g=>g.from<sel.b&&g.to>sel.a).forEach(g=>gapTowns(g).filter(t=>t.km>=sel.a&&t.km<=sel.b).forEach(t=>L.marker([t.lat,t.lon],{icon:L.divIcon({className:"",html:`<div class="mapq">?</div>`,iconSize:[16,16],iconAnchor:[8,8]})}).bindTooltip(`${t.name}: fuel unconfirmed`,{permanent:true,direction:"right",offset:[8,0],className:"maplbl q"}).addTo(layer)));
   pois.filter(p=>ui.types[p.kind]&&inR(p)).sort((a,b)=>a.off-b.off).slice(0,+ui.max).forEach(p=>{const t=TYPES.find(x=>x.id===p.kind); L.marker([p.lat,p.lon],{icon:dotIcon(t.c,10)}).bindTooltip(`${p.name} · ${t.n}`).addTo(layer);});
   if(ui.lay.stay) stays.forEach(s=>{ if(!trip.days.some((d,k)=>d.to===s.night&&k<nDays()-1)) return; s.places.forEach(p=>L.marker([p.lat,p.lon],{icon:dotIcon("#2F5BA8",9)}).bindTooltip(p.name).addTo(layer)); });
   if(!focusR){ const g=sel?seg(sel.a,sel.b):plan.geom; if(g.length>1&&(window._refit||sel||lastSel!==ui.tab)){map.fitBounds(L.latLngBounds(g.map(x=>[x.lat,x.lon])),{padding:[24,24]});} window._refit=false; lastSel=ui.tab; }
@@ -1639,4 +1542,5 @@ $("keyDlg").innerHTML=$("keyDlg").innerHTML.replace("STYLE_FAST",STYLE_ICON.fast
 {const fb=$("feedback"); const set=()=>{const l=feedbackLink(); fb.hidden=!l; if(l) fb.href=l;}; set(); fb.addEventListener("click",set);}
 snapTrip(true);
 renderLayers(); showStyle(); syncDays(); renderAll(); recalc();
+
 </script></body></html>

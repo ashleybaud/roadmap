@@ -1,0 +1,21 @@
+const OSRM="https://router.project-osrm.org/route/v1/driving/";
+const PHOTON="https://photon.komoot.io/api/";
+/* routing and map tiles: Stadia Maps (paid, authorised by domain); free servers only as a fallback */
+const ROUTER="https://api.stadiamaps.com/route/v1";
+const TILES={url:"https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png",attribution:'© <a href="https://stadiamaps.com/">Stadia Maps</a> © <a href="https://openmaptiles.org/">OpenMapTiles</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',maxZoom:18};
+const OVERPASS="/api/places";
+const TYPES=[
+  {id:"view",n:"Viewpoints",c:"#2F5BA8",on:true},
+  {id:"pass",n:"Mountain passes",c:"#6B4E9B",on:true},
+  {id:"sight",n:"Sights & history",c:"#9A6A33",on:true},
+  {id:"food",n:"Food & coffee",c:"#B3261E",on:false},
+  {id:"camp",n:"Campsites",c:"#0B6E4F",on:false}
+];
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const store={get(k){try{return JSON.parse(localStorage.getItem(k))}catch(e){return null}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const rad=d=>d*Math.PI/180;
+const hav=(a,b)=>{const dl=rad(b.lat-a.lat),dn=rad(b.lon-a.lon);const h=Math.sin(dl/2)**2+Math.cos(rad(a.lat))*Math.cos(rad(b.lat))*Math.sin(dn/2)**2;return 12742*Math.asin(Math.sqrt(h));};
+const fmtT=m=>{m=Math.round(m);return String(Math.floor(m/60)%24).padStart(2,"0")+":"+String(((m%60)+60)%60).padStart(2,"0");};
+const fmtDur=m=>{m=Math.round(m);return Math.floor(m/60)+"h"+String(m%60).padStart(2,"0");};
+const toMin=t=>{const [h,m]=(t||"0:0").split(":").map(Number);return h*60+m;};
