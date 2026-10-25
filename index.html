@@ -1356,10 +1356,12 @@ $("details").addEventListener("click",e=>{
   const rb=t.closest("[data-risk]"); if(rb){const k2=+rb.dataset.risk; riskOpen.has(k2)?riskOpen.delete(k2):riskOpen.add(k2); renderDetails(); return;}
   if(t.closest("[data-print]")){printTrip();return;}
   const g=t.closest("[data-gpx]"); if(g){downloadGpx(+g.dataset.gpx);return;}
-  const ls=t.closest("[data-legsty]"); if(ls&&k!=null){ const [j2,f2]=ls.dataset.legsty.split(":"), f=f2==="1", d2=trip.days[k];
-    let tgt=d2.vias[+j2]; if(tgt&&tgt.auto){ tgt=d2.vias.slice(+j2+1).find(v=>!v.auto)||null; }
-    if(tgt) tgt.fast=f; else d2.toFast=f;
-    const n=d2.vias.length; d2.vias=d2.vias.filter(v=>!v.auto); d2.legs=n!==d2.vias.length?[]:d2.legs.map((l,i)=>i===+j2?{wantAlts:(l||{}).wantAlts}:l); d2.fresh=true; delete d2.noMore; changed(); return; }
+  const ls=t.closest("[data-legsty]"); if(ls&&k!=null){ const [j2,f2]=ls.dataset.legsty.split(":"), j=+j2, f=f2==="1", d2=trip.days[k], v=d2.vias[j];
+    if(v&&v.auto){ delete v.auto; v.fast=f; d2.legs[j]={}; changed(); return; } // using a suggestion makes it the rider's own stop
+    if(v) v.fast=f; else d2.toFast=f;
+    let i=j-1, cut=false; while(i>=0&&d2.vias[i].auto){ d2.vias.splice(i,1); i--; cut=true; } // suggestions on this stretch were picked for the old way
+    if(cut){ d2.legs=[]; delete d2.noMore; } else d2.legs[j]={wantAlts:(d2.legs[j]||{}).wantAlts};
+    changed(); return; }
   const fl=t.closest("[data-focusleg]"); if(fl&&plan&&k!=null){const L=plan.days[k].legs[+fl.dataset.focusleg-1]; focusRange(L.a,L.b); return;}
   const fd=t.closest("[data-focusday]"); if(fd&&plan){const pd=plan.days[+fd.dataset.focusday]; focusRange(pd.a,pd.b); return;}
   const up=t.closest("[data-vup]"); if(up&&k!=null){const i=+up.dataset.vup,v=trip.days[k].vias; if(i>0){[v[i-1],v[i]]=[v[i],v[i-1]];trip.days[k].legs=[];changed();} return;}
