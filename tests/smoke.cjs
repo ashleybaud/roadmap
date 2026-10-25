@@ -67,6 +67,8 @@ const TRIP = {
   await page.waitForTimeout(1500);
 
   ok(await page.$$eval("#iconbar .ib", b => b.length) === 6, "map buttons missing");
+  ok(await page.$$eval("#iconbar [data-key]", b => b.length) === 1, "key (?) button missing from the map box");
+  ok(await page.evaluate(() => trip.days.every(d => !d.fresh)), "suggestions not settled after one pass");
   ok(await page.$$eval(".sumbox", b => b.length) >= 2, "overview day boxes missing");
   ok(await page.$$eval(".sumbox .wmin", b => b.length) === 0, "fuel warning text shown on overview");
 

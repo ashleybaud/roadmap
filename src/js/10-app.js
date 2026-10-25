@@ -72,14 +72,14 @@ async function recalc(){
     renderAll();
     loadWeather(my).then(()=>{if(my===seq) renderAll();}).catch(()=>{wx=null;});
     const ok=await loadPlaces(my); if(my!==seq) return;
-    if(autoRounds<3){ fp=fuelPlan(); if(autoFuel()){ autoRounds++; save(); recalc(); return; } }
+    fp=fuelPlan(); if(autoRounds<1&&autoFuel()){ autoRounds++; save(); recalc(); return; }
     $("status").textContent=ok===false?"Fuel stations couldn't load. Checking your own fuel stops only.":ok==="partial"?"Points of interest couldn't load.":"";
     renderAll();
   }catch(e){ if(my===seq){$("status").textContent="Couldn't get a route. Check each place is on a road, and your connection."; renderAll();} }
 }
 
 /* ---------- fuel ---------- */
-let townList=null; allTowns().then(t=>{ townList=t.filter(x=>x.place!=="hamlet"); townLabels(); if(plan){ plan._cands=null; if(placesOk&&autoRounds<3){ fp=fuelPlan(); if(autoFuel()){ autoRounds++; save(); recalc(); return; } } renderAll(); } }).catch(()=>{});
+let townList=null; allTowns().then(t=>{ townList=t.filter(x=>x.place!=="hamlet"); townLabels(); if(plan){ plan._cands=null; if(placesOk){ fp=fuelPlan(); if(autoRounds<1&&autoFuel()){ autoRounds++; save(); recalc(); return; } } renderAll(); } }).catch(()=>{});
 /* fuel: riders fill up wherever there's fuel. We only flag stretches with no known fuel longer than the bike's range. */
 /* fuel: we suggest towns to stop in (fuel, preferably food) at least every "stop every" km.
    Towns on the route first; if none, the nearest one off the route with the detour. */
@@ -99,7 +99,7 @@ function stopTowns(){
 function daySuggest(k,ignoreAuto){
   const pd=plan&&plan.days[k], S=+settings.range||0; if(!pd||!placesOk) return {through:[],sugg:[],probs:[]};
   const no=trip.days[k].noAuto||[], cands=stopTowns().filter(t=>!no.includes(t.name)), through=cands.filter(t=>t.off<=2&&t.km>=pd.a-1&&t.km<=pd.b+1);
-  const own=pd.pts.slice(1,-1).map((p,i)=>({p,km:pd.legs[i].b})).filter(x=>ignoreAuto?!x.p.auto&&stopFuel(x.p):stopFuel(x.p)||x.p.auto);
+  const own=pd.pts.slice(1,-1).map((p,i)=>({p,km:pd.legs[i].b})).filter(x=>stopFuel(x.p)&&!(ignoreAuto&&x.p.auto));
   const sugg=[], probs=[]; if(!(S>0)) return {through,sugg,probs};
   let pos=pd.a, posName=pd.pts[0].name, guard=0;
   const inWin=(t,win)=>t.km>pos+5&&t.km<=win;
@@ -110,7 +110,8 @@ function daySuggest(k,ignoreAuto){
     if(o){ pos=o.km; posName=o.p.name; continue; }
     const steps=[c=>c.fuel&&c.off<=2,c=>c.fuel&&c.off<=40,c=>c.off<=2,c=>c.off<=40]; // on the route first, so a suggestion doesn't move the route
     let pick=null;
-    for(let i=0;i<steps.length&&!pick;i++){ const l=cands.filter(t=>steps[i](t)&&inWin(t,win)); if(l.length) pick=i%2===0?far(l):near(l); }
+    let pi=-1; for(let i=0;i<steps.length&&!pick;i++){ const l=cands.filter(t=>steps[i](t)&&inWin(t,win)); if(l.length){ pick=i%2===0?far(l):near(l); pi=i; } }
+    if(pick&&pi>=2){ const nf=cands.filter(t=>t.fuel&&t.km>pos+5&&t.km<pd.b)[0]; probs.push({from:pos,to:nf?nf.km:pd.b,fromName:posName,toName:nf?nf.name:pd.pts[pd.pts.length-1].name}); }
     if(pick){ sugg.push(pick); pos=pick.km; posName=pick.name; continue; }
     const next=cands.filter(t=>t.km>win&&t.km<pd.b).sort((x,y)=>(x.off<=5?0:1)-(y.off<=5?0:1)||x.km-y.km)[0];
     probs.push({from:pos,to:next?next.km:pd.b,fromName:posName,toName:next?next.name:pd.pts[pd.pts.length-1].name});
@@ -167,6 +168,7 @@ function hook(id,onPick){const el=document.getElementById(id); if(el) wireSearch
 function renderTripBar(){
   $("startDate").value=trip.startDate; $("endDate").value=trip.endDate; $("endDate").min=trip.startDate;
   if(document.activeElement!==$("startPlace")) $("startPlace").value=trip.start&&trip.start.lat!=null?trip.start.name:"";
+  const noStart=!trip.start||trip.start.lat==null; $("startPlace").classList.toggle("need",noStart); $("startPlace").placeholder=noStart?"Tap ⌖ or type a town":"My location or a town";
   if(document.activeElement!==$("endPlace")) $("endPlace").value=trip.round||!trip.end?"":trip.end.name;
   $("sameStart").hidden=!!trip.round||!trip.end; $("clearStart").hidden=!trip.start||trip.start.lat==null;
 }
@@ -191,9 +193,9 @@ function useMyLocation(){
 }
 $("useLoc").addEventListener("click",useMyLocation);
 $("clearStart").addEventListener("click",()=>{trip.start=null;$("startPlace").value="";$("startPlace").focus();changed();});
+function locateIfAllowed(){ navigator.permissions?.query({name:"geolocation"}).then(r=>{if(r.state==="granted") useMyLocation();}).catch(()=>{}); }
 if(trip.start&&trip.start.name==="My location"&&trip.start.lat==null){
-  $("status").textContent="Tap ⌖ to start from your location, or type a town.";
-  navigator.permissions?.query({name:"geolocation"}).then(r=>{if(r.state==="granted") useMyLocation();}).catch(()=>{});
+  locateIfAllowed();
 }
 
 /* ---------- day tabs ---------- */
@@ -204,7 +206,6 @@ function renderTabs(){
     const f=plan&&plan.days[k]?dayRisk(k):null, to=dayTo(k);
     tabs.push(`<button class="dtab ${ui.tab===k?"on":""}" data-day="${k}" role="tab" title="${esc(dayLong(k))} → ${esc(to?to.name:"night stop?")}"><b>${esc(dayDate(k).toLocaleDateString(undefined,{weekday:"short"}))} ${dayDate(k).getDate()}${f&&f.level!=="ok"?`<span class="tdot" style="background:var(--${f.level==="bad"?"bad":"warn"})"></span>`:""}</b><span class="note tto">→ ${esc(to?to.name:"night stop?")}</span></button>`);
   });
-  tabs.push(`<button class="dtab keybtn" type="button" data-key title="What the icons and colours mean">?</button>`);
   $("dayTabs").innerHTML=tabs.join("");
   requestAnimationFrame(()=>{ const c=$("dayTabs"), on=c.querySelector(".dtab.on"); if(on&&c.scrollWidth>c.clientWidth) c.scrollTo({left:on.offsetLeft-c.offsetLeft-(c.clientWidth-on.offsetWidth)/2}); });
 }
@@ -496,11 +497,11 @@ function gradesTxt(t){ const e=(t&&t.extra)||""; const g=[]; if(/\b93\b/.test(e)
 /* ---------- summary box: one line per day, used on the Overview and the day view ---------- */
 function stopsChain(k){
   const d=trip.days[k], v=d.vias.filter(x=>x.lat!=null);
-  return v.map((x,i)=>x.auto?`<i class="autoname" data-gostop="${k}:${i+1}">${esc(x.name)} ⛽${x.detour?` (+${x.detour} km)`:""}</i>`:`<b>${esc(x.name)}</b>`).join(", ");
+  return v.map((x,i)=>x.auto?`<i class="autoname" data-gostop="${k}:${i+1}">${esc(x.name)}${x.fuelHere?" ⛽":" (fuel?)"}${x.detour?` (+${x.detour} km)`:""}</i>`:`<b>${esc(x.name)}</b>`).join(", ");
 }
 function sumBox(k,big){
   const pd=!planStale&&plan&&plan.days[k], d=trip.days[k], r=pd?dayRisk(k):null, from=dayFrom(k);
-  const msg=!trip.start||trip.start.lat==null?"Pick where you start":!from?"Pick the night stop before this day":!dayTo(k)?"Pick where you sleep":!dayPts(k)?"Add a stop or a finish":"Working out the route…";
+  const msg=!trip.start||trip.start.lat==null?(k===0?"Set From above to see the route":""):!from?"Pick the night stop before this day":!dayTo(k)?"Pick where you sleep":!dayPts(k)?"Add a stop or a finish":"Working out the route…";
   const chain=stopsChain(k), ds=fp&&fp.days&&fp.days[k];
   const warn=ds&&+settings.range>0?ds.probs.map(p=>`<div class="wmin">⚠ No town within reach: ${Math.round(p.to-p.from)} km, ${esc(p.fromName)} to ${esc(p.toName)}.</div>`).join(""):"";
   return `<div class="sumbox ${big?"big":""}">
@@ -524,7 +525,7 @@ function autoFuel(){
       const want=daySuggest(k,true).sugg.filter(ok), have=td.vias.filter(v=>v.auto).map(v=>v.name).sort().join("|");
       if(want.map(t=>t.name).sort().join("|")!==have){ td.vias=td.vias.filter(v=>!v.auto); td.legs=[]; want.forEach(t=>insertVia(k,mk(t))); added=true; }
     } else if(!td.noMore) daySuggest(k).sugg.filter(t=>ok(t)&&!td.vias.some(v=>v.name===t.name||hav(v,t)<1)).forEach(t=>{ if(insertVia(k,mk(t))!==false) added=true; }); });
-  if(!added||autoRounds>=2) trip.days.forEach(d=>delete d.fresh);
+  trip.days.forEach(d=>delete d.fresh); // one pass: suggestions are picked on the route without them, then left alone
   return added;
 }
 
@@ -586,7 +587,8 @@ function stopList(k){
         ${lg.track?`<span class="note">Own track: ${esc(lg.trackName||"GPX")}</span><button class="btn small ghost" type="button" data-untrack="${j-1}">Remove track</button>`
           :`<label class="btn small ghost" style="cursor:pointer;align-self:flex-start">Use my GPX for this stretch<input type="file" accept=".gpx,application/gpx+xml" data-track="${j-1}" hidden></label>`}
       </div></details>`:"";
-    const autoTag=p.auto?`<span class="autotag" title="Fuel and food here. You asked to stop at least every ${esc(String(settings.range))} km.">Suggested stop${p.detour?` · +${p.detour} km`:""}</span>`:"";
+    const autoTag=p.auto?(p.fuelHere?`<span class="autotag" title="Fuel and food here. You asked to stop at least every ${esc(String(settings.range))} km.">Suggested stop${p.detour?` · +${p.detour} km`:""}</span>`
+      :`<span class="autotag nofuel" title="No fuel on our map here, and none closer. Ask locally or carry extra.">Suggested stop · fuel not confirmed${p.detour?` · +${p.detour} km`:""}</span>`):"";
     h+=`<li class="stop ${open?"open":""} ${p.auto?"auto":""}"><div class="shead"><div class="sl1"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab">${lab}</span><b>${esc(p.name)}</b><span class="note">${isFrom?"":`km ${km}`}</span></button><span class="avail">${icons}</span></div>
       <div class="sl2"><span class="sl2l">${autoTag}</span><span class="stools">${way}${tools}${opts}</span></div></div>${open&&plan?stopDetail(k,j,stopFocus.cat):""}</li>`;
   });
@@ -650,7 +652,7 @@ $("details").addEventListener("click",e=>{
   if(t.closest("[data-tripedit]")){tripEdit=!tripEdit;renderDetails();return;}
   if(t.closest("[data-newtrip]")&&!clearArm){ clearArm=true; renderDetails(); return; }
   if(t.closest("[data-nocancel]")){ clearArm=false; renderDetails(); return; }
-  if(t.closest("[data-newtrip]")){ clearArm=false; snapTrip(true); const prev=JSON.parse(JSON.stringify(trip)); Object.assign(trip,freshTrip()); tripEdit=true; ui.tab="ov"; plan=null; fp=null; changed();
+  if(t.closest("[data-newtrip]")){ clearArm=false; snapTrip(true); const prev=JSON.parse(JSON.stringify(trip)); Object.assign(trip,freshTrip()); tripEdit=true; ui.tab="ov"; plan=null; fp=null; changed(); locateIfAllowed();
     const tt=$("toast"); tt.innerHTML=`Trip cleared. <button type="button" class="linkbtn">Undo</button>`; tt.hidden=false; tt.querySelector("button").onclick=()=>{Object.keys(trip).forEach(x=>delete trip[x]);Object.assign(trip,prev);tt.hidden=true;changed();}; clearTimeout(toastT); toastT=setTimeout(()=>tt.hidden=true,8000); return; }
   const avb=t.closest("[data-av]"); if(avb){ const [k2,j2,c]=avb.dataset.av.split(":"); const same=stopFocus&&stopFocus.k===+k2&&stopFocus.j===+j2&&stopFocus.cat===c; stopFocus=same?null:{k:+k2,j:+j2,cat:c}; if(!stopFocus) window._refit=true; renderDetails(); drawMap(); return; }
   const pl=t.closest("[data-ploc]"); if(pl&&!t.closest("a,button")&&map){ const [la,lo]=pl.dataset.ploc.split(",").map(Number); map.setView([la,lo],16); if(window.innerWidth<=1000) $("map").scrollIntoView({behavior:"smooth",block:"start"}); return; }
@@ -674,7 +676,10 @@ $("details").addEventListener("click",e=>{
   const rb=t.closest("[data-risk]"); if(rb){const k2=+rb.dataset.risk; riskOpen.has(k2)?riskOpen.delete(k2):riskOpen.add(k2); renderDetails(); return;}
   if(t.closest("[data-print]")){printTrip();return;}
   const g=t.closest("[data-gpx]"); if(g){downloadGpx(+g.dataset.gpx);return;}
-  const ls=t.closest("[data-legsty]"); if(ls&&k!=null){ const [j2,f2]=ls.dataset.legsty.split(":"); const d2=trip.days[k], v2=d2.vias[+j2]; if(v2) v2.fast=f2==="1"; else d2.toFast=f2==="1"; d2.legs[+j2]={wantAlts:(d2.legs[+j2]||{}).wantAlts}; changed(); return; }
+  const ls=t.closest("[data-legsty]"); if(ls&&k!=null){ const [j2,f2]=ls.dataset.legsty.split(":"), f=f2==="1", d2=trip.days[k];
+    let tgt=d2.vias[+j2]; if(tgt&&tgt.auto){ tgt=d2.vias.slice(+j2+1).find(v=>!v.auto)||null; }
+    if(tgt) tgt.fast=f; else d2.toFast=f;
+    const n=d2.vias.length; d2.vias=d2.vias.filter(v=>!v.auto); d2.legs=n!==d2.vias.length?[]:d2.legs.map((l,i)=>i===+j2?{wantAlts:(l||{}).wantAlts}:l); d2.fresh=true; delete d2.noMore; changed(); return; }
   const fl=t.closest("[data-focusleg]"); if(fl&&plan&&k!=null){const L=plan.days[k].legs[+fl.dataset.focusleg-1]; focusRange(L.a,L.b); return;}
   const fd=t.closest("[data-focusday]"); if(fd&&plan){const pd=plan.days[+fd.dataset.focusday]; focusRange(pd.a,pd.b); return;}
   const up=t.closest("[data-vup]"); if(up&&k!=null){const i=+up.dataset.vup,v=trip.days[k].vias; if(i>0){[v[i-1],v[i]]=[v[i],v[i-1]];trip.days[k].legs=[];changed();} return;}
@@ -806,9 +811,9 @@ ui.lay=Object.assign({fuel:true,stay:!!ui.sleep,food:!!ui.types.food,sights:true
 function renderLayers(){
   $("iconbar").innerHTML=`<span class="ibhead">On the map</span>`+LAY.map(([id,ic,w,t])=>{ const on=!!ui.lay[id]&&id!=="road";
     return `<button type="button" class="ib ${on?"on":""}" data-lay="${id}" title="${esc(w)}: ${esc(t)}" aria-label="${esc(w)}" aria-pressed="${on}" ${id==="road"?"disabled":""}>${ic}</button>`; }).join("")
-    +(ui.lay.sights?`<label class="ibmax" title="How many sights to show">★ <select data-max aria-label="How many sights">${[["10","10"],["25","25"],["50","50"],["1000","All"]].map(([v,l])=>`<option value="${v}" ${ui.max===v?"selected":""}>${l}</option>`).join("")}</select></label>`:"");
+    +(ui.lay.sights?`<label class="ibmax" title="How many sights to show">★ <select data-max aria-label="How many sights">${[["10","10"],["25","25"],["50","50"],["1000","All"]].map(([v,l])=>`<option value="${v}" ${ui.max===v?"selected":""}>${l}</option>`).join("")}</select></label>`:"")+`<button type="button" class="ibkey" data-key title="What the icons and colours mean">?</button>`;
 }
-$("iconbar").addEventListener("click",e=>{ if(e.target.closest("select")) return; const b=e.target.closest("[data-lay]"); if(!b||b.disabled) return; const id=b.dataset.lay; ui.lay[id]=!ui.lay[id];
+$("iconbar").addEventListener("click",e=>{ if(e.target.closest("select")) return; if(e.target.closest("[data-key]")){ $("keyDlg").showModal(); return; } const b=e.target.closest("[data-lay]"); if(!b||b.disabled) return; const id=b.dataset.lay; ui.lay[id]=!ui.lay[id];
   if(id==="food") ui.types.food=ui.lay.food; if(id==="sights") ["view","pass","sight"].forEach(t=>ui.types[t]=ui.lay.sights); if(id==="stay"){ ui.sleep=ui.lay.stay; ui.types.camp=ui.lay.stay; }
   saveUi(); renderLayers(); renderAll(); });
 $("iconbar").addEventListener("change",e=>{ if(e.target.dataset.max!==undefined){ ui.max=e.target.value; saveUi(); renderAll(); } });
