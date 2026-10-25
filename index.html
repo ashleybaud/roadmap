@@ -660,7 +660,7 @@ const freshTrip=()=>({startDate:tomorrow,endDate:tomorrow,start:pt("My location"
 const DEFAULT_TRIP_OLD={startDate:tomorrow,endDate:addDays(tomorrow,1),start:pt("My location",null,null),end:null,round:true,
   days:[{to:pt("Cederberg Oasis",-32.550504,19.360797),style:"default",vias:[pt("Ceres",-33.369052,19.310031,{type:"fuel"})],legs:[]},{style:"default",vias:[pt("Citrusdal",-32.589,19.015,{type:"fuel"})],legs:[]}]};
 const trip=store.get("rr4-trip")||migrate()||freshTrip();
-if(trip.sugV!==2){ (trip.days||[]).forEach(d=>{ const n=(d.vias||[]).length; d.vias=(d.vias||[]).filter(v=>!v.auto); if(d.vias.length!==n) d.legs=[]; delete d.sig; }); trip.sugV=2; }
+if(trip.sugV!==3){ (trip.days||[]).forEach(d=>{ d.fresh=true; }); trip.sugV=3; }
 if(trip.startDate<ymd(new Date())){const n=trip.days.length;trip.startDate=tomorrow;trip.endDate=addDays(tomorrow,n-1);}
 
 const SET_FIELDS=["range","leave","pace","corridor","style","maxHours","breakMin"];
@@ -736,10 +736,10 @@ function stopTowns(){
     out.push({name:t.name,lat:t.lat,lon:t.lon,km:c[bi],off:bd,fuel,food,place:t.place}); });
   out.sort((a,b)=>a.km-b.km); plan._cands=out.filter((t,i,a)=>!a.slice(0,i).some(o=>o.name===t.name&&Math.abs(o.km-t.km)<20)); return plan._cands;
 }
-function daySuggest(k){
+function daySuggest(k,ignoreAuto){
   const pd=plan&&plan.days[k], S=+settings.range||0; if(!pd||!placesOk) return {through:[],sugg:[],probs:[]};
   const no=trip.days[k].noAuto||[], cands=stopTowns().filter(t=>!no.includes(t.name)), through=cands.filter(t=>t.off<=2&&t.km>=pd.a-1&&t.km<=pd.b+1);
-  const own=pd.pts.slice(1,-1).map((p,i)=>({p,km:pd.legs[i].b})).filter(x=>stopFuel(x.p)||x.p.auto);
+  const own=pd.pts.slice(1,-1).map((p,i)=>({p,km:pd.legs[i].b})).filter(x=>ignoreAuto?!x.p.auto&&stopFuel(x.p):stopFuel(x.p)||x.p.auto);
   const sugg=[], probs=[]; if(!(S>0)) return {through,sugg,probs};
   let pos=pd.a, posName=pd.pts[0].name, guard=0;
   const inWin=(t,win)=>t.km>pos+5&&t.km<=win;
@@ -1229,8 +1229,14 @@ function stripAuto(){ trip.days.forEach(d=>{ const n=d.vias.length; d.vias=d.via
 function autoFuel(){
   if(!plan||!placesOk||!townList||!(+settings.range>0)) return false;
   let added=false;
-  plan.days.forEach((d,k)=>{ if(!d) return; const no=trip.days[k].noAuto||[];
-    daySuggest(k).sugg.filter(t=>!no.includes(t.name)&&!trip.days[k].vias.some(v=>hav(v,t)<1)&&!(dayTo(k)&&hav(dayTo(k),t)<1)&&!(dayFrom(k)&&hav(dayFrom(k),t)<1)).forEach(t=>{ if(insertVia(k,pt(t.name,t.lat,t.lon,{auto:true,fuelHere:!!t.fuel,detour:t.off>5?Math.round(t.off*2):0}))!==false) added=true; }); });
+  plan.days.forEach((d,k)=>{ if(!d) return; const td=trip.days[k], no=td.noAuto||[]; if(!td.sig) td.sig=daySig(k);
+    const ok=t=>!no.includes(t.name)&&!td.vias.some(v=>!v.auto&&(v.name===t.name||hav(v,t)<1))&&!(dayTo(k)&&hav(dayTo(k),t)<1)&&!(dayFrom(k)&&hav(dayFrom(k),t)<1);
+    const mk=t=>pt(t.name,t.lat,t.lon,{auto:true,fuelHere:!!t.fuel,detour:t.off>5?Math.round(t.off*2):0});
+    if(td.fresh){ // this day's start or night stop changed: work its suggestions out again from scratch
+      const want=daySuggest(k,true).sugg.filter(ok), have=td.vias.filter(v=>v.auto).map(v=>v.name).sort().join("|");
+      if(want.map(t=>t.name).sort().join("|")!==have){ td.vias=td.vias.filter(v=>!v.auto); td.legs=[]; want.forEach(t=>insertVia(k,mk(t))); added=true; }
+    } else daySuggest(k).sugg.filter(t=>ok(t)&&!td.vias.some(v=>v.name===t.name||hav(v,t)<1)).forEach(t=>{ if(insertVia(k,mk(t))!==false) added=true; }); });
+  if(!added||autoRounds>=2) trip.days.forEach(d=>delete d.fresh);
   return added;
 }
 
@@ -1580,7 +1586,7 @@ function renderHist(){
 $("histList").addEventListener("click",e=>{ const b=e.target.closest("[data-restore]"); if(!b) return; const h=store.get("rr4-hist")||[], x=h[+b.dataset.restore]; if(!x) return; snapTrip(true); const t=JSON.parse(x.key); Object.keys(trip).forEach(k=>delete trip[k]); Object.assign(trip,t); ui.tab="ov"; $("settings").close(); changed(); });
 const daySig=k=>[dayFrom(k),dayTo(k)].map(p=>p&&p.lat!=null?p.lat.toFixed(3)+","+p.lon.toFixed(3):"-").join("|");
 function changed(){ window._refit=true; focusR=null; stopFocus=null; autoRounds=0;
-  syncDays(); trip.days.forEach((d,k)=>{ const s=daySig(k); if(d.sig&&d.sig!==s){ const n=d.vias.length; d.vias=d.vias.filter(v=>!v.auto); if(d.vias.length!==n) d.legs=[]; } d.sig=s; });
+  syncDays(); trip.days.forEach((d,k)=>{ const s=daySig(k); if(d.sig&&d.sig!==s) d.fresh=true; d.sig=s; });
   snapTrip(); recalc(); }
 $("keyDlg").innerHTML=$("keyDlg").innerHTML.replace("STYLE_FAST",STYLE_ICON.fast).replace("STYLE_ROUGH",STYLE_ICON.default).replaceAll("FUEL",ICON.fuel);
 {const fb=$("feedback"); const set=()=>{const l=feedbackLink(); fb.hidden=!l; if(l) fb.href=l;}; set(); fb.addEventListener("click",set);}
