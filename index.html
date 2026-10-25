@@ -780,14 +780,15 @@ function daySuggest(k,ignoreAuto){
   const sugg=[], probs=[]; if(!(S>0)) return {through,sugg,probs};
   let pos=pd.a, posName=pd.pts[0].name, guard=0;
   const inWin=(t,win)=>t.km>pos+5&&t.km<=win;
-  const far=l=>{ const f=l.filter(t=>t.food); return (f.length?f:l).reduce((x,y)=>y.km>x.km?y:x); };
-  const near=l=>l.reduce((x,y)=>y.off<x.off?y:x);
   while(pd.b-pos>S&&guard++<50){
     const win=pos+S, o=own.filter(x=>x.km>pos+5&&x.km<=win).pop();
     if(o){ pos=o.km; posName=o.p.name; continue; }
-    const steps=[c=>c.fuel&&c.off<=2,c=>c.fuel&&c.off<=40,c=>c.off<=2,c=>c.off<=40]; // on the route first, so a suggestion doesn't move the route
-    let pick=null;
-    let pi=-1; for(let i=0;i<steps.length&&!pick;i++){ const l=cands.filter(t=>steps[i](t)&&inWin(t,win)); if(l.length){ pick=i%2===0?far(l):near(l); pi=i; } }
+    // pick: a fuel town late in the window (so stops aren't bunched), on the route if possible, with food if possible
+    const choose=l=>{ const late=l.filter(t=>t.km>=pos+S*0.6);
+      if(!late.length) return l.slice().sort((x,y)=>((x.off>2)-(y.off>2))||(y.km-x.km))[0];
+      return late.slice().sort((x,y)=>((x.off>2)-(y.off>2))||((!x.food)-(!y.food))||(y.km-x.km))[0]; };
+    let pick=null, pi=-1; const fuelL=cands.filter(t=>t.fuel&&t.off<=40&&inWin(t,win));
+    if(fuelL.length){ pick=choose(fuelL); pi=0; } else { const anyL=cands.filter(t=>t.off<=40&&inWin(t,win)); if(anyL.length){ pick=choose(anyL); pi=2; } }
     if(pick&&pi>=2){ const nf=cands.filter(t=>t.fuel&&t.km>pos+5&&t.km<pd.b)[0]; probs.push({from:pos,to:nf?nf.km:pd.b,fromName:posName,toName:nf?nf.name:pd.pts[pd.pts.length-1].name}); }
     if(pick){ sugg.push(pick); pos=pick.km; posName=pick.name; continue; }
     const next=cands.filter(t=>t.km>win&&t.km<pd.b).sort((x,y)=>(x.off<=5?0:1)-(y.off<=5?0:1)||x.km-y.km)[0];
