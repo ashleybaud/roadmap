@@ -221,6 +221,9 @@ a.btn{text-decoration:none;display:inline-flex;align-items:center}
 .rlab{font-family:var(--f-mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);min-width:52px;padding-top:12px}
 .rpt{display:flex;gap:8px}
 @media (max-width:700px){.banner{font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.tripline{font-size:.88rem}}
+input.empty,.wtext input.empty[type=text]{border:1.5px dashed var(--warn)!important;background:color-mix(in srgb,var(--muted) 14%,transparent)!important;border-radius:4px!important}
+input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
+.morevia{font-size:inherit;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -666,7 +669,7 @@ function wireSearch(input,list,onPick){
   input.addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); commit(); input.blur(); } });
   input.addEventListener("blur",()=>{ setTimeout(()=>{ if(!done&&!commit()) list.hidden=true; },150); });
 }
-function searchBox(id,value,placeholder,noClear){return `<div class="ac" style="flex:1;min-width:0"><div class="inbtn"><input type="text" id="${id}" value="${esc(value||"")}" placeholder="${esc(placeholder)}" autocomplete="off">${!noClear&&value?`<button class="icon" type="button" data-clear="${id}" title="Clear" aria-label="Clear">✕</button>`:""}</div><div class="sugg" hidden></div></div>`;}
+function searchBox(id,value,placeholder,noClear){return `<div class="ac" style="flex:1;min-width:0"><div class="inbtn"><input type="text" id="${id}" class="${value?"":"empty"}" value="${esc(value||"")}" placeholder="${esc(placeholder)}" autocomplete="off">${!noClear&&value?`<button class="icon" type="button" data-clear="${id}" title="Clear" aria-label="Clear">✕</button>`:""}</div><div class="sugg" hidden></div></div>`;}
 function hook(id,onPick){const el=document.getElementById(id); if(el) wireSearch(el,el.closest(".ac").querySelector(".sugg"),onPick);}
 
 /* ---------- trip bar ---------- */
@@ -884,10 +887,13 @@ function feedbackLink(){
 /* ---------- story layout: one line per day, same block on Overview and day views ---------- */
 const editOpen=new Set(), editTo=new Set(), fuelOpen=new Set(), showAll=new Set(); let tripEdit=false;
 const curDay=()=>ui.tab==="ov"?(nDays()===1?0:null):ui.tab;
-function viaText(k){ const v=trip.days[k].vias.filter(x=>x.lat!=null); if(!v.length) return ""; return `via ${v.slice(0,2).map(x=>esc(x.name)).join(", ")}${v.length>2?` +${v.length-2} more`:""} `; }
+const viaOpen=new Set();
+function viaList(k,v,full){ if(!v.length) return ""; if(full||viaOpen.has(k)||v.length<=2) return `via ${v.map(x=>esc(x.name)).join(", ")} `;
+  return `via ${v.slice(0,2).map(x=>esc(x.name)).join(", ")} <button type="button" class="linkbtn morevia" data-morevias="${k}">+${v.length-2} more</button> `; }
+function viaText(k,full){ return viaList(k,trip.days[k].vias.filter(x=>x.lat!=null),full); }
 function toCell(k){
   const last=k===nDays()-1, d=trip.days[k], to=dayTo(k), id=(last?"finish-":"night-")+k, cur=last?(to?to.name:""):(d.to?d.to.name:"");
-  if(editTo.has(k)||!cur) return searchBox(id,cur,last?"Where you finish":"Where you sleep");
+  if(editTo.has(k)||!cur) return searchBox(id,cur,last?"Pick where you finish":"Pick where you sleep");
   return `<button type="button" class="tolink" data-editto="${k}" title="Tap to change">${esc(cur)}</button>`;
 }
 function fuelBtn(k){ const pd=plan.days[k]; return `<button type="button" class="fbtn" data-fuelk="${k}" title="Fuel stops for the day">${fuelPill(rangeFuel(pd.a,pd.b))}</button>`; }
@@ -899,7 +905,7 @@ function fuelList(k){
 function storyLine(k,big){
   const pd=plan&&plan.days[k], d=trip.days[k], r=pd?dayRisk(k):null;
   const msg=!trip.start||trip.start.lat==null?"Pick where you start":!dayFrom(k)?"Pick the night stop before this day":!dayTo(k)?"Pick where you sleep":!dayPts(k)?"Add a stop or a finish":"Working out the route…";
-  return `<div class="story"><div class="sline">${big?`<h2 class="sdate">${esc(dayLong(k))}</h2>`:`<b class="sdate">${esc(dayName(k))}:</b>`} <span class="svia">${viaText(k)}→</span> ${toCell(k)}${d.style==="fast"?` <span class="sty" title="Get me there quickly">${STYLE_ICON.fast}</span>`:""}</div>
+  return `<div class="story"><div class="sline">${big?`<h2 class="sdate">${esc(dayLong(k))}</h2>`:`<b class="sdate">${esc(dayName(k))}:</b>`} <span class="svia">${viaText(k,big)}→</span> ${toCell(k)}${d.style==="fast"?` <span class="sty" title="Get me there quickly">${STYLE_ICON.fast}</span>`:""}</div>
     <div class="sicons">${pd?timePill(k,pd.km,dayMinutes(k),`data-focusday="${k}"`)+fuelBtn(k)+sunSpan(k)+wxLink(k)+`<span class="flags">${flagIcons(r,k)}</span>`:`<span class="note">${msg}</span>`}</div>
     ${riskHtml(r,k)}${fuelList(k)}</div>`;
 }
@@ -997,6 +1003,7 @@ $("details").addEventListener("click",e=>{
   if(t.closest("[data-tripedit]")){tripEdit=!tripEdit;renderDetails();return;}
   if(t.closest("[data-newtrip]")){ const prev=JSON.parse(JSON.stringify(trip)); Object.assign(trip,freshTrip()); tripEdit=true; changed();
     const tt=$("toast"); tt.innerHTML=`Trip cleared. <button type="button" class="linkbtn">Undo</button>`; tt.hidden=false; tt.querySelector("button").onclick=()=>{Object.keys(trip).forEach(x=>delete trip[x]);Object.assign(trip,prev);tt.hidden=true;changed();}; clearTimeout(toastT); toastT=setTimeout(()=>tt.hidden=true,8000); return; }
+  const mv=t.closest("[data-morevias]"); if(mv){viaOpen.add(+mv.dataset.morevias);renderDetails();return;}
   const et=t.closest("[data-editto]"); if(et){editTo.add(+et.dataset.editto);renderDetails();return;}
   const cl=t.closest("[data-clear]"); if(cl){ const id=cl.dataset.clear, m=id.match(/^(night|finish|via)-(\d+)(?:-(\d+))?$/); if(!m) return;
     if(m[1]==="night"){trip.days[+m[2]].to=null;editTo.add(+m[2]);} else if(m[1]==="finish"){trip.round=true;} else {trip.days[+m[2]].vias.splice(+m[3],1);trip.days[+m[2]].legs=[];}
@@ -1102,7 +1109,7 @@ function drawMap(){
   const range=sel?[sel.a,sel.b]:[0,plan.total], inR=x=>x.km!=null&&x.km>=range[0]-1&&x.km<=range[1]+1;
   townPoints().forEach(p=>{ const km=plan.ptKm.get(p); if(sel&&!(km!=null&&km>=sel.a-0.5&&km<=sel.b+0.5)) return;
     const night=trip.days.some((d,k)=>d.to===p&&k<nDays()-1);
-    const key=sel?(p===dayFrom(ui.tab)||p===dayTo(ui.tab)):(p===trip.start||night||p===endPt());
+    const key=sel?true:(p===trip.start||night||p===endPt());
     const m=L.marker([p.lat,p.lon],{icon:dotIcon(night?"#2F5BA8":p.type==="fuel"?"#0B6E4F":"#18201C",night||key?16:12,p.type==="fuel")}).bindTooltip(p.name,key?{permanent:true,direction:"right",offset:[10,0],className:"maplbl"}:{}).addTo(layer);
     m.on("click",()=>{ const k=trip.days.findIndex((d,i)=>plan.days[i]&&plan.days[i].pts.includes(p)&&(sel?i===ui.tab:true)); if(k<0) return; const j=plan.days[k].pts.indexOf(p); openPanel(k,j,night?"stay":"fuel"); });
   });
