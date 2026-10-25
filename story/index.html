@@ -1071,7 +1071,7 @@ function arrMin(k,j){
 const breakOf=p=>p&&p.mins!=null?+p.mins:+settings.breakMin;
 function linksHtml(t,name,town){
   t=t||{}; const phone=t.phone, web=t.website;
-  return `${phone?`<a href="tel:${esc(String(phone).replace(/[^\d+]/g,""))}" title="${esc(phone)}">Call</a>`:""}${web?`<a href="${esc(/^https?:/.test(web)?web:"https://"+web)}" target="_blank" rel="noopener">Website</a>`:`<a href="https://www.google.com/search?q=${encodeURIComponent((name||"")+" "+(town||""))}" target="_blank" rel="noopener">Find online</a>`}`;
+  return `${phone?`<a href="tel:${esc(String(phone).replace(/[^\d+]/g,""))}" title="${esc(phone)}">Call</a>`:""}${web?`<a href="${esc(/^https?:/.test(web)?web:"https://"+web)}" target="_blank" rel="noopener">Website</a>`:name?`<a href="https://www.google.com/search?q=${encodeURIComponent(name+" "+(town||""))}" target="_blank" rel="noopener">Find online</a>`:""}`;
 }
 function hoursHtml(t,k,j){
   const h=t&&t.hours; if(!h) return `<span class="note">Hours unknown${t&&t.phone?", phone ahead":""}</span>`;
@@ -1088,7 +1088,7 @@ function placeRow(x,k,j,extraAct){
   const dist=x.dstop!=null?`${x.dstop<0.1?"at the stop":x.dstop.toFixed(1)+" km from the stop"}`:(x.off!=null?(x.off<0.3?"on the route":`${x.off.toFixed(1)} km off the route`):"");
   const g=x.kind==="fuel"?gradesTxt(t):"";
   const hrs=["fuel","food","shop","cash","repair"].includes(x.kind)?hoursHtml(t,k,j):"";
-  return `<div class="srow" data-ploc="${x.lat},${x.lon}"><div><b>${esc(nm)}</b><span class="note">${esc(dist)}${g?" · "+esc(g):""}</span>${hrs}</div><div class="sact">${linksHtml(t,nm,town)}${extraAct||""}</div></div>`;
+  return `<div class="srow" data-ploc="${x.lat},${x.lon}"><div><b>${esc(nm)}</b><span class="note">${esc(dist)}${g?" · "+esc(g):""}</span>${hrs}</div><div class="sact">${linksHtml(t,x.name&&x.name!=="Fuel"?x.name:"",town)}${extraAct||""}</div></div>`;
 }
 function listBlock(title,icon,list,key,rowFn){
   const shown=showAll.has(key)?list:list.slice(0,8);
