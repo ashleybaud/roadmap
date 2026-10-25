@@ -17,11 +17,15 @@ const KINDS = {
   view:  `nwr[tourism=viewpoint][name]`,
   pass:  `node[mountain_pass=yes][name]`,
   sight: `nwr[tourism~"^(attraction|museum)$"][name];nwr[historic~"^(monument|ruins|archaeological_site|memorial|castle|fort)$"][name]`,
-  food:  `nwr[amenity~"^(restaurant|cafe|pub)$"][name]`,
+  food:  `nwr[amenity~"^(restaurant|cafe|pub|fast_food)$"][name]`,
   camp:  `nwr[tourism=camp_site][name]`,
   sleep: `nwr[tourism~"^(hotel|guest_house|hostel|chalet|motel|apartment)$"][name]`,
   med:   `nwr[amenity~"^(hospital|clinic)$"]`,
   ford:  `nwr[ford=yes]`,
+  shop:  `nwr[shop~"^(convenience|supermarket|general|kiosk)$"]`,
+  toilets: `nwr[amenity=toilets]`,
+  cash:  `nwr[amenity=atm];nwr[amenity=bank][atm=yes]`,
+  repair: `nwr[shop~"^(tyres|motorcycle|motorcycle_repair|car_repair)$"];nwr[craft=mechanic]`,
 };
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -64,8 +68,23 @@ function row(e, kind) {
   const t = e.tags || {};
   const out = [+lat.toFixed(5), +lon.toFixed(5), t.name || t.brand || ""];
   if (kind === "towns") out.push(t.place || "", t["is_in:state"] || t["addr:state"] || "");
-  if (kind === "sleep" || kind === "camp" || kind === "food") {
-    out.push(t.tourism || t.amenity || "", t.phone || t["contact:phone"] || "", t.website || t["contact:website"] || "", t.email || t["contact:email"] || "");
+  const contact = () => [t.phone || t["contact:phone"] || "", t.website || t["contact:website"] || "", t.email || t["contact:email"] || ""];
+  if (kind === "sleep" || kind === "camp") out.push(t.tourism || t.amenity || "", ...contact());
+  // places riders stop at: type, contact, opening hours, extra (fuel grades, toilets)
+  if (["fuel", "food", "shop", "toilets", "cash", "repair"].includes(kind)) {
+    let extra = "";
+    if (kind === "fuel") {
+      const g = [];
+      if (t["fuel:octane_93"] === "yes") g.push("93");
+      if (t["fuel:octane_95"] === "yes") g.push("95");
+      if (t["fuel:diesel"] === "yes" || t["fuel:50"] === "yes" || t["fuel:500"] === "yes") g.push("D");
+      if (t.toilets === "yes") g.push("T");
+      if (t.shop && t.shop !== "no") g.push("S");
+      extra = g.join(" ");
+    }
+    if (kind === "toilets" && t.fee) extra = t.fee === "yes" ? "fee" : "";
+    out.push(t.amenity || t.shop || t.craft || "", ...contact(), t.opening_hours || "", extra);
+    while (out.length > 3 && out[out.length - 1] === "") out.pop();
   }
   if (kind === "med") out.push(t.amenity || "", t.phone || t["contact:phone"] || "");
   return out;
