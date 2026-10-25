@@ -318,6 +318,12 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .tripbar>.field:nth-child(4){display:none}
 @media (max-width:560px){.tripbar{grid-template-columns:1fr 1fr!important}.tripbar>.field:nth-child(3){grid-column:1/-1}}
 .clearrow{justify-content:flex-end}
+.iconbar{display:inline-flex;flex-wrap:wrap;gap:4px;align-items:center}
+.ib{width:34px;height:30px;border:1px solid var(--line);border-radius:6px;background:var(--panel);cursor:pointer;font-size:1rem;opacity:.45;line-height:1}
+.ib.on{opacity:1;border-color:var(--ink);background:color-mix(in srgb,var(--accent) 14%,var(--panel))}
+.ib:disabled{cursor:not-allowed;opacity:.25}
+.ibmax{font-size:.8rem;display:inline-flex;align-items:center;gap:4px;margin-left:4px}
+.ibmax select{width:auto;padding:2px 4px;font-size:.8rem}
 </style>
 </head>
 <body>
@@ -332,7 +338,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
   <div class="work">
     <div class="mapcol">
       <div class="mapbar">
-        <details class="layers" id="layersBox"><summary class="btn ghost small">Show on map</summary><div class="layerlist" id="layers"></div></details>
+        <div class="iconbar" id="iconbar" role="toolbar" aria-label="Show on map"></div>
         <span class="status" id="status" role="status"></span><span class="toast" id="toast" role="status" hidden></span>
       </div>
       <div id="map"></div>
@@ -464,17 +470,18 @@ const lineKm=g=>{let k=0;for(let i=1;i<g.length;i++)k+=hav(g[i-1],g[i]);return k
 async function routeLeg(a,b,lg){
   if(lg&&lg.track){const geom=lg.track.map(([la,lo])=>({lat:la,lon:lo}));const km=lineKm(geom);return [{km,min:km/30*60,geom}];}
   const style=lg&&lg.fast?"tar":settings.style;
-  const key=style+"|"+[a,b].map(p=>p.lon.toFixed(5)+","+p.lat.toFixed(5)).join(";");
+  const alts=!!(lg&&lg.alts);
+  const key=style+(alts?"|alts":"")+"|"+[a,b].map(p=>p.lon.toFixed(5)+","+p.lat.toFixed(5)).join(";");
   if(cache.has(key)) return cache.get(key);
   let out;
   try{
-    const body={locations:[a,b].map(p=>({lat:p.lat,lon:p.lon,type:"break"})),costing:"motorcycle",costing_options:{motorcycle:STYLE[style]||STYLE.rough},alternates:2,units:"kilometers",directions_type:"none"};
+    const body={locations:[a,b].map(p=>({lat:p.lat,lon:p.lon,type:"break"})),costing:"motorcycle",costing_options:{motorcycle:STYLE[style]||STYLE.rough},...(alts?{alternates:2}:{}),units:"kilometers",directions_type:"none"};
     const ctl=new AbortController(); setTimeout(()=>ctl.abort(),25000);
     const r=await fetch(VALHALLA+"?json="+encodeURIComponent(JSON.stringify(body)),{signal:ctl.signal});
     const j=await r.json(); if(!j.trip) throw new Error(j.error||"no route");
     out=[j.trip,...(j.alternates||[]).map(x=>x.trip)].map(t=>({km:t.summary.length,min:t.summary.time/60,geom:decode6(t.legs[0].shape)}));
   }catch(e){
-    const r=await fetch(OSRM+[a,b].map(p=>p.lon.toFixed(5)+","+p.lat.toFixed(5)).join(";")+"?overview=full&geometries=geojson&alternatives=2"); if(!r.ok) throw new Error("route");
+    const r=await fetch(OSRM+[a,b].map(p=>p.lon.toFixed(5)+","+p.lat.toFixed(5)).join(";")+"?overview=full&geometries=geojson"+(alts?"&alternatives=2":"")); if(!r.ok) throw new Error("route");
     const j=await r.json(); if(j.code!=="Ok") throw new Error(j.code);
     out=j.routes.map(x=>({km:x.distance/1000,min:x.duration/60,geom:x.geometry.coordinates.map(([lo,la])=>({lat:la,lon:lo}))}));
   }
@@ -490,7 +497,10 @@ function simplify(pts,eps){
 }
 /* where along the whole trip (km) a point sits, and how far off the route it is */
 function locate(p,geom,cum){
-  let bi=0,bd=Infinity; for(let i=0;i<geom.length;i+=2){const d=hav(p,geom[i]);if(d<bd){bd=d;bi=i;}}
+  const st=Math.max(2,Math.floor(geom.length/800)); let bi=0,bd=Infinity;
+  for(let i=0;i<geom.length;i+=st){const d=hav(p,geom[i]);if(d<bd){bd=d;bi=i;}}
+  const lo=Math.max(0,bi-st), hi=Math.min(geom.length-1,bi+st);
+  for(let i=lo;i<=hi;i++){const d=hav(p,geom[i]);if(d<bd){bd=d;bi=i;}}
   return {km:cum[bi],off:bd};
 }
 
@@ -683,7 +693,7 @@ async function recalc(){
   $("status").textContent="Working out the route…"; planStale=true; renderAll();
   try{
     const res=await Promise.all(trip.days.map((d,k)=>{const pts=dayPts(k); if(!pts) return null; const fast=d.style==="fast";
-      return Promise.all(pts.slice(0,-1).map((a,j)=>routeLeg(a,pts[j+1],{fast,track:d.legs[j]&&d.legs[j].track}))).then(opts=>({pts,opts}));}));
+      return Promise.all(pts.slice(0,-1).map((a,j)=>routeLeg(a,pts[j+1],{fast,track:d.legs[j]&&d.legs[j].track,alts:d.legs[j]&&d.legs[j].wantAlts}))).then(opts=>({pts,opts}));}));
     if(my!==seq) return;
     const geom=[],cum=[],ptKm=new Map(),days=[]; let acc=0;
     res.forEach((r,k)=>{
@@ -718,9 +728,9 @@ function stopTowns(){
   const g=plan.geom, c=plan.cum, step=Math.max(1,Math.floor(g.length/2000)), out=[];
   let s=90,w=180,n=-90,e=-180; g.forEach(p=>{s=Math.min(s,p.lat);n=Math.max(n,p.lat);w=Math.min(w,p.lon);e=Math.max(e,p.lon);});
   const fuelSrc=fuelRowsAll||fuelAll, foodSrc=foodRowsAll||pois.filter(x=>x.kind==="food");
-  townList.forEach(t=>{ if(t.lat<s-0.45||t.lat>n+0.45||t.lon<w-0.5||t.lon>e+0.5) return;
+  townList.forEach(t=>{ if(t.lat<s-0.6||t.lat>n+0.6||t.lon<w-0.7||t.lon>e+0.7) return;
     let bd=99,bi=-1; for(let i=0;i<g.length;i+=step){const d=hav(t,g[i]); if(d<bd){bd=d;bi=i;}}
-    if(bi<0||bd>40) return;
+    if(bi<0||bd>60) return;
     const fuel=fuelSrc.some(f=>Math.abs(f.lat-t.lat)<0.04&&hav(f,t)<=3), food=foodSrc.some(f=>Math.abs(f.lat-t.lat)<0.03&&hav(f,t)<=2);
     out.push({name:t.name,lat:t.lat,lon:t.lon,km:c[bi],off:bd,fuel,food,place:t.place}); });
   out.sort((a,b)=>a.km-b.km); plan._cands=out.filter((t,i,a)=>!a.slice(0,i).some(o=>o.name===t.name&&Math.abs(o.km-t.km)<20)); return plan._cands;
@@ -1009,7 +1019,7 @@ function printHtml(){
     // stops with what's there
     h+=`<h3>Stops</h3><table class="ptable"><thead><tr><th>Stop</th><th>km</th><th>At the stop</th></tr></thead><tbody>`;
     d.pts.forEach((p,j)=>{ if(j===0) return; const av=stopAvail(p), here=AV.filter(a=>av[a[0]].length).map(a=>a[2]).join(", ");
-      h+=`<tr><td><b>${esc(p.name)}</b>${p.auto?" (auto-added for fuel)":""}${j===d.pts.length-1?(last?" (finish)":" (night stop)"):""}</td><td class="num">${Math.round(d.legs[j-1].b-d.a)}</td><td>${esc(here)||"Nothing known within 1 km"}</td></tr>`; });
+      h+=`<tr><td><b>${esc(p.name)}</b>${p.auto?" (suggested for fuel)":""}${j===d.pts.length-1?(last?" (finish)":" (night stop)"):""}</td><td class="num">${Math.round(d.legs[j-1].b-d.a)}</td><td>${esc(here)||"Nothing known within 1 km"}</td></tr>`; });
     h+=`</tbody></table>`;
     // fuel
     const ds=fp&&fp.days&&fp.days[k];
@@ -1276,11 +1286,11 @@ function stopList(k){
     const icons=av?AV.filter(a=>av[a[0]].length).map(a=>`<button type="button" class="avi ${open&&stopFocus.cat===a[0]?"on":""}" data-av="${k}:${j}:${a[0]}" title="${esc(a[2])}: ${av[a[0]].length}">${a[1]}</button>`).join(""):"";
     const tools=!isFrom&&!isTo?`<button class="icon" type="button" title="Move up" data-vup="${vi}">↑</button><button class="icon" type="button" title="Remove" data-vdel="${vi}">✕</button>`:"";
     const opts=L?`<details class="legopts"><summary class="icon" title="Options for the way in">⋯</summary><div class="legmenu">
-        ${L.n>1&&!lg.track?`<label class="chk">Way <select data-alt="${j-1}">${L.alts.map((km2,x)=>`<option value="${x}" ${(lg.alt||0)===x?"selected":""}>Way ${x+1} · ${Math.round(km2)} km</option>`).join("")}</select></label>`:`<span class="note">${lg.track?"":"No other ways found for this stretch."}</span>`}
+        ${L.n>1&&!lg.track?`<label class="chk">Way <select data-alt="${j-1}">${L.alts.map((km2,x)=>`<option value="${x}" ${(lg.alt||0)===x?"selected":""}>Way ${x+1} · ${Math.round(km2)} km</option>`).join("")}</select></label>`:lg.track?"":lg.wantAlts?`<span class="note">No other ways found for this stretch.</span>`:`<button class="btn small ghost" type="button" data-wantalts="${j-1}">Find other ways</button>`}
         ${lg.track?`<span class="note">Own track: ${esc(lg.trackName||"GPX")}</span><button class="btn small ghost" type="button" data-untrack="${j-1}">Remove track</button>`
           :`<label class="btn small ghost" style="cursor:pointer;align-self:flex-start">Use my GPX for this stretch<input type="file" accept=".gpx,application/gpx+xml" data-track="${j-1}" hidden></label>`}
       </div></details>`:"";
-    const autoTag=p.auto?`<span class="autotag">Auto-added for fuel${p.detour?` · +${p.detour} km`:""}</span><button class="btn small ghost" type="button" data-keep="${vi}">Keep</button>`:"";
+    const autoTag=p.auto?`<span class="autotag">Suggested ⛽${p.detour?` · +${p.detour} km`:""}</span>`:"";
     h+=`<li class="stop ${open?"open":""} ${p.auto?"auto":""}"><div class="shead"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab">${lab}</span><b>${esc(p.name)}</b><span class="note">${isFrom?"":`km ${km}`}</span></button>${autoTag}
       <span class="avail">${icons}</span>${gp}<span class="stools">${tools}${opts}</span></div>${open&&plan?stopDetail(k,j,stopFocus.cat):""}</li>`;
   });
@@ -1374,6 +1384,7 @@ $("details").addEventListener("click",e=>{
   const fd=t.closest("[data-focusday]"); if(fd&&plan){const pd=plan.days[+fd.dataset.focusday]; focusRange(pd.a,pd.b); return;}
   const up=t.closest("[data-vup]"); if(up&&k!=null){const i=+up.dataset.vup,v=trip.days[k].vias; if(i>0){[v[i-1],v[i]]=[v[i],v[i-1]];trip.days[k].legs=[];changed();} return;}
   const del=t.closest("[data-vdel]"); if(del&&k!=null){ const d=trip.days[k], v=d.vias[+del.dataset.vdel]; if(v&&v.auto){ d.noAuto=[...(d.noAuto||[]),v.name]; } d.vias.splice(+del.dataset.vdel,1); d.legs=[]; changed(); return; }
+  const wa=t.closest("[data-wantalts]"); if(wa&&k!=null){ const j2=+wa.dataset.wantalts; trip.days[k].legs[j2]=Object.assign({},trip.days[k].legs[j2],{wantAlts:true}); $("status").textContent="Looking for other ways…"; save(); recalc(); return; }
   const kp=t.closest("[data-keep]"); if(kp&&k!=null){ const v=trip.days[k].vias[+kp.dataset.keep]; if(v){ delete v.auto; save(); renderAll(); } return; }
   const gs=t.closest("[data-gostop]"); if(gs){ const [k2,j2]=gs.dataset.gostop.split(":").map(Number); ui.tab=k2; stopFocus={k:k2,j:j2}; saveUi(); renderAll(); return; }
   const un=t.closest("[data-untrack]"); if(un&&k!=null){const L=trip.days[k].legs[+un.dataset.untrack]; if(L){delete L.track;delete L.trackName;} changed();return;}
@@ -1463,15 +1474,23 @@ function drawMap(){
   townPoints().forEach(p=>{ const km=plan.ptKm.get(p); if(sel&&!(km!=null&&km>=sel.a-0.5&&km<=sel.b+0.5)) return;
     const night=trip.days.some((d,k)=>d.to===p&&k<nDays()-1);
     const key=sel?true:(p===trip.start||night||p===endPt());
-    const m=L.marker([p.lat,p.lon],{icon:p.auto?L.divIcon({className:"",html:`<div class="mapemo dashed">⛽</div>`,iconSize:[22,22],iconAnchor:[11,11]}):dotIcon(night?"#2F5BA8":stopFuel(p)?"#0B6E4F":"#18201C",night||key?16:12,stopFuel(p))}).bindTooltip(p.auto?"Auto-added: "+p.name:p.name,key?{permanent:true,direction:"right",offset:[10,0],className:"maplbl"}:{}).addTo(layer);
+    const m=L.marker([p.lat,p.lon],{icon:p.auto?L.divIcon({className:"",html:`<div class="mapemo dashed">⛽</div>`,iconSize:[22,22],iconAnchor:[11,11]}):dotIcon(night?"#2F5BA8":stopFuel(p)?"#0B6E4F":"#18201C",night||key?16:12,stopFuel(p))}).bindTooltip(p.auto?"Suggested: "+p.name:p.name,key?{permanent:true,direction:"right",offset:[10,0],className:"maplbl"}:{}).addTo(layer);
     m.on("click",()=>{ const k=trip.days.findIndex((d,i)=>plan.days[i]&&plan.days[i].pts.includes(p)&&(sel?i===ui.tab:true)); if(k<0) return; const j=plan.days[k].pts.indexOf(p); ui.tab=k; stopFocus={k,j}; saveUi(); renderAll(); });
   });
-  if(fp&&ui.fuelSugg) fp.fills.filter(f=>inR(f)).forEach(f=>L.marker([f.lat,f.lon],{icon:dotIcon("#0B6E4F",11,true)}).bindTooltip("Suggested fuel: "+f.name).addTo(layer));
+  if(fp&&ui.lay.fuel){
+    fp.fills.filter(f=>inR(f)).forEach(f=>L.marker([f.lat,f.lon],{icon:dotIcon("#0B6E4F",10,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
+    const stopsHere=townPoints();
+    stopTowns().filter(t=>t.fuel&&t.off>2&&inR(t)&&!stopsHere.some(p=>hav(p,t)<3)).forEach(t=>{ const k=plan.days.findIndex(d=>d&&t.km>=d.a-1&&t.km<=d.b+1); if(k<0) return;
+      L.marker([t.lat,t.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:#0B6E4F">⛽</div>`,iconSize:[22,22],iconAnchor:[11,11]})})
+        .bindTooltip(t.name,sel?{permanent:true,direction:"right",offset:[12,0],className:"maplbl"}:{})
+        .bindPopup(`<b>${esc(t.name)}</b><br>${Math.round(t.off)} km off the route${t.food?" · food":""}<br><button class="btn small" type="button" data-addtown="${k}|${esc(t.name)}|${t.lat}|${t.lon}">Add as a stop</button>`).addTo(layer); });
+  }
+  if(ui.lay.med&&meds) meds.filter(m=>m.off<=25&&inR(m)).forEach(m=>L.marker([m.lat,m.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:#B3261E;color:#B3261E">✚</div>`,iconSize:[22,22],iconAnchor:[11,11]})}).bindTooltip(`${m.name||(m.type==="hospital"?"Hospital":"Clinic")}${m.phone?" · "+m.phone:""}`).addTo(layer));
   if(false) fp.days[ui.tab].sugg.forEach(t=>L.marker([t.lat,t.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:#0B6E4F">⛽</div>`,iconSize:[22,22],iconAnchor:[11,11]})}).bindTooltip(`Suggested stop: ${t.name}`,{permanent:true,direction:"right",offset:[12,0],className:"maplbl"}).addTo(layer));
   if(fp&&sel) fp.gaps.filter(g=>g.from<sel.b&&g.to>sel.a).forEach(g=>gapTowns(g).filter(t=>t.km>=sel.a&&t.km<=sel.b).forEach(t=>L.marker([t.lat,t.lon],{icon:L.divIcon({className:"",html:`<div class="mapq">?</div>`,iconSize:[16,16],iconAnchor:[8,8]})}).bindTooltip(`${t.name}: fuel unconfirmed`,{permanent:true,direction:"right",offset:[8,0],className:"maplbl q"}).addTo(layer)));
-  if(ui.fuelAll) fuelStations.filter(inR).forEach(f=>L.marker([f.lat,f.lon],{icon:dotIcon("#ffffff",8,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
+  if(ui.lay.fuel) fuelStations.filter(inR).forEach(f=>L.marker([f.lat,f.lon],{icon:dotIcon("#ffffff",8,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
   pois.filter(p=>ui.types[p.kind]&&inR(p)).sort((a,b)=>a.off-b.off).slice(0,+ui.max).forEach(p=>{const t=TYPES.find(x=>x.id===p.kind); L.marker([p.lat,p.lon],{icon:dotIcon(t.c,10)}).bindTooltip(`${p.name} · ${t.n}`).addTo(layer);});
-  if(ui.sleep) stays.forEach(s=>{ if(!trip.days.some((d,k)=>d.to===s.night&&k<nDays()-1)) return; s.places.forEach(p=>L.marker([p.lat,p.lon],{icon:dotIcon("#2F5BA8",9)}).bindTooltip(p.name).addTo(layer)); });
+  if(ui.lay.stay) stays.forEach(s=>{ if(!trip.days.some((d,k)=>d.to===s.night&&k<nDays()-1)) return; s.places.forEach(p=>L.marker([p.lat,p.lon],{icon:dotIcon("#2F5BA8",9)}).bindTooltip(p.name).addTo(layer)); });
   if(!focusR){ const g=sel?seg(sel.a,sel.b):plan.geom; if(g.length>1&&(window._refit||sel||lastSel!==ui.tab)){map.fitBounds(L.latLngBounds(g.map(x=>[x.lat,x.lon])),{padding:[24,24]});} window._refit=false; lastSel=ui.tab; }
 }
 function drawPanelLayer(){
@@ -1485,16 +1504,19 @@ function drawPanelLayer(){
   if(tab==="stay"||sc.jj===0) map.setView([sc.p.lat,sc.p.lon],12); else if(pts.length>1) map.fitBounds(L.latLngBounds(pts),{padding:[30,30]});
 }
 
-/* ---------- layers menu ---------- */
+/* ---------- icon bar: what to show on the map ---------- */
+const LAY=[["fuel","⛽","Fuel: stations on the route and fuel towns nearby"],["stay","🛏","Places to stay at night stops"],["food","🍴","Food"],["sights","★","Sights, viewpoints and passes"],["med","✚","Hospitals and clinics"],["road","🛣","Road type, tar to single track (coming next)"]];
+ui.lay=Object.assign({fuel:true,stay:!!ui.sleep,food:!!ui.types.food,sights:true,med:false},ui.lay||{});
 function renderLayers(){
-  const box=(id,on,label,dot)=>`<label><input type="checkbox" data-layer="${id}" ${on?"checked":""}>${dot}${label}</label>`;
-  const sq=c=>`<span class="dot" style="background:${c};border-radius:2px;border:1px solid #18201C"></span>`;
-  $("layers").innerHTML=box("fuelSugg",ui.fuelSugg,"Fuel on the route",sq("#0B6E4F"))+box("fuelAll",ui.fuelAll,"All fuel stations",sq("#ffffff"))+box("sleep",ui.sleep,"Places to stay at night stops",`<span class="dot" style="background:#2F5BA8"></span>`)
-    +TYPES.map(t=>box("t-"+t.id,ui.types[t.id],t.n,`<span class="dot" style="background:${t.c}"></span>`)).join("")
-    +`<label>Show up to <select data-max style="width:auto;padding:3px 6px">${[["10","10"],["25","25"],["50","50"],["1000","All"]].map(([v,l])=>`<option value="${v}" ${ui.max===v?"selected":""}>${l}</option>`).join("")}</select></label>`;
+  $("iconbar").innerHTML=LAY.map(([id,ic,t])=>`<button type="button" class="ib ${ui.lay[id]?"on":""}" data-lay="${id}" title="${esc(t)}" ${id==="road"?"disabled":""}>${ic}</button>`).join("")
+    +`<label class="ibmax" title="How many sights to show">★ <select data-max>${[["10","10"],["25","25"],["50","50"],["1000","All"]].map(([v,l])=>`<option value="${v}" ${ui.max===v?"selected":""}>${l}</option>`).join("")}</select></label>`;
 }
-$("layers").addEventListener("change",e=>{ if(e.target.dataset.max!==undefined){ui.max=e.target.value;} else { const l=e.target.dataset.layer; if(!l) return; if(l.startsWith("t-")) ui.types[l.slice(2)]=e.target.checked; else ui[l]=e.target.checked; } saveUi(); renderAll(); });
-document.addEventListener("click",e=>{const b=$("layersBox"); if(b.open&&!b.contains(e.target)) b.open=false; document.querySelectorAll(".legopts[open]").forEach(x=>{if(!x.contains(e.target)) x.open=false;});});
+$("iconbar").addEventListener("click",e=>{ const b=e.target.closest("[data-lay]"); if(!b||b.disabled) return; const id=b.dataset.lay; ui.lay[id]=!ui.lay[id];
+  if(id==="food") ui.types.food=ui.lay.food; if(id==="sights") ["view","pass","sight"].forEach(t=>ui.types[t]=ui.lay.sights); if(id==="stay"){ ui.sleep=ui.lay.stay; ui.types.camp=ui.lay.stay; }
+  saveUi(); renderLayers(); renderAll(); });
+$("iconbar").addEventListener("change",e=>{ if(e.target.dataset.max!==undefined){ ui.max=e.target.value; saveUi(); renderAll(); } });
+document.addEventListener("click",e=>{ const b=e.target.closest("[data-addtown]"); if(!b) return; const [k,name,la,lo]=b.dataset.addtown.split("|"); if(insertVia(+k,pt(name,+la,+lo,{fuelHere:true}))!==false){ map.closePopup(); $("status").textContent=`Added ${name}.`; changed(); } });
+document.addEventListener("click",e=>{ document.querySelectorAll(".legopts[open]").forEach(x=>{if(!x.contains(e.target)) x.open=false;});});
 
 /* ---------- GPX ---------- */
 function downloadGpx(k){
@@ -1553,7 +1575,10 @@ function renderHist(){
   $("histList").innerHTML=h.length?h.map((x,i)=>`<div class="srow"><div><b>${esc(x.label)}</b><span class="note">saved ${esc(new Date(x.at).toLocaleString(undefined,{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}))}</span></div><button class="btn small ghost" type="button" data-restore="${i}">Restore</button></div>`).join(""):`<div class="note">Nothing saved yet.</div>`;
 }
 $("histList").addEventListener("click",e=>{ const b=e.target.closest("[data-restore]"); if(!b) return; const h=store.get("rr4-hist")||[], x=h[+b.dataset.restore]; if(!x) return; snapTrip(true); const t=JSON.parse(x.key); Object.keys(trip).forEach(k=>delete trip[k]); Object.assign(trip,t); ui.tab="ov"; $("settings").close(); changed(); });
-function changed(){ window._refit=true; focusR=null; stopFocus=null; autoRounds=0; stripAuto(); snapTrip(); recalc(); }
+const daySig=k=>[dayFrom(k),dayTo(k)].map(p=>p&&p.lat!=null?p.lat.toFixed(3)+","+p.lon.toFixed(3):"-").join("|");
+function changed(){ window._refit=true; focusR=null; stopFocus=null; autoRounds=0;
+  syncDays(); trip.days.forEach((d,k)=>{ const s=daySig(k); if(d.sig&&d.sig!==s){ const n=d.vias.length; d.vias=d.vias.filter(v=>!v.auto); if(d.vias.length!==n) d.legs=[]; } d.sig=s; });
+  snapTrip(); recalc(); }
 $("keyDlg").innerHTML=$("keyDlg").innerHTML.replace("STYLE_FAST",STYLE_ICON.fast).replace("STYLE_ROUGH",STYLE_ICON.default).replaceAll("FUEL",ICON.fuel);
 {const fb=$("feedback"); const set=()=>{const l=feedbackLink(); fb.hidden=!l; if(l) fb.href=l;}; set(); fb.addEventListener("click",set);}
 snapTrip(true);
