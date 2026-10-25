@@ -273,6 +273,20 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .sopts{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:center;padding:6px 0}
 .sopts input[type=number]{padding:3px 6px}
 [data-ploc]{cursor:pointer}
+.via{color:var(--accent);font-weight:800;letter-spacing:.02em}
+.svia b{color:var(--ink)}
+.story{display:flex;flex-wrap:wrap;align-items:flex-start;gap:6px 14px}
+.story .sline{flex:1 1 260px}
+.story .sicons{margin-left:auto;justify-content:flex-end}
+.story>.risklist{flex-basis:100%}
+.wline{flex-direction:row!important;flex-wrap:wrap;align-items:flex-start;gap:6px 14px}
+.wline .wtext{flex:1 1 280px}
+.wline .sicons{margin-left:auto;justify-content:flex-end}
+.wline>.risklist,.wline>.note{flex-basis:100%}
+.flags{margin-left:0}
+.shead .avail{margin-left:auto}
+.totals{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;border-top:2px solid var(--ink);padding-top:10px;font-size:.92rem}
+.print .via{color:#0B6E4F;font-weight:800}
 </style>
 </head>
 <body>
@@ -912,7 +926,7 @@ function printHtml(){
   plan.days.forEach((d,k)=>{ if(!d) return;
     const to=d.pts[d.pts.length-1], vias=d.pts.slice(1,-1), w=dayWx(k), s=sunMin(k), r=dayRisk(k), f=rangeFuel(d.a,d.b);
     const notes=r?r.reasons.filter(x=>x.lvl!=="info"&&x.kind!=="fuel").map(x=>x.short):[];
-    h+=`<tr class="${r&&r.level!=="ok"?r.level:""}"><td><b>${esc(dayName(k))}</b></td><td>${vias.length?`via <b>${vias.map(v=>esc(v.name)).join(", ")}</b> → `:"→ "}<b>${esc(to.name)}</b>${k<n-1?" (night)":""}</td>
+    h+=`<tr class="${r&&r.level!=="ok"?r.level:""}"><td><b>${esc(dayName(k))}</b></td><td>${vias.length?`<b class="via">via</b> <b>${vias.map(v=>esc(v.name)).join(", ")}</b> → `:"→ "}<b>${esc(to.name)}</b>${k<n-1?" (night)":""}</td>
       <td class="num">${Math.round(d.km)}</td><td class="num">${fmtDur(dayMinutes(k))}</td><td class="${f&&f.level?f.level:""}">${esc(fuelTxt(f))}</td><td>${s!=null?fmtT(s):"?"}</td><td>${w&&!w.none?`${esc(WXW(w.code))} ${Math.round(w.tmin)}–${Math.round(w.tmax)}°C`:"—"}</td><td>${esc(notes.join(", "))||"—"}</td></tr>`;
   });
   h+=`</tbody></table><p class="pnote">Every day is assumed to start with a full tank where a fuel station is within 5 km of the night stop. Fuel, places and hospitals come from OpenStreetMap and can be wrong: phone ahead on remote legs. Emergency from a mobile: 112.</p></section>`;
@@ -959,8 +973,8 @@ function feedbackLink(){
 const editOpen=new Set(), editTo=new Set(), fuelOpen=new Set(), showAll=new Set(); let tripEdit=false;
 const curDay=()=>ui.tab==="ov"?(nDays()===1?0:null):ui.tab;
 const viaOpen=new Set();
-function viaList(k,v,full){ if(!v.length) return ""; if(full||viaOpen.has(k)||v.length<=2) return `via ${v.map(x=>esc(x.name)).join(", ")} `;
-  return `via ${v.slice(0,2).map(x=>esc(x.name)).join(", ")} <button type="button" class="linkbtn morevia" data-morevias="${k}">+${v.length-2} more</button> `; }
+function viaList(k,v,full){ if(!v.length) return ""; if(full||viaOpen.has(k)||v.length<=2) return `<b class="via">via</b> <b>${v.map(x=>esc(x.name)).join(", ")}</b> `;
+  return `<b class="via">via</b> <b>${v.slice(0,2).map(x=>esc(x.name)).join(", ")}</b> <button type="button" class="linkbtn morevia" data-morevias="${k}">+${v.length-2} more</button> `; }
 function viaText(k,full){ return viaList(k,trip.days[k].vias.filter(x=>x.lat!=null),full); }
 function toCell(k){
   const last=k===nDays()-1, d=trip.days[k], to=dayTo(k), id=(last?"finish-":"night-")+k, cur=last?(to?to.name:""):(d.to?d.to.name:"");
@@ -981,10 +995,15 @@ function storyLine(k,big){
     ${riskHtml(r,k)}${fuelList(k)}</div>`;
 }
 function tripLine(){
-  const n=nDays(), tot=plan?plan.days.reduce((t,d)=>t+(d?d.km:0),0):0, s=trip.start?trip.start.name:"?";
-  const fin=trip.round||!trip.end?"and back":`to ${trip.end.name}`;
-  return `<div class="tripline"><span>${esc(n===1?dayName(0):`${dayName(0)} – ${dayName(n-1)}`)} · from <b>${esc(s)}</b> ${esc(fin)} · ${n} day${n>1?"s":""}${tot?` · ${Math.round(tot).toLocaleString()} km`:""}</span>
+  const s=trip.start?trip.start.name:"?";
+  return `<div class="tripline"><span><span class="lbl">From</span> <b>${esc(s)}</b></span>
     <button class="btn small ghost" type="button" data-tripedit>${tripEdit?"Done":"Edit"}</button></div>`;
+}
+function tripTotals(){
+  if(!plan) return "";
+  const n=nDays(), tot=plan.days.reduce((t,d)=>t+(d?d.km:0),0), ride=plan.days.reduce((t,d,k)=>t+(d?dayMinutes(k):0),0);
+  const fin=trip.round||!trip.end?(trip.start?trip.start.name:"?"):trip.end.name;
+  return `<div class="totals"><span>Back at <b>${esc(fin)}</b></span><span>${n} day${n>1?"s":""} · ${Math.round(tot).toLocaleString()} km · about ${fmtDur(ride)} riding</span></div>`;
 }
 function stayRows(k){
   const last=k===nDays()-1, to=dayTo(k); if(!to||(last&&trip.round)) return "";
@@ -1210,6 +1229,7 @@ function overviewHtml(){
   const ready=n===1?(trip.round?trip.days[0].vias.length>0:!!trip.end):trip.days.slice(0,-1).every(d=>d.to);
   if(ready) h+=`<div class="btns"><button class="btn small" type="button" data-addday>+ Add a day</button></div>`;
   if(n===1&&ready) h+=dayBody(0);
+  if(n>1) h+=tripTotals();
   if(plan&&n>1) h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px">${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">${esc(dayName(k))} GPX</button>`:"").join("")}<button class="btn small ghost" type="button" data-print>Save as PDF</button></div></div>`;
   h+=`<div class="btns"><button class="linkbtn" type="button" data-newtrip>Start a new trip</button></div>`;
   return h+footNote();
