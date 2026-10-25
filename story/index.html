@@ -715,7 +715,8 @@ function routeTowns(){
   townList.forEach(t=>{ if(t.lat<s-0.1||t.lat>n+0.1||t.lon<w-0.1||t.lon>e+0.1) return; let bd=9,bi=-1; for(let i=0;i<g.length;i+=step){const d=hav(t,g[i]); if(d<bd){bd=d;bi=i;}} if(bi>=0&&bd<=5) out.push({name:t.name,km:c[bi],lat:t.lat,lon:t.lon,off:bd}); });
   out.sort((a,b)=>a.km-b.km); plan._towns=out.filter((t,i,a)=>!a.slice(0,i).some(o=>o.name===t.name)); return plan._towns;
 }
-const townsTxt=g=>g.towns&&g.towns.length?` Towns on the way that may have fuel: ${g.towns.slice(0,6).map(t=>t.name).join(", ")}${g.towns.length>6?` and ${g.towns.length-6} more`:""}.`:"";
+const gapTowns=g=>(g.towns||[]).filter(t=>t.name!==g.fromName&&t.name!==g.toName);
+const townsTxt=g=>gapTowns(g).length?` Towns on the way that may have fuel: ${gapTowns(g).slice(0,6).map(t=>t.name).join(", ")}${gapTowns(g).length>6?` and ${gapTowns(g).length-6} more`:""}.`:"";
 function gapText(g){ const len=Math.round(g.to-g.from); return `${len} km with no fuel on our map, ${g.fromName} to ${g.toName}. That's longer than your ${settings.range} km range.${townsTxt(g)} Check before you go.`; }
 function rangeFuel(a,b){
   if(!fp||!(+settings.range>0)) return null;
@@ -1434,7 +1435,7 @@ function drawMap(){
     m.on("click",()=>{ const k=trip.days.findIndex((d,i)=>plan.days[i]&&plan.days[i].pts.includes(p)&&(sel?i===ui.tab:true)); if(k<0) return; const j=plan.days[k].pts.indexOf(p); ui.tab=k; stopFocus={k,j}; saveUi(); renderAll(); });
   });
   if(fp&&ui.fuelSugg) fp.fills.filter(f=>inR(f)).forEach(f=>L.marker([f.lat,f.lon],{icon:dotIcon("#0B6E4F",11,true)}).bindTooltip("Suggested fuel: "+f.name).addTo(layer));
-  if(fp&&sel) fp.gaps.filter(g=>g.from<sel.b&&g.to>sel.a).forEach(g=>(g.towns||[]).filter(t=>t.km>=sel.a&&t.km<=sel.b).forEach(t=>L.marker([t.lat,t.lon],{icon:L.divIcon({className:"",html:`<div class="mapq">?</div>`,iconSize:[16,16],iconAnchor:[8,8]})}).bindTooltip(`${t.name}: fuel unconfirmed`,{permanent:true,direction:"right",offset:[8,0],className:"maplbl q"}).addTo(layer)));
+  if(fp&&sel) fp.gaps.filter(g=>g.from<sel.b&&g.to>sel.a).forEach(g=>gapTowns(g).filter(t=>t.km>=sel.a&&t.km<=sel.b).forEach(t=>L.marker([t.lat,t.lon],{icon:L.divIcon({className:"",html:`<div class="mapq">?</div>`,iconSize:[16,16],iconAnchor:[8,8]})}).bindTooltip(`${t.name}: fuel unconfirmed`,{permanent:true,direction:"right",offset:[8,0],className:"maplbl q"}).addTo(layer)));
   if(ui.fuelAll) fuelStations.filter(inR).forEach(f=>L.marker([f.lat,f.lon],{icon:dotIcon("#ffffff",8,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
   pois.filter(p=>ui.types[p.kind]&&inR(p)).sort((a,b)=>a.off-b.off).slice(0,+ui.max).forEach(p=>{const t=TYPES.find(x=>x.id===p.kind); L.marker([p.lat,p.lon],{icon:dotIcon(t.c,10)}).bindTooltip(`${p.name} · ${t.n}`).addTo(layer);});
   if(ui.sleep) stays.forEach(s=>{ if(!trip.days.some((d,k)=>d.to===s.night&&k<nDays()-1)) return; s.places.forEach(p=>L.marker([p.lat,p.lon],{icon:dotIcon("#2F5BA8",9)}).bindTooltip(p.name).addTo(layer)); });
