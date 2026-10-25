@@ -1490,7 +1490,7 @@ function drawMap(){
     fp.fills.filter(f=>inR(f)).forEach(f=>L.marker([f.lat,f.lon],{icon:dotIcon("#0B6E4F",10,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
     const stopsHere=townPoints();
     const ftowns=stopTowns().filter(t=>t.fuel&&t.off>2&&inR(t)&&!stopsHere.some(p=>hav(p,t)<3)), lbl=sel&&ftowns.length<=8;
-    ftowns.forEach(t=>{ const k=plan.days.findIndex(d=>d&&t.km>=d.a-1&&t.km<=d.b+1); if(k<0) return;
+    if(sel||plan.days.filter(Boolean).length===1) ftowns.forEach(t=>{ const k=plan.days.findIndex(d=>d&&t.km>=d.a-1&&t.km<=d.b+1); if(k<0) return;
       L.marker([t.lat,t.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:#0B6E4F">⛽</div>`,iconSize:[22,22],iconAnchor:[11,11]})})
         .bindTooltip(t.name,lbl?{permanent:true,direction:"right",offset:[12,0],className:"maplbl"}:{})
         .bindPopup(`<b>${esc(t.name)}</b><br>${Math.round(t.off)} km off the route${t.food?" · food":""}<br><button class="btn small" type="button" data-addtown="${k}|${esc(t.name)}|${t.lat}|${t.lon}">Add as a stop</button>`).addTo(layer); });
