@@ -281,6 +281,15 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .story .sline{display:block;line-height:1.9}
 .story .sline>*{vertical-align:baseline}
 .story .sline .ac{display:inline-block;vertical-align:middle;min-width:200px}
+.dh{flex-direction:column!important;flex-wrap:nowrap!important;gap:6px!important}
+.dhline{margin:0;font-size:1.35rem;line-height:1.35}
+.dhline .tolink{font-size:inherit;font-family:inherit}
+.dhline .arr{color:var(--muted);font-weight:400}
+.dhfrom{display:flex;flex-wrap:wrap;align-items:center;gap:4px 10px}
+.dhfrom .dhtext{flex:1 1 240px;line-height:1.7}
+.dhfrom .dep{font-size:1.12rem}
+.dhfrom .avail{margin-left:auto}
+.dhdetail{border:1px solid var(--line);border-radius:6px}
 </style>
 </head>
 <body>
@@ -1081,6 +1090,23 @@ function hoursHtml(t,k,j){
 }
 function gradesTxt(t){ const e=(t&&t.extra)||""; const g=[]; if(/\b93\b/.test(e)) g.push("93"); if(/\b95\b/.test(e)) g.push("95"); if(/\bD\b/.test(e)) g.push("Diesel"); return g.length?g.join(" · "):""; }
 
+/* day view heading: named after where you sleep; departure underneath so the stops read top to bottom */
+function gapPill(g,prefix){ const len=Math.round(g.to-g.from); return `<span class="pill fbad" title="No fuel known for ${len} km, ${esc(g.fromName)} to ${esc(g.toName)}. Fuel may exist that the map doesn't show: ask locally, plan fuel before it, or carry extra.">${ICON.fuel}${prefix||"No fuel next"} ${len} km</span>`; }
+function gapsStarting(a,b){ return fp&&+settings.range>0?fp.gaps.filter(g=>g.from>=a-0.5&&g.from<b-0.5):[]; }
+function dayHead(k){
+  const pd=plan&&plan.days[k], d=trip.days[k], r=pd?dayRisk(k):null, from=dayFrom(k);
+  const msg=!trip.start||trip.start.lat==null?"Pick where you start":!from?"Pick the night stop before this day":!dayTo(k)?"Pick where you sleep":!dayPts(k)?"Add a stop or a finish":"Working out the route…";
+  let depIcons="", depGap="";
+  if(pd&&placesOk){ const av=stopAvail(pd.pts[0]); depIcons=AV.filter(a=>av[a[0]].length).map(a=>`<button type="button" class="avi ${stopFocus&&stopFocus.k===k&&stopFocus.j===0&&stopFocus.cat===a[0]?"on":""}" data-av="${k}:0:${a[0]}" title="${esc(a[2])}: ${av[a[0]].length}">${a[1]}</button>`).join(""); }
+  if(pd&&fp&&+settings.range>0){ const g=fp.gaps.find(g=>(g.from<pd.a+0.5&&g.to>pd.a+0.5)||(g.from>=pd.a-0.5&&g.from<pd.legs[0].a+0.5)) || fp.gaps.find(g=>g.from>=pd.a-0.5&&g.from<pd.legs[0].b-0.5); if(g) depGap=gapPill(g,g.from<pd.a-0.5?"No fuel, continues":"No fuel next"); }
+  return `<div class="story dh">
+    <h2 class="dhline"><span class="dhdate">${esc(dayLong(k))}</span> <span class="arr">→</span> ${toCell(k)}${d.style==="fast"?` <span class="sty" title="Get me there quickly">${STYLE_ICON.fast}</span>`:""}</h2>
+    <div class="dhfrom"><span class="dhtext"><span class="lbl">from</span> <b class="dep">${esc(from?from.name:"?")}</b> ${viaText(k,true)}</span><span class="avail">${depIcons}</span>${depGap}</div>
+    ${stopFocus&&stopFocus.k===k&&stopFocus.j===0&&pd?`<div class="dhdetail">${stopDetail(k,0,stopFocus.cat)}</div>`:""}
+    ${pd?`<div class="sicons"><span class="sl">${timePill(k,pd.km,dayMinutes(k),`data-focusday="${k}"`)+fuelBtn(k)}</span><span class="sr">${sunSpan(k)+wxLink(k)}<span class="flags">${flagIcons(r,k)}</span></span></div>${riskHtml(r,k)}${fuelList(k)}`:`<div class="note">${msg}</div>`}
+  </div>`;
+}
+
 /* ---------- day planner: stops as a list, tap a stop to see it on the map ---------- */
 let stopFocus=null;
 function placeRow(x,k,j,extraAct){
@@ -1127,8 +1153,10 @@ function stopList(k){
   if(!pd) return h;
   h+=`<ol class="stops">`;
   pd.pts.forEach((p,j)=>{
+    if(j===0) return;
     const isFrom=j===0, isTo=j===pd.pts.length-1, vi=j-1, L=j>0?pd.legs[j-1]:null, lg=j>0?(d.legs[j-1]||{}):{};
     const open=stopFocus&&stopFocus.k===k&&stopFocus.j===j, km=j>0?Math.round(pd.legs[j-1].b-pd.a):0;
+    const nextL=pd.legs[j], gp=gapsStarting(L.b,nextL?nextL.b:L.b+1).map(g=>gapPill(g)).join("");
     const lab=isFrom?"From":isTo?(last?"Finish":"Night stop"):`Stop ${j}`;
     const av=placesOk?stopAvail(p):null;
     const icons=av?AV.filter(a=>av[a[0]].length).map(a=>`<button type="button" class="avi ${open&&stopFocus.cat===a[0]?"on":""}" data-av="${k}:${j}:${a[0]}" title="${esc(a[2])}: ${av[a[0]].length}">${a[1]}</button>`).join(""):"";
@@ -1139,7 +1167,7 @@ function stopList(k){
           :`<label class="btn small ghost" style="cursor:pointer;align-self:flex-start">Use my GPX for this stretch<input type="file" accept=".gpx,application/gpx+xml" data-track="${j-1}" hidden></label>`}
       </div></details>`:"";
     h+=`<li class="stop ${open?"open":""}"><div class="shead"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab">${lab}</span><b>${esc(p.name)}</b><span class="note">${isFrom?"":`km ${km}`}</span></button>
-      <span class="avail">${icons}</span>${L?fuelPill(rangeFuel(L.a,L.b)):""}<span class="stools">${tools}${opts}</span></div>${open&&plan?stopDetail(k,j,stopFocus.cat):""}</li>`;
+      <span class="avail">${icons}</span>${gp}<span class="stools">${tools}${opts}</span></div>${open&&plan?stopDetail(k,j,stopFocus.cat):""}</li>`;
   });
   h+=`</ol><div class="rname"><span class="lbl" style="white-space:nowrap">Add a stop</span>${searchBox("addvia-"+k,"","Town, pass or place on this day",true)}</div>`;
   return h;
@@ -1179,7 +1207,7 @@ function overviewHtml(){
   return h+footNote();
 }
 function footNote(){ return placesOk&&dataDate?`<div class="note">Map data from OpenStreetMap, as of ${esc(dataDate)}. Weather from Open-Meteo. Phone ahead on remote legs.</div>`:""; }
-function dayHtml(k){ return storyLine(k,true)+dayBody(k); }
+function dayHtml(k){ return dayHead(k)+dayBody(k); }
 function chip(k,j,tab,num){return `<button class="chip2 ${tab==="stay"?"stay":""}" type="button" data-panel="${k}:${j}:${tab}" title="${TABS[tab]}">${ICON[tab]}<span>${num}</span></button>`;}
 function wireDetails(){
   trip.days.forEach((d,k)=>hook("night-"+k,p=>{editTo.delete(k);trip.days[k].to=p;changed();}));
