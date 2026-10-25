@@ -108,7 +108,7 @@ function daySuggest(k,ignoreAuto){
   while(pd.b-pos>S&&guard++<50){
     const win=pos+S, o=own.filter(x=>x.km>pos+5&&x.km<=win).pop();
     if(o){ pos=o.km; posName=o.p.name; continue; }
-    const steps=[c=>c.fuel&&c.off<=5,c=>c.fuel&&c.off<=40,c=>c.off<=5,c=>c.off<=40];
+    const steps=[c=>c.fuel&&c.off<=2,c=>c.fuel&&c.off<=40,c=>c.off<=2,c=>c.off<=40]; // on the route first, so a suggestion doesn't move the route
     let pick=null;
     for(let i=0;i<steps.length&&!pick;i++){ const l=cands.filter(t=>steps[i](t)&&inWin(t,win)); if(l.length) pick=i%2===0?far(l):near(l); }
     if(pick){ sugg.push(pick); pos=pick.km; posName=pick.name; continue; }
@@ -586,9 +586,9 @@ function stopList(k){
         ${lg.track?`<span class="note">Own track: ${esc(lg.trackName||"GPX")}</span><button class="btn small ghost" type="button" data-untrack="${j-1}">Remove track</button>`
           :`<label class="btn small ghost" style="cursor:pointer;align-self:flex-start">Use my GPX for this stretch<input type="file" accept=".gpx,application/gpx+xml" data-track="${j-1}" hidden></label>`}
       </div></details>`:"";
-    const autoTag=p.auto?`<span class="autotag">Suggested ⛽${p.detour?` · +${p.detour} km`:""}</span>`:"";
-    h+=`<li class="stop ${open?"open":""} ${p.auto?"auto":""}"><div class="shead"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab">${lab}</span><b>${esc(p.name)}</b><span class="note">${isFrom?"":`km ${km}`}</span></button>${autoTag}
-      <span class="avail">${icons}</span><span class="stools">${way}${tools}${opts}</span></div>${open&&plan?stopDetail(k,j,stopFocus.cat):""}</li>`;
+    const autoTag=p.auto?`<span class="autotag" title="Fuel and food here. You asked to stop at least every ${esc(String(settings.range))} km.">Suggested stop${p.detour?` · +${p.detour} km`:""}</span>`:"";
+    h+=`<li class="stop ${open?"open":""} ${p.auto?"auto":""}"><div class="shead"><div class="sl1"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab">${lab}</span><b>${esc(p.name)}</b><span class="note">${isFrom?"":`km ${km}`}</span></button><span class="avail">${icons}</span></div>
+      <div class="sl2"><span class="sl2l">${autoTag}</span><span class="stools">${way}${tools}${opts}</span></div></div>${open&&plan?stopDetail(k,j,stopFocus.cat):""}</li>`;
   });
   h+=`</ol><div class="rname"><span class="lbl" style="white-space:nowrap">Add a stop</span>${searchBox("addvia-"+k,"","Town, pass or place on this day",true)}</div>`;
   return h;
@@ -804,7 +804,9 @@ function drawPanelLayer(){
 const LAY=[["fuel","⛽","Fuel","Fuel stations on the route"],["stay","🛏","Stay","Places to stay at night stops"],["food","🍴","Food","Places to eat"],["sights","★","Sights","Sights, viewpoints and passes"],["med","🏥","Medical","Hospitals and clinics"],["road","🛣","Road type","Tar to single track, coming next"]];
 ui.lay=Object.assign({fuel:true,stay:!!ui.sleep,food:!!ui.types.food,sights:true,med:false},ui.lay||{});
 function renderLayers(){
-  $("iconbar").innerHTML=`<span class="iblbl">On the map</span>`+LAY.map(([id,ic,w,t])=>`<button type="button" class="ib ${ui.lay[id]?"on":""}" data-lay="${id}" title="${esc(t)}" aria-pressed="${!!ui.lay[id]}" ${id==="road"?"disabled":""}><span class="e">${ic}</span>${w}${id==="sights"&&ui.lay.sights?`<select data-max aria-label="How many sights">${[["10","10"],["25","25"],["50","50"],["1000","All"]].map(([v,l])=>`<option value="${v}" ${ui.max===v?"selected":""}>${l}</option>`).join("")}</select>`:""}</button>`).join("");
+  $("iconbar").innerHTML=`<div class="ibhead">On the map</div><div class="ibgrid">`+LAY.map(([id,ic,w,t])=>{ const on=!!ui.lay[id]&&id!=="road";
+    const sub=id==="sights"&&on?`<select data-max aria-label="How many sights">${[["10","10"],["25","25"],["50","50"],["1000","All"]].map(([v,l])=>`<option value="${v}" ${ui.max===v?"selected":""}>${l}</option>`).join("")}</select>`:id==="road"?`<span class="ibsub">soon</span>`:"";
+    return `<button type="button" class="ib ${on?"on":""}" data-lay="${id}" title="${esc(t)}" aria-pressed="${on}" ${id==="road"?"disabled":""}><span class="e">${ic}</span><span class="w">${w}</span>${sub}</button>`; }).join("")+`</div>`;
 }
 $("iconbar").addEventListener("click",e=>{ if(e.target.closest("select")) return; const b=e.target.closest("[data-lay]"); if(!b||b.disabled) return; const id=b.dataset.lay; ui.lay[id]=!ui.lay[id];
   if(id==="food") ui.types.food=ui.lay.food; if(id==="sights") ["view","pass","sight"].forEach(t=>ui.types[t]=ui.lay.sights); if(id==="stay"){ ui.sleep=ui.lay.stay; ui.types.camp=ui.lay.stay; }
