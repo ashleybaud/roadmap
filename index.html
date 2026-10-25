@@ -274,6 +274,10 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .shead .avail{margin-left:auto}
 .totals{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;border-top:2px solid var(--ink);padding-top:10px;font-size:.92rem}
 .print .via{color:#0B6E4F;font-weight:800}
+.story .sicons,.wline .sicons{flex-basis:100%;margin-left:0;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px 10px}
+.sicons .sl,.sicons .sr{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.sicons .sr{margin-left:auto;justify-content:flex-end}
+.sline h2.sdate{width:auto!important;display:inline;font-size:1.25rem;margin-right:4px}
 </style>
 </head>
 <body>
@@ -978,7 +982,7 @@ function storyLine(k,big){
   const pd=plan&&plan.days[k], d=trip.days[k], r=pd?dayRisk(k):null;
   const msg=!trip.start||trip.start.lat==null?"Pick where you start":!dayFrom(k)?"Pick the night stop before this day":!dayTo(k)?"Pick where you sleep":!dayPts(k)?"Add a stop or a finish":"Working out the route…";
   return `<div class="story"><div class="sline">${big?`<h2 class="sdate">${esc(dayLong(k))}</h2>`:`<b class="sdate">${esc(dayName(k))}:</b>`} <span class="svia">${viaText(k,big)}→</span> ${toCell(k)}${d.style==="fast"?` <span class="sty" title="Get me there quickly">${STYLE_ICON.fast}</span>`:""}</div>
-    <div class="sicons">${pd?timePill(k,pd.km,dayMinutes(k),`data-focusday="${k}"`)+fuelBtn(k)+sunSpan(k)+wxLink(k)+`<span class="flags">${flagIcons(r,k)}</span>`:`<span class="note">${msg}</span>`}</div>
+    <div class="sicons">${pd?`<span class="sl">${timePill(k,pd.km,dayMinutes(k),`data-focusday="${k}"`)+fuelBtn(k)}</span><span class="sr">${sunSpan(k)+wxLink(k)}<span class="flags">${flagIcons(r,k)}</span></span>`:`<span class="note">${msg}</span>`}</div>
     ${riskHtml(r,k)}${fuelList(k)}</div>`;
 }
 function tripLine(){
