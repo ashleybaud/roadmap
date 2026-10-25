@@ -683,7 +683,7 @@ function fuelPlan(){
   const range=+settings.range||0, total=plan.total, marks=[];
   plan.days.forEach(d=>{ if(!d) return; d.pts.forEach((p,i)=>{ const km=i===0?d.a:d.legs[i-1].b; marks.push({km,name:p.name}); }); });
   const nameAt=(km,p)=>{ let best=null,bd=6; marks.forEach(m=>{const dd=Math.abs(m.km-km); if(dd<bd){bd=dd;best=m.name;}}); if(best) return best;
-    if(townList&&p.lat!=null){ let tn=null,td=15; townList.forEach(t=>{const dd=hav(t,p); if(dd<td){td=dd;tn=t.name;}}); if(tn) return tn; } return p.name; };
+    if(townList&&p.lat!=null){ let tn=null,td=15; townList.forEach(t=>{const dd=hav(t,p)+({city:0,town:0,village:4}[t.place]??8); if(dd<td){td=dd;tn=t.name;}}); if(tn) return tn; } return p.name; };
   const fills=(placesOk?fuelStations:[]).map(f=>({id:f.id,km:f.km,lat:f.lat,lon:f.lon,name:f.name&&f.name!=="Fuel"?f.name:"Fuel station",tags:f.tags,st:true}));
   const pts=[{km:0,name:trip.start?trip.start.name:"start"},...fills];
   if(!placesOk) return {fills,gaps:[],loading:true};
