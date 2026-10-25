@@ -665,17 +665,19 @@ async function recalc(){
 }
 
 /* ---------- fuel ---------- */
+let townList=null; allTowns().then(t=>{ townList=t.filter(x=>x.place!=="hamlet"); if(plan) renderAll(); }).catch(()=>{});
 /* fuel: riders fill up wherever there's fuel. We only flag stretches with no known fuel longer than the bike's range. */
 function fuelPlan(){
   const range=+settings.range||0, total=plan.total, marks=[];
   plan.days.forEach(d=>{ if(!d) return; d.pts.forEach((p,i)=>{ const km=i===0?d.a:d.legs[i-1].b; marks.push({km,name:p.name}); }); });
-  const nameAt=(km,fb)=>{ let best=null,bd=6; marks.forEach(m=>{const dd=Math.abs(m.km-km); if(dd<bd){bd=dd;best=m.name;}}); return best||fb; };
+  const nameAt=(km,p)=>{ let best=null,bd=6; marks.forEach(m=>{const dd=Math.abs(m.km-km); if(dd<bd){bd=dd;best=m.name;}}); if(best) return best;
+    if(townList&&p.lat!=null){ let tn=null,td=15; townList.forEach(t=>{const dd=hav(t,p); if(dd<td){td=dd;tn=t.name;}}); if(tn) return tn; } return p.name; };
   const fills=(placesOk?fuelStations:[]).map(f=>({id:f.id,km:f.km,lat:f.lat,lon:f.lon,name:f.name&&f.name!=="Fuel"?f.name:"Fuel station",tags:f.tags,st:true}));
   const pts=[{km:0,name:trip.start?trip.start.name:"start"},...fills];
   plan.days.forEach(d=>{ if(!d) return; d.pts.slice(1,-1).forEach((p,i)=>{ if(p.fuelHere||p.type==="fuel") pts.push({km:d.legs[i].b,name:p.name}); }); });
   pts.sort((x,y)=>x.km-y.km); pts.push({km:total,name:endPt()?endPt().name:"finish",end:true});
   const gaps=[];
-  if(range>0) for(let i=1;i<pts.length;i++){ const a=pts[i-1], b=pts[i]; if(b.km-a.km>range) gaps.push({from:a.km,to:b.km,fromName:nameAt(a.km,a.name),toName:b.end?b.name:nameAt(b.km,b.name)}); }
+  if(range>0) for(let i=1;i<pts.length;i++){ const a=pts[i-1], b=pts[i]; if(b.km-a.km>range) gaps.push({from:a.km,to:b.km,fromName:nameAt(a.km,a),toName:b.end?b.name:nameAt(b.km,b)}); }
   return {fills,gaps};
 }
 function rangeFuel(a,b){
