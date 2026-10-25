@@ -1511,12 +1511,13 @@ const dotIcon=(c,sz,sq)=>L.divIcon({className:"",html:`<div style="width:${sz}px
 let lblLayer=null;
 function townLabels(){ if(!map||!lblLayer||!townList) return; lblLayer.clearLayers(); const z=map.getZoom(), bb=map.getBounds().pad(-0.03);
   const want=z<7?["city"]:["city","town"]; const list=townList.filter(t=>want.includes(t.place)&&bb.contains([t.lat,t.lon])).sort((a,b)=>(a.place==="city"?0:1)-(b.place==="city"?0:1)).slice(0,z<9?25:45);
-  const used=[]; list.forEach(t=>{ const pnt=map.latLngToContainerPoint([t.lat,t.lon]); if(used.some(u=>Math.abs(u.x-pnt.x)<90&&Math.abs(u.y-pnt.y)<22)) return; used.push(pnt);
+  const own=plan?townPoints():[];
+  const used=own.map(p=>map.latLngToContainerPoint([p.lat,p.lon])); list.forEach(t=>{ const pnt=map.latLngToContainerPoint([t.lat,t.lon]); if(used.some(u=>Math.abs(u.x-pnt.x)<90&&Math.abs(u.y-pnt.y)<22)) return; used.push(pnt);
     L.marker([t.lat,t.lon],{interactive:false,keyboard:false,icon:L.divIcon({className:"townlbl"+(t.place==="city"?" city":""),html:`<span>${esc(t.name)}</span>`,iconSize:[0,0]})}).addTo(lblLayer); }); }
 function ensureMap(){ if(!map){map=L.map("map",{scrollWheelZoom:true});L.tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png",{maxZoom:17,attribution:"© OpenStreetMap contributors"}).addTo(map);map.setView([-31,20],5); lblLayer=L.layerGroup().addTo(map); map.on("moveend",townLabels); if(window.ResizeObserver) new ResizeObserver(()=>map.invalidateSize()).observe($("map"));} map.invalidateSize(); if(layer) layer.remove(); layer=L.layerGroup().addTo(map); }
 const seg=(a,b)=>plan.geom.filter((g,i)=>plan.cum[i]>=a-0.01&&plan.cum[i]<=b+0.01);
 function drawMap(){
-  if(!window.L) return; ensureMap(); if(!plan) return;
+  if(!window.L) return; ensureMap(); if(!plan) return; townLabels();
   const sel=ui.tab==="ov"?null:plan.days[ui.tab];
   plan.days.forEach((d,k)=>{ if(!d) return; const on=!sel||k===ui.tab; L.polyline(seg(d.a,d.b).map(g=>[g.lat,g.lon]),{color:on?DAYCOL[k%DAYCOL.length]:"#5C6660",weight:on?5:3,opacity:on?.9:.3}).addTo(layer); });
   if(panel){ drawPanelLayer(); return; }
