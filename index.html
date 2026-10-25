@@ -1191,7 +1191,8 @@ function dayHead(k){ return sumBox(k,true)+`<h3 class="detailh">Stops</h3>`; }
 
 /* ---------- fuel towns added for the rider (marked, removable, can be kept) ---------- */
 let autoRounds=0;
-const legFast=(d,j)=>{ const v=d.vias[j], f=v?v.fast:d.toFast; return f!=null?f:d.style==="fast"; };
+// way of the stretch into stop j; a suggested stop takes the way of the stretch it sits in (the next own stop's choice)
+const legFast=(d,j)=>{ let i=j; while(i<d.vias.length&&d.vias[i].auto&&d.vias[i].fast==null) i++; const v=d.vias[i], f=v?v.fast:d.toFast; return f!=null?f:d.style==="fast"; };
 function autoFuel(){
   if(!plan||!placesOk||!townList||!(+settings.range>0)||plan._autoDone) return false;
   plan._autoDone=true; // one pass per worked-out route
