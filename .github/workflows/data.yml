@@ -25,7 +25,7 @@ jobs:
           node-version: 20
       - run: node scripts/fetch-data.mjs
         env:
-          ONLY: ${{ github.event.inputs.only || (github.event_name == 'push' && 'fuel,food,shop,toilets,cash,repair' || '') }}
+          ONLY: ${{ github.event.inputs.only || (github.event_name == 'push' && 'towns' || '') }}
       - name: Save data
         run: |
           git config user.name "route-and-range-bot"

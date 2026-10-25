@@ -13,7 +13,7 @@ const SERVERS = [
 ];
 const KINDS = {
   fuel:  `nwr[amenity=fuel]`,
-  towns: `node[place~"^(city|town|village|hamlet)$"][name]`,
+  towns: `nwr[place~"^(city|town|village|hamlet)$"][name]`,
   view:  `nwr[tourism=viewpoint][name]`,
   pass:  `node[mountain_pass=yes][name]`,
   sight: `nwr[tourism~"^(attraction|museum)$"][name];nwr[historic~"^(monument|ruins|archaeological_site|memorial|castle|fort)$"][name]`,
