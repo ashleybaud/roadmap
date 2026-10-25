@@ -322,9 +322,9 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 <dialog id="keyDlg">
   <form method="dialog" class="keylist">
     <h2>What the icons mean</h2>
-    <div><span class="pill fok">FUEL</span> Fuel fine for the whole stretch.</div>
-    <div><span class="pill fwarn">FUEL 18 km</span> You'd dip into your reserve. The number is what's left in the tank.</div>
-    <div><span class="pill fbad">FUEL 313 km</span> A stretch with no fuel known. The number is how long it is.</div>
+    <div><span class="pill foff">FUEL 4</span> Fuel stations on the route that day. Tap for the list.</div>
+    <div><span class="pill fbad">FUEL No fuel 523 km</span> A stretch with no known fuel that's longer than your bike's range. Fuel may still exist: ask locally, plan fuel before it, or carry extra.</div>
+    <div>⛽ on a stop: fuel within 1 km. Tap it to see the stations in the area.</div>
     <div><span class="pill dist long">526 km · 9h30</span> Orange: more riding than your daily limit in Settings.</div>
     <div><span class="sun swarn">☼ 19:02</span> Orange: you'd arrive within an hour of sunset. <span class="sun sbad">☼ 19:02</span> Red: after dark.</div>
     <div><span class="flag fwarn">☂</span> Weather: storms, strong wind, heat, near freezing or rain. Red is serious.</div>
@@ -333,7 +333,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
     <div><span class="flag finfo">◷</span> The clocks change during the day.</div>
     <div><span class="sty">STYLE_FAST</span> Get me there quickly. <span class="sty">STYLE_ROUGH</span> Road less travelled, or the style set in Settings.</div>
     <div><span class="tdot" style="background:var(--warn)"></span> A dot on a day tab: something on that day needs a look.</div>
-    <p class="note">Every day is assumed to start with a full tank where a fuel station is within 5 km of the night stop, or where you've ticked "Fill up here tonight". Fuel, places and hospitals come from OpenStreetMap and can be wrong. Phone ahead on remote legs.</p>
+    <p class="note">We show where fuel is; we don't track your tank. Your bike range is used only to flag long stretches with no known fuel. Fuel, places and hospitals come from OpenStreetMap and can be wrong. Phone ahead on remote legs.</p>
     <div class="btns"><button class="btn" value="close">Close</button></div>
   </form>
 </dialog>
@@ -341,15 +341,13 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
   <form method="dialog" style="display:flex;flex-direction:column;gap:12px">
     <h2>Settings</h2>
     <div class="row2">
-      <div class="field"><label class="lbl" for="range">Range on a full tank (km)</label><input id="range" type="number" min="60" max="1200" step="5" value="200"></div>
-      <div class="field"><label class="lbl" for="reserve">Arrive with at least (km)</label><input id="reserve" type="number" min="0" max="300" step="5" value="30"></div>
+      <div class="field" style="grid-column:1/-1"><label class="lbl" for="range">Bike range (km)</label><input id="range" type="number" min="0" max="1200" step="5" value="200"><span class="note">Used only to flag stretches with no known fuel that are longer than your bike can ride. We show where fuel is; we don't track your tank. Set 0 to turn the flags off.</span></div>
     </div>
     <div class="row2">
       <div class="field"><label class="lbl" for="leave">Leave each day at</label><input id="leave" type="time" value="08:00"></div>
       <div class="field"><label class="lbl" for="pace">Slower than normal by (%)</label><input id="pace" type="number" min="0" max="100" step="5" value="0"></div>
     </div>
     <div class="row2">
-      <div class="field"><label class="lbl" for="fuelMode">Fuel</label><select id="fuelMode"><option value="suggest">Suggest fuel stops and warn</option><option value="warn">Warn only</option><option value="off">Off</option></select></div>
       <div class="field"><label class="lbl" for="maxHours">Longest riding day (hours)</label><input id="maxHours" type="number" min="2" max="16" step="0.5" value="8"></div>
       <div class="field"><label class="lbl" for="breakMin">Each stop takes (minutes)</label><input id="breakMin" type="number" min="0" max="240" step="5" value="20"></div>
     </div>
@@ -613,7 +611,7 @@ const DEFAULT_TRIP_OLD={startDate:tomorrow,endDate:addDays(tomorrow,1),start:pt(
 const trip=store.get("rr4-trip")||migrate()||freshTrip();
 if(trip.startDate<ymd(new Date())){const n=trip.days.length;trip.startDate=tomorrow;trip.endDate=addDays(tomorrow,n-1);}
 
-const SET_FIELDS=["range","reserve","leave","pace","corridor","style","fuelMode","maxHours","breakMin"];
+const SET_FIELDS=["range","leave","pace","corridor","style","maxHours","breakMin"];
 const settings=Object.assign({range:200,reserve:30,leave:"08:00",pace:0,corridor:5,style:"rough",fuelMode:"suggest",maxHours:8,breakMin:20},store.get("rr2-settings")||{});
 const ui=Object.assign({types:Object.fromEntries(TYPES.map(t=>[t.id,t.on])),max:"10",fuelAll:false,fuelSugg:true,sleep:false},store.get("rr4-ui")||{});
 ui.tab=ui.tab??"ov"; delete ui._lastSel;
@@ -667,47 +665,34 @@ async function recalc(){
 }
 
 /* ---------- fuel ---------- */
+/* fuel: riders fill up wherever there's fuel. We only flag stretches with no known fuel longer than the bike's range. */
 function fuelPlan(){
-  const range=+settings.range,reserve=+settings.reserve,total=plan.total;
-  const mine=[]; plan.days.forEach(d=>{if(!d)return; d.pts.slice(1,-1).forEach(p=>{if(stopFuel(p)&&plan.ptKm.has(p)) mine.push({id:"me"+mine.length,lat:p.lat,lon:p.lon,name:p.name,km:plan.ptKm.get(p),mine:true});});});
-  plan.days.forEach((d,k)=>{ if(!d||k>=nDays()-1) return; const nt=d.pts[d.pts.length-1], km=plan.ptKm.get(nt);
-    if(km!=null&&(nt.fill||fuelAll.some(f=>hav(f,nt)<=5))) mine.push({id:"night"+k,lat:nt.lat,lon:nt.lon,name:nt.name+" (overnight fill)",km,mine:true,night:true}); });
-  mine.sort((a,b)=>a.km-b.km);
-  const st=[...mine,...(placesOk?fuelStations:[])].sort((a,b)=>a.km-b.km).filter((x,i,a)=>!a.slice(0,i).some(o=>Math.abs(o.km-x.km)<1));
-  let pos=0,tank=range,guard=0; const fills=[],gaps=[];
-  const use=s=>{tank-=s.km-pos; fills.push(Object.assign({},s,{arrive:tank})); pos=s.km; tank=range;};
-  while(pos<total&&guard++<500){
-    const nextMine=mine.find(m=>m.km>pos+0.3&&m.km<=pos+tank);
-    if(pos+tank-reserve>=total&&!nextMine) break;
-    if(nextMine){use(nextMine);continue;}
-    const reach=st.filter(s=>s.km>pos+0.3&&s.km<=pos+tank-reserve);
-    if(reach.length){use(reach[reach.length-1]);continue;}
-    const next=st.find(s=>s.km>pos+0.3);
-    if(!next||next.km>pos+tank){gaps.push({from:pos,to:next?next.km:total}); if(!next) break;}
-    use(Object.assign({},next,{tight:true}));
-  }
-  const tankAt=km=>{let p=0,t=range;for(const f of fills){if(f.km>km)break;t-=f.km-p;p=f.km;t=range;}return t-(km-p);};
-  return {fills,gaps,tankAt};
+  const range=+settings.range||0, total=plan.total, marks=[];
+  plan.days.forEach(d=>{ if(!d) return; d.pts.forEach((p,i)=>{ const km=i===0?d.a:d.legs[i-1].b; marks.push({km,name:p.name}); }); });
+  const nameAt=(km,fb)=>{ let best=null,bd=6; marks.forEach(m=>{const dd=Math.abs(m.km-km); if(dd<bd){bd=dd;best=m.name;}}); return best||fb; };
+  const fills=(placesOk?fuelStations:[]).map(f=>({id:f.id,km:f.km,lat:f.lat,lon:f.lon,name:f.name&&f.name!=="Fuel"?f.name:"Fuel station",tags:f.tags,st:true}));
+  const pts=[{km:0,name:trip.start?trip.start.name:"start"},...fills];
+  plan.days.forEach(d=>{ if(!d) return; d.pts.slice(1,-1).forEach((p,i)=>{ if(p.fuelHere||p.type==="fuel") pts.push({km:d.legs[i].b,name:p.name}); }); });
+  pts.sort((x,y)=>x.km-y.km); pts.push({km:total,name:endPt()?endPt().name:"finish",end:true});
+  const gaps=[];
+  if(range>0) for(let i=1;i<pts.length;i++){ const a=pts[i-1], b=pts[i]; if(b.km-a.km>range) gaps.push({from:a.km,to:b.km,fromName:nameAt(a.km,a.name),toName:b.end?b.name:nameAt(b.km,b.name)}); }
+  return {fills,gaps};
 }
 function rangeFuel(a,b){
-  if(settings.fuelMode==="off"||!fp) return null;
-  let min=Infinity; for(let k=a;k<b;k+=1) min=Math.min(min,fp.tankAt(k)); min=Math.min(min,fp.tankAt(Math.max(a,b-0.01)));
-  const gap=fp.gaps.find(g=>g.from<b&&g.to>a);
-  if(min<0) return {level:"bad",short:gap?`${Math.round(gap.to-gap.from)} km`:"Dry",text:gap?`${Math.round(gap.to-gap.from)} km with no fuel known.`:"Runs dry before the end of this stretch."};
-  if(min<+settings.reserve) return {level:"warn",short:`${Math.round(min)} km`,text:`Down to ${Math.round(min)} km of fuel, below your ${settings.reserve} km reserve.`};
-  return {level:"",short:"",text:`Never below ${Math.round(min)} km of fuel.`};
+  if(!fp||!(+settings.range>0)) return null;
+  const g=fp.gaps.find(g=>g.from<b-0.1&&g.to>a+0.1); if(!g) return null;
+  const len=Math.round(g.to-g.from);
+  return {level:"bad",short:`${len} km`,text:`No fuel known for ${len} km, ${g.fromName} to ${g.toName}. That's longer than your ${settings.range} km range. Fuel may exist that the map doesn't show: ask locally, plan fuel before it, or carry extra.`};
 }
 function fuelPill(f){
-  if(settings.fuelMode==="off") return "";
-  if(!f) return `<span class="pill foff" title="Checking fuel">${ICON.fuel}…</span>`;
-  return `<span class="pill ${f.level==="bad"?"fbad":f.level==="warn"?"fwarn":"fok"}" title="${esc(f.text)}">${ICON.fuel}${esc(f.short)}</span>`;
+  if(!f) return "";
+  return `<span class="pill fbad" title="${esc(f.text)}">${ICON.fuel}No fuel ${esc(f.short)}</span>`;
 }
 const distPill=(km,min,attrs)=>`<span class="pill dist" ${attrs||""} title="Show on the map">${Math.round(km)} km · ${fmtDur(min)}</span>`;
 function dayMinutes(k){
   const d=plan&&plan.days[k]; if(!d) return 0;
   const pace=1+(+settings.pace||0)/100, stopMin=d.pts.slice(1,-1).reduce((t,p)=>t+breakOf(p),0);
-  const auto=settings.fuelMode==="suggest"&&fp?fp.fills.filter(f=>!f.mine&&f.km>d.a&&f.km<=d.b).length:0;
-  return d.min*pace+stopMin+auto*10;
+  return d.min*pace+stopMin;
 }
 
 /* ---------- search wiring ---------- */
@@ -911,7 +896,7 @@ function routeSketch(){
 function printHtml(){
   const n=nDays(), tot=plan.days.reduce((t,d)=>t+(d?d.km:0),0), ride=plan.days.reduce((t,d,k)=>t+(d?dayMinutes(k):0),0);
   const fin=trip.round?trip.start.name:endPt().name;
-  const fuelTxt=f=>!f||!f.level?"OK":f.level==="warn"?`${f.short} left`:`No fuel ${f.short}`;
+  const fuelTxt=f=>f?`No fuel ${f.short}`:"—";
   const lnk=(t,name,town)=>{ t=t||{}; const w=t.website?(/^https?:/.test(t.website)?t.website:"https://"+t.website):`https://www.google.com/search?q=${encodeURIComponent(name+" "+(town||""))}`; return `${t.phone?esc(t.phone)+" · ":""}<a href="${esc(w)}">${t.website?"website":"find online"}</a>`; };
   let h=`<section class="pcover"><h1>${esc(trip.start.name)} → ${esc(fin)}</h1>
     <p class="pmeta">${esc(dayLong(0))}${n>1?` to ${esc(dayLong(n-1))}`:""} · ${n} day${n>1?"s":""} · ${Math.round(tot).toLocaleString()} km · about ${fmtDur(ride)} riding</p>
@@ -923,7 +908,7 @@ function printHtml(){
     h+=`<tr class="${r&&r.level!=="ok"?r.level:""}"><td><b>${esc(dayName(k))}</b></td><td>${vias.length?`<b class="via">via</b> <b>${vias.map(v=>esc(v.name)).join(", ")}</b> → `:"→ "}<b>${esc(to.name)}</b>${k<n-1?" (night)":""}</td>
       <td class="num">${Math.round(d.km)}</td><td class="num">${fmtDur(dayMinutes(k))}</td><td class="${f&&f.level?f.level:""}">${esc(fuelTxt(f))}</td><td>${s!=null?fmtT(s):"?"}</td><td>${w&&!w.none?`${esc(WXW(w.code))} ${Math.round(w.tmin)}–${Math.round(w.tmax)}°C`:"—"}</td><td>${esc(notes.join(", "))||"—"}</td></tr>`;
   });
-  h+=`</tbody></table><p class="pnote">Every day is assumed to start with a full tank where a fuel station is within 5 km of the night stop. Fuel, places and hospitals come from OpenStreetMap and can be wrong: phone ahead on remote legs. Emergency from a mobile: 112.</p></section>`;
+  h+=`</tbody></table><p class="pnote">Fuel is shown where the map knows it. "No fuel" marks a stretch with no known fuel that's longer than your ${esc(String(settings.range))} km range: fuel may still exist, so ask locally. Places and hospitals come from OpenStreetMap and can be wrong: phone ahead on remote legs. Emergency from a mobile: 112.</p></section>`;
   plan.days.forEach((d,k)=>{ if(!d) return;
     const from=d.pts[0], to=d.pts[d.pts.length-1], last=k===n-1, r=dayRisk(k), m=dayMed(k);
     const fills=fp?fp.fills.filter(f=>f.km>d.a+0.3&&f.km<=d.b+0.3):[];
@@ -935,7 +920,7 @@ function printHtml(){
       h+=`<tr><td><b>${esc(p.name)}</b>${j===d.pts.length-1?(last?" (finish)":" (night stop)"):""}</td><td class="num">${Math.round(d.legs[j-1].b-d.a)}</td><td>${esc(here)||"Nothing known within 1 km"}</td></tr>`; });
     h+=`</tbody></table>`;
     // fuel
-    h+=`<h3>Fuel</h3>`+(fills.length?`<ul>${fills.map(f=>{ const x=fuelAll.find(q=>hav(q,f)<0.3)||f, t=x.tags||{}, g=gradesTxt(t); return `<li>km ${Math.round(f.km-d.a)}: <b>${esc(f.name&&f.name!=="Fuel"?f.name:"Fuel station")}</b>${g?" · "+esc(g):""}${t.hours?" · "+esc(t.hours):""}${t.phone?" · "+esc(t.phone):""}</li>`; }).join("")}</ul>`:`<p>No fuel stop needed.</p>`);
+    h+=`<h3>Fuel on the way</h3>`+(fills.length?`<ul>${fills.map(f=>{ const x=fuelAll.find(q=>hav(q,f)<0.3)||f, t=x.tags||{}, g=gradesTxt(t); return `<li>km ${Math.round(f.km-d.a)}: <b>${esc(f.name&&f.name!=="Fuel"?f.name:"Fuel station")}</b>${g?" · "+esc(g):""}${t.hours?" · "+esc(t.hours):""}${t.phone?" · "+esc(t.phone):""}</li>`; }).join("")}</ul>`:`<p>None known on the route.</p>`);
     // night
     if(!(last&&trip.round)){ const sf=stayFor(to), pl=sf?sf.places:[], chosen=pl.find(p=>hav(p,to)<0.2);
       h+=`<h3>${last?"Finish":"Night"}: ${esc(to.name)}</h3>`;
@@ -975,11 +960,14 @@ function toCell(k){
   if(editTo.has(k)||!cur) return searchBox(id,cur,last?"Pick where you finish":"Pick where you sleep");
   return `<button type="button" class="tolink" data-editto="${k}" title="Tap to change">${esc(cur)}</button>`;
 }
-function fuelBtn(k){ const pd=plan.days[k]; return `<button type="button" class="fbtn" data-fuelk="${k}" title="Fuel stops for the day">${fuelPill(rangeFuel(pd.a,pd.b))}</button>`; }
+function fuelBtn(k){ const pd=plan.days[k], f=rangeFuel(pd.a,pd.b), n=fp?fp.fills.filter(x=>x.km>=pd.a-0.3&&x.km<=pd.b+0.3).length:0;
+  return `<button type="button" class="fbtn" data-fuelk="${k}" title="Fuel on the way">${f?fuelPill(f):`<span class="pill foff">${ICON.fuel}${n}</span>`}</button>`; }
 function fuelList(k){
   if(!fuelOpen.has(k)||!plan||!plan.days[k]||!fp) return "";
-  const pd=plan.days[k], fills=fp.fills.filter(f=>f.km>pd.a+0.3&&f.km<=pd.b+0.3);
-  return `<div class="risklist">${fills.length?fills.map(f=>`<div class="frow"><span>km ${Math.round(f.km-pd.a)}: <b>${esc(f.name&&f.name!=="Fuel"?f.name:"Fuel station")}</b>${f.mine?" (your stop)":""}</span>${f.mine?"":`<button class="btn small ghost" type="button" data-addfill="${f.id}" data-day="${k}">Add</button>`}</div>`).join(""):`<div class="rinfo">No fuel stop needed today.</div>`}</div>`;
+  const pd=plan.days[k], gaps=fp.gaps.filter(g=>g.from<pd.b-0.1&&g.to>pd.a+0.1), st=fp.fills.filter(f=>f.km>=pd.a-0.3&&f.km<=pd.b+0.3);
+  let h=gaps.map(g=>`<div class="verdict v-bad">No fuel known for ${Math.round(g.to-g.from)} km, ${esc(g.fromName)} to ${esc(g.toName)}. Fuel may exist that the map doesn't show: ask locally, plan fuel before it, or carry extra.</div>`).join("");
+  h+=`<div class="rinfo"><b>Fuel on the way</b> ${st.length}</div>`+(st.length?st.map(f=>{const t=f.tags||{}, g=gradesTxt(t); return `<div class="frow"><span>km ${Math.max(0,Math.round(f.km-pd.a))}: <b>${esc(f.name)}</b>${g?" · "+esc(g):""}${t.hours?` · <span class="note">${esc(t.hours)}</span>`:""}${t.phone?` · <a href="tel:${esc(String(t.phone).replace(/[^\d+]/g,""))}">${esc(t.phone)}</a>`:""}</span><button class="btn small ghost" type="button" data-addfill="${f.id}" data-day="${k}">Add as a stop</button></div>`;}).join(""):`<div class="rinfo">None known on the route today.</div>`);
+  return `<div class="risklist">${h}</div>`;
 }
 function storyLine(k,big){
   const pd=plan&&plan.days[k], d=trip.days[k], r=pd?dayRisk(k):null;
@@ -1003,8 +991,6 @@ function stayRows(k){
   const last=k===nDays()-1, to=dayTo(k); if(!to||(last&&trip.round)) return "";
   const sf=stayFor(to), all=sf?sf.places:[], key="stay-"+k, list=showAll.has(key)?all:all.slice(0,10);
   let h=`<section class="dsec"><h3>Where to stay in ${esc(to.name)} <span class="note">${placesOk?all.length:"…"}</span></h3>`;
-  if(!last){ const auto=fuelAll.some(f=>hav(f,to)<=5);
-    h+=auto?`<div class="note">Fuel within 5 km, so the next day starts with a full tank.</div>`:`<label class="chk"><input type="checkbox" data-nightfill="${k}" ${to.fill?"checked":""}> Fill up here tonight, so the next day starts with a full tank</label>`; }
   h+=list.length?`<div class="stable">${list.map(p=>`<div class="srow"><div><b>${esc(p.name)}</b><span class="note">${esc((p.tags.tourism||"").replace("_"," "))} · ${p.dist.toFixed(1)} km</span></div>
       <div class="sact">${linksHtml(p.tags,p.name,to.name)}${!last?`<button class="linkbtn" type="button" data-staynight="${k}:${esc(p.id)}">Stay here</button>`:""}</div></div>`).join("")}</div>`
     :`<div class="note">${placesOk?"Nothing listed within 15 km. Phone the town's info office or check booking sites.":"Loading…"}</div>`;
@@ -1128,7 +1114,7 @@ function stopDetail(k,j,cat){
     const sc=scope(k,j), way=fuelAll.filter(f=>f.km!=null&&f.km>=sc.a-0.5&&f.km<=sc.b+0.5&&hav(f,p)>1).sort((a,b)=>a.km-b.km);
     const sights=panelItems(k,j,"sight");
     h+=`<h4 class="sub">On the way in from ${esc(pd.pts[j-1].name)}</h4>`;
-    h+=way.length?listBlock("Fuel along the way",AV[0][1],way,`wf-${k}-${j}`,x=>placeRow(x,k,j,`<button class="linkbtn" type="button" data-sfuel="${k}:${j}:${esc(x.id)}">Fill up here</button>`)):`<div class="note">No other fuel known on this stretch.</div>`;
+    h+=way.length?listBlock("Fuel along the way",AV[0][1],way,`wf-${k}-${j}`,x=>placeRow(x,k,j,`<button class="linkbtn" type="button" data-sfuel="${k}:${j}:${esc(x.id)}">Add as a stop</button>`)):`<div class="note">No other fuel known on this stretch.</div>`;
     if(sights.length) h+=listBlock("Sights and viewpoints","★",sights,`s-${k}-${j}`,x=>placeRow(Object.assign({},x,{kind:"sight"}),k,j,`<button class="linkbtn" type="button" data-sadd="${k}:${j}:${esc(x.id)}">Add</button>`));
   }
   return h+`</div>`;
@@ -1160,7 +1146,7 @@ function dayBody(k){
   const pd=plan&&plan.days[k];
   let h=stopList(k);
   if(!pd) return h;
-  if(!placesOk&&settings.fuelMode!=="off") h+=`<div class="verdict v-warn">Station data isn't loaded. Fuel is checked against your own fuel stops only.</div>`;
+  if(!placesOk) h+=`<div class="verdict v-warn">Fuel stations didn't load, so long stretches without fuel can't be checked. Check your connection and reload.</div>`;
   const m=dayMed(k);
   if(m) h+=`<details class="medbox"><summary><span class="lbl">Medical</span> ${m.near.length} hospital${m.near.length===1?"":"s"} and clinics near the route · furthest point ${fmtFar(m.far)} km from a hospital</summary>
     ${m.near.map(x=>`<div class="item"><div class="meta"><b>${esc(x.name||(x.type==="hospital"?"Hospital":"Clinic"))}</b><span class="note">${x.type==="hospital"?"Hospital":"Clinic"} · km ${Math.round(x.km-pd.a)} · ${x.off<0.5?"on the route":x.off.toFixed(1)+" km off"}${x.phone?` · <a href="tel:${esc(x.phone.replace(/[^\d+]/g,""))}">${esc(x.phone)}</a>`:""}</span></div></div>`).join("")||`<div class="note">None listed within 25 km of the route.</div>`}
@@ -1284,9 +1270,6 @@ function renderPanel(){
   $("pTabs").innerHTML=Object.entries(TABS).filter(([x])=>x!=="food"||ui.types.food).map(([x,v])=>`<button type="button" class="tab ${x===tab?"on":""}" data-tab="${x}">${ICON[x]}${v} <span class="note">${panelItems(k,j,x).length}</span></button>`).join("");
   const items=panelItems(k,j,tab); let h="";
   if(tab==="fuel"&&sc.jj>0){const f=rangeFuel(sc.a,sc.b); if(f&&f.level) h+=`<div class="verdict ${f.level==="bad"?"v-bad":"v-warn"}">${esc(f.text)}</div>`;}
-  if(tab==="fuel"&&isNight){const auto=fuelAll.some(f=>hav(f,p)<=5);
-    h+=auto?`<div class="note">A station is within 5 km, so ${esc(dayDate(k+1).toLocaleDateString(undefined,{weekday:"long"}))} starts with a full tank.</div>`
-      :`<label class="chk"><input type="checkbox" data-pfill ${p.fill?"checked":""}> Fill up here tonight, so ${esc(dayDate(k+1).toLocaleDateString(undefined,{weekday:"long"}))} starts with a full tank</label>`;}
   if(tab==="stay") h+=`<div class="note">Within 15 km of ${esc(p.name)}, from OpenStreetMap. Prices aren't listed, so phone or check the website.</div>`;
   h+=items.length?items.map(x=>{
     const where=tab==="stay"?`${esc((x.tags.tourism||"").replace("_"," "))} · ${x.dist.toFixed(1)} km from town`:x.km!=null?`${x.off<0.3?"on the route":x.off.toFixed(1)+" km off"}`:"";
@@ -1331,7 +1314,7 @@ function drawMap(){
     const m=L.marker([p.lat,p.lon],{icon:dotIcon(night?"#2F5BA8":stopFuel(p)?"#0B6E4F":"#18201C",night||key?16:12,stopFuel(p))}).bindTooltip(p.name,key?{permanent:true,direction:"right",offset:[10,0],className:"maplbl"}:{}).addTo(layer);
     m.on("click",()=>{ const k=trip.days.findIndex((d,i)=>plan.days[i]&&plan.days[i].pts.includes(p)&&(sel?i===ui.tab:true)); if(k<0) return; const j=plan.days[k].pts.indexOf(p); ui.tab=k; stopFocus={k,j}; saveUi(); renderAll(); });
   });
-  if(fp&&settings.fuelMode==="suggest"&&ui.fuelSugg) fp.fills.filter(f=>!f.mine&&inR(f)).forEach(f=>L.marker([f.lat,f.lon],{icon:dotIcon("#0B6E4F",11,true)}).bindTooltip("Suggested fuel: "+f.name).addTo(layer));
+  if(fp&&ui.fuelSugg) fp.fills.filter(f=>inR(f)).forEach(f=>L.marker([f.lat,f.lon],{icon:dotIcon("#0B6E4F",11,true)}).bindTooltip("Suggested fuel: "+f.name).addTo(layer));
   if(ui.fuelAll) fuelStations.filter(inR).forEach(f=>L.marker([f.lat,f.lon],{icon:dotIcon("#ffffff",8,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
   pois.filter(p=>ui.types[p.kind]&&inR(p)).sort((a,b)=>a.off-b.off).slice(0,+ui.max).forEach(p=>{const t=TYPES.find(x=>x.id===p.kind); L.marker([p.lat,p.lon],{icon:dotIcon(t.c,10)}).bindTooltip(`${p.name} · ${t.n}`).addTo(layer);});
   if(ui.sleep) stays.forEach(s=>{ if(!trip.days.some((d,k)=>d.to===s.night&&k<nDays()-1)) return; s.places.forEach(p=>L.marker([p.lat,p.lon],{icon:dotIcon("#2F5BA8",9)}).bindTooltip(p.name).addTo(layer)); });
@@ -1352,7 +1335,7 @@ function drawPanelLayer(){
 function renderLayers(){
   const box=(id,on,label,dot)=>`<label><input type="checkbox" data-layer="${id}" ${on?"checked":""}>${dot}${label}</label>`;
   const sq=c=>`<span class="dot" style="background:${c};border-radius:2px;border:1px solid #18201C"></span>`;
-  $("layers").innerHTML=box("fuelSugg",ui.fuelSugg,"Suggested fuel stops",sq("#0B6E4F"))+box("fuelAll",ui.fuelAll,"All fuel stations",sq("#ffffff"))+box("sleep",ui.sleep,"Places to stay at night stops",`<span class="dot" style="background:#2F5BA8"></span>`)
+  $("layers").innerHTML=box("fuelSugg",ui.fuelSugg,"Fuel on the route",sq("#0B6E4F"))+box("fuelAll",ui.fuelAll,"All fuel stations",sq("#ffffff"))+box("sleep",ui.sleep,"Places to stay at night stops",`<span class="dot" style="background:#2F5BA8"></span>`)
     +TYPES.map(t=>box("t-"+t.id,ui.types[t.id],t.n,`<span class="dot" style="background:${t.c}"></span>`)).join("")
     +`<label>Show up to <select data-max style="width:auto;padding:3px 6px">${[["10","10"],["25","25"],["50","50"],["1000","All"]].map(([v,l])=>`<option value="${v}" ${ui.max===v?"selected":""}>${l}</option>`).join("")}</select></label>`;
 }
@@ -1363,7 +1346,7 @@ document.addEventListener("click",e=>{const b=$("layersBox"); if(b.open&&!b.cont
 function downloadGpx(k){
   const pd=plan.days[k]; if(!pd) return; const from=pd.pts[0], to=pd.pts[pd.pts.length-1];
   const name=`${dayName(k)} ${from.name} to ${to.name}`, g=seg(pd.a,pd.b);
-  const w=[...pd.pts.slice(1).map(p=>({lat:p.lat,lon:p.lon,n:p.name})),...(fp&&settings.fuelMode==="suggest"?fp.fills.filter(f=>!f.mine&&f.km>pd.a&&f.km<=pd.b).map(f=>({lat:f.lat,lon:f.lon,n:"Fuel "+f.name})):[])];
+  const w=[...pd.pts.slice(1).map(p=>({lat:p.lat,lon:p.lon,n:p.name})),...(fp?fp.fills.filter(f=>f.km>pd.a&&f.km<=pd.b).map(f=>({lat:f.lat,lon:f.lon,n:"Fuel "+f.name})):[])];
   const text=`<?xml version="1.0" encoding="UTF-8"?>
 <gpx version="1.1" creator="Route and Range" xmlns="http://www.topografix.com/GPX/1/1">
 ${w.map(p=>`  <wpt lat="${p.lat.toFixed(5)}" lon="${p.lon.toFixed(5)}"><name>${esc(p.n)}</name></wpt>`).join("\n")}
@@ -1389,7 +1372,7 @@ $("settings").addEventListener("close",()=>{
   SET_FIELDS.forEach(id=>settings[id]=$(id).value); store.set("rr2-settings",settings);
   showStyle(); reroute?recalc():renderAll();
 });
-const STYLE_TEXT={rough:"<b>Road less travelled:</b> gravel and back roads first. For the quick way, pick the motorway sign under Edit route.",mixed:"<b>Mixed:</b> gravel where it saves time, tar where it doesn't.",tar:"<b>Tar:</b> main roads and highways."};
+const STYLE_TEXT={rough:"<b>Road less travelled:</b> gravel and back roads first. For the quick way, pick the motorway sign on that day.",mixed:"<b>Mixed:</b> gravel where it saves time, tar where it doesn't.",tar:"<b>Tar:</b> main roads and highways."};
 function showStyle(){ $("styleBanner").innerHTML=STYLE_TEXT[settings.style]||STYLE_TEXT.rough; }
 function render(){ renderAll(); }
 function renderAll(){
