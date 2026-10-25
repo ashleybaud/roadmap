@@ -292,6 +292,11 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .dhdetail{border:1px solid var(--line);border-radius:6px}
 .mapq{width:16px;height:16px;border-radius:50%;background:#fff;border:2px solid #B3261E;color:#B3261E;font:700 10px/12px sans-serif;text-align:center}
 .maplbl.q{color:#B3261E;border-color:#B3261E}
+.sugg2{display:flex;flex-direction:column;gap:6px;font-size:.9rem}
+.thru{line-height:1.8}
+.thru .tw.on{font-weight:700}
+.sgl{display:flex;flex-wrap:wrap;align-items:center;gap:6px 14px}
+.sgi{display:inline-flex;align-items:center;gap:6px}
 </style>
 </head>
 <body>
@@ -334,9 +339,9 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
   <form method="dialog" class="keylist">
     <h2>What the icons mean</h2>
     <div><span class="pill foff">FUEL 4</span> Fuel stations on the route that day. Tap for the list.</div>
-    <div><span class="pill fbad">FUEL Fuel unconfirmed 523 km</span> A stretch with no fuel on our map that's longer than your bike's range. Small towns on the way may have fuel: they show on the map with a red <span class="mapq" style="display:inline-block">?</span>. Check before you go.</div>
+    <div><b>Suggested stops:</b> towns with fuel (⛽), and food (🍴) where possible, spaced by your "Stop at least every" setting. Tap Add to route through them.</div>
+    <div><span class="pill fwarn">FUEL Check fuel</span> No town with fuel on our map within that distance. Small towns may still have fuel: ask locally or carry extra.</div>
     <div>Know a place has fuel? Open the stop and tick "Fuel here (not on our map)".</div>
-    <div>⛽ on a stop: fuel within 1 km. Tap it to see the stations in the area.</div>
     <div><span class="pill dist long">526 km · 9h30</span> Orange: more riding than your daily limit in Settings.</div>
     <div><span class="sun swarn">☼ 19:02</span> Orange: you'd arrive within an hour of sunset. <span class="sun sbad">☼ 19:02</span> Red: after dark.</div>
     <div><span class="flag fwarn">☂</span> Weather: storms, strong wind, heat, near freezing or rain. Red is serious.</div>
@@ -345,7 +350,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
     <div><span class="flag finfo">◷</span> The clocks change during the day.</div>
     <div><span class="sty">STYLE_FAST</span> Get me there quickly. <span class="sty">STYLE_ROUGH</span> Road less travelled, or the style set in Settings.</div>
     <div><span class="tdot" style="background:var(--warn)"></span> A dot on a day tab: something on that day needs a look.</div>
-    <p class="note">We show where fuel is; we don't track your tank. Your bike range is used only to flag long stretches with no known fuel. Fuel, places and hospitals come from OpenStreetMap and can be wrong. Phone ahead on remote legs.</p>
+    <p class="note">We show where fuel is; we don't track your tank. Suggested stops use your "Stop at least every" setting. Fuel, places and hospitals come from OpenStreetMap and can be wrong. Phone ahead on remote legs.</p>
     <div class="btns"><button class="btn" value="close">Close</button></div>
   </form>
 </dialog>
@@ -353,7 +358,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
   <form method="dialog" style="display:flex;flex-direction:column;gap:12px">
     <h2>Settings</h2>
     <div class="row2">
-      <div class="field" style="grid-column:1/-1"><label class="lbl" for="range">Bike range (km)</label><input id="range" type="number" min="0" max="1200" step="5" value="200"><span class="note">Used only to flag stretches with no known fuel that are longer than your bike can ride. We show where fuel is; we don't track your tank. Set 0 to turn the flags off.</span></div>
+      <div class="field" style="grid-column:1/-1"><label class="lbl" for="range">Stop at least every (km)</label><input id="range" type="number" min="0" max="1200" step="5" value="150"><span class="note">How far you or your bike can go before you need fuel, food or a rest. We suggest towns with fuel at about this spacing. Set 0 to turn suggestions off.</span></div>
     </div>
     <div class="row2">
       <div class="field"><label class="lbl" for="leave">Leave each day at</label><input id="leave" type="time" value="08:00"></div>
@@ -529,10 +534,12 @@ async function loadLocal(my){
   const fuel=await localKind("fuel",ccs); if(!fuel) return null;
   if(my!==seq) return;
   const extra=await fetch("/data/extra-fuel.json").then(r=>r.ok?r.json():[]).catch(()=>[]);
+  fuelRowsAll=[...fuel.map(r=>({lat:r[0],lon:r[1]})),...extra.map(x=>({lat:x.lat,lon:x.lon}))];
   fuelAll=[...nearRoute(fuel,"fuel",10),...extra.map((x,k)=>Object.assign({id:"x"+k,lat:x.lat,lon:x.lon,name:x.name,kind:"fuel",note:x.note,tags:{}},locate(x,plan.geom,plan.cum)))].filter(p=>p.off<=10);
   fuelStations=fuelAll.filter(p=>p.off<=5).sort((a,b)=>a.km-b.km); placesOk=true; render();
   const corridor=Math.max(1,+settings.corridor); let all=[];
-  for(const k of ["view","pass","sight","food","camp"]){ const rows=await localKind(k,ccs); if(rows) all.push(...nearRoute(rows,k,corridor)); }
+  for(const k of ["view","pass","sight","food","camp"]){ const rows=await localKind(k,ccs); if(rows){ all.push(...nearRoute(rows,k,corridor)); if(k==="food") foodRowsAll=rows.map(r=>({lat:r[0],lon:r[1]})); } }
+  if(plan) plan._cands=null;
   pois=all.filter(p=>p.off<=corridor+0.5);
   const stopPts=townPoints(); amen=[];
   for(const k of ["shop","toilets","cash","repair"]){ const rows=await localKind(k,ccs); if(!rows) continue;
@@ -552,7 +559,7 @@ async function loadPlaces(my){
   return loadRemote(my);
 }
 async function loadRemote(my){
-  meds=null; fords=null; amen=[];
+  meds=null; fords=null; amen=[]; fuelRowsAll=null; foodRowsAll=null;
   const nights=townPoints();
   const fb=boxes(2.5), pb=boxes(Math.max(1,+settings.corridor));
   // 1. fuel first: it decides whether the ride works
@@ -679,19 +686,45 @@ async function recalc(){
 /* ---------- fuel ---------- */
 let townList=null; allTowns().then(t=>{ townList=t.filter(x=>x.place!=="hamlet"); if(plan) renderAll(); }).catch(()=>{});
 /* fuel: riders fill up wherever there's fuel. We only flag stretches with no known fuel longer than the bike's range. */
+/* fuel: we suggest towns to stop in (fuel, preferably food) at least every "stop every" km.
+   Towns on the route first; if none, the nearest one off the route with the detour. */
+let fuelRowsAll=null, foodRowsAll=null;
+function stopTowns(){
+  if(!plan||!townList) return [];
+  if(plan._cands) return plan._cands;
+  const g=plan.geom, c=plan.cum, step=Math.max(1,Math.floor(g.length/2000)), out=[];
+  let s=90,w=180,n=-90,e=-180; g.forEach(p=>{s=Math.min(s,p.lat);n=Math.max(n,p.lat);w=Math.min(w,p.lon);e=Math.max(e,p.lon);});
+  const fuelSrc=fuelRowsAll||fuelAll, foodSrc=foodRowsAll||pois.filter(x=>x.kind==="food");
+  townList.forEach(t=>{ if(t.lat<s-0.45||t.lat>n+0.45||t.lon<w-0.5||t.lon>e+0.5) return;
+    let bd=99,bi=-1; for(let i=0;i<g.length;i+=step){const d=hav(t,g[i]); if(d<bd){bd=d;bi=i;}}
+    if(bi<0||bd>40) return;
+    const fuel=fuelSrc.some(f=>Math.abs(f.lat-t.lat)<0.04&&hav(f,t)<=3), food=foodSrc.some(f=>Math.abs(f.lat-t.lat)<0.03&&hav(f,t)<=2);
+    out.push({name:t.name,lat:t.lat,lon:t.lon,km:c[bi],off:bd,fuel,food,place:t.place}); });
+  out.sort((a,b)=>a.km-b.km); plan._cands=out.filter((t,i,a)=>!a.slice(0,i).some(o=>o.name===t.name&&Math.abs(o.km-t.km)<20)); return plan._cands;
+}
+function daySuggest(k){
+  const pd=plan&&plan.days[k], S=+settings.range||0; if(!pd||!placesOk) return {through:[],sugg:[],probs:[]};
+  const cands=stopTowns(), through=cands.filter(t=>t.off<=2&&t.km>=pd.a-1&&t.km<=pd.b+1);
+  const own=pd.pts.slice(1,-1).map((p,i)=>({p,km:pd.legs[i].b})).filter(x=>stopFuel(x.p));
+  const sugg=[], probs=[]; if(!(S>0)) return {through,sugg,probs};
+  let pos=pd.a, posName=pd.pts[0].name, guard=0;
+  while(pd.b-pos>S&&guard++<50){
+    const win=pos+S, o=own.filter(x=>x.km>pos+5&&x.km<=win).pop();
+    if(o){ pos=o.km; posName=o.p.name; continue; }
+    const on=cands.filter(t=>t.fuel&&t.off<=5&&t.km>pos+5&&t.km<=win);
+    if(on.length){ const f=on.filter(t=>t.food), pick=(f.length?f:on).reduce((x,y)=>y.km>x.km?y:x); sugg.push(pick); pos=pick.km; posName=pick.name; continue; }
+    const off=cands.filter(t=>t.fuel&&t.off>5&&t.km>pos+5&&t.km<=win);
+    if(off.length){ const pick=off.reduce((x,y)=>y.off<x.off?y:x); sugg.push(Object.assign({detour:true},pick)); pos=pick.km; posName=pick.name; continue; }
+    const next=cands.filter(t=>t.fuel&&t.km>win).sort((x,y)=>x.km-y.km)[0];
+    const to=next&&next.km<pd.b?next:null;
+    probs.push({from:pos,to:to?to.km:pd.b,fromName:posName,toName:to?to.name:pd.pts[pd.pts.length-1].name,towns:through.filter(t=>!t.fuel&&t.km>pos+3&&t.km<(to?to.km:pd.b)-3)});
+    if(!to) break; sugg.push(to); pos=to.km; posName=to.name;
+  }
+  return {through,sugg,probs};
+}
 function fuelPlan(){
-  const range=+settings.range||0, total=plan.total, marks=[];
-  plan.days.forEach(d=>{ if(!d) return; d.pts.forEach((p,i)=>{ const km=i===0?d.a:d.legs[i-1].b; marks.push({km,name:p.name}); }); });
-  const nameAt=(km,p)=>{ let best=null,bd=6; marks.forEach(m=>{const dd=Math.abs(m.km-km); if(dd<bd){bd=dd;best=m.name;}}); if(best) return best;
-    if(townList&&p.lat!=null){ let tn=null,td=15; townList.forEach(t=>{const dd=hav(t,p)+({city:0,town:0,village:4}[t.place]??8); if(dd<td){td=dd;tn=t.name;}}); if(tn) return tn; } return p.name; };
   const fills=(placesOk?fuelStations:[]).map(f=>({id:f.id,km:f.km,lat:f.lat,lon:f.lon,name:f.name&&f.name!=="Fuel"?f.name:"Fuel station",tags:f.tags,st:true}));
-  const pts=[{km:0,name:trip.start?trip.start.name:"start"},...fills];
-  if(!placesOk) return {fills,gaps:[],loading:true};
-  plan.days.forEach(d=>{ if(!d) return; d.pts.forEach((p,i)=>{ if(i>0&&(p.fuelHere||p.type==="fuel")) pts.push({km:d.legs[i-1].b,name:p.name}); }); });
-  pts.sort((x,y)=>x.km-y.km); pts.push({km:total,name:endPt()?endPt().name:"finish",end:true});
-  const gaps=[];
-  if(range>0) for(let i=1;i<pts.length;i++){ const a=pts[i-1], b=pts[i]; if(b.km-a.km>range) gaps.push({from:a.km,to:b.km,fromName:nameAt(a.km,a),toName:b.end?b.name:nameAt(b.km,b),towns:routeTowns().filter(t=>t.km>a.km+3&&t.km<b.km-3)}); }
-  return {fills,gaps};
+  return {fills,gaps:[],days:plan.days.map((d,k)=>d?daySuggest(k):null)};
 }
 /* small towns within 5 km of the route, so a rider can judge a long stretch for themselves */
 function routeTowns(){
@@ -706,6 +739,12 @@ const gapTowns=g=>(g.towns||[]).filter(t=>t.name!==g.fromName&&t.name!==g.toName
 const townsTxt=g=>gapTowns(g).length?` Towns on the way that may have fuel: ${gapTowns(g).slice(0,6).map(t=>t.name).join(", ")}${gapTowns(g).length>6?` and ${gapTowns(g).length-6} more`:""}.`:"";
 function gapText(g){ const len=Math.round(g.to-g.from); return `${len} km with no fuel on our map, ${g.fromName} to ${g.toName}. That's longer than your ${settings.range} km range.${townsTxt(g)} Check before you go.`; }
 function rangeFuel(a,b){
+  if(!fp||!fp.days) return null;
+  const k=plan.days.findIndex(d=>d&&Math.abs(d.a-a)<0.5&&Math.abs(d.b-b)<0.5); if(k<0) return null;
+  const pr=fp.days[k]&&fp.days[k].probs[0]; if(!pr) return null; const len=Math.round(pr.to-pr.from);
+  return {level:"warn",short:`${len} km`,text:`No town with fuel on our map for ${len} km, ${pr.fromName} to ${pr.toName}.${pr.towns.length?` ${pr.towns.map(t=>t.name).join(", ")} on the way may have fuel.`:""} Ask locally or carry extra.`};
+}
+function rangeFuelOld(a,b){
   if(!fp||!(+settings.range>0)) return null;
   const g=fp.gaps.find(g=>g.from<b-0.1&&g.to>a+0.1); if(!g) return null;
   const len=Math.round(g.to-g.from);
@@ -713,7 +752,7 @@ function rangeFuel(a,b){
 }
 function fuelPill(f){
   if(!f) return "";
-  return `<span class="pill fbad" title="${esc(f.text)}">${ICON.fuel}Fuel unconfirmed ${esc(f.short)}</span>`;
+  return `<span class="pill fwarn" title="${esc(f.text)}">${ICON.fuel}Check fuel</span>`;
 }
 const distPill=(km,min,attrs)=>`<span class="pill dist" ${attrs||""} title="Show on the map">${Math.round(km)} km · ${fmtDur(min)}</span>`;
 function dayMinutes(k){
@@ -923,7 +962,7 @@ function routeSketch(){
 function printHtml(){
   const n=nDays(), tot=plan.days.reduce((t,d)=>t+(d?d.km:0),0), ride=plan.days.reduce((t,d,k)=>t+(d?dayMinutes(k):0),0);
   const fin=trip.round?trip.start.name:endPt().name;
-  const fuelTxt=f=>f?`Unconfirmed ${f.short}`:"—";
+  const fuelTxt=f=>f?`Check: ${f.short} without a fuel town`:"—";
   const lnk=(t,name,town)=>{ t=t||{}; const w=t.website?(/^https?:/.test(t.website)?t.website:"https://"+t.website):`https://www.google.com/search?q=${encodeURIComponent(name+" "+(town||""))}`; return `${t.phone?esc(t.phone)+" · ":""}<a href="${esc(w)}">${t.website?"website":"find online"}</a>`; };
   let h=`<section class="pcover"><h1>${esc(trip.start.name)} → ${esc(fin)}</h1>
     <p class="pmeta">${esc(dayLong(0))}${n>1?` to ${esc(dayLong(n-1))}`:""} · ${n} day${n>1?"s":""} · ${Math.round(tot).toLocaleString()} km · about ${fmtDur(ride)} riding</p>
@@ -935,7 +974,7 @@ function printHtml(){
     h+=`<tr class="${r&&r.level!=="ok"?r.level:""}"><td><b>${esc(dayName(k))}</b></td><td>${vias.length?`<b class="via">via</b> <b>${vias.map(v=>esc(v.name)).join(", ")}</b> → `:"→ "}<b>${esc(to.name)}</b>${k<n-1?" (night)":""}</td>
       <td class="num">${Math.round(d.km)}</td><td class="num">${fmtDur(dayMinutes(k))}</td><td class="${f&&f.level?f.level:""}">${esc(fuelTxt(f))}</td><td>${s!=null?fmtT(s):"?"}</td><td>${w&&!w.none?`${esc(WXW(w.code))} ${Math.round(w.tmin)}–${Math.round(w.tmax)}°C`:"—"}</td><td>${esc(notes.join(", "))||"—"}</td></tr>`;
   });
-  h+=`</tbody></table><p class="pnote">Fuel is shown where the map knows it. "Unconfirmed" marks a stretch with no fuel on our map that's longer than your ${esc(String(settings.range))} km range. Small towns on the way may have fuel: check before you go. Places and hospitals come from OpenStreetMap and can be wrong: phone ahead on remote legs. Emergency from a mobile: 112.</p></section>`;
+  h+=`</tbody></table><p class="pnote">Fuel is shown where the map knows it. Suggested stops are towns with fuel about every ${esc(String(settings.range))} km. "Check" marks a stretch with no town with fuel on our map: small towns may still have fuel, so ask locally. Places and hospitals come from OpenStreetMap and can be wrong: phone ahead on remote legs. Emergency from a mobile: 112.</p></section>`;
   plan.days.forEach((d,k)=>{ if(!d) return;
     const from=d.pts[0], to=d.pts[d.pts.length-1], last=k===n-1, r=dayRisk(k), m=dayMed(k);
     const fills=fp?fp.fills.filter(f=>f.km>d.a+0.3&&f.km<=d.b+0.3):[];
@@ -947,6 +986,9 @@ function printHtml(){
       h+=`<tr><td><b>${esc(p.name)}</b>${j===d.pts.length-1?(last?" (finish)":" (night stop)"):""}</td><td class="num">${Math.round(d.legs[j-1].b-d.a)}</td><td>${esc(here)||"Nothing known within 1 km"}</td></tr>`; });
     h+=`</tbody></table>`;
     // fuel
+    const ds=fp&&fp.days&&fp.days[k];
+    if(ds&&(ds.sugg.length||ds.probs.length)) h+=`<h3>Suggested stops</h3><ul>${ds.sugg.map(t=>`<li><b>${esc(t.name)}</b>, km ${Math.max(0,Math.round(t.km-d.a))}${t.fuel?" · fuel":""}${t.food?" · food":""}${t.detour?` · ${Math.round(t.off)} km off the route`:""}</li>`).join("")}${ds.probs.map(p=>`<li class="warn">No town with fuel on our map between ${esc(p.fromName)} and ${esc(p.toName)} (${Math.round(p.to-p.from)} km). Ask locally or carry extra.</li>`).join("")}</ul>`;
+    if(ds&&ds.through.length) h+=`<p><b>Through:</b> ${ds.through.map(t=>esc(t.name)).join(" · ")}</p>`;
     h+=`<h3>Fuel on the way</h3>`+(fills.length?`<ul>${fills.map(f=>{ const x=fuelAll.find(q=>hav(q,f)<0.3)||f, t=x.tags||{}, g=gradesTxt(t); return `<li>km ${Math.round(f.km-d.a)}: <b>${esc(f.name&&f.name!=="Fuel"?f.name:"Fuel station")}</b>${g?" · "+esc(g):""}${t.hours?" · "+esc(t.hours):""}${t.phone?" · "+esc(t.phone):""}</li>`; }).join("")}</ul>`:`<p>None known on the route.</p>`);
     // night
     if(!(last&&trip.round)){ const sf=stayFor(to), pl=sf?sf.places:[], chosen=pl.find(p=>hav(p,to)<0.2);
@@ -1107,6 +1149,22 @@ function hoursHtml(t,k,j){
 }
 function gradesTxt(t){ const e=(t&&t.extra)||""; const g=[]; if(/\b93\b/.test(e)) g.push("93"); if(/\b95\b/.test(e)) g.push("95"); if(/\bD\b/.test(e)) g.push("Diesel"); return g.length?g.join(" · "):""; }
 
+
+function suggHtml(k){
+  if(!plan||!plan.days[k]) return "";
+  if(!placesOk) return `<div class="note">Checking fuel…</div>`;
+  const ds=fp&&fp.days&&fp.days[k]; if(!ds) return "";
+  const pd=plan.days[k], km=t=>Math.max(0,Math.round(t.km-pd.a));
+  const icons=t=>`${t.fuel?"⛽":""}${t.food?"🍴":""}`;
+  let h=`<div class="sugg2">`;
+  if(ds.through.length) h+=`<div class="thru"><span class="lbl">Through</span> ${ds.through.map(t=>`<span class="tw ${ds.sugg.includes(t)?"on":""}">${esc(t.name)} <span class="note">km ${km(t)}</span>${icons(t)}</span>`).join(" · ")}</div>`;
+  if(+settings.range>0){
+    if(ds.sugg.length) h+=`<div class="sgl"><span class="lbl">Suggested stops</span>${ds.sugg.map(t=>`<span class="sgi"><b>${esc(t.name)}</b> <span class="note">km ${km(t)}${t.detour?` · ${Math.round(t.off)} km off the route, adds about ${Math.round(t.off*2)} km`:""}</span> ${icons(t)} <button class="btn small ghost" type="button" data-sadd2="${k}:${esc(t.name)}">Add</button></span>`).join("")}</div>`;
+    else if(!ds.probs.length) h+=`<div class="note">Fuel towns are within ${esc(String(settings.range))} km all day. No extra stop needed.</div>`;
+    h+=ds.probs.map(p=>`<div class="verdict v-warn">No town with fuel on our map between ${esc(p.fromName)} and ${esc(p.toName)} (${Math.round(p.to-p.from)} km).${p.towns.length?` ${esc(p.towns.map(t=>t.name).join(", "))} on the way may have fuel.`:""} Ask locally or carry extra.</div>`).join("");
+  }
+  return h+`</div>`;
+}
 /* day view heading: named after where you sleep; departure underneath so the stops read top to bottom */
 function gapPill(g,prefix){ const len=Math.round(g.to-g.from); return `<span class="pill fbad" title="${esc(gapText(g))}">${ICON.fuel}${prefix||"Fuel unconfirmed, next"} ${len} km</span>`; }
 function gapsStarting(a,b){ return fp&&+settings.range>0?fp.gaps.filter(g=>g.from>=a-0.5&&g.from<b-0.5):[]; }
@@ -1119,6 +1177,7 @@ function dayHead(k){
   return `<div class="story dh">
     <h2 class="dhline"><span class="dhdate">${esc(dayLong(k))}</span> <span class="arr">→</span> ${toCell(k)}${d.style==="fast"?` <span class="sty" title="Get me there quickly">${STYLE_ICON.fast}</span>`:""}</h2>
     <div class="dhfrom"><span class="dhtext"><span class="lbl">from</span> <b class="dep">${esc(from?from.name:"?")}</b> ${viaText(k,true)}</span><span class="avail">${depIcons}</span>${depGap}</div>
+    ${suggHtml(k)}
     ${stopFocus&&stopFocus.k===k&&stopFocus.j===0&&pd?`<div class="dhdetail">${stopDetail(k,0,stopFocus.cat)}</div>`:""}
     ${pd?`<div class="sicons"><span class="sl">${timePill(k,pd.km,dayMinutes(k),`data-focusday="${k}"`)+fuelBtn(k)}</span><span class="sr">${sunSpan(k)+wxLink(k)}<span class="flags">${flagIcons(r,k)}</span></span></div>${riskHtml(r,k)}${fuelList(k)}`:`<div class="note">${msg}</div>`}
   </div>`;
@@ -1250,6 +1309,7 @@ $("details").addEventListener("click",e=>{
   const so=t.closest("[data-stop]"); if(so){ const [k2,j2]=so.dataset.stop.split(":").map(Number); stopFocus=stopFocus&&stopFocus.k===k2&&stopFocus.j===j2&&!stopFocus.cat?null:{k:k2,j:j2}; if(!stopFocus) window._refit=true; renderDetails(); drawMap(); return; }
   const sf=t.closest("[data-sfuel]"); if(sf){ const [k2,j2,id]=sf.dataset.sfuel.split(":"); const x=fuelAll.find(q=>q.id===id); if(x){ if(!addStop(+k2,+j2-1,pt(x.name&&x.name!=="Fuel"?x.name:"Fuel stop",x.lat,x.lon,{fuelHere:true}))) return; stopFocus=null; $("status").textContent="Fuel stop added."; changed(); } return; }
   const sa=t.closest("[data-sadd]"); if(sa){ const [k2,j2,id]=sa.dataset.sadd.split(":"); const x=pois.find(q=>q.id===id); if(x){ if(!addStop(+k2,+j2-1,pt(x.name,x.lat,x.lon,{stay:x.kind==="sleep"||x.kind==="camp"}))) return; stopFocus=null; $("status").textContent=`Added ${x.name}.`; changed(); } return; }
+  const s2=t.closest("[data-sadd2]"); if(s2){ const [k2,...nm]=s2.dataset.sadd2.split(":"); const name=nm.join(":"), tw=(fp.days[+k2]?.sugg||[]).find(x=>x.name===name); if(tw&&insertVia(+k2,pt(tw.name,tw.lat,tw.lon,{fuelHere:true}))!==false){ $("status").textContent=`Added ${tw.name}.`; changed(); } return; }
   const mv=t.closest("[data-morevias]"); if(mv){viaOpen.add(+mv.dataset.morevias);renderDetails();return;}
   const et=t.closest("[data-editto]"); if(et){editTo.add(+et.dataset.editto);renderDetails();return;}
   const cl=t.closest("[data-clear]"); if(cl){ const id=cl.dataset.clear, m=id.match(/^(night|finish|via)-(\d+)(?:-(\d+))?$/); if(!m) return;
@@ -1362,6 +1422,7 @@ function drawMap(){
     m.on("click",()=>{ const k=trip.days.findIndex((d,i)=>plan.days[i]&&plan.days[i].pts.includes(p)&&(sel?i===ui.tab:true)); if(k<0) return; const j=plan.days[k].pts.indexOf(p); ui.tab=k; stopFocus={k,j}; saveUi(); renderAll(); });
   });
   if(fp&&ui.fuelSugg) fp.fills.filter(f=>inR(f)).forEach(f=>L.marker([f.lat,f.lon],{icon:dotIcon("#0B6E4F",11,true)}).bindTooltip("Suggested fuel: "+f.name).addTo(layer));
+  if(fp&&fp.days&&sel&&fp.days[ui.tab]) fp.days[ui.tab].sugg.forEach(t=>L.marker([t.lat,t.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:#0B6E4F">⛽</div>`,iconSize:[22,22],iconAnchor:[11,11]})}).bindTooltip(`Suggested stop: ${t.name}`,{permanent:true,direction:"right",offset:[12,0],className:"maplbl"}).addTo(layer));
   if(fp&&sel) fp.gaps.filter(g=>g.from<sel.b&&g.to>sel.a).forEach(g=>gapTowns(g).filter(t=>t.km>=sel.a&&t.km<=sel.b).forEach(t=>L.marker([t.lat,t.lon],{icon:L.divIcon({className:"",html:`<div class="mapq">?</div>`,iconSize:[16,16],iconAnchor:[8,8]})}).bindTooltip(`${t.name}: fuel unconfirmed`,{permanent:true,direction:"right",offset:[8,0],className:"maplbl q"}).addTo(layer)));
   if(ui.fuelAll) fuelStations.filter(inR).forEach(f=>L.marker([f.lat,f.lon],{icon:dotIcon("#ffffff",8,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
   pois.filter(p=>ui.types[p.kind]&&inR(p)).sort((a,b)=>a.off-b.off).slice(0,+ui.max).forEach(p=>{const t=TYPES.find(x=>x.id===p.kind); L.marker([p.lat,p.lon],{icon:dotIcon(t.c,10)}).bindTooltip(`${p.name} · ${t.n}`).addTo(layer);});
