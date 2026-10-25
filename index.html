@@ -313,6 +313,11 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .mapemo.dashed{border-style:dashed;border-color:#0B6E4F}
 .days .ovday{padding:6px 0;border-top:0}
 .wherebox{display:inline-block;min-width:220px;vertical-align:middle}
+.tripbar{grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr)!important;border-bottom:0}
+.tripbar>.field:nth-child(3){order:-1}
+.tripbar>.field:nth-child(4){display:none}
+@media (max-width:560px){.tripbar{grid-template-columns:1fr 1fr!important}.tripbar>.field:nth-child(3){grid-column:1/-1}}
+.clearrow{justify-content:flex-end}
 </style>
 </head>
 <body>
@@ -346,7 +351,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
   <section class="tripbar" aria-label="Trip">
     <div class="field"><label class="lbl" for="startDate">Leave</label><input id="startDate" type="date"></div>
     <div class="field"><label class="lbl" for="endDate">Back</label><input id="endDate" type="date"></div>
-    <div class="field ac"><label class="lbl" for="startPlace">Start</label><div class="inbtn"><input id="startPlace" type="text" autocomplete="off" placeholder="My location or a town"><button class="icon" id="clearStart" type="button" title="Clear" aria-label="Clear" hidden>✕</button><button class="icon" id="useLoc" type="button" title="Use my location" aria-label="Use my location">⌖</button></div><div class="sugg" hidden></div></div>
+    <div class="field ac"><label class="lbl" for="startPlace">From</label><div class="inbtn"><input id="startPlace" type="text" autocomplete="off" placeholder="My location or a town"><button class="icon" id="clearStart" type="button" title="Clear" aria-label="Clear" hidden>✕</button><button class="icon" id="useLoc" type="button" title="Use my location" aria-label="Use my location">⌖</button></div><div class="sugg" hidden></div></div>
     <div class="field ac"><label class="lbl" for="endPlace">Finish</label><div class="inbtn"><input id="endPlace" type="text" autocomplete="off" placeholder="Same as start"><button class="icon" id="sameStart" type="button" title="Finish where I started" aria-label="Finish where I started" hidden>✕</button></div><div class="sugg" hidden></div></div>
   </section>
 </div>
@@ -675,7 +680,7 @@ const styleName=()=>({rough:"Road less travelled",mixed:"Mixed",tar:"Tar"})[sett
 async function recalc(){
   const my=++seq; syncDays(); save();
   if(!trip.start||trip.start.lat==null){ plan=null; fp=null; if(!/Getting|Tap/.test($("status").textContent))$("status").textContent="Pick where you start."; renderAll(); return; }
-  $("status").textContent="Working out the route…";
+  $("status").textContent="Working out the route…"; planStale=true; renderAll();
   try{
     const res=await Promise.all(trip.days.map((d,k)=>{const pts=dayPts(k); if(!pts) return null; const fast=d.style==="fast";
       return Promise.all(pts.slice(0,-1).map((a,j)=>routeLeg(a,pts[j+1],{fast,track:d.legs[j]&&d.legs[j].track}))).then(opts=>({pts,opts}));}));
@@ -690,7 +695,7 @@ async function recalc(){
       days.push({pts:r.pts,legs,km:legs.reduce((t,x)=>t+x.km,0),min:legs.reduce((t,x)=>t+x.min,0),a:legs[0].a,b:legs[legs.length-1].b});
     });
     if(!geom.length){plan=null;fp=null;$("status").textContent="Pick where you're going to see the route.";renderAll();return;}
-    plan={days,geom,cum,total:acc,ptKm};
+    plan={days,geom,cum,total:acc,ptKm}; planStale=false;
     $("status").textContent="Finding fuel and places…";
     renderAll();
     loadWeather(my).then(()=>{if(my===seq) renderAll();}).catch(()=>{wx=null;});
@@ -1195,7 +1200,7 @@ function stopsChain(k){
   return v.map((x,i)=>x.auto?`<i class="autoname" data-gostop="${k}:${i+1}">${esc(x.name)} ⛽${x.detour?` (+${x.detour} km)`:""}</i>`:`<b>${esc(x.name)}</b>`).join(", ");
 }
 function sumBox(k,big){
-  const pd=plan&&plan.days[k], d=trip.days[k], r=pd?dayRisk(k):null, from=dayFrom(k);
+  const pd=!planStale&&plan&&plan.days[k], d=trip.days[k], r=pd?dayRisk(k):null, from=dayFrom(k);
   const msg=!trip.start||trip.start.lat==null?"Pick where you start":!from?"Pick the night stop before this day":!dayTo(k)?"Pick where you sleep":!dayPts(k)?"Add a stop or a finish":"Working out the route…";
   const chain=stopsChain(k), ds=fp&&fp.days&&fp.days[k];
   const warn=ds&&+settings.range>0?ds.probs.map(p=>`<div class="wmin">⚠ No town within reach: ${Math.round(p.to-p.from)} km, ${esc(p.fromName)} to ${esc(p.toName)}.</div>`).join(""):"";
@@ -1257,7 +1262,7 @@ function stopDetail(k,j,cat){
   return h+`</div>`;
 }
 function stopList(k){
-  const d=trip.days[k], pd=plan&&plan.days[k], last=k===nDays()-1;
+  const d=trip.days[k], pd=!planStale&&plan&&plan.days[k], last=k===nDays()-1;
   let h=`<div class="rehead"><span class="lbl">Way</span><div class="seg2" role="group" aria-label="Day style"><button type="button" data-style="default" class="${d.style!=="fast"?"on":""}" title="${esc(styleName())}" aria-label="${esc(styleName())}">${STYLE_ICON.default}</button><button type="button" data-style="fast" class="${d.style==="fast"?"on":""}" title="Get me there quickly" aria-label="Get me there quickly">${STYLE_ICON.fast}</button></div></div>`;
   if(!pd) return h+`<div class="rname"><span class="lbl" style="white-space:nowrap">Add a stop</span>${searchBox("addvia-"+k,"","Town, pass or place on this day",true)}</div>`;
   h+=`<ol class="stops">`;
@@ -1283,7 +1288,7 @@ function stopList(k){
   return h;
 }
 function dayBody(k){
-  const pd=plan&&plan.days[k];
+  const pd=!planStale&&plan&&plan.days[k];
   let h=stopList(k);
   if(!pd) return h;
   if(!placesOk) h+=`<div class="verdict v-warn">Fuel stations didn't load, so long stretches without fuel can't be checked. Check your connection and reload.</div>`;
@@ -1305,16 +1310,16 @@ function drawStopLayer(){
   if(pts.length<2) map.setView([sc.p.lat,sc.p.lon],cat?15:12); else map.fitBounds(L.latLngBounds(pts),{padding:[30,30],maxZoom:cat?16:13});
   return true;
 }
+function clearLink(){ return `<div class="btns clearrow">${clearArm?`<span class="note">Clear this trip?</span><button class="btn small" type="button" data-newtrip>Clear</button><button class="btn small ghost" type="button" data-nocancel>Cancel</button>`:`<button class="linkbtn small" type="button" data-newtrip>Clear trip</button>`}</div>`; }
 function overviewHtml(){
-  const open=tripEdit||!trip.start||trip.start.lat==null;
-  let h=tripLine()+(open?`<div class="tbslot"></div><div class="btns">${clearArm?`<span class="note">Clear this trip?</span><button class="btn small" type="button" data-newtrip>Clear</button><button class="btn small ghost" type="button" data-nocancel>Cancel</button>`:`<button class="btn small ghost" type="button" data-newtrip>Clear trip</button>`}</div>`:"");
-  if(nDays()===1) return h+sumBox(0,false)+dayBody(0)+footNote();
+  let h=`<div class="tbslot"></div>`;
+  if(nDays()===1) return h+sumBox(0,false)+dayBody(0)+clearLink()+footNote();
   h+=`<div class="days">`;
   trip.days.forEach((d,k)=>{ h+=`<div class="ovday" data-gotoday="${k}">${sumBox(k,false)}</div>`; });
   h+=`</div>`;
   h+=tripTotals();
-  if(plan) h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px">${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">${esc(dayName(k))} GPX</button>`:"").join("")}<button class="btn small ghost" type="button" data-print>Save as PDF</button></div></div>`;
-  return h+footNote();
+  if(plan&&!planStale) h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px">${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">${esc(dayName(k))} GPX</button>`:"").join("")}<button class="btn small ghost" type="button" data-print>Save as PDF</button></div></div>`;
+  return h+clearLink()+footNote();
 }
 function footNote(){ return placesOk&&dataDate?`<div class="note">Map data from OpenStreetMap, as of ${esc(dataDate)}. Weather from Open-Meteo. Phone ahead on remote legs.</div>`:""; }
 function dayHtml(k){ return dayHead(k)+dayBody(k); }
@@ -1533,7 +1538,7 @@ function renderAll(){
   const tot=plan?plan.days.reduce((t,d)=>t+(d?d.km:0),0):0;
   $("hdrSummary").textContent=plan?`${Math.round(tot)} km · ${nDays()} day${nDays()>1?"s":""}`:"";
 }
-let clearArm=false;
+let clearArm=false, planStale=false;
 function tripLabel(t){ const n=(t.days||[]).length, nights=(t.days||[]).slice(0,-1).map(d=>d.to&&d.to.name).filter(Boolean); const last=(t.days||[])[n-1]; const dest=nights.length?nights.join(", "):(last&&last.vias&&last.vias[0]?last.vias[0].name:""); return `${t.start?t.start.name:"?"}${dest?" → "+dest:""} · ${n} day${n>1?"s":""}`; }
 function snapTrip(force){
   const t=JSON.parse(JSON.stringify(trip)); if(!t.start||t.start.lat==null) return;
