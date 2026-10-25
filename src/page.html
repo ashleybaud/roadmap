@@ -71,7 +71,7 @@ input[type=text],input[type=number],input[type=time],input[type=date],select{bac
 .leaflet-container{font:inherit}
 
 /* day tabs + details */
-.daytabs{display:flex;gap:4px;overflow-x:auto;border-bottom:2px solid var(--ink);padding-bottom:0;scrollbar-width:thin}
+.daytabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:2px solid var(--ink);padding-bottom:0}
 .dtab{border:1px solid var(--line);border-bottom:0;background:var(--bg);border-radius:6px 6px 0 0;padding:6px 10px;cursor:pointer;white-space:nowrap;display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-width:max-content}
 .dtab b{font-family:var(--f-display);font-size:1rem}
 .dtab .note{font-size:.72rem}
@@ -318,20 +318,15 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .tripbar>.field:nth-child(4){display:none}
 @media (max-width:560px){.tripbar{grid-template-columns:1fr 1fr!important}.tripbar>.field:nth-child(3){grid-column:1/-1}}
 .clearrow{justify-content:flex-end}
-.iconbar{border:2px solid var(--ink);border-radius:10px;padding:8px 10px 10px;margin:10px 0 12px;background:var(--panel)}
-.ibhead{font-size:.75rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}
-.ibgrid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px}
-@media (max-width:640px){.ibgrid{grid-template-columns:repeat(3,1fr)}}
-.ib{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:72px;padding:6px 4px;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);color:var(--muted,#5b6660);cursor:pointer;font-family:inherit}
-.ib .e{font-size:1.6rem;line-height:1.1;filter:grayscale(.6);opacity:.7}
-.ib .w{font-size:.85rem;font-weight:600}
-.ib.on{background:#0B6E4F;border-color:#0B6E4F;color:#fff}
-.ib.on .e{filter:none;opacity:1}
-.ib.on::after{content:"✓";position:absolute;top:3px;right:6px;font-size:.8rem;font-weight:700;color:#fff}
-.ib:disabled{cursor:not-allowed;opacity:.45;border-style:dashed}
-.ibsub{font-size:.7rem;font-style:italic}
-.ib select{border:1px solid rgba(255,255,255,.6);border-radius:4px;background:transparent;color:inherit;font:600 .75rem inherit;font-family:inherit;padding:0 2px;width:auto;cursor:pointer}
-.ib.on select option{color:#18201C}
+.iconbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;border:2px solid var(--ink);border-radius:10px;padding:6px 10px;margin:10px 0 12px;background:var(--panel)}
+.ibhead{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-right:4px;flex-basis:100%}
+@media (min-width:641px){.ibhead{flex-basis:auto}}
+.ib{position:relative;width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);cursor:pointer;font-size:1.45rem;line-height:1;padding:0;filter:grayscale(.7);opacity:.6}
+.ib.on{background:#0B6E4F;border-color:#0B6E4F;filter:none;opacity:1}
+.ib.on::after{content:"✓";position:absolute;top:1px;right:3px;font-size:.65rem;font-weight:700;color:#fff}
+.ib:disabled{cursor:not-allowed;opacity:.3;border-style:dashed}
+.ibmax{display:inline-flex;align-items:center;gap:4px;font-size:.85rem;font-weight:600;margin-left:2px}
+.ibmax select{width:auto;padding:2px 4px;font-size:.85rem}
 .fgrp summary{cursor:pointer}
 .fgrp .note{margin:2px 0 2px 14px}
 .legway svg{width:22px;height:22px}
@@ -343,6 +338,9 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .sl1,.sl2{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
 .sl1 .sname{min-width:0}
 .sl2l{display:inline-flex;align-items:center}
+.dtab{min-width:0;max-width:118px;flex:0 1 auto}
+.dtab .tto{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dtab.keybtn{max-width:none}
 </style>
 </head>
 <body>
@@ -396,6 +394,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
     <div><span class="flag finfo">◷</span> The clocks change during the day.</div>
     <div><span class="sty">STYLE_FAST</span> Get me there quickly. <span class="sty">STYLE_ROUGH</span> Road less travelled, or the style set in Settings.</div>
     <div><span class="tdot" style="background:var(--warn)"></span> A dot on a day tab: something on that day needs a look.</div>
+    <div><b>On the map</b> (green = shown): ⛽ fuel stations on the route · 🛏 places to stay at night stops · 🍴 food · ★ sights, viewpoints and passes · 🏥 hospitals and clinics · 🛣 road type, tar to single track (coming soon)</div>
     <p class="note">We show where fuel is; we don't track your tank. Suggested stops use your "Stop at least every" setting. Fuel, places and hospitals come from OpenStreetMap and can be wrong. Phone ahead on remote legs.</p>
     <div class="btns"><button class="btn" value="close">Close</button></div>
   </form>

@@ -202,7 +202,7 @@ function renderTabs(){
   const tabs=[`<button class="dtab ${ui.tab==="ov"?"on":""}" data-day="ov" role="tab"><b>Overview</b><span class="note">${nDays()} day${nDays()>1?"s":""}</span></button>`];
   if(nDays()>1) trip.days.forEach((d,k)=>{
     const f=plan&&plan.days[k]?dayRisk(k):null, to=dayTo(k);
-    tabs.push(`<button class="dtab ${ui.tab===k?"on":""}" data-day="${k}" role="tab"><b>${esc(dayDate(k).toLocaleDateString(undefined,{weekday:"short"}))}${f&&f.level!=="ok"?`<span class="tdot" style="background:var(--${f.level==="bad"?"bad":"warn"})"></span>`:""}</b><span class="note">${esc(dayDate(k).toLocaleDateString(undefined,{day:"numeric",month:"short"}))}</span><span class="note">→ ${esc(to?to.name:"night stop?")}</span></button>`);
+    tabs.push(`<button class="dtab ${ui.tab===k?"on":""}" data-day="${k}" role="tab" title="${esc(dayLong(k))} → ${esc(to?to.name:"night stop?")}"><b>${esc(dayDate(k).toLocaleDateString(undefined,{weekday:"short"}))} ${dayDate(k).getDate()}${f&&f.level!=="ok"?`<span class="tdot" style="background:var(--${f.level==="bad"?"bad":"warn"})"></span>`:""}</b><span class="note tto">→ ${esc(to?to.name:"night stop?")}</span></button>`);
   });
   tabs.push(`<button class="dtab keybtn" type="button" data-key title="What the icons and colours mean">?</button>`);
   $("dayTabs").innerHTML=tabs.join("");
@@ -804,9 +804,9 @@ function drawPanelLayer(){
 const LAY=[["fuel","⛽","Fuel","Fuel stations on the route"],["stay","🛏","Stay","Places to stay at night stops"],["food","🍴","Food","Places to eat"],["sights","★","Sights","Sights, viewpoints and passes"],["med","🏥","Medical","Hospitals and clinics"],["road","🛣","Road type","Tar to single track, coming next"]];
 ui.lay=Object.assign({fuel:true,stay:!!ui.sleep,food:!!ui.types.food,sights:true,med:false},ui.lay||{});
 function renderLayers(){
-  $("iconbar").innerHTML=`<div class="ibhead">On the map</div><div class="ibgrid">`+LAY.map(([id,ic,w,t])=>{ const on=!!ui.lay[id]&&id!=="road";
-    const sub=id==="sights"&&on?`<select data-max aria-label="How many sights">${[["10","10"],["25","25"],["50","50"],["1000","All"]].map(([v,l])=>`<option value="${v}" ${ui.max===v?"selected":""}>${l}</option>`).join("")}</select>`:id==="road"?`<span class="ibsub">soon</span>`:"";
-    return `<button type="button" class="ib ${on?"on":""}" data-lay="${id}" title="${esc(t)}" aria-pressed="${on}" ${id==="road"?"disabled":""}><span class="e">${ic}</span><span class="w">${w}</span>${sub}</button>`; }).join("")+`</div>`;
+  $("iconbar").innerHTML=`<span class="ibhead">On the map</span>`+LAY.map(([id,ic,w,t])=>{ const on=!!ui.lay[id]&&id!=="road";
+    return `<button type="button" class="ib ${on?"on":""}" data-lay="${id}" title="${esc(w)}: ${esc(t)}" aria-label="${esc(w)}" aria-pressed="${on}" ${id==="road"?"disabled":""}>${ic}</button>`; }).join("")
+    +(ui.lay.sights?`<label class="ibmax" title="How many sights to show">★ <select data-max aria-label="How many sights">${[["10","10"],["25","25"],["50","50"],["1000","All"]].map(([v,l])=>`<option value="${v}" ${ui.max===v?"selected":""}>${l}</option>`).join("")}</select></label>`:"");
 }
 $("iconbar").addEventListener("click",e=>{ if(e.target.closest("select")) return; const b=e.target.closest("[data-lay]"); if(!b||b.disabled) return; const id=b.dataset.lay; ui.lay[id]=!ui.lay[id];
   if(id==="food") ui.types.food=ui.lay.food; if(id==="sights") ["view","pass","sight"].forEach(t=>ui.types[t]=ui.lay.sights); if(id==="stay"){ ui.sleep=ui.lay.stay; ui.types.camp=ui.lay.stay; }
