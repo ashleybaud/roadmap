@@ -515,7 +515,8 @@ function dayHead(k){ return sumBox(k,true)+`<h3 class="detailh">Stops</h3>`; }
 let autoRounds=0;
 const legFast=(d,j)=>{ const v=d.vias[j], f=v?v.fast:d.toFast; return f!=null?f:d.style==="fast"; };
 function autoFuel(){
-  if(!plan||!placesOk||!townList||!(+settings.range>0)) return false;
+  if(!plan||!placesOk||!townList||!(+settings.range>0)||plan._autoDone) return false;
+  plan._autoDone=true; // one pass per worked-out route
   let added=false;
   plan.days.forEach((d,k)=>{ if(!d) return; const td=trip.days[k], no=td.noAuto||[]; if(!td.sig) td.sig=daySig(k);
     const ok=t=>!no.includes(t.name)&&!td.vias.some(v=>!v.auto&&(v.name===t.name||hav(v,t)<1))&&!(dayTo(k)&&hav(dayTo(k),t)<1)&&!(dayFrom(k)&&hav(dayFrom(k),t)<1);
