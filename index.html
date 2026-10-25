@@ -1204,7 +1204,10 @@ function autoFuel(){
       delete td.noMore;
       const want=daySuggest(k,true).sugg.filter(ok), have=td.vias.filter(v=>v.auto).map(v=>v.name).sort().join("|");
       if(want.map(t=>t.name).sort().join("|")!==have){ td.vias=td.vias.filter(v=>!v.auto); td.legs=[]; want.forEach(t=>insertVia(k,mk(t))); added=true; }
-    } else if(!td.noMore) daySuggest(k).sugg.filter(t=>ok(t)&&!td.vias.some(v=>v.name===t.name||hav(v,t)<1)).forEach(t=>{ if(insertVia(k,mk(t))!==false) added=true; }); });
+    } else if(!td.noMore){ const add=daySuggest(k).sugg.filter(t=>ok(t)&&!td.vias.some(v=>v.name===t.name||hav(v,t)<1));
+      if(add.length){ const n=td.vias.length; td.vias=td.vias.filter(v=>!(v.auto&&!v.fuelHere)); if(td.vias.length!==n) td.legs=[]; // fill-in towns without fuel make way for the new picks
+        const again=daySuggest(k).sugg.filter(t=>ok(t)&&!td.vias.some(v=>v.name===t.name||hav(v,t)<1));
+        (again.length?again:add).forEach(t=>{ if(insertVia(k,mk(t))!==false) added=true; }); if(td.vias.length!==n) added=true; } } });
   trip.days.forEach(d=>delete d.fresh); // one pass: suggestions are picked on the route without them, then left alone
   return added;
 }
