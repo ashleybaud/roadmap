@@ -324,6 +324,8 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .ib:disabled{cursor:not-allowed;opacity:.25}
 .ibmax{font-size:.8rem;display:inline-flex;align-items:center;gap:4px;margin-left:4px}
 .ibmax select{width:auto;padding:2px 4px;font-size:.8rem}
+.fgrp summary{cursor:pointer}
+.fgrp .note{margin:2px 0 2px 14px}
 </style>
 </head>
 <body>
@@ -1090,7 +1092,15 @@ function fuelList(k){
   if(!fuelOpen.has(k)||!plan||!plan.days[k]||!fp) return "";
   const pd=plan.days[k], gaps=fp.gaps.filter(g=>g.from<pd.b-0.1&&g.to>pd.a+0.1), st=fp.fills.filter(f=>f.km>=pd.a-0.3&&f.km<=pd.b+0.3);
   let h=gaps.map(g=>`<div class="verdict v-bad">${esc(gapText(g))}</div>`).join("");
-  h+=`<div class="rinfo"><b>Fuel on the way</b> ${st.length}</div>`+(st.length?st.map(f=>{const t=f.tags||{}, g=gradesTxt(t); const off=fuelAll.find(x=>x.id===f.id)?.off; return `<div class="frow"><span>km ${Math.max(0,Math.round(f.km-pd.a))}: <b>${esc(f.name)}</b>${off>=1?` · ${off.toFixed(1)} km off the route`:""}${g?" · "+esc(g):""}${t.hours?` · <span class="note">${esc(t.hours)}</span>`:""}${t.phone?` · <a href="tel:${esc(String(t.phone).replace(/[^\d+]/g,""))}">${esc(t.phone)}</a>`:""}</span><button class="btn small ghost" type="button" data-addfill="${f.id}" data-day="${k}">Add as a stop</button></div>`;}).join(""):`<div class="rinfo">None known on the route today.</div>`);
+  const tel=t=>t.phone?` · <a href="tel:${esc(String(t.phone).replace(/[^\d+]/g,""))}">${esc(t.phone)}</a>`:"";
+  const one=f=>{const t=f.tags||{}, g=gradesTxt(t), off=fuelAll.find(x=>x.id===f.id)?.off; return `<b>${esc(f.name)}</b>${off>=1?` · ${off.toFixed(1)} km off the route`:""}${g?" · "+esc(g):""}${t.hours?` · <span class="note">${esc(t.hours)}</span>`:""}${tel(t)}`;};
+  const groups=[]; st.forEach(f=>{ const tw=townList&&townList.filter(t=>Math.abs(t.lat-f.lat)<0.05&&hav(t,f)<=3).sort((x,y)=>hav(x,f)-hav(y,f))[0];
+    const gr=tw&&groups.find(g=>g.town===tw); if(gr) gr.st.push(f); else groups.push({town:tw||null,st:[f],km:f.km}); });
+  const h24=f=>/24\/7|00:00-24:00/.test((f.tags||{}).hours||""), dsl=f=>/D/.test(((f.tags||{}).extra||""))||/diesel/i.test(gradesTxt(f.tags||{})||"");
+  h+=`<div class="rinfo"><b>Fuel on the way</b> ${groups.length} ${groups.length===1?"place":"places"}</div>`+(groups.length?groups.map(g=>{ const km=`km ${Math.max(0,Math.round(g.km-pd.a))}`;
+    if(!g.town||g.st.length===1){ const f=g.st[0]; return `<div class="frow"><span>${km}: ${g.town&&g.town.name!==f.name?`<b>${esc(g.town.name)}</b> · `:""}${one(f)}</span><button class="btn small ghost" type="button" data-addfill="${f.id}" data-day="${k}">Add as a stop</button></div>`; }
+    const n=g.st.length, x=[g.st.some(h24)?"open 24h":"",g.st.some(dsl)?"Diesel":""].filter(Boolean).join(" · ");
+    return `<div class="frow"><details class="fgrp"><summary>${km}: <b>${esc(g.town.name)}</b> · ${n} stations${x?" · "+x:""}</summary>${g.st.map(f=>`<div class="note">${one(f)}</div>`).join("")}</details><button class="btn small ghost" type="button" data-addtown="${k}|${esc(g.town.name)}|${g.town.lat}|${g.town.lon}">Add as a stop</button></div>`; }).join(""):`<div class="rinfo">None known on the route today.</div>`);
   return `<div class="risklist">${h}</div>`;
 }
 function storyLine(k,big){
@@ -1503,18 +1513,17 @@ function drawMap(){
     m.on("click",()=>{ const k=trip.days.findIndex((d,i)=>plan.days[i]&&plan.days[i].pts.includes(p)&&(sel?i===ui.tab:true)); if(k<0) return; const j=plan.days[k].pts.indexOf(p); ui.tab=k; stopFocus={k,j}; saveUi(); renderAll(); });
   });
   if(fp&&ui.lay.fuel){
-    fp.fills.filter(f=>inR(f)).forEach(f=>L.marker([f.lat,f.lon],{icon:dotIcon("#0B6E4F",10,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
-    const stopsHere=townPoints();
-    const ftowns=stopTowns().filter(t=>t.fuel&&t.off>2&&inR(t)&&!stopsHere.some(p=>hav(p,t)<3)), lbl=sel&&ftowns.length<=8;
+    fuelStations.filter(f=>inR(f)&&f.off<=2).forEach(f=>L.marker([f.lat,f.lon],{icon:dotIcon("#0B6E4F",10,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
+    const stopsHere=townPoints(), gapsOn=(fp.days||[]).flatMap(d=>d?d.probs:[]);
+    const ftowns=stopTowns().filter(t=>t.fuel&&t.off>2&&inR(t)&&!stopsHere.some(p=>hav(p,t)<3)&&gapsOn.some(g=>t.km>=g.from-5&&t.km<=g.to+5)), lbl=sel&&ftowns.length<=8;
     if(sel||plan.days.filter(Boolean).length===1) ftowns.forEach(t=>{ const k=plan.days.findIndex(d=>d&&t.km>=d.a-1&&t.km<=d.b+1); if(k<0) return;
       L.marker([t.lat,t.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:#0B6E4F">⛽</div>`,iconSize:[22,22],iconAnchor:[11,11]})})
         .bindTooltip(t.name,lbl?{permanent:true,direction:"right",offset:[12,0],className:"maplbl"}:{})
         .bindPopup(`<b>${esc(t.name)}</b><br>${Math.round(t.off)} km off the route${t.food?" · food":""}<br><button class="btn small" type="button" data-addtown="${k}|${esc(t.name)}|${t.lat}|${t.lon}">Add as a stop</button>`).addTo(layer); });
   }
-  if(ui.lay.med&&meds) meds.filter(m=>m.off<=25&&inR(m)).forEach(m=>L.marker([m.lat,m.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:#B3261E;color:#B3261E">✚</div>`,iconSize:[22,22],iconAnchor:[11,11]})}).bindTooltip(`${m.name||(m.type==="hospital"?"Hospital":"Clinic")}${m.phone?" · "+m.phone:""}`).addTo(layer));
+  if(ui.lay.med&&meds) meds.filter(m=>m.off<=25&&inR(m)).forEach(m=>L.marker([m.lat,m.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:#B3261E">🏥</div>`,iconSize:[22,22],iconAnchor:[11,11]})}).bindTooltip(`${m.name||(m.type==="hospital"?"Hospital":"Clinic")}${m.phone?" · "+m.phone:""}`).addTo(layer));
   if(false) fp.days[ui.tab].sugg.forEach(t=>L.marker([t.lat,t.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:#0B6E4F">⛽</div>`,iconSize:[22,22],iconAnchor:[11,11]})}).bindTooltip(`Suggested stop: ${t.name}`,{permanent:true,direction:"right",offset:[12,0],className:"maplbl"}).addTo(layer));
   if(fp&&sel) fp.gaps.filter(g=>g.from<sel.b&&g.to>sel.a).forEach(g=>gapTowns(g).filter(t=>t.km>=sel.a&&t.km<=sel.b).forEach(t=>L.marker([t.lat,t.lon],{icon:L.divIcon({className:"",html:`<div class="mapq">?</div>`,iconSize:[16,16],iconAnchor:[8,8]})}).bindTooltip(`${t.name}: fuel unconfirmed`,{permanent:true,direction:"right",offset:[8,0],className:"maplbl q"}).addTo(layer)));
-  if(ui.lay.fuel) fuelStations.filter(inR).forEach(f=>L.marker([f.lat,f.lon],{icon:dotIcon("#ffffff",8,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
   pois.filter(p=>ui.types[p.kind]&&inR(p)).sort((a,b)=>a.off-b.off).slice(0,+ui.max).forEach(p=>{const t=TYPES.find(x=>x.id===p.kind); L.marker([p.lat,p.lon],{icon:dotIcon(t.c,10)}).bindTooltip(`${p.name} · ${t.n}`).addTo(layer);});
   if(ui.lay.stay) stays.forEach(s=>{ if(!trip.days.some((d,k)=>d.to===s.night&&k<nDays()-1)) return; s.places.forEach(p=>L.marker([p.lat,p.lon],{icon:dotIcon("#2F5BA8",9)}).bindTooltip(p.name).addTo(layer)); });
   if(!focusR){ const g=sel?seg(sel.a,sel.b):plan.geom; if(g.length>1&&(window._refit||sel||lastSel!==ui.tab)){map.fitBounds(L.latLngBounds(g.map(x=>[x.lat,x.lon])),{padding:[24,24]});} window._refit=false; lastSel=ui.tab; }
