@@ -72,7 +72,7 @@ ${(Array.isArray(ld) ? ld : [ld]).filter(Boolean).map(x => `<script type="applic
 <body><div class="wrap">
 <header><a class="logo" href="/">OneTrackMind</a><div class="motto">Recce. Ride. Report.</div><nav class="hdrlinks" aria-label="Site">${[["/","Plan a trip"],["/routes/","Routes"],["/about/","About the founder"]].map(([h,t])=>`<a href="${h}"${active===h?' class="on" aria-current="page"':""}>${t}</a>`).join("")}<a href="${BLOG}" target="_blank" rel="noopener">Misadventures ↗</a></nav></header>
 ${body}
-<footer>OneTrackMind is a free trip planner for multi-day rides and drives: motorbikes, 4x4s and cars. Built by riders. Stories and misadventures on <a href="${BLOG}">onetrackmind.co.za</a>. · <a href="/privacy.html">Privacy</a> · <a href="/rules.html">Rules</a></footer>
+<footer>OneTrackMind is a free trip planner for multi-day rides and drives: motorbikes, 4x4s and cars. Built by riders. Stories and misadventures on <a href="${BLOG}">onetrackmind.co.za</a>. · <a href="/terms.html">Terms and disclaimer</a> · <a href="/privacy.html">Privacy</a> · <a href="/rules.html">Rules</a></footer>
 </div></body></html>
 `;
 }
@@ -151,7 +151,7 @@ fs.rmSync(path.join(ROOT, "routes"), { recursive: true, force: true });
 live.forEach(r => write(`routes/${r.id}/index.html`, routePage(r)));
 write("routes/index.html", routesIndex());
 write("about/index.html", aboutPage());
-const urls = ["/", "/routes/", "/about/", ...live.map(r => `/routes/${r.id}/`), "/privacy.html", "/rules.html"];
+const urls = ["/", "/routes/", "/about/", ...live.map(r => `/routes/${r.id}/`), "/terms.html", "/privacy.html", "/rules.html"];
 write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${today}</lastmod></url>`).join("\n")}\n</urlset>\n`);
 write("robots.txt", `# Everyone welcome, search engines and AI assistants included.\nUser-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${SITE}/sitemap.xml\n`);
 write("llms.txt", `# OneTrackMind

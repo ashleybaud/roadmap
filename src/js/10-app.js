@@ -351,6 +351,7 @@ function printHtml(){
   // ---- page 1: the whole trip, critical first
   let h=`<section class="pcover"><h1>${esc(trip.start.name)} → ${esc(fin)}</h1>
     <p class="pmeta">${esc(dayLong(0))}${n>1?` to ${esc(dayLong(n-1))}`:""} · ${n} day${n>1?"s":""} · ${Math.round(tot).toLocaleString()} km · about ${fmtDur(ride)} ${VEH().ing} · leave each day ${fmtT(lv)}</p>`;
+  h+=`<p class="pmeta">Planning aid only. Map, fuel, grade, stay and weather data can be wrong or out of date: check before you go. You ride at your own risk. Terms: onetrackmind.online/terms.html</p>`;
   const crit=[]; G.forEach((g,k)=>g.filter(x=>x.lvl!=="info").forEach(x=>crit.push(Object.assign({},x,{text:dayName(k)+": "+x.text}))));
   h+=`<div class="pcrit"><h2>Before you go</h2>${crit.length?`<ul class="pwarn">${crit.map(li).join("")}</ul>`:`<p>Nothing flagged. Still phone ahead on remote legs.</p>`}</div>`;
   if(n>1) h+=`<div class="pcrit"><h2>Where you sleep</h2><table class="ptable"><tbody>${trip.days.slice(0,n-1).map((d,k)=>{ const to=d.to; return `<tr class="${to&&to.stay&&to.booked?"":"warn"}"><td><b>${esc(dayName(k))}</b></td><td>${to?`<b>${esc(to.name)}</b>${to.stay?(to.town?", "+esc(to.town.name):""):" (town: place to stay not chosen)"}`:"not set"}</td><td>${to&&to.stay?esc([to.phone,to.web,to.email].filter(Boolean).join(" · ")):""}</td><td>${to&&to.stay?(to.booked?"Booked":"Not booked"):""}</td></tr>`; }).join("")}</tbody></table></div>`;
@@ -711,7 +712,7 @@ function overviewHtml(){
   if(plan&&!planStale) h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px">${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">${esc(dayName(k))} GPX</button>`:"").join("")}<button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}</div></div>`;
   return h+clearLink()+footNote();
 }
-function footNote(){ return `<div class="note">${placesOk&&dataDate?`Map data from OpenStreetMap, as of ${esc(dataDate)}. Weather from Open-Meteo. Phone ahead on remote legs. `:""}<a href="/privacy.html">Privacy</a></div>`; }
+function footNote(){ return `<div class="note">${placesOk&&dataDate?`Map data from OpenStreetMap, as of ${esc(dataDate)}. Weather from Open-Meteo. Phone ahead on remote legs. `:""}Plan with it, check before you go: you ride at your own risk. <a href="/terms.html">Terms and disclaimer</a> · <a href="/privacy.html">Privacy</a></div>`; }
 function dayHtml(k){ return dayHead(k)+dayBody(k); }
 function wireDetails(){
   trip.days.forEach((d,k)=>hook("night-"+k,p=>{editTo.delete(k);trip.days[k].to=p;changed();}));

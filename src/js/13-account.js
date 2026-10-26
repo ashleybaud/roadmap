@@ -33,7 +33,7 @@ function renderAcct(msg){
       <form id="aForm" class="dlgwrap"><div class="field"><label class="lbl" for="aEmail">Your email</label><input id="aEmail" type="email" autocomplete="email" required></div>
       <label class="chk"><input type="checkbox" id="aContrib" ${acct.wantContrib?"checked":""}> Become a contributor: I'll add routes, places and road reports, and I agree to the <a href="/rules.html" target="_blank">contributor rules</a></label>
       <div class="btns" style="justify-content:flex-end"><button class="btn" type="submit">Email me a link</button></div></form>
-      <p class="note" style="margin:0">We keep your email and the routes you save, nothing else. See <a href="/privacy.html" target="_blank">privacy</a>.</p>`;
+      <p class="note" style="margin:0">We keep your email and the routes you save, nothing else. See <a href="/privacy.html" target="_blank">privacy</a> and <a href="/terms.html" target="_blank">terms</a>.</p>`;
     $("aForm").onsubmit=async e=>{ e.preventDefault(); const email=$("aEmail").value.trim(), btn=e.target.querySelector("button[type=submit]")||e.target.querySelector(".btns button"); btn.disabled=true; btn.textContent="Sending…";
       try{ if($("aContrib").checked) localStorage.setItem("otm-wantcontrib","1"); else localStorage.removeItem("otm-wantcontrib"); }catch(err){}
       try{ const j=await api("/api/auth/start",{method:"POST",body:{email,back:"/"}}); acctMode="sent"; acct.sentTo=email; startWaiting(j.poll); renderAcct(); }
