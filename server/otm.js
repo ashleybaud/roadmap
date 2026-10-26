@@ -106,3 +106,21 @@ export async function sendEmail(env, { to, subject, text, html, replyTo }) {
 export const validEmail = e => typeof e === "string" && e.length <= 200 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
 export const clean = (s, n) => String(s == null ? "" : s).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, "").trim().slice(0, n);
 export const escHtml = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+/* ---------- admin: emails listed in the ADMIN_EMAILS variable (comma separated) ---------- */
+export const isAdmin = (env, u) => !!(u && (env.ADMIN_EMAILS || "").toLowerCase().split(/[,\s]+/).filter(Boolean).includes(u.email));
+
+/* ---------- rider reports: a fixed list, each fades after a while ---------- */
+export const REPORT_KINDS = {
+  fuel_ok: { label: "Fuel available", days: 30 },
+  no_fuel: { label: "No fuel", days: 30 },
+  road_closed: { label: "Road closed", days: 14 },
+  washaway: { label: "Washaway or flood damage", days: 45 },
+  bad_road: { label: "Bad surface: corrugations, ruts, sand", days: 45 },
+  graded: { label: "Freshly graded", days: 30 },
+  roadworks: { label: "Roadworks or stop-go", days: 30 },
+  river_high: { label: "River crossing high", days: 7 },
+  animals: { label: "Animals on the road", days: 14 },
+  danger: { label: "Danger: crime or unsafe stop", days: 30 },
+  good_stay: { label: "Good place to stay or eat", days: 365 },
+};

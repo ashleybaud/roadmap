@@ -404,6 +404,13 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .rrow .ract{display:flex;gap:6px;flex:none}
 .acctline{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding-top:10px}
 .pkb{font-size:.86rem;margin-top:4px}
+.repkinds{display:flex;flex-wrap:wrap;gap:6px}
+.repkinds button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:16px;padding:5px 10px;cursor:pointer;font:inherit;font-size:.86rem}
+.repkinds button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.stars{display:flex;gap:4px}.stars button{font-size:1.6rem;line-height:1;background:none;border:0;cursor:pointer;color:var(--line);padding:0 2px}.stars button.on{color:#D9A441}
+.rateline{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font-size:.88rem;margin-top:6px}
+.repmk{width:24px;height:24px;border-radius:50%;background:#fff;border:2px solid #B26A00;display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,.35)}
+.repmk.bad{border-color:#B3261E}.repmk.good{border-color:#2E7D32}
 .rrow.pk{align-items:flex-start}
 .okmsg{color:var(--ok);font-weight:600}.errmsg{color:var(--bad);font-weight:600}
 .guide{border:2px solid var(--ink);border-radius:8px;background:var(--panel);padding:0 14px}
@@ -448,6 +455,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
       <section><h3>5. Before you go</h3><p>Every day shows distance, riding time, sunset and weather. Orange means have a look: a long day, arriving near dark, rain or heat. "Good to know" lists what to sort out first, like public holidays, border posts, and long stretches without fuel or a hospital.</p></section>
       <section><h3>6. Got a route already?</h3><p>Use "Plan from a GPX file" with a route from a friend or your Garmin. It's followed exactly, split into days, and night stops and fuel are added.</p></section>
       <section><h3>7. Take it with you</h3><p>Each day downloads as a GPX file for your GPS or phone. "Save as PDF" prints the whole trip with the warnings up front.</p></section>
+      <section><h3>Recce. Ride. Report.</h3><p>Sign in to save routes and open them on any device. On the road, open a stop and tap "Report the road here": washaways, no fuel, roadworks, a good stay. Riders planning that road see it on the map 📣 and under "Good to know". Rode a route? Rate it and say how hard you found it.</p></section>
       <section><h3>Worth knowing</h3><p>Trips are saved on this device only, for now. Fuel, places and road surfaces come from OpenStreetMap and can be wrong, especially out in the sticks. Phone ahead on remote stretches, and tell us what's wrong with "Send feedback".</p></section>
     </div>
     <div class="btns"><button type="button" class="btn small ghost" id="howItWorks">Change my bike, roads and distances</button></div>
@@ -498,7 +506,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
     <div><span class="flag finfo">◷</span> The clocks change during the day.</div>
     <div><span class="sty">STYLE_FAST</span> Get me there quickly. <span class="sty">STYLE_ROUGH</span> Road less travelled, or the style set in Settings.</div>
     <div><span class="tdot" style="background:var(--warn)"></span> A dot on a day tab: something on that day needs a look.</div>
-    <div><b>On the map</b> (green = shown): ⛽ fuel stations on the route · 🛏 places to stay at night stops · 🍴 food · ★ sights, viewpoints and passes · 🏥 hospitals and clinics · 🛣 the route coloured by grade</div>
+    <div><b>On the map</b> (green = shown): ⛽ fuel stations on the route · 🛏 places to stay at night stops · 🍴 food · ★ sights, viewpoints and passes · 🏥 hospitals and clinics · 📣 what riders reported on the road lately · 🛣 the route coloured by grade</div>
     <h3 style="margin-top:6px">Route grades</h3><div id="gradeKey" class="keylist" style="gap:6px"></div><p class="note">Graded from what OpenStreetMap says about each road. Roads change after rain and grading, so check locally. Riders' reports will sharpen this.</p>
     <p class="note">We show where fuel is; we don't track your tank. Suggested stops use your "Stop at least every" setting. Fuel, places and hospitals come from OpenStreetMap and can be wrong. Phone ahead on remote legs.</p>
     <div class="btns"><button class="btn" value="close">Close</button></div>
@@ -548,6 +556,24 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
     <div class="dlghead"><div><h2 id="pkTitle">OneTrackMind picks</h2><div class="note">Real roads we rate. Open one, then change anything: dates, night stops, the way.</div></div><button class="icon" type="button" data-pkclose aria-label="Close">✕</button></div>
     <div class="rlist" id="pkList"></div>
   </div>
+</dialog>
+<dialog id="repDlg" class="welcome" aria-labelledby="rpTitle">
+  <form class="dlgwrap" id="repForm">
+    <div class="dlghead"><div><h2 id="rpTitle">Report the road</h2><div class="note" id="rpWhere"></div></div><button class="icon" type="button" data-rpclose aria-label="Close">✕</button></div>
+    <div class="field"><span class="lbl">What did you see?</span><div class="repkinds" id="rpKinds"></div></div>
+    <div class="row2"><div class="field"><label class="lbl" for="rpDate">When</label><input id="rpDate" type="date"></div><div class="field"><span class="lbl">Where</span><button class="btn small ghost" type="button" id="rpHere">Use where I am now</button></div></div>
+    <div class="field"><label class="lbl" for="rpText">Anything to add</label><input id="rpText" type="text" maxlength="500" placeholder="e.g. washed out just after the bridge, go slow"></div>
+    <div class="btns" style="justify-content:flex-end"><span class="note" id="rpMsg"></span><button class="btn" type="submit">Send report</button></div>
+  </form>
+</dialog>
+<dialog id="rateDlg" class="welcome" aria-labelledby="rtTitle">
+  <form class="dlgwrap" id="rateForm">
+    <div class="dlghead"><div><h2 id="rtTitle">Rate this route</h2><div class="note">Only if you've ridden it. Your grade helps the next rider pick the right bike and skills.</div></div><button class="icon" type="button" data-rtclose aria-label="Close">✕</button></div>
+    <div class="field"><span class="lbl">How good is it?</span><div class="stars" id="rtStars"></div></div>
+    <div class="field"><label class="lbl" for="rtGrade">How hard did you find it?</label><select id="rtGrade"></select></div>
+    <div class="row2"><div class="field"><label class="lbl" for="rtDate">When did you ride it?</label><input id="rtDate" type="date"></div><div class="field"><label class="lbl" for="rtVeh">On</label><select id="rtVeh"><option value="bike">Motorbike</option><option value="jeep">Jeep / 4x4</option><option value="car">Car</option></select></div></div>
+    <div class="btns" style="justify-content:flex-end"><span class="note" id="rtMsg"></span><button class="btn" type="submit">Save rating</button></div>
+  </form>
 </dialog>
 <dialog id="settings">
   <form method="dialog" style="display:flex;flex-direction:column;gap:12px">

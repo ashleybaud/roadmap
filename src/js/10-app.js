@@ -440,7 +440,7 @@ function tripTotals(){
   if(!plan) return "";
   const n=nDays(), tot=plan.days.reduce((t,d)=>t+(d?d.km:0),0), ride=plan.days.reduce((t,d,k)=>t+(d?dayMinutes(k):0),0);
   const fin=trip.round||!trip.end?(trip.start?trip.start.name:"?"):trip.end.name;
-  return `<div class="totals"><span>Back at <b>${esc(fin)}</b></span><span>${n} day${n>1?"s":""} · ${Math.round(tot).toLocaleString()} km · about ${fmtDur(ride)} ${VEH().ing}</span></div>${gradeBar(tripGrade(),true)}`;
+  return `<div class="totals"><span>Back at <b>${esc(fin)}</b></span><span>${n} day${n>1?"s":""} · ${Math.round(tot).toLocaleString()} km · about ${fmtDur(ride)} ${VEH().ing}</span></div>${gradeBar(tripGrade(),true)}${typeof rateLine==="function"?rateLine():""}`;
 }
 function stayRows(k){
   const last=k===nDays()-1, to=dayTo(k); if(!to||(last&&trip.round)) return "";
@@ -589,7 +589,7 @@ function stopDetail(k,j,cat){
   h+=any?AV.filter(a=>av[a[0]].length).map(a=>listBlock(a[2],a[1],av[a[0]],`${a[0]}-${k}-${j}`,x=>placeRow(x,k,j))).join(""):`<div class="note">Nothing known within 1 km. Small places are often missing from the map, so ask locally.</div>`;
   { const auto=fuelAll.some(f=>hav(f,p)<=1);
     h+=`<div class="sopts">${auto?`<span class="note">Fuel here, on our map.</span>`:`<label class="chk"><input type="checkbox" data-fuelpt="${k}:${j}" ${p.fuelHere||p.type==="fuel"?"checked":""}> Fuel here (not on our map)</label>`}
-      ${isVia?`<label class="chk">Break <input type="number" min="0" max="600" step="5" value="${breakOf(p)}" data-breakmin="${k}:${j-1}" style="width:5em"> min</label>`:""}<button class="linkbtn small" type="button" data-fixat="${p.lat},${p.lon},${esc(p.name)}">Something wrong here? Suggest a change</button></div>`;
+      ${isVia?`<label class="chk">Break <input type="number" min="0" max="600" step="5" value="${breakOf(p)}" data-breakmin="${k}:${j-1}" style="width:5em"> min</label>`:""}${acct.ready?`<button class="linkbtn small" type="button" data-repat="${p.lat},${p.lon},${esc(p.name)}">Report the road here</button>`:""}<button class="linkbtn small" type="button" data-fixat="${p.lat},${p.lon},${esc(p.name)}">Something wrong on our map? Suggest a change</button></div>`;
   }
   if(isTo&&!(last&&trip.round)) h+=stayRows(k).replace('<section class="dsec">','<section class="dsec in">');
   if(j>0){
@@ -654,7 +654,7 @@ function drawStopLayer(){
 function clearLink(){ return `<div class="btns clearrow">${clearArm?`<span class="note">Clear this trip?</span><button class="btn small" type="button" data-newtrip>Clear</button><button class="btn small ghost" type="button" data-nocancel>Cancel</button>`:`<button class="linkbtn small" type="button" data-newtrip>Clear trip</button>`}</div>`; }
 function overviewHtml(){
   let h=`<div class="tbslot"></div>`+gpxBar();
-  if(nDays()===1) return h+sumBox(0,false)+(!planStale&&plan&&plan.days[0]?gtkHtml(0):"")+dayBody(0)+clearLink()+footNote();
+  if(nDays()===1) return h+sumBox(0,false)+(plan&&!planStale&&typeof rateLine==="function"?rateLine():"")+(!planStale&&plan&&plan.days[0]?gtkHtml(0):"")+dayBody(0)+clearLink()+footNote();
   h+=`<div class="days">`;
   trip.days.forEach((d,k)=>{ h+=`<div class="ovday" data-gotoday="${k}">${sumBox(k,false)}</div>`; });
   h+=`</div>`;
@@ -832,6 +832,7 @@ function drawMap(){
     const st=sel?{color:on?col:"#5C6660",weight:on?5:3,opacity:on?.9:.3}:{color:on?col:"#5C6660",weight:on?(k===0?7:5):3,opacity:on?.95:.25,dashArray:k>0?"10 8":null,lineCap:"butt"};
     L.polyline(seg(d.a,d.b).map(g=>[g.lat,g.lon]),st).addTo(layer); });
   if(ui.lay.road) drawGradeLayer(sel);
+  if(ui.lay.rep&&typeof drawReports==="function") drawReports(sel);
   if(panel){ drawPanelLayer(); return; }
   if(stopFocus&&sel&&stopFocus.k===ui.tab&&drawStopLayer()) return;
   if(focusR){ const s=seg(focusR.a,focusR.b); if(s.length>1){L.polyline(s.map(g=>[g.lat,g.lon]),{color:"#B26A00",weight:7}).addTo(layer); map.fitBounds(L.latLngBounds(s.map(g=>[g.lat,g.lon])),{padding:[30,30]});} }
@@ -876,8 +877,8 @@ function drawPanelLayer(){
 }
 
 /* ---------- icon bar: what to show on the map ---------- */
-const LAY=[["fuel","⛽","Fuel","Fuel stations on the route"],["stay","🛏","Stay","Places to stay at night stops"],["food","🍴","Food","Places to eat"],["sights","★","Sights","Sights, viewpoints and passes"],["med","🏥","Medical","Hospitals and clinics"],["road","🛣","Road grade","The route coloured by grade, G1 tar to G5 expert"]];
-ui.lay=Object.assign({fuel:true,stay:!!ui.sleep,food:!!ui.types.food,sights:true,med:false},ui.lay||{});
+const LAY=[["fuel","⛽","Fuel","Fuel stations on the route"],["stay","🛏","Stay","Places to stay at night stops"],["food","🍴","Food","Places to eat"],["sights","★","Sights","Sights, viewpoints and passes"],["med","🏥","Medical","Hospitals and clinics"],["rep","📣","Rider reports","What riders reported on the road lately"],["road","🛣","Road grade","The route coloured by grade, G1 tar to G5 expert"]];
+ui.lay=Object.assign({fuel:true,stay:!!ui.sleep,food:!!ui.types.food,sights:true,med:false,rep:true},ui.lay||{}); if(ui.lay.rep===undefined) ui.lay.rep=true;
 function renderLayers(){
   $("iconbar").innerHTML=`<span class="ibhead">On the map</span>`+LAY.map(([id,ic,w,t])=>{ const on=!!ui.lay[id];
     return `<button type="button" class="ib ${on?"on":""}" data-lay="${id}" title="${esc(w)}: ${esc(t)}" aria-label="${esc(w)}" aria-pressed="${on}">${ic}</button>`; }).join("")

@@ -103,6 +103,7 @@ function goodToKnow(k){
     if(near) add("warn","route","Border post "+b.name+": "+b.hours+". Passport, bike papers and a letter of authority if the bike isn't in your name."); });
   if(w&&w.tz) add("info","route","Clocks change today: "+utc(w.tz.from)+" to "+utc(w.tz.to)+".");
 
+  if(typeof reportsFor==="function") reportsFor(k).forEach(function(r){ add(r.lvl,"route",r.text); });
   var rank={bad:0,warn:1,info:2};
   return out.sort(function(a,b){return rank[a.lvl]-rank[b.lvl];});
 }

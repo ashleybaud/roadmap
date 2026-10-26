@@ -188,6 +188,20 @@ __name2(sendEmail, "sendEmail");
 var validEmail = /* @__PURE__ */ __name2((e) => typeof e === "string" && e.length <= 200 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e), "validEmail");
 var clean = /* @__PURE__ */ __name2((s, n) => String(s == null ? "" : s).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, "").trim().slice(0, n), "clean");
 var escHtml = /* @__PURE__ */ __name2((s) => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]), "escHtml");
+var isAdmin = /* @__PURE__ */ __name2((env, u) => !!(u && (env.ADMIN_EMAILS || "").toLowerCase().split(/[,\s]+/).filter(Boolean).includes(u.email)), "isAdmin");
+var REPORT_KINDS = {
+  fuel_ok: { label: "Fuel available", days: 30 },
+  no_fuel: { label: "No fuel", days: 30 },
+  road_closed: { label: "Road closed", days: 14 },
+  washaway: { label: "Washaway or flood damage", days: 45 },
+  bad_road: { label: "Bad surface: corrugations, ruts, sand", days: 45 },
+  graded: { label: "Freshly graded", days: 30 },
+  roadworks: { label: "Roadworks or stop-go", days: 30 },
+  river_high: { label: "River crossing high", days: 7 },
+  animals: { label: "Animals on the road", days: 14 },
+  danger: { label: "Danger: crime or unsafe stop", days: 30 },
+  good_stay: { label: "Good place to stay or eat", days: 365 }
+};
 var onRequestPost = handle(async ({ request, env }) => {
   sameOrigin(request);
   return json({ ok: true }, 200, { "Set-Cookie": await endSession(env, request) });
@@ -254,6 +268,17 @@ var onRequestGet2 = handle(async ({ request, env }) => {
   const cookie = await startSession(env, user.id), back = tok.back || "/";
   return new Response(null, { status: 302, headers: { "Location": back + (back.includes("?") ? "&" : "?") + "signedin=1", "Set-Cookie": cookie, "Cache-Control": "no-store" } });
 });
+var onRequestGet3 = handle(async ({ request, env }) => {
+  const region = clean(new URL(request.url).searchParams.get("region"), 10);
+  const D = await db(env);
+  const q = `SELECT r.id, r.title, r.summary, r.km, r.days, r.vehicle, r.style, r.region, r.pick, r.grade_json, r.updated,
+      (SELECT ROUND(AVG(stars),1) FROM route_ratings WHERE route_id = r.id AND stars IS NOT NULL) AS stars,
+      (SELECT COUNT(*) FROM route_ratings WHERE route_id = r.id) AS ratings
+    FROM routes r WHERE r.visibility = 'public' ${region ? "AND (r.region = ?1 OR r.region IS NULL)" : ""} ORDER BY r.pick DESC, ratings DESC, r.updated DESC LIMIT 200`;
+  const st = D.prepare(q);
+  const res = await (region ? st.bind(region) : st).all();
+  return json({ routes: res.results || [] });
+});
 function routeCols(b) {
   const trip = b.trip;
   if (!trip || typeof trip !== "object" || !Array.isArray(trip.days) || !trip.start)
@@ -276,7 +301,7 @@ function routeCols(b) {
 __name(routeCols, "routeCols");
 __name2(routeCols, "routeCols");
 var LIST_COLS = `id, title, summary, km, days, vehicle, style, visibility, pick, grade_json, created, updated`;
-var onRequestGet3 = handle(async ({ request, env }) => {
+var onRequestGet4 = handle(async ({ request, env }) => {
   const u = await requireUser(env, request);
   const r = await (await db(env)).prepare(`SELECT ${LIST_COLS} FROM routes WHERE user_id = ? ORDER BY updated DESC LIMIT 200`).bind(u.id).all();
   return json({ routes: r.results || [] });
@@ -301,18 +326,23 @@ async function own(env, request, id) {
 }
 __name(own, "own");
 __name2(own, "own");
-var onRequestGet4 = handle(async ({ request, env, params }) => {
+var onRequestGet5 = handle(async ({ request, env, params }) => {
   const D = await db(env), r = await D.prepare(`SELECT * FROM routes WHERE id = ?`).bind(params.id).first();
   const u = await currentUser(env, request), mine = !!(r && u && r.user_id === u.id);
   if (!r || !mine && r.visibility === "private")
     throw new HttpError(404, "Route not found, or it isn't shared.");
   const { data, user_id, ...rest } = r;
-  return json({ route: { ...rest, mine, ...JSON.parse(data) } });
+  return json({ route: { ...rest, mine, ...JSON.parse(data) }, admin: isAdmin(env, u) });
 });
 var onRequestPut = handle(async ({ request, env, params }) => {
   sameOrigin(request);
-  const { D, r } = await own(env, request, params.id), b = await body(request);
+  const { u, D, r } = await own(env, request, params.id), b = await body(request);
   const vis = VIS.includes(b.visibility) ? b.visibility : r.visibility;
+  if (b.pick != null) {
+    if (!isAdmin(env, u))
+      throw new HttpError(403, "Only OneTrackMind can make a route a pick.");
+    await D.prepare(`UPDATE routes SET pick = ?, visibility = CASE WHEN ? = 1 THEN 'public' ELSE visibility END WHERE id = ?`).bind(b.pick ? 1 : 0, b.pick ? 1 : 0, r.id).run();
+  }
   if (b.trip) {
     const c = routeCols({ ...b, title: b.title || r.title });
     await D.prepare(`UPDATE routes SET title=?, summary=?, data=?, km=?, days=?, vehicle=?, style=?, region=?, start_lat=?, start_lon=?, grade_json=?, visibility=?, updated=? WHERE id=?`).bind(c.title, c.summary, c.data, c.km, c.days, c.vehicle, c.style, c.region, c.start_lat, c.start_lon, c.grade_json, vis, now(), r.id).run();
@@ -427,6 +457,73 @@ async function onRequestPost6({ request }) {
 }
 __name(onRequestPost6, "onRequestPost6");
 __name2(onRequestPost6, "onRequestPost");
+async function checkRoute(D, id, u) {
+  if (/^pick:[a-z0-9-]{2,60}$/.test(id))
+    return;
+  const r = await D.prepare(`SELECT user_id, visibility FROM routes WHERE id = ?`).bind(id).first();
+  if (!r || r.visibility === "private" && (!u || r.user_id !== u.id))
+    throw new HttpError(404, "Route not found.");
+}
+__name(checkRoute, "checkRoute");
+__name2(checkRoute, "checkRoute");
+var onRequestGet6 = handle(async ({ request, env }) => {
+  const id = new URL(request.url).searchParams.get("route") || "", D = await db(env), u = await currentUser(env, request);
+  const s = await D.prepare(`SELECT ROUND(AVG(stars),1) AS stars, ROUND(AVG(grade),1) AS grade, COUNT(*) AS n FROM route_ratings WHERE route_id = ?`).bind(id).first();
+  const mine = u ? await D.prepare(`SELECT stars, grade, rode_on, vehicle FROM route_ratings WHERE route_id = ? AND user_id = ?`).bind(id, u.id).first() : null;
+  return json({ ...s || { n: 0 }, mine: mine || null });
+});
+var onRequestPost7 = handle(async ({ request, env }) => {
+  sameOrigin(request);
+  const u = await requireUser(env, request), b = await body(request, 4e3), D = await db(env);
+  const id = String(b.route || "");
+  await checkRoute(D, id, u);
+  const stars = Math.round(+b.stars), grade = Math.round(+b.grade);
+  if (!(stars >= 1 && stars <= 5))
+    throw new HttpError(400, "Pick 1 to 5 stars.");
+  if (!(grade >= 1 && grade <= 5))
+    throw new HttpError(400, "Pick the grade you found it.");
+  const rode = String(b.rode_on || "");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(rode) || rode > (/* @__PURE__ */ new Date()).toISOString().slice(0, 10))
+    throw new HttpError(400, "When did you ride it? Only riders who've ridden it can rate it.");
+  await D.prepare(`INSERT INTO route_ratings (route_id, user_id, stars, grade, rode_on, vehicle, created) VALUES (?,?,?,?,?,?,?)
+    ON CONFLICT(route_id, user_id) DO UPDATE SET stars=excluded.stars, grade=excluded.grade, rode_on=excluded.rode_on, vehicle=excluded.vehicle, created=excluded.created`).bind(id, u.id, stars, grade, rode, ["bike", "jeep", "car"].includes(b.vehicle) ? b.vehicle : null, now()).run();
+  return json({ ok: true });
+});
+var onRequestGet7 = handle(async ({ request, env }) => {
+  const q = new URL(request.url).searchParams, n = /* @__PURE__ */ __name2((k) => +q.get(k), "n");
+  const [s, w, nn, e] = [n("s"), n("w"), n("n"), n("e")];
+  if (![s, w, nn, e].every(Number.isFinite) || nn - s > 25 || e - w > 25)
+    throw new HttpError(400, "Give a smaller area.");
+  const D = await db(env), u = await currentUser(env, request);
+  const r = await D.prepare(`SELECT id, kind, text, lat, lon, seen_on, created, user_id FROM reports WHERE lat BETWEEN ? AND ? AND lon BETWEEN ? AND ? AND expires > ? ORDER BY created DESC LIMIT 300`).bind(s, nn, w, e, now()).all();
+  return json({
+    kinds: Object.fromEntries(Object.entries(REPORT_KINDS).map(([k, v]) => [k, v.label])),
+    reports: (r.results || []).map(({ user_id, ...x }) => ({ ...x, label: (REPORT_KINDS[x.kind] || {}).label || x.kind, mine: !!(u && user_id === u.id) }))
+  });
+});
+var onRequestPost8 = handle(async ({ request, env }) => {
+  sameOrigin(request);
+  const u = await requireUser(env, request), b = await body(request, 4e3), D = await db(env);
+  const k = REPORT_KINDS[b.kind];
+  if (!k)
+    throw new HttpError(400, "Pick what you saw.");
+  const lat = +b.lat, lon = +b.lon;
+  if (!Number.isFinite(lat) || !Number.isFinite(lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180)
+    throw new HttpError(400, "Where was it?");
+  const today = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10), seen = /^\d{4}-\d{2}-\d{2}$/.test(b.seen_on || "") && b.seen_on <= today ? b.seen_on : today;
+  const recent = await D.prepare(`SELECT COUNT(*) AS n FROM reports WHERE user_id = ? AND created > ?`).bind(u.id, now() - 36e5).first();
+  if (recent && recent.n >= 30)
+    throw new HttpError(429, "That's a lot of reports in an hour. Try again later.");
+  const id = newId(8), from = Date.parse(seen + "T12:00:00Z");
+  await D.prepare(`INSERT INTO reports (id, route_id, user_id, kind, text, lat, lon, seen_on, expires, created) VALUES (?,?,?,?,?,?,?,?,?,?)`).bind(id, clean(b.route, 80) || null, u.id, b.kind, clean(b.text, 500) || null, lat, lon, seen, from + k.days * 864e5, now()).run();
+  return json({ ok: true, id });
+});
+var onRequestDelete3 = handle(async ({ request, env }) => {
+  sameOrigin(request);
+  const u = await requireUser(env, request), id = new URL(request.url).searchParams.get("id") || "";
+  await (await db(env)).prepare(`DELETE FROM reports WHERE id = ? AND user_id = ?`).bind(id, u.id).run();
+  return json({ ok: true });
+});
 async function onRequest(ctx) {
   const u = new URL(ctx.request.url);
   if (u.hostname === "www.onetrackmind.online") {
@@ -467,22 +564,29 @@ var routes = [
     modules: [onRequestGet2]
   },
   {
-    routePath: "/api/routes/:id",
+    routePath: "/api/routes/public",
     mountPath: "/api/routes",
+    method: "GET",
+    middlewares: [],
+    modules: [onRequestGet3]
+  },
+  {
+    routePath: "/api/routes/:id",
+    mountPath: "/api/routes/:id",
     method: "DELETE",
     middlewares: [],
     modules: [onRequestDelete]
   },
   {
     routePath: "/api/routes/:id",
-    mountPath: "/api/routes",
+    mountPath: "/api/routes/:id",
     method: "GET",
     middlewares: [],
-    modules: [onRequestGet4]
+    modules: [onRequestGet5]
   },
   {
     routePath: "/api/routes/:id",
-    mountPath: "/api/routes",
+    mountPath: "/api/routes/:id",
     method: "PUT",
     middlewares: [],
     modules: [onRequestPut]
@@ -516,11 +620,46 @@ var routes = [
     modules: [onRequestPost6]
   },
   {
+    routePath: "/api/ratings",
+    mountPath: "/api",
+    method: "GET",
+    middlewares: [],
+    modules: [onRequestGet6]
+  },
+  {
+    routePath: "/api/ratings",
+    mountPath: "/api",
+    method: "POST",
+    middlewares: [],
+    modules: [onRequestPost7]
+  },
+  {
+    routePath: "/api/reports",
+    mountPath: "/api",
+    method: "DELETE",
+    middlewares: [],
+    modules: [onRequestDelete3]
+  },
+  {
+    routePath: "/api/reports",
+    mountPath: "/api",
+    method: "GET",
+    middlewares: [],
+    modules: [onRequestGet7]
+  },
+  {
+    routePath: "/api/reports",
+    mountPath: "/api",
+    method: "POST",
+    middlewares: [],
+    modules: [onRequestPost8]
+  },
+  {
     routePath: "/api/routes",
     mountPath: "/api/routes",
     method: "GET",
     middlewares: [],
-    modules: [onRequestGet3]
+    modules: [onRequestGet4]
   },
   {
     routePath: "/api/routes",
