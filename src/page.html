@@ -35,7 +35,7 @@ h3{font-size:1.1rem;font-weight:600}
 a{color:var(--accent)}
 header{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;border-bottom:2px solid var(--ink);padding-bottom:8px}
 input,select,button{font:inherit;color:inherit}
-input[type=text],input[type=number],input[type=time],input[type=date],select{background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:7px 9px;width:100%}
+input[type=text],input[type=email],input[type=number],input[type=time],input[type=date],select{background:var(--bg);border:1px solid var(--line);border-radius:4px;padding:7px 9px;width:100%}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .btn{border:1px solid var(--ink);background:var(--ink);color:var(--bg);border-radius:4px;padding:7px 12px;font-weight:600;cursor:pointer;white-space:nowrap}
 .btn.ghost{background:transparent;color:var(--ink)}
@@ -388,6 +388,15 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .gpxbtn{cursor:pointer}
 .gpxnote{font-weight:700;border:1px solid var(--line);border-radius:4px;padding:1px 5px}
 .welcome{max-width:560px}
+.dlgwrap{display:flex;flex-direction:column;gap:12px}
+.dlghead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+#fText{width:100%;font:inherit;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);resize:vertical}
+.rlist{display:flex;flex-direction:column;gap:6px;max-height:50vh;overflow:auto}
+.rrow{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--line);border-radius:6px;padding:8px 10px;background:var(--panel)}
+.rrow .rt{font-weight:600}
+.rrow .ract{display:flex;gap:6px;flex:none}
+.acctline{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding-top:10px}
+.okmsg{color:var(--ok);font-weight:600}.errmsg{color:var(--bad);font-weight:600}
 .guide{border:2px solid var(--ink);border-radius:8px;background:var(--panel);padding:0 14px}
 .guide>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:10px 0}
 .guide>summary::-webkit-details-marker{display:none}
@@ -416,7 +425,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 <div class="wrap">
   <header>
     <div><h1>OneTrackMind <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><div class="note">Every great route, graded for your skill, planned day by day.</div></div>
-    <div class="btns"><span class="lbl mono" id="hdrSummary"></span><a class="btn ghost" id="feedback" href="#" hidden>Send feedback</a><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
+    <div class="btns"><span class="lbl mono" id="hdrSummary"></span><button class="btn ghost" id="feedback" type="button">Send feedback</button><button class="btn ghost" id="acctBtn" type="button" hidden>Sign in</button><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
   </header>
 
   <details class="guide" id="guide">
@@ -504,6 +513,23 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
     </ol>
     <p class="note" style="margin:0">Have a route already? Use <b>Plan from a GPX file</b> and it's split into days for you. Trips are saved on this device only. You can change all of this later in Settings.</p>
     <div class="btns" style="justify-content:flex-end"><button class="btn" value="ok">Start planning</button></div>
+  </form>
+</dialog>
+<dialog id="acctDlg" class="welcome" aria-labelledby="aTitle">
+  <div class="dlgwrap">
+    <div class="dlghead"><h2 id="aTitle">Sign in</h2><button class="icon" type="button" data-aclose aria-label="Close">✕</button></div>
+    <div id="aBody"></div>
+  </div>
+</dialog>
+<dialog id="fbDlg" class="welcome" aria-labelledby="fTitle">
+  <form class="dlgwrap" id="fbForm">
+    <div class="dlghead"><h2 id="fTitle">Send feedback</h2><button class="icon" type="button" data-fclose aria-label="Close">✕</button></div>
+    <div class="field"><label class="lbl" for="fKind">What's it about?</label><select id="fKind"><option value="feedback">Feedback or an idea</option><option value="fix">Something's wrong on the map: fuel, a road, a place</option><option value="bug">Something didn't work</option></select></div>
+    <div class="note" id="fWhere" hidden></div>
+    <div class="field"><label class="lbl" for="fText">Tell us</label><textarea id="fText" rows="5" maxlength="4000" required placeholder="What worked, what didn't, what you'd change"></textarea></div>
+    <div class="field" id="fEmailRow"><label class="lbl" for="fEmail">Your email, if you'd like a reply</label><input id="fEmail" type="email" autocomplete="email" placeholder="optional"></div>
+    <label class="chk"><input type="checkbox" id="fTrip" checked> Include this trip so we can see what you saw</label>
+    <div class="btns" style="justify-content:flex-end"><span class="note" id="fMsg"></span><button class="btn" type="submit" id="fSend">Send</button></div>
   </form>
 </dialog>
 <dialog id="settings">
