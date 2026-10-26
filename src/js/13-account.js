@@ -4,14 +4,18 @@ const acct={ready:false,user:null,routes:null};
 async function api(path,opt){
   const o=Object.assign({headers:{}},opt||{}); if(o.body&&typeof o.body!=="string"){ o.body=JSON.stringify(o.body); o.headers["Content-Type"]="application/json"; }
   const r=await fetch(path,o); let j=null; try{ j=await r.json(); }catch(e){}
+  if(r.status===428){ acct.contributor=false; if(typeof openContrib==="function"&&!$("contribDlg").open) openContrib(); throw new Error("Agree to the contributor rules first."); }
   if(!r.ok) throw new Error((j&&j.error)||"Couldn't reach OneTrackMind. Check your connection.");
   return j||{};
 }
 async function loadMe(){
-  try{ const j=await api("/api/auth/me"); acct.ready=!!(j&&j.ready); acct.user=j&&j.user||null; acct.admin=!!(j&&j.admin); }catch(e){ acct.ready=false; acct.user=null; }
+  try{ const j=await api("/api/auth/me"); acct.ready=!!(j&&j.ready); acct.user=j&&j.user||null; acct.admin=!!(j&&j.admin); acct.contributor=!!(j&&j.contributor); }catch(e){ acct.ready=false; acct.user=null; }
+  // ticked "Become a contributor" when signing in: record it now
+  try{ if(acct.user&&!acct.contributor&&localStorage.getItem("otm-wantcontrib")==="1"){ await api("/api/account",{method:"POST",body:{contributor:true}}); acct.contributor=true; localStorage.removeItem("otm-wantcontrib"); } }catch(e){}
   const b=$("acctBtn"); b.hidden=!acct.ready; b.textContent=acct.user?"My routes":"Sign in"; $("addBtn").hidden=!acct.ready;
   if(typeof refreshReview==="function") refreshReview();
   renderAll();
+  if(typeof fabBadge==="function"){ fabBadge(); flushOutbox(); }
 }
 function saveRouteBtn(){ return acct.ready?`<button class="btn small ghost" type="button" data-saveroute>${trip.savedId&&acct.user?"Update saved route":"Save route"}</button>`:""; }
 const tripKm=()=>plan?Math.round(plan.days.reduce((t,d)=>t+(d?d.km:0),0)):null;
@@ -27,9 +31,11 @@ function renderAcct(msg){
     $("aTitle").textContent="Sign in";
     B.innerHTML=`${m}<p class="note" style="margin:0">${esc(acct.why||"Save your routes and open them on any device.")} We'll email you a link to sign in. No password.</p>
       <form id="aForm" class="dlgwrap"><div class="field"><label class="lbl" for="aEmail">Your email</label><input id="aEmail" type="email" autocomplete="email" required></div>
+      <label class="chk"><input type="checkbox" id="aContrib" ${acct.wantContrib?"checked":""}> Become a contributor: I'll add routes, places and road reports, and I agree to the <a href="/rules.html" target="_blank">contributor rules</a></label>
       <div class="btns" style="justify-content:flex-end"><button class="btn" type="submit">Email me a link</button></div></form>
       <p class="note" style="margin:0">We keep your email and the routes you save, nothing else. See <a href="/privacy.html" target="_blank">privacy</a>.</p>`;
-    $("aForm").onsubmit=async e=>{ e.preventDefault(); const email=$("aEmail").value.trim(), btn=e.target.querySelector("button"); btn.disabled=true; btn.textContent="Sending…";
+    $("aForm").onsubmit=async e=>{ e.preventDefault(); const email=$("aEmail").value.trim(), btn=e.target.querySelector("button[type=submit]")||e.target.querySelector(".btns button"); btn.disabled=true; btn.textContent="Sending…";
+      try{ if($("aContrib").checked) localStorage.setItem("otm-wantcontrib","1"); else localStorage.removeItem("otm-wantcontrib"); }catch(err){}
       try{ await api("/api/auth/start",{method:"POST",body:{email,back:"/"}}); acctMode="sent"; acct.sentTo=email; renderAcct(); }
       catch(err){ btn.disabled=false; btn.textContent="Email me a link"; renderAcct({err:1,text:err.message}); $("aEmail").value=email; } };
     setTimeout(()=>$("aEmail")&&$("aEmail").focus(),50);
@@ -48,10 +54,11 @@ function renderAcct(msg){
     B.innerHTML=`${m}${plan?`<div class="btns"><button class="btn small" type="button" data-saveroute>${trip.savedId?"Update this route":"Save this trip"}</button></div>`:""}
       <div class="rlist">${R==null?`<div class="note">Loading…</div>`:R.length?R.map(r=>`<div class="rrow"><div><div class="rt">${esc(r.title)}</div><div class="note">${r.km?r.km.toLocaleString()+" km · ":""}${r.days} day${r.days>1?"s":""}${r.vehicle?" · "+esc((VEHICLES[r.vehicle]||"").replace(/^\S+\s/,"")):""} · ${esc(new Date(r.updated).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}))}</div></div>
         <div class="ract">${acct.admin?`<button class="btn small ghost" type="button" data-rpick="${r.id}:${r.pick?0:1}">${r.pick?"Unpick":"Make pick"}</button>`:r.visibility==="public"?`<span class="note">Public</span>`:r.visibility==="review"?`<span class="note" title="We check every shared route before other riders see it">Waiting for approval</span>`:`<button class="btn small ghost" type="button" data-rpub="${r.id}" title="Let other riders find and rate it">Share publicly</button>`}<button class="btn small" type="button" data-ropen="${r.id}">Open</button><button class="icon" type="button" title="Delete" data-rdel="${r.id}">✕</button></div></div>`).join(""):`<div class="note">Nothing saved yet. Plan a trip, then tap Save route.</div>`}</div>
+      ${typeof marksHtml==="function"?marksHtml():""}
       <div class="acctline"><span class="note">Signed in as <b>${esc(acct.user.email)}</b></span><span class="btns"><button class="linkbtn" type="button" data-signout>Sign out</button><button class="linkbtn" type="button" data-delacct>${acct.delArm?"Tap again to delete your account and routes":"Delete account"}</button></span></div>`;
   }
 }
-async function loadRoutes(){ try{ acct.routes=(await api("/api/routes")).routes; }catch(e){ acct.routes=[]; renderAcct({err:1,text:e.message}); return; } if(acctMode==="routes") renderAcct(); }
+async function loadRoutes(){ if(typeof loadMyMarks==="function") loadMyMarks(); try{ acct.routes=(await api("/api/routes")).routes; }catch(e){ acct.routes=[]; renderAcct({err:1,text:e.message}); return; } if(acctMode==="routes") renderAcct(); }
 async function saveRoute(update){
   const body={title:($("sTitle")&&$("sTitle").value.trim())||defaultTitle(),trip:JSON.parse(JSON.stringify(trip)),settings,km:tripKm(),summary:tripSummary(),region:trip.start&&trip.start.lat<-16&&trip.start.lat>-35?"za":"",grade:(()=>{ const G=tripGrade(); return G?{km:G.km.map(x=>Math.round(x)),top:G.top}:null; })()};
   delete body.trip.savedId; delete body.trip.savedTitle;
@@ -103,7 +110,7 @@ document.addEventListener("click",e=>{ if(!e.target.closest("#details [data-save
 if(/[?&]signedin=1/.test(location.search)){ history.replaceState(null,"",location.pathname); setTimeout(()=>{ if(acct.user){ const tt=$("toast"); tt.innerHTML=`You're signed in as <b>${esc(acct.user.email)}</b>. If OneTrackMind is open in another tab, you can close that one.`; tt.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>tt.hidden=true,12000); } },1500); }
 // signed in from the email in another tab? notice it when this tab is looked at again
 { let lastCheck=0; const recheck=()=>{ if(document.visibilityState!=="visible"||acct.user||!acct.ready||Date.now()-lastCheck<3000) return; lastCheck=Date.now();
-    api("/api/auth/me").then(j=>{ if(j&&j.user){ acct.user=j.user; acct.admin=!!j.admin; $("acctBtn").textContent="My routes"; if(typeof refreshReview==="function") refreshReview(); if($("acctDlg").open&&acctMode==="sent"){ $("acctDlg").close(); } renderAll(); $("status").textContent=`Signed in as ${j.user.email}.`; } }).catch(()=>{}); };
+    api("/api/auth/me").then(j=>{ if(j&&j.user){ acct.user=j.user; acct.admin=!!j.admin; acct.contributor=!!j.contributor; $("acctBtn").textContent="My routes"; if(typeof flushOutbox==="function") flushOutbox(); if(typeof refreshReview==="function") refreshReview(); if($("acctDlg").open&&acctMode==="sent"){ $("acctDlg").close(); } renderAll(); $("status").textContent=`Signed in as ${j.user.email}.`; } }).catch(()=>{}); };
   document.addEventListener("visibilitychange",recheck); window.addEventListener("focus",recheck); }
 
 /* ---------- feedback and suggested changes: stored and emailed to us; plain email if the server can't take it ---------- */

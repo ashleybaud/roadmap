@@ -28,6 +28,9 @@ const SCHEMA = [
 // columns added after tables already existed (each runs once; "duplicate column" errors are expected afterwards)
 const MIGRATIONS = [
   `ALTER TABLE reports ADD COLUMN status TEXT NOT NULL DEFAULT 'ok'`,
+  `ALTER TABLE users ADD COLUMN contributor INTEGER NOT NULL DEFAULT 0`,
+  `ALTER TABLE users ADD COLUMN blocked INTEGER NOT NULL DEFAULT 0`,
+  `ALTER TABLE users ADD COLUMN trusted INTEGER NOT NULL DEFAULT 0`,
 ];
 let schemaReady = null;
 export async function db(env) {
@@ -81,9 +84,9 @@ function cookieVal(request, name) {
 export async function currentUser(env, request) {
   const raw = cookieVal(request, COOKIE); if (!raw || !env.DB) return null;
   const D = await db(env), sid = await sha256(raw);
-  const row = await D.prepare(`SELECT u.id, u.email, u.name, s.expires FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.id = ?`).bind(sid).first();
+  const row = await D.prepare(`SELECT u.id, u.email, u.name, u.contributor, u.blocked, u.trusted, s.expires FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.id = ?`).bind(sid).first();
   if (!row || row.expires < now()) return null;
-  return { id: row.id, email: row.email, name: row.name };
+  return { id: row.id, email: row.email, name: row.name, contributor: !!row.contributor, blocked: !!row.blocked, trusted: !!row.trusted };
 }
 export async function requireUser(env, request) {
   const u = await currentUser(env, request);
@@ -136,3 +139,10 @@ export const REPORT_KINDS = {
 };
 
 export const SPOT_KINDS = { view: "Viewpoint", pass: "Pass", farmstall: "Farm stall", coffee: "Coffee or food", stay: "Bike-friendly stay", camp: "Camping", workshop: "Workshop or tyres", fuel: "Fuel", water: "Water", other: "Worth a stop" };
+
+// adding things for other riders: needs the contributor rules agreed, and not blocked. Admin and trusted riders go live straight away.
+export function requireContributor(env, u) {
+  if (u.blocked) throw new HttpError(403, "Your account can't add things for other riders. Email hello@onetrackmind.online if you think that's wrong.");
+  if (!u.contributor && !isAdmin(env, u)) throw new HttpError(428, "contributor");
+}
+export const liveStatus = (env, u) => (isAdmin(env, u) || u.trusted ? "ok" : "pending");

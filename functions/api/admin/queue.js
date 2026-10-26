@@ -5,9 +5,9 @@ async function admin(env, request) { const u = await requireUser(env, request); 
 export const onRequestGet = handle(async ({ request, env }) => {
   await admin(env, request); const D = await db(env);
   const [routes, spots, reports, feedback] = await D.batch([
-    D.prepare(`SELECT r.id, r.title, r.summary, r.km, r.days, r.vehicle, r.updated, u.email FROM routes r JOIN users u ON u.id = r.user_id WHERE r.visibility = 'review' ORDER BY r.updated LIMIT 100`),
-    D.prepare(`SELECT s.id, s.kind, s.name, s.note, s.lat, s.lon, s.created, u.email FROM spots s JOIN users u ON u.id = s.user_id WHERE s.status = 'pending' ORDER BY s.created LIMIT 200`),
-    D.prepare(`SELECT r.id, r.kind, r.text, r.lat, r.lon, r.seen_on, r.created, u.email FROM reports r JOIN users u ON u.id = r.user_id WHERE r.status = 'pending' AND r.expires > ? ORDER BY r.created LIMIT 200`).bind(now()),
+    D.prepare(`SELECT r.id, r.title, r.summary, r.km, r.days, r.vehicle, r.updated, u.email, u.name AS who, u.id AS uid FROM routes r JOIN users u ON u.id = r.user_id WHERE r.visibility = 'review' ORDER BY r.updated LIMIT 100`),
+    D.prepare(`SELECT s.id, s.kind, s.name, s.note, s.lat, s.lon, s.created, u.email, u.name AS who, u.id AS uid FROM spots s JOIN users u ON u.id = s.user_id WHERE s.status = 'pending' ORDER BY s.created LIMIT 200`),
+    D.prepare(`SELECT r.id, r.kind, r.text, r.lat, r.lon, r.seen_on, r.created, u.email, u.name AS who, u.id AS uid FROM reports r JOIN users u ON u.id = r.user_id WHERE r.status = 'pending' AND r.expires > ? ORDER BY r.created LIMIT 200`).bind(now()),
     D.prepare(`SELECT id, kind, text, email, page, lat, lon, created FROM feedback WHERE status = 'new' ORDER BY created DESC LIMIT 200`),
   ]);
   return json({ routes: routes.results, spots: spots.results.map(s => ({ ...s, label: SPOT_KINDS[s.kind] || s.kind })),
@@ -19,6 +19,12 @@ export const onRequestPost = handle(async ({ request, env }) => {
   else if (b.type === "spot") await D.prepare(`UPDATE spots SET status = ?, reviewed = ? WHERE id = ?`).bind(ok ? "ok" : "rejected", now(), id).run();
   else if (b.type === "report") await D.prepare(`UPDATE reports SET status = ? WHERE id = ?`).bind(ok ? "ok" : "rejected", id).run();
   else if (b.type === "feedback") await D.prepare(`UPDATE feedback SET status = 'done' WHERE id = ?`).bind(id).run();
+  else if (b.type === "user" && b.action === "block") await D.batch([
+    D.prepare(`UPDATE users SET blocked = 1, trusted = 0 WHERE id = ?`).bind(id),
+    D.prepare(`UPDATE spots SET status = 'rejected' WHERE user_id = ? AND status = 'pending'`).bind(id),
+    D.prepare(`UPDATE reports SET status = 'rejected' WHERE user_id = ? AND status = 'pending'`).bind(id),
+    D.prepare(`UPDATE routes SET visibility = 'private' WHERE user_id = ? AND visibility = 'review'`).bind(id)]);
+  else if (b.type === "user" && b.action === "trust") await D.prepare(`UPDATE users SET trusted = 1 WHERE id = ? AND blocked = 0`).bind(id).run();
   else throw new HttpError(400, "Unknown item.");
   return json({ ok: true });
 });

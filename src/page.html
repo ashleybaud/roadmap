@@ -412,6 +412,14 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .addcard b{font-family:var(--f-display);font-size:1.2rem}.addcard span{font-size:.86rem;color:var(--muted)}
 .addcard:hover{background:color-mix(in srgb,var(--accent) 10%,var(--panel))}
 dialog.wide{max-width:760px;width:calc(100vw - 32px)}
+@media (max-width:1000px){.mapcol{position:relative}}
+.markfab{position:absolute;right:14px;bottom:28px;z-index:900;width:58px;height:58px;border-radius:50%;border:3px solid #fff;background:var(--ink);color:#fff;font-size:26px;box-shadow:0 3px 10px rgba(0,0,0,.35);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.markfab .qn{position:absolute;top:-4px;right:-4px;background:var(--warn);color:#fff;border-radius:10px;font:700 11px/18px system-ui;min-width:18px;height:18px;padding:0 4px}
+.markedit{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.markedit input{flex:1;min-width:140px}
+.qkgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
+.qkgrid button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:12px 6px;border:2px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;font-size:.8rem;cursor:pointer;min-height:84px}
+.qkgrid button span{font-size:28px;line-height:1}
+.qkgrid button:active{background:var(--ink);color:var(--bg)}
 .spotmk{width:24px;height:24px;border-radius:6px;background:#fff;border:2px solid #6B4E9B;display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,.35)}
 .spotmk.pend{border-style:dashed;opacity:.8}
 #map.picking{cursor:crosshair}
@@ -482,6 +490,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
 
       </div>
       <div id="map"></div>
+      <button type="button" class="markfab" id="markFab" hidden aria-label="Mark a place or report the road" title="Mark a place or report the road">📍</button>
     </div>
     <div class="panel" style="padding-top:8px">
       <div class="daytabs" id="dayTabs" role="tablist"></div>
@@ -614,6 +623,24 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
     <div class="dlghead"><h2 id="rvTitle">Waiting for approval</h2><button class="icon" type="button" data-rvclose aria-label="Close">✕</button></div>
     <div id="rvBody" class="rlist"></div>
   </div>
+</dialog>
+<dialog id="quickDlg" class="welcome" aria-labelledby="qkTitle">
+  <div class="dlgwrap">
+    <div class="dlghead"><div><h2 id="qkTitle">Where you are now</h2><div class="note" id="qkWhere">Pull over first. One tap saves it at your position.</div></div><button class="icon" type="button" data-qkclose aria-label="Close">✕</button></div>
+    <div class="lbl">Mark a place</div><div class="qkgrid" id="qkSpots"></div>
+    <div class="lbl">Report the road</div><div class="qkgrid" id="qkReps"></div>
+    <div class="note">No signal? It's kept on your phone and sent when you have signal. Add a name later under My routes → My marks.</div>
+    <div class="btns"><button class="linkbtn small" type="button" data-qkmap>Somewhere else? Tap the map instead</button></div>
+  </div>
+</dialog>
+<dialog id="contribDlg" class="welcome" aria-labelledby="ctTitle">
+  <form class="dlgwrap" id="contribForm">
+    <div class="dlghead"><h2 id="ctTitle">Become a contributor</h2><button class="icon" type="button" data-ctclose aria-label="Close">✕</button></div>
+    <p class="note" style="margin:0">Once, then marking a place is two taps. We check everything before other riders see it.</p>
+    <div class="field"><label class="lbl" for="ctName">Name other riders see</label><input id="ctName" type="text" maxlength="40" placeholder="e.g. Karoo Ash" autocomplete="nickname"></div>
+    <label class="chk"><input type="checkbox" id="ctAgree" required> I agree to the <a href="/rules.html" target="_blank">contributor rules</a></label>
+    <div class="btns" style="justify-content:flex-end"><span class="note" id="ctMsg"></span><button class="btn" type="submit">Agree and continue</button></div>
+  </form>
 </dialog>
 <dialog id="settings">
   <form method="dialog" style="display:flex;flex-direction:column;gap:12px">

@@ -1,5 +1,5 @@
 // GET one route (yours, or anyone's that's shared or public). PUT {title?, trip?, visibility?}: update yours. DELETE: remove yours.
-import { handle, json, body, db, currentUser, requireUser, sameOrigin, clean, now, HttpError, isAdmin } from "../../../../server/otm.js";
+import { handle, json, body, db, currentUser, requireUser, sameOrigin, clean, now, HttpError, isAdmin, requireContributor, liveStatus } from "../../../../server/otm.js";
 import { routeCols } from "../index.js";
 
 const VIS = ["private", "link", "public"]; // "public" asked by a rider becomes "review" until OneTrackMind approves it
@@ -19,7 +19,7 @@ export const onRequestGet = handle(async ({ request, env, params }) => {
 export const onRequestPut = handle(async ({ request, env, params }) => {
   sameOrigin(request); const { u, D, r } = await own(env, request, params.id), b = await body(request);
   let vis = VIS.includes(b.visibility) ? b.visibility : r.visibility;
-  if (vis === "public" && r.visibility !== "public" && !isAdmin(env, u)) vis = "review";
+  if (vis === "public" && r.visibility !== "public") { requireContributor(env, u); if (liveStatus(env, u) !== "ok") vis = "review"; }
   if (b.pick != null) { if (!isAdmin(env, u)) throw new HttpError(403, "Only OneTrackMind can make a route a pick."); await D.prepare(`UPDATE routes SET pick = ?, visibility = CASE WHEN ? = 1 THEN 'public' ELSE visibility END WHERE id = ?`).bind(b.pick ? 1 : 0, b.pick ? 1 : 0, r.id).run(); }
   if (b.trip) {
     const c = routeCols({ ...b, title: b.title || r.title });
