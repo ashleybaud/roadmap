@@ -32,9 +32,11 @@ const CSS = `:root{--bg:#EEF0EA;--panel:#fff;--ink:#18201C;--muted:#5C6660;--lin
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121614;--panel:#1A201D;--ink:#E7EBE5;--muted:#9AA39D;--line:#2E3631;--accent:#4CC08F;--chip:#232A26;color-scheme:dark}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.6 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
 a{color:var(--accent)}.wrap{max-width:820px;margin:0 auto;padding:0 16px}
-header{border-bottom:2px solid var(--ink);padding:14px 0 10px;display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;justify-content:space-between}
-.logo{font:700 1.7rem/1 "Barlow Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.02em;color:var(--ink);text-decoration:none}
-.motto{font:500 .85rem "IBM Plex Mono",monospace;color:var(--muted)}nav{display:flex;flex-wrap:wrap;gap:8px}nav a{font:700 1.05rem "Barlow Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;color:#fff;background:#0B6E4F;padding:5px 14px;border-radius:5px}
+header{border-bottom:2px solid var(--ink);padding:14px 0 12px}
+.logo{display:inline-block;font:700 2.7rem/1 "Barlow Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:-.005em;color:var(--ink);text-decoration:none}
+.motto{font:700 1.2rem "Barlow Condensed","Arial Narrow",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:2px 0 0}
+.hdrlinks{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.hdrlinks a{font:700 1.05rem "Barlow Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;color:#fff;background:#0B6E4F;padding:5px 14px;border-radius:5px;border:2px solid #0B6E4F}.hdrlinks a:hover{filter:brightness(1.12)}.hdrlinks a.on{background:transparent;color:var(--accent);border-color:var(--accent)}
+@media (max-width:640px){.logo{font-size:1.9rem}.motto{font-size:.95rem}.hdrlinks a{font-size:.95rem;padding:4px 10px}}
 h1,h2{font-family:"Barlow Condensed","Arial Narrow",sans-serif;line-height:1.1;text-transform:uppercase;letter-spacing:.01em}
 h1{font-size:2.4rem;margin:28px 0 6px}h2{font-size:1.5rem;margin:30px 0 8px}
 .meta{color:var(--muted);font-size:.95rem}.fdr{color:var(--accent);font-weight:600;margin:6px 0 0}
@@ -46,7 +48,7 @@ blockquote{margin:14px 0;padding:4px 16px;border-left:3px solid var(--accent);ba
 footer{border-top:1px solid var(--line);margin:40px 0 0;padding:16px 0 30px;color:var(--muted);font-size:.9rem}
 .note{font-size:.9rem;color:var(--muted)}`;
 
-function page({ url, title, desc, body, ld, image }) {
+function page({ url, title, desc, body, ld, image, active }) {
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -65,7 +67,7 @@ function page({ url, title, desc, body, ld, image }) {
 ${(Array.isArray(ld) ? ld : [ld]).filter(Boolean).map(x => `<script type="application/ld+json">${JSON.stringify(x)}</script>`).join("\n")}
 </head>
 <body><div class="wrap">
-<header><div><a class="logo" href="/">OneTrackMind</a> <span class="motto">Recce. Ride. Report.</span></div><nav><a href="/">Plan a trip</a><a href="/routes/">Routes</a><a href="/about/">About</a></nav></header>
+<header><a class="logo" href="/">OneTrackMind</a><div class="motto">Recce. Ride. Report.</div><nav class="hdrlinks" aria-label="Site">${[["/","Plan a trip"],["/routes/","Routes"],["/about/","About the founder"]].map(([h,t])=>`<a href="${h}"${active===h?' class="on" aria-current="page"':""}>${t}</a>`).join("")}<a href="${BLOG}" target="_blank" rel="noopener">Misadventures ↗</a></nav></header>
 ${body}
 <footer>OneTrackMind is a free trip planner for multi-day rides and drives: motorbikes, 4x4s and cars. Built by riders. Stories and misadventures on <a href="${BLOG}">onetrackmind.co.za</a>. · <a href="/privacy.html">Privacy</a> · <a href="/rules.html">Rules</a></footer>
 </div></body></html>
@@ -107,7 +109,7 @@ ${f.tips && f.tips.length ? `<h2>Good to know</h2><ul>${f.tips.map(t => `<li>${e
     provider: ORG, ...(f ? { author: FOUNDER } : {}),
     itinerary: { "@type": "ItemList", itemListElement: places(r).map((p, i) => ({ "@type": "ListItem", position: i + 1, item: { "@type": "Place", name: p.name, geo: { "@type": "GeoCoordinates", latitude: p.lat, longitude: p.lon } } })) },
   }, { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Routes", item: SITE + "/routes/" }, { "@type": "ListItem", position: 2, name: r.title, item: `${SITE}/routes/${r.id}/` }] }];
-  return page({ url: `/routes/${r.id}/`, title: `${r.title} · ${n}-day route · OneTrackMind`, desc, body, ld });
+  return page({ active: "/routes/", url: `/routes/${r.id}/`, title: `${r.title} · ${n}-day route · OneTrackMind`, desc, body, ld });
 }
 
 function routesIndex() {
@@ -118,7 +120,7 @@ function routesIndex() {
 <h2>OneTrackMind picks</h2><div class="cards">${oth.map(card).join("")}</div>
 <p>Got a road you love? <a href="/">Plan it, save it and share it</a>. We check every route before other riders see it.</p></main>`;
   const ld = { "@context": "https://schema.org", "@type": "CollectionPage", name: "OneTrackMind routes", url: SITE + "/routes/", hasPart: live.map(r => ({ "@type": "TouristTrip", name: r.title, url: `${SITE}/routes/${r.id}/` })) };
-  return page({ url: "/routes/", title: "Routes: multi-day motorbike, 4x4 and self-drive trips · OneTrackMind", desc: "Multi-day motorbike, 4x4 and self-drive routes in South Africa, Namibia, Lesotho and Europe, with fuel, night stops and road grades. Free to plan.", body, ld });
+  return page({ active: "/routes/", url: "/routes/", title: "Routes: multi-day motorbike, 4x4 and self-drive trips · OneTrackMind", desc: "Multi-day motorbike, 4x4 and self-drive routes in South Africa, Namibia, Lesotho and Europe, with fuel, night stops and road grades. Free to plan.", body, ld });
 }
 
 function aboutPage() {
@@ -138,7 +140,7 @@ function aboutPage() {
 <a class="cta" href="/">Plan your next trip</a>
 </main>`;
   const ld = [{ "@context": "https://schema.org", "@type": "AboutPage", url: SITE + "/about/", mainEntity: FOUNDER }, { "@context": "https://schema.org", ...FOUNDER, description: "Founder of OneTrackMind. 25 years in motorcycle retail (Ducati Cape Town, KTM Cape Town), adventure rider, Simola Hill Climb racer and Alfa Romeo builder in the Swartland, South Africa.", knowsAbout: ["Adventure motorcycling", "Namibia overland travel", "Hill climb racing", "Alfa Romeo restoration"] }];
-  return page({ url: "/about/", title: "About the founder · OneTrackMind", desc: "Ashley spent 25 years selling speed at Ducati and KTM Cape Town, has ridden Namibia since 2003, and built OneTrackMind: the free multi-day trip planner he wished he'd had.", body, ld });
+  return page({ active: "/about/", url: "/about/", title: "About the founder · OneTrackMind", desc: "Ashley spent 25 years selling speed at Ducati and KTM Cape Town, has ridden Namibia since 2003, and built OneTrackMind: the free multi-day trip planner he wished he'd had.", body, ld });
 }
 
 function write(rel, s) { const p = path.join(ROOT, rel); fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, s); }
