@@ -112,7 +112,7 @@ function daySuggest(k,ignoreAuto){
       return late.slice().sort((x,y)=>((x.off>2)-(y.off>2))||((!x.food)-(!y.food))||(y.km-x.km))[0]; };
     let pick=null, pi=-1; const fuelL=cands.filter(t=>t.fuel&&t.off<=40&&inWin(t,win));
     if(fuelL.length){ pick=choose(fuelL); pi=0; } else { const anyL=cands.filter(t=>t.off<=40&&inWin(t,win)); if(anyL.length){ pick=choose(anyL); pi=2; } }
-    if(pick&&pi>=2){ const nf=cands.filter(t=>t.fuel&&t.km>pos+5&&t.km<pd.b)[0]; probs.push({from:pos,to:nf?nf.km:pd.b,fromName:posName,toName:nf?nf.name:pd.pts[pd.pts.length-1].name}); }
+    if(pick&&pi>=2){ const nf=cands.filter(t=>t.fuel&&t.off<=40&&t.km>win&&t.km<pd.b)[0]; probs.push({from:pos,to:nf?nf.km:pd.b,fromName:posName,toName:nf?nf.name:pd.pts[pd.pts.length-1].name}); }
     if(pick){ sugg.push(pick); pos=pick.km; posName=pick.name; continue; }
     const next=cands.filter(t=>t.km>win&&t.km<pd.b).sort((x,y)=>(x.off<=5?0:1)-(y.off<=5?0:1)||x.km-y.km)[0];
     probs.push({from:pos,to:next?next.km:pd.b,fromName:posName,toName:next?next.name:pd.pts[pd.pts.length-1].name});

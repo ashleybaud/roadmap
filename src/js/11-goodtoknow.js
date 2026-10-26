@@ -35,10 +35,11 @@ function goodToKnow(k){
   var out=[], add=function(lvl,sec,text){ out.push({lvl:lvl,sec:sec,text:text}); };
   var last=pd.pts.length-1, to=pd.pts[last], date=dayDate(k), dateStr=addDays(trip.startDate,k);
   var arrive=arrMin(k,last), s=sunMin(k), w=dayWx(k), lastDay=k===nDays()-1;
+  var at=function(m){ return fmtT(m)+(m>=1440?" (after midnight)":""); };
 
   // ---- destination
   if(s!=null){
-    if(s<arrive) add("bad","dest","You arrive at "+to.name+" about "+fmtT(arrive)+", after sunset ("+fmtT(s)+"). Leave earlier or shorten the day.");
+    if(s<arrive) add("bad","dest","You arrive at "+to.name+" about "+at(arrive)+", after sunset ("+fmtT(s)+"). Leave earlier or shorten the day.");
     else if(s-arrive<60) add("warn","dest","You arrive at "+to.name+" about "+fmtT(arrive)+", "+Math.round(s-arrive)+" min before sunset ("+fmtT(s)+").");
     else add("info","dest","Arrive at "+to.name+" about "+fmtT(arrive)+" if you leave at "+fmtT(toMin(settings.leave))+". Sunset "+fmtT(s)+".");
   }
