@@ -5,7 +5,15 @@
 <meta name='impact-site-verification' value='b2c96c47-69eb-4d1d-9453-aa86bf1ccbb9'>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>OneTrackMind · Recce. Ride. Report.</title>
-<meta name="description" content="Plan multi-day rides and drives day by day: gravel or tar routes, fuel, night stops, sunset and weather. For motorbikes, 4x4s and cars.">
+<meta name="description" content="Free planner for multi-day motorbike, 4x4 and self-drive trips. Day by day on real roads: fuel gaps, night stops, camping and places to stay, sunset, weather and a grade for every road, read for your vehicle.">
+<link rel="canonical" href="https://onetrackmind.online/">
+<link rel="icon" href="/img/icon.svg" type="image/svg+xml">
+<meta property="og:type" content="website"><meta property="og:site_name" content="OneTrackMind">
+<meta property="og:title" content="OneTrackMind · Plan multi-day rides and drives">
+<meta property="og:description" content="Plan multi-day rides and drives on real roads. Fuel, night stops, and every road graded for your bike, 4x4 or car. Free.">
+<meta property="og:url" content="https://onetrackmind.online/"><meta property="og:image" content="https://onetrackmind.online/img/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","@id":"https://onetrackmind.online/#app","name":"OneTrackMind","url":"https://onetrackmind.online/","applicationCategory":"TravelApplication","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"ZAR"},"description":"Free planner for multi-day motorbike, 4x4 and self-drive trips: fuel stops and gaps, night stops and places to stay, sunset, weather, height profile and a road grade for every stretch, read for your vehicle.","publisher":{"@id":"https://onetrackmind.online/#org"}},{"@type":"Organization","@id":"https://onetrackmind.online/#org","name":"OneTrackMind","url":"https://onetrackmind.online/","logo":"https://onetrackmind.online/img/icon.svg","sameAs":["https://onetrackmind.co.za"],"founder":{"@type":"Person","name":"Ashley","url":"https://onetrackmind.online/about/"}}]}</script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -407,6 +415,11 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .rrow .ract{display:flex;gap:6px;flex:none}
 .acctline{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding-top:10px}
 .pkb{font-size:.86rem;margin-top:4px}
+.hdrlinks a{color:var(--accent);font-weight:600}
+.fdr{font-size:.8rem;color:var(--accent);font-weight:600;margin-top:2px}
+.drafttag{font:600 .7rem var(--f-mono);background:var(--warn);color:var(--onfill);padding:1px 6px;border-radius:3px;vertical-align:middle}
+.fdrbox{border-left:3px solid var(--accent);background:var(--chip);padding:8px 10px;margin:10px 0;font-size:.88rem}
+.fdrbox ul{margin:6px 0 6px 18px;padding:0}.fdrbox li{margin:2px 0}.fdrbox a{color:var(--accent)}
 .stayfield{grid-column:1/-1}
 .staychips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 8px}
 .staychips button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:16px;padding:4px 10px;cursor:pointer;font:inherit;font-size:.82rem}
@@ -469,7 +482,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
 <body>
 <div class="wrap">
   <header>
-    <div><h1>OneTrackMind <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><div class="note">Every great route, graded for your skill, planned day by day. <b>Built by riders:</b> add your favourite routes, mark the places worth stopping.</div></div>
+    <div><h1>OneTrackMind <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><div class="note">Every great route, graded for your skill, planned day by day. <b>Built by riders:</b> add your favourite routes, mark the places worth stopping.</div><div class="note hdrlinks"><a href="/routes/">Routes</a> · <a href="/about/">About the founder</a> · <a href="https://onetrackmind.co.za" target="_blank" rel="noopener">Misadventures</a></div></div>
     <div class="btns"><span class="lbl mono" id="hdrSummary"></span><button class="btn ghost" id="feedback" type="button">Send feedback</button><button class="btn" id="addBtn" type="button" hidden>+ Add yours</button><button class="btn ghost" id="reviewBtn" type="button" hidden>Review</button><button class="btn ghost" id="acctBtn" type="button" hidden>Sign in</button><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
   </header>
 

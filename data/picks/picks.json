@@ -3,6 +3,1642 @@
  "note": "OneTrackMind picks: real roads, first drafts to be ridden and checked",
  "routes": [
   {
+   "id": "namibia-2020-tortoise",
+   "title": "Northern Namibia in the Tortoise",
+   "region": "Namibia · Etosha, Kunene, Skeleton Coast",
+   "style": "rough",
+   "vehicles": [
+    "jeep",
+    "car"
+   ],
+   "blurb": "Ten days in a rented 4x4 camper: Etosha, Opuwo, Epupa Falls, Palmwag and down the Skeleton Coast to Walvis. Washed-away roads and blind river crossings after the rains.",
+   "founder": {
+    "year": 2020,
+    "ride": "Toyota 4x4 camper (the Tortoise), two-up",
+    "story": "The trip started with an expired passport at the check-in counter and only got better. Ten days in a rented camper with Logistics, no fixed plan and a paper map. Etosha after the rains, puddles deep enough to lose a number plate. Back to Opuwo, where the 2017 bike trip fell apart. Five hours for 180 km to Epupa, river crossings washed away, a croc in the reeds. Then Sesfontein, Palmwag, a puncture at 40 degrees and the Skeleton Coast, which my father always talked about and never saw. Not the same as a bike. Flexible, comfortable, and it still clears the mind.",
+    "posts": [
+     {
+      "t": "Day 0: We haven't left yet",
+      "u": "https://onetrackmind.co.za/2020/01/17/2020-namibia-day-0-we-havent-left-yet/"
+     },
+     {
+      "t": "Day 4: Why I ride",
+      "u": "https://onetrackmind.co.za/2020/01/20/2020-namibia-day-4-why-i-ride/"
+     },
+     {
+      "t": "Day 6: Punctured",
+      "u": "https://onetrackmind.co.za/2020/01/22/2020-namibia-day-5-punctured/"
+     },
+     {
+      "t": "Day 7: Skeleton Coast",
+      "u": "https://onetrackmind.co.za/2020/01/23/2020-namibia-day-6-skeleton-coast/"
+     },
+     {
+      "t": "Day 9: The End",
+      "u": "https://onetrackmind.co.za/2020/01/26/2020-namibia-day-9-the-end/"
+     }
+    ],
+    "tips": [
+     "Gondwana Card: South Africans save up to half on Gondwana lodges.",
+     "Epupa: don't swim in the river. Crocodiles.",
+     "Fill up at Torra Bay junction; fuel is far apart on the coast.",
+     "Two nights at Epupa. The planner shows it as one stop; add a rest day yourself."
+    ]
+   },
+   "trip": {
+    "start": {
+     "name": "Windhoek",
+     "lat": -22.57761,
+     "lon": 17.07727
+    },
+    "end": {
+     "name": "Windhoek",
+     "lat": -22.57761,
+     "lon": 17.07727
+    },
+    "round": false,
+    "days": [
+     {
+      "to": {
+       "name": "Outjo",
+       "lat": -20.11186,
+       "lon": 16.15669
+      },
+      "vias": [],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Namutoni (Etosha)",
+       "lat": -18.80811,
+       "lon": 16.94007
+      },
+      "vias": [
+       {
+        "name": "Andersson Gate",
+        "lat": -19.33145,
+        "lon": 15.94018
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Opuwo Country Lodge",
+       "lat": -18.04461,
+       "lon": 13.83337
+      },
+      "vias": [],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Omarunga, Epupa Falls",
+       "lat": -17.00205,
+       "lon": 13.24615
+      },
+      "vias": [],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Palmwag Lodge",
+       "lat": -19.88568,
+       "lon": 13.93691
+      },
+      "vias": [
+       {
+        "name": "Opuwo",
+        "lat": -18.06,
+        "lon": 13.84,
+        "fast": true
+       },
+       {
+        "name": "Sesfontein",
+        "lat": -19.12317,
+        "lon": 13.61758
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Henties Bay",
+       "lat": -22.11597,
+       "lon": 14.28266
+      },
+      "vias": [
+       {
+        "name": "Springbokwasser Gate",
+        "lat": -20.31055,
+        "lon": 13.64769
+       },
+       {
+        "name": "Torra Bay",
+        "lat": -20.32287,
+        "lon": 13.23804
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Walvis Bay",
+       "lat": -22.95576,
+       "lon": 14.50711
+      },
+      "vias": [],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Windhoek Game Camp",
+       "lat": -22.41504,
+       "lon": 17.05086
+      },
+      "vias": [],
+      "style": "default",
+      "legs": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "namibia-2020-orange-river",
+   "title": "Fish River Canyon and the Orange River",
+   "region": "Northern Cape · Southern Namibia",
+   "style": "rough",
+   "vehicles": [
+    "bike",
+    "jeep",
+    "car"
+   ],
+   "blurb": "Cape Town to Canyon Village in one 850 km day, the Fish River Canyon, the hot tar to Aus, then the Orange River road from Rosh Pinah to Noordoewer. Back over Piekenierskloof.",
+   "founder": {
+    "year": 2020,
+    "ride": "KTM 1290 Super Adventure, four riders",
+    "story": "A spontaneous baby shower for a riding mate. In Namibia, obviously. Day one was 850 km and my kind of day. Then the Fish River Canyon, Canyon Roadhouse and the straightest, hottest tar to Klein Aus at 41 degrees. Day three is the reason to go: the Orange River between Rosh Pinah and Noordoewer, my favourite piece of riding anywhere in the world. Fast, flowing, wheel to wheel with mates. TKC80s gave me grip to choose my lines while the General's tyres kept trying to put him in the river.",
+    "posts": [
+     {
+      "t": "Day 1",
+      "u": "https://onetrackmind.co.za/2020/02/01/namibia-2-day-1/"
+     },
+     {
+      "t": "Day 2",
+      "u": "https://onetrackmind.co.za/2020/02/02/namibia-2-day-2/"
+     },
+     {
+      "t": "Day 3",
+      "u": "https://onetrackmind.co.za/2020/02/03/namibia-2-day-3/"
+     },
+     {
+      "t": "Day 4",
+      "u": "https://onetrackmind.co.za/2020/02/04/namibia-2-day-4/"
+     }
+    ],
+    "tips": [
+     "Day 1 is 850 km. Split it at Springbok if you want to enjoy it.",
+     "Fill up at every town on the way home: Steinkopf, Springbok, Vanrhynsdorp, Klawer.",
+     "Tyre choice matters on the river road; knobblies win."
+    ]
+   },
+   "trip": {
+    "start": {
+     "name": "Cape Town",
+     "lat": -33.92487,
+     "lon": 18.42406
+    },
+    "end": {
+     "name": "Cape Town",
+     "lat": -33.92487,
+     "lon": 18.42406
+    },
+    "round": false,
+    "days": [
+     {
+      "to": {
+       "name": "Canyon Village",
+       "lat": -27.65535,
+       "lon": 17.76667
+      },
+      "vias": [
+       {
+        "name": "Piekenierskloof Pass",
+        "lat": -32.64294,
+        "lon": 18.94755,
+        "type": "pass"
+       },
+       {
+        "name": "Springbok",
+        "lat": -29.66609,
+        "lon": 17.8831,
+        "fast": true
+       },
+       {
+        "name": "Noordoewer",
+        "lat": -28.72197,
+        "lon": 17.61798,
+        "fast": true
+       }
+      ],
+      "style": "default",
+      "legs": [],
+      "toFast": true
+     },
+     {
+      "to": {
+       "name": "Klein-Aus Vista",
+       "lat": -26.65611,
+       "lon": 16.23389
+      },
+      "vias": [
+       {
+        "name": "Hobas (Fish River Canyon)",
+        "lat": -27.61891,
+        "lon": 17.71596
+       },
+       {
+        "name": "Canyon Roadhouse",
+        "lat": -27.52418,
+        "lon": 17.81483
+       },
+       {
+        "name": "Seeheim",
+        "lat": -26.81625,
+        "lon": 17.79998
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Felix Unite, Noordoewer",
+       "lat": -28.73,
+       "lon": 17.63
+      },
+      "vias": [
+       {
+        "name": "Rosh Pinah",
+        "lat": -27.96424,
+        "lon": 16.76108
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": null,
+      "vias": [
+       {
+        "name": "Steinkopf",
+        "lat": -29.2625,
+        "lon": 17.73333,
+        "fast": true
+       },
+       {
+        "name": "Springbok",
+        "lat": -29.66609,
+        "lon": 17.8831,
+        "fast": true
+       },
+       {
+        "name": "Klawer",
+        "lat": -31.775,
+        "lon": 18.62556,
+        "fast": true
+       }
+      ],
+      "style": "default",
+      "legs": [],
+      "toFast": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "namibia-2017-epupa",
+   "title": "Destination Epupa Falls",
+   "region": "Namibia · Fish River to Kunene",
+   "style": "rough",
+   "vehicles": [
+    "bike",
+    "jeep"
+   ],
+   "blurb": "Canyon Village, Sesriem, Swakopmund, Grootberg and north to Epupa Falls on the Angolan border, back via Opuwo and Windhoek. Sand, corrugations and long gaps between fuel.",
+   "founder": {
+    "year": 2017,
+    "ride": "KTM 1290 Super Adventure, with 990, 1190 and an Africa Twin",
+    "story": "A sandstorm on day one, a broken arm on day two, a tyre change by committee in the middle of nowhere and an oil light 180 km from Angola. Textbook how not to adventure bike, which is exactly why we ran bootcamps. We still made Epupa Falls. When I stopped at Opuwo, a lodge owner I'd never met drove me and the bike to Oshakati and sorted the rest over a braai. Namibia does that. It was my father's birthday at the falls. Couldn't think of a better place to spend it.",
+    "posts": [
+     {
+      "t": "Shakedown. Literally.",
+      "u": "https://onetrackmind.co.za/2017/06/26/namibia-2017-day-2/"
+     },
+     {
+      "t": "Sandmonster bites",
+      "u": "https://onetrackmind.co.za/2017/07/17/namibia-2017-day-3/"
+     },
+     {
+      "t": "Grootberg",
+      "u": "https://onetrackmind.co.za/2017/07/18/namibia-2017-day-5/"
+     },
+     {
+      "t": "Tyred",
+      "u": "https://onetrackmind.co.za/2017/07/19/namibia-2017-day-6/"
+     },
+     {
+      "t": "Adventure 101",
+      "u": "https://onetrackmind.co.za/2017/07/19/namibia-2017-day-7/"
+     },
+     {
+      "t": "Tough Call",
+      "u": "https://onetrackmind.co.za/2017/07/19/namibia-day-8/"
+     }
+    ],
+    "tips": [
+     "Fill up at every station you pass north of Henties Bay.",
+     "Carry a satellite phone. Cell signal is good in towns, nothing in between.",
+     "Grootberg Lodge: 4x4 or motorbike for the driveway.",
+     "Heed the oil light. Nothing good comes from pushing on."
+    ]
+   },
+   "trip": {
+    "start": {
+     "name": "Noordoewer",
+     "lat": -28.72197,
+     "lon": 17.61798
+    },
+    "end": {
+     "name": "Windhoek",
+     "lat": -22.57761,
+     "lon": 17.07727
+    },
+    "round": false,
+    "days": [
+     {
+      "to": {
+       "name": "Canyon Village",
+       "lat": -27.65535,
+       "lon": 17.76667
+      },
+      "vias": [],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Tsauchab River Camp",
+       "lat": -24.44585,
+       "lon": 16.17174
+      },
+      "vias": [],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Swakopmund",
+       "lat": -22.6784,
+       "lon": 14.5266
+      },
+      "vias": [],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Grootberg Lodge",
+       "lat": -19.85108,
+       "lon": 14.1332
+      },
+      "vias": [
+       {
+        "name": "Henties Bay",
+        "lat": -22.11597,
+        "lon": 14.28266
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Epupa Falls",
+       "lat": -17.00205,
+       "lon": 13.24615
+      },
+      "vias": [
+       {
+        "name": "Opuwo",
+        "lat": -18.06,
+        "lon": 13.84
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Opuwo Country Lodge",
+       "lat": -18.04461,
+       "lon": 13.83337
+      },
+      "vias": [],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": null,
+      "vias": [],
+      "style": "default",
+      "legs": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "wild-coast-2019",
+   "title": "Wild Coast to Cape Town",
+   "region": "Eastern Cape · Garden Route · Klein Karoo",
+   "style": "mixed",
+   "vehicles": [
+    "bike",
+    "jeep"
+   ],
+   "blurb": "Port St Johns down the old Transkei to Wavecrest, the Kei mouth pont, East London, Port Alfred, the Langkloof to Oudtshoorn and home through Seweweekspoort.",
+   "founder": {
+    "year": 2019,
+    "ride": "KTM 790 Adventure (the Silent Assassin)",
+    "story": "The day of avoidance: dogs, pigs, goats, cows, horses, taxis, drunk taxis, potholes and ruts, on a roadbook from a local in Port St Johns. Rain had washed the gravel into ruts. I tried to ride places I'd never been, ran low on fuel looking for the Kei pont, and snuck a lap of the East London GP circuit. Missed the Baviaans turn lost in my thoughts and took the Langkloof instead. Last night at Buffelsdrift with an owner who'd built it for conservation. If your job is stressful, ride shorter days and stop more.",
+    "posts": [
+     {
+      "t": "Port St Johns to Wavecrest",
+      "u": "https://onetrackmind.co.za/2019/06/16/port-st-johns-wavecrest/"
+     },
+     {
+      "t": "Wavecrest to Port Alfred",
+      "u": "https://onetrackmind.co.za/2019/06/17/wavecrest-port-alfred/"
+     },
+     {
+      "t": "Port Alfred to Oudtshoorn",
+      "u": "https://onetrackmind.co.za/2019/06/18/port-alfred-oudtshoorn/"
+     },
+     {
+      "t": "Oudtshoorn to Cape Town",
+      "u": "https://onetrackmind.co.za/2019/06/19/oudtshoorn-cape-town/"
+     }
+    ],
+    "tips": [
+     "Livestock and taxis on every road in the old Transkei. Ride slower than you think.",
+     "Fuel range lulls you. Fill up before hunting for the Kei mouth pont.",
+     "Day 1 from Durban isn't in the blog; the story starts at Port St Johns."
+    ]
+   },
+   "trip": {
+    "start": {
+     "name": "Durban",
+     "lat": -29.86181,
+     "lon": 31.00991
+    },
+    "end": {
+     "name": "Cape Town",
+     "lat": -33.92487,
+     "lon": 18.42406
+    },
+    "round": false,
+    "days": [
+     {
+      "to": {
+       "name": "Port St Johns",
+       "lat": -31.62045,
+       "lon": 29.54534
+      },
+      "vias": [],
+      "style": "default",
+      "legs": [],
+      "toFast": true
+     },
+     {
+      "to": {
+       "name": "Wavecrest",
+       "lat": -32.58537,
+       "lon": 28.52304
+      },
+      "vias": [
+       {
+        "name": "Coffee Bay",
+        "lat": -31.9852,
+        "lon": 29.14697
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Port Alfred",
+       "lat": -33.59818,
+       "lon": 26.89148
+      },
+      "vias": [
+       {
+        "name": "Morgan Bay",
+        "lat": -32.70515,
+        "lon": 28.33968
+       },
+       {
+        "name": "East London GP Circuit",
+        "lat": -33.0459,
+        "lon": 27.8746,
+        "fast": true
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Buffelsdrift, Oudtshoorn",
+       "lat": -33.52883,
+       "lon": 22.2522
+      },
+      "vias": [
+       {
+        "name": "Langkloof",
+        "lat": -33.77694,
+        "lon": 23.58639
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": null,
+      "vias": [
+       {
+        "name": "Cango Caves",
+        "lat": -33.39228,
+        "lon": 22.21438
+       },
+       {
+        "name": "Calitzdorp",
+        "lat": -33.53267,
+        "lon": 21.68786
+       },
+       {
+        "name": "Seweweekspoort",
+        "lat": -33.42667,
+        "lon": 21.42454,
+        "type": "pass"
+       }
+      ],
+      "style": "default",
+      "legs": [],
+      "toFast": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "seven-passes-prince-alfred",
+   "title": "Montagu Pass, Seven Passes and Prince Alfred's",
+   "region": "Garden Route · Outeniqua",
+   "style": "rough",
+   "vehicles": [
+    "bike",
+    "jeep",
+    "car"
+   ],
+   "blurb": "A loop from Louvain Guest Farm: down Montagu Pass, the old Seven Passes road through the forest to Knysna, then up Prince Alfred's Pass for a burger at De Vlugt.",
+   "founder": {
+    "year": 2020,
+    "ride": "KTM, on the CDBA weekend",
+    "story": "A sublime morning over Montagu Pass, a road I first rode in Ducati leathers on a 950 doing Uniondale, Baviaanskloof and back to Knysna in a day. It was my mother's birthday. Then the Seven Passes through the back of Wilderness into Knysna and up Prince Alfred's. Not without drama: a sidecar in the forest, then a rider with no talent left crashing into the scene. Ride your own pace on these passes. They're narrow, blind, and other people use them too.",
+    "posts": [
+     {
+      "t": "CDBA Day 3",
+      "u": "https://onetrackmind.co.za/2020/02/22/2020-cdba-day-3/"
+     },
+     {
+      "t": "CDBA Reflections",
+      "u": "https://onetrackmind.co.za/2020/02/23/2020-cdba-day-4/"
+     }
+    ],
+    "tips": [
+     "Prince Alfred's Pass is narrow with blind corners. Expect someone in your lane.",
+     "Angie's G Spot at De Vlugt for lunch.",
+     "Cell signal is patchy on the passes; know who to call."
+    ]
+   },
+   "trip": {
+    "start": {
+     "name": "Louvain Guest Farm",
+     "lat": -33.81259,
+     "lon": 22.65534
+    },
+    "end": null,
+    "round": true,
+    "days": [
+     {
+      "to": null,
+      "vias": [
+       {
+        "name": "Montagu Pass",
+        "lat": -33.86957,
+        "lon": 22.44649,
+        "type": "pass"
+       },
+       {
+        "name": "Wilderness",
+        "lat": -33.99324,
+        "lon": 22.57863
+       },
+       {
+        "name": "Knysna",
+        "lat": -34.03573,
+        "lon": 23.04848
+       },
+       {
+        "name": "Prince Alfred's Pass",
+        "lat": -33.75883,
+        "lon": 23.16262,
+        "type": "pass"
+       },
+       {
+        "name": "Angie's G Spot, De Vlugt",
+        "lat": -33.81269,
+        "lon": 23.175
+       },
+       {
+        "name": "Uniondale",
+        "lat": -33.65556,
+        "lon": 23.12556,
+        "fast": true
+       }
+      ],
+      "style": "default",
+      "legs": [],
+      "toFast": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "speedweek-hakskeenpan",
+   "title": "Speedweek run to Hakskeenpan",
+   "region": "Northern Cape · Kalahari",
+   "style": "mixed",
+   "vehicles": [
+    "jeep",
+    "car",
+    "bike"
+   ],
+   "blurb": "Cape Town over Sutherland and Calvinia to Upington and out to Hakskeenpan for Speedweek. Home via Augrabies and Springbok.",
+   "founder": {
+    "year": 2014,
+    "ride": "Prado with a KTM 1190R on the trailer",
+    "story": "It started over G&Ts on a Friday afternoon with a plan to charter a helicopter. The helicopter didn't happen, so we left at 4am with spare clothes and no tent. Sutherland and Calvinia to dodge the N7 roadworks, firewood from Upington because that makes you the hero, and 1,250 km later a Mad Max sunset on the pan. Next day a mate did 246 km/h on an adventure bike. The helicopter might have been cheaper.",
+    "posts": [
+     {
+      "t": "Speedweek 2014, Hakskeenpan",
+      "u": "https://onetrackmind.co.za/2018/05/11/speedweek-2014-hakskeenpan/"
+     }
+    ],
+    "tips": [
+     "We did 1,250 km in one day. Don't. Sleep in Upington.",
+     "Take firewood from Upington. There's none on the pan.",
+     "Book or bring a tent. Speedweek fills up."
+    ]
+   },
+   "trip": {
+    "start": {
+     "name": "Cape Town",
+     "lat": -33.92487,
+     "lon": 18.42406
+    },
+    "end": {
+     "name": "Cape Town",
+     "lat": -33.92487,
+     "lon": 18.42406
+    },
+    "round": false,
+    "days": [
+     {
+      "to": {
+       "name": "Upington",
+       "lat": -28.45632,
+       "lon": 21.24187
+      },
+      "vias": [
+       {
+        "name": "Sutherland",
+        "lat": -32.39389,
+        "lon": 20.66111
+       },
+       {
+        "name": "Calvinia",
+        "lat": -31.46944,
+        "lon": 19.77722
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Hakskeenpan",
+       "lat": -26.8194,
+       "lon": 20.22501
+      },
+      "vias": [],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Springbok",
+       "lat": -29.66609,
+       "lon": 17.8831
+      },
+      "vias": [
+       {
+        "name": "Augrabies Falls",
+        "lat": -28.59157,
+        "lon": 20.34065
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": null,
+      "vias": [],
+      "style": "default",
+      "legs": [],
+      "toFast": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "eu-road-trip-2018",
+   "title": "EU Road Trip 2018: Mattighofen to Goodwood and back",
+   "region": "Austria · Germany · Belgium · UK · France · Italy",
+   "style": "tar",
+   "vehicles": [
+    "bike",
+    "car"
+   ],
+   "blurb": "5,609 km on two KTM 790 Dukes: Porsche Museum, Hockenheim, a lap of the Nürburgring, Spa, Aston Martin, Alfaholics, Brooklands, Goodwood Festival of Speed, the Riviera, Lucca, Tavullia, World Ducati Week, Modena and home over the Alps.",
+   "founder": {
+    "year": 2018,
+    "ride": "KTM 790 Duke, two mates",
+    "story": "A trip of a lifetime that changed my life. A TV reviewer said nobody should tour on a 790 Duke. We did 5,609 km, six countries, at 5.4 litres per 100. The Nürburgring on a public Sunday, first time, on motorcycles. Aston Martin's factory, Alfaholics, Brooklands. My mate won the pillion seat in the Vulcan up the hill at Goodwood. An overnight ferry to France, sleeping on deck on the Riviera, Lenny Kravitz by accident in Lucca, a night opposite Rossi's ranch and World Ducati Week. 212 km of rain to finish. Grinning in my helmet the whole way.",
+    "posts": [
+     {
+      "t": "The whole trip",
+      "u": "https://onetrackmind.co.za/euroadtrip2018/"
+     },
+     {
+      "t": "Hockenheim and the Nürburgring",
+      "u": "https://onetrackmind.co.za/2018/07/08/euroadtrip2018-nurburgring/"
+     },
+     {
+      "t": "Goodwood Festival of Speed",
+      "u": "https://onetrackmind.co.za/2018/07/15/euroadtrip2018-goodwood-festival-of-speed/"
+     },
+     {
+      "t": "Lenny in Lucca",
+      "u": "https://onetrackmind.co.za/2018/07/18/euroroadtrip2018-lenny-in-lucca/"
+     },
+     {
+      "t": "World Ducati Week",
+      "u": "https://onetrackmind.co.za/2018/07/20/euroadtrip2018-world-ducati-week/"
+     }
+    ],
+    "tips": [
+     "The Channel: we took the Eurotunnel out and an overnight ferry from Portsmouth back. The planner routes the ferry.",
+     "Bike theft is real in the UK. Lock it to something.",
+     "Nights in England are approximate where the blog doesn't say."
+    ]
+   },
+   "trip": {
+    "start": {
+     "name": "Mattighofen",
+     "lat": 48.10308,
+     "lon": 13.15031
+    },
+    "end": {
+     "name": "Mattighofen",
+     "lat": 48.10308,
+     "lon": 13.15031
+    },
+    "round": false,
+    "days": [
+     {
+      "to": {
+       "name": "Stuttgart",
+       "lat": 48.8343,
+       "lon": 9.15245
+      },
+      "vias": [
+       {
+        "name": "Munich Airport",
+        "lat": 48.35396,
+        "lon": 11.77859,
+        "fast": true
+       },
+       {
+        "name": "Porsche Museum",
+        "lat": 48.8343,
+        "lon": 9.15245
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Nürburg",
+       "lat": 50.34134,
+       "lon": 6.95192
+      },
+      "vias": [
+       {
+        "name": "Hockenheimring",
+        "lat": 49.3298,
+        "lon": 8.5763
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "La Louvière",
+       "lat": 50.47936,
+       "lon": 4.18563
+      },
+      "vias": [
+       {
+        "name": "Spa-Francorchamps",
+        "lat": 50.43693,
+        "lon": 5.97013
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Banbury",
+       "lat": 52.06018,
+       "lon": -1.34028
+      },
+      "vias": [
+       {
+        "name": "Calais",
+        "lat": 50.95248,
+        "lon": 1.85384,
+        "fast": true
+       },
+       {
+        "name": "Folkestone",
+        "lat": 51.07913,
+        "lon": 1.17941
+       },
+       {
+        "name": "Brands Hatch",
+        "lat": 51.35749,
+        "lon": 0.26001
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Clevedon (Alfaholics)",
+       "lat": 51.43606,
+       "lon": -2.85265
+      },
+      "vias": [
+       {
+        "name": "Aston Martin, Gaydon",
+        "lat": 52.19594,
+        "lon": -1.48846
+       },
+       {
+        "name": "Burford, Cotswolds",
+        "lat": 51.8077,
+        "lon": -1.6367
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Shepperton",
+       "lat": 51.39392,
+       "lon": -0.44867
+      },
+      "vias": [],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Portsmouth",
+       "lat": 50.80003,
+       "lon": -1.0906
+      },
+      "vias": [
+       {
+        "name": "Brooklands Museum",
+        "lat": 51.35524,
+        "lon": -0.46327
+       },
+       {
+        "name": "Wellington, Somerset",
+        "lat": 50.97838,
+        "lon": -3.22755
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Portsmouth",
+       "lat": 50.80003,
+       "lon": -1.0906
+      },
+      "vias": [
+       {
+        "name": "Goodwood Festival of Speed",
+        "lat": 50.87231,
+        "lon": -0.73927
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Lyon",
+       "lat": 45.75781,
+       "lon": 4.83201
+      },
+      "vias": [
+       {
+        "name": "Le Havre",
+        "lat": 49.4944,
+        "lon": 0.1079
+       },
+       {
+        "name": "Paris",
+        "lat": 48.8535,
+        "lon": 2.34839,
+        "fast": true
+       }
+      ],
+      "style": "default",
+      "legs": [],
+      "toFast": true
+     },
+     {
+      "to": {
+       "name": "Saint-Raphaël",
+       "lat": 43.425,
+       "lon": 6.7683
+      },
+      "vias": [],
+      "style": "default",
+      "legs": [],
+      "toFast": true
+     },
+     {
+      "to": {
+       "name": "Lucca",
+       "lat": 44.01776,
+       "lon": 10.45443
+      },
+      "vias": [
+       {
+        "name": "Nice",
+        "lat": 43.70094,
+        "lon": 7.26839
+       },
+       {
+        "name": "Monaco",
+        "lat": 43.73235,
+        "lon": 7.42768
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Tavullia (VR46 MotoRanch)",
+       "lat": 43.89776,
+       "lon": 12.75479
+      },
+      "vias": [],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Modena",
+       "lat": 44.65213,
+       "lon": 10.93665
+      },
+      "vias": [
+       {
+        "name": "Misano (World Ducati Week)",
+        "lat": 43.96218,
+        "lon": 12.68403
+       },
+       {
+        "name": "Museo Lamborghini, Sant'Agata",
+        "lat": 44.65914,
+        "lon": 11.12583
+       },
+       {
+        "name": "Pagani, San Cesario",
+        "lat": 44.564,
+        "lon": 11.0336
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Innsbruck",
+       "lat": 47.26543,
+       "lon": 11.39277
+      },
+      "vias": [],
+      "style": "default",
+      "legs": [],
+      "toFast": true
+     },
+     {
+      "to": null,
+      "vias": [],
+      "style": "default",
+      "legs": [],
+      "toFast": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "eu-road-trip-2019",
+   "title": "EU Road Trip 2019: KTM factory to San Marino MotoGP",
+   "region": "Austria · Italy",
+   "style": "tar",
+   "vehicles": [
+    "bike",
+    "car"
+   ],
+   "blurb": "From the KTM factory in Mattighofen: Hohenwerfen and the ice caves, then over the Alps to Misano for the San Marino MotoGP, and back via Venice.",
+   "founder": {
+    "year": 2019,
+    "ride": "KTM 1290 Super Duke GT",
+    "story": "A dealer trip to the KTM factory, 235,000 bikes a year, and we were treated like VIPs. A cultural day that turned into a hike in the mist to an ice cave. When the boys flew home and Goodwood Revival fell through, I had three paid laps of the Nürburgring or Rossi at Misano. Rossi won't be around forever. A farmer's tan under the Italian sun, panniers that made MotoGP hands-free, then home via Venice to stay a block and a half from where 2018 started. Full circle.",
+    "posts": [
+     {
+      "t": "KTM Factory Tour Day 2",
+      "u": "https://onetrackmind.co.za/2019/09/10/2019-ktm-factory-tour-day-2/"
+     },
+     {
+      "t": "Day 4: Hohenwerfen",
+      "u": "https://onetrackmind.co.za/2019/09/12/2019-ktm-factory-tour-day-4/"
+     },
+     {
+      "t": "Austria to Italy",
+      "u": "https://onetrackmind.co.za/2019/09/14/euroadtrip2019-austria-to-italy/"
+     },
+     {
+      "t": "MotoGP San Marino",
+      "u": "https://onetrackmind.co.za/2019/09/15/euroadtrip2019-motogp-sanmarino/"
+     },
+     {
+      "t": "Back to Salzburg",
+      "u": "https://onetrackmind.co.za/2019/09/16/euroadtrip2019-one-night-in-salzburg/"
+     }
+    ],
+    "tips": [
+     "Book the Eisriesenwelt and don't believe 'short walk'. It's a climb.",
+     "Local SIM in Italy: cheap data for the whole of Europe.",
+     "Panniers make a race weekend easy: lock the helmet away and walk."
+    ]
+   },
+   "trip": {
+    "start": {
+     "name": "Mattighofen",
+     "lat": 48.10308,
+     "lon": 13.15031
+    },
+    "end": {
+     "name": "Salzburg",
+     "lat": 47.79813,
+     "lon": 13.04648
+    },
+    "round": false,
+    "days": [
+     {
+      "to": {
+       "name": "Mattighofen",
+       "lat": 48.10308,
+       "lon": 13.15031
+      },
+      "vias": [
+       {
+        "name": "Burg Hohenwerfen",
+        "lat": 47.4836,
+        "lon": 13.1878
+       },
+       {
+        "name": "Eisriesenwelt",
+        "lat": 47.51086,
+        "lon": 13.19323
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Riccione",
+       "lat": 43.99827,
+       "lon": 12.64744
+      },
+      "vias": [],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Riccione",
+       "lat": 43.99827,
+       "lon": 12.64744
+      },
+      "vias": [
+       {
+        "name": "Misano World Circuit",
+        "lat": 43.96218,
+        "lon": 12.68403
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Mattighofen",
+       "lat": 48.10308,
+       "lon": 13.15031
+      },
+      "vias": [
+       {
+        "name": "Venice (Mestre)",
+        "lat": 45.48246,
+        "lon": 12.2317
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": null,
+      "vias": [],
+      "style": "default",
+      "legs": [],
+      "toFast": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "motor-valley-2017",
+   "title": "Motor Valley and EICMA in a Fiat 500",
+   "region": "Italy · Emilia-Romagna, Veneto, Lombardy, Piedmont",
+   "style": "tar",
+   "vehicles": [
+    "car",
+    "bike"
+   ],
+   "blurb": "Milan to Bologna for Lamborghini, Pagani, Ducati and Ferrari, the back roads to Venice, EICMA in Milan, the Alfa Romeo museum at Arese, MV Agusta at Varese and the car museum in Turin.",
+   "founder": {
+    "year": 2017,
+    "ride": "Hired Fiat 500",
+    "story": "A day flight via Dubai, no sleep, then a Fiat 500 for the ultimate road trip to Bologna. Lamborghini, Pagani, the Ducati museum for the first time in ten years, the back roads to Venice, single track both ways, very Italian. EICMA for the 790 Duke and the Adventure prototype. The Alfa Romeo museum, a bucket list tick. MV Agusta closed, so I asked security for a factory tour. Ten minutes later I had my own guide. Turin to finish. If fuel runs through your veins, go.",
+    "posts": [
+     {
+      "t": "790 reasons to attend EICMA",
+      "u": "https://onetrackmind.co.za/2017/11/01/790-reasons-to-attend-eicma-2017/"
+     },
+     {
+      "t": "Bologna, Ducati, Venice",
+      "u": "https://onetrackmind.co.za/2017/11/05/bologna-ducati-venice/"
+     },
+     {
+      "t": "Alfa Romeo Museum",
+      "u": "https://onetrackmind.co.za/2017/11/09/alfa-romeo-museum/"
+     },
+     {
+      "t": "MV Agusta factory tour",
+      "u": "https://onetrackmind.co.za/2017/11/10/mv-agusta/"
+     },
+     {
+      "t": "Museo dell'Automobile, Turin",
+      "u": "https://onetrackmind.co.za/2017/11/12/museo-nazionale-dellautomobile-di-torino/"
+     }
+    ],
+    "tips": [
+     "Venice parking fills up. Park at Mestre and take the train in.",
+     "Ask nicely at the factories. It works more often than you'd think.",
+     "Check museum opening hours; some only open in the afternoon."
+    ]
+   },
+   "trip": {
+    "start": {
+     "name": "Milan Malpensa Airport",
+     "lat": 45.62963,
+     "lon": 8.72355
+    },
+    "end": {
+     "name": "Turin",
+     "lat": 45.03185,
+     "lon": 7.67345
+    },
+    "round": false,
+    "days": [
+     {
+      "to": {
+       "name": "Bologna",
+       "lat": 44.49382,
+       "lon": 11.34263
+      },
+      "vias": [
+       {
+        "name": "Museo Lamborghini, Sant'Agata",
+        "lat": 44.65914,
+        "lon": 11.12583
+       }
+      ],
+      "style": "default",
+      "legs": [],
+      "toFast": true
+     },
+     {
+      "to": {
+       "name": "Bologna",
+       "lat": 44.49382,
+       "lon": 11.34263
+      },
+      "vias": [
+       {
+        "name": "Pagani, San Cesario",
+        "lat": 44.564,
+        "lon": 11.0336
+       },
+       {
+        "name": "Museo Enzo Ferrari, Modena",
+        "lat": 44.65213,
+        "lon": 10.93665
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Venice (Mestre)",
+       "lat": 45.48246,
+       "lon": 12.2317
+      },
+      "vias": [
+       {
+        "name": "Ducati Museum, Borgo Panigale",
+        "lat": 44.51616,
+        "lon": 11.26843
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Milan (EICMA, Rho Fiera)",
+       "lat": 45.52117,
+       "lon": 9.08847
+      },
+      "vias": [],
+      "style": "default",
+      "legs": [],
+      "toFast": true
+     },
+     {
+      "to": null,
+      "vias": [
+       {
+        "name": "Alfa Romeo Museum, Arese",
+        "lat": 45.55797,
+        "lon": 9.04716
+       },
+       {
+        "name": "MV Agusta, Varese",
+        "lat": 45.8038,
+        "lon": 8.77816
+       }
+      ],
+      "style": "default",
+      "legs": [],
+      "toFast": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "baviaanskloof-in-a-day",
+   "draft": true,
+   "title": "Uniondale, Baviaanskloof and back to Knysna in a day",
+   "region": "Garden Route · Baviaanskloof",
+   "style": "rough",
+   "vehicles": [
+    "bike",
+    "jeep"
+   ],
+   "blurb": "Knysna over Montagu Pass to Uniondale, through the Baviaanskloof and back to Knysna. A long, big day.",
+   "founder": {
+    "year": null,
+    "ride": "Ducati 950, in leathers",
+    "story": "The first time I rode Montagu Pass: Uniondale, Baviaanskloof and back to Knysna in one day, on a 950 in Ducati leathers. The leathers were never the same.",
+    "posts": [
+     {
+      "t": "Mentioned in CDBA Day 3",
+      "u": "https://onetrackmind.co.za/2020/02/22/2020-cdba-day-3/"
+     }
+    ],
+    "tips": []
+   },
+   "trip": {
+    "start": {
+     "name": "Knysna",
+     "lat": -34.03573,
+     "lon": 23.04848
+    },
+    "end": null,
+    "round": true,
+    "days": [
+     {
+      "to": null,
+      "vias": [
+       {
+        "name": "Montagu Pass",
+        "lat": -33.86957,
+        "lon": 22.44649,
+        "type": "pass"
+       },
+       {
+        "name": "Uniondale",
+        "lat": -33.65556,
+        "lon": 23.12556
+       },
+       {
+        "name": "Willowmore",
+        "lat": -33.2925,
+        "lon": 23.49
+       },
+       {
+        "name": "Patensie",
+        "lat": -33.7582,
+        "lon": 24.8178
+       }
+      ],
+      "style": "default",
+      "legs": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "simola-road-trip",
+   "draft": true,
+   "title": "Road trip to Simola in the race car",
+   "region": "Western Cape · Route 62",
+   "style": "tar",
+   "vehicles": [
+    "car",
+    "bike"
+   ],
+   "blurb": "From the farm in the Swartland along Route 62 to Knysna for the Simola Hill Climb.",
+   "founder": {
+    "year": 2025,
+    "ride": "Alfa Romeo 105 race car",
+    "story": "Road-tripping the race car to Simola felt like the spirit of the event. The wrong fuel pump made it a long day of stops and adjustments; the car set the pace, not the plan. And yet: on time, through scrutineering, event completed, 1:04.8.",
+    "posts": [
+     {
+      "t": "Progress, Accidentally",
+      "u": "https://onetrackmind.co.za/2026/03/29/progress-accidentally/"
+     }
+    ],
+    "tips": []
+   },
+   "trip": {
+    "start": {
+     "name": "Malmesbury",
+     "lat": -33.46028,
+     "lon": 18.72361
+    },
+    "end": {
+     "name": "Simola, Knysna",
+     "lat": -34.0245,
+     "lon": 23.0693
+    },
+    "round": false,
+    "days": [
+     {
+      "to": {
+       "name": "Oudtshoorn",
+       "lat": -33.5903,
+       "lon": 22.20421
+      },
+      "vias": [
+       {
+        "name": "Montagu",
+        "lat": -33.78699,
+        "lon": 20.11783
+       },
+       {
+        "name": "Barrydale",
+        "lat": -33.90412,
+        "lon": 20.72136
+       },
+       {
+        "name": "Calitzdorp",
+        "lat": -33.53267,
+        "lon": 21.68786
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": null,
+      "vias": [],
+      "style": "default",
+      "legs": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "montagu-classic",
+   "draft": true,
+   "title": "Langeberg and Montagu in a classic",
+   "region": "Western Cape · Breede River",
+   "style": "tar",
+   "vehicles": [
+    "car",
+    "bike"
+   ],
+   "blurb": "A slow drive from the Swartland into the mountains around Montagu in a classic Alfa.",
+   "founder": {
+    "year": 2024,
+    "ride": "1971 Alfa Romeo 1750 GTV",
+    "story": "Race car to build, so obviously we took a slow drive into the mountains around Montagu. Carburettor smells, carburettor sounds, precious cargo and no modern comforts. Everyone should explore their own country in a classic car.",
+    "posts": [
+     {
+      "t": "Langberg, Montagu",
+      "u": "https://onetrackmind.co.za/2024/06/07/langberg-montagu/"
+     }
+    ],
+    "tips": []
+   },
+   "trip": {
+    "start": {
+     "name": "Malmesbury",
+     "lat": -33.46028,
+     "lon": 18.72361
+    },
+    "end": null,
+    "round": true,
+    "days": [
+     {
+      "to": {
+       "name": "Montagu",
+       "lat": -33.78699,
+       "lon": 20.11783
+      },
+      "vias": [],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": null,
+      "vias": [],
+      "style": "default",
+      "legs": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "lesotho-2016",
+   "draft": true,
+   "title": "Lesotho after the Roof of Africa",
+   "region": "Lesotho · Maseru, Semonkong, Malealea",
+   "style": "rough",
+   "vehicles": [
+    "bike",
+    "jeep"
+   ],
+   "blurb": "Mountain Kingdom roads from Maseru: Roma, Semonkong and the Maletsunyane Falls, Malealea. Route to be confirmed.",
+   "founder": {
+    "year": 2016,
+    "ride": "KTM",
+    "story": "Every year we supported up to 15 riders at the Roof of Africa. In 2016 we only had three entries, which left me free to take a couple of mates and explore Lesotho.",
+    "posts": [
+     {
+      "t": "Lesotho 2016, Roof of Africa Adventure",
+      "u": "https://onetrackmind.co.za/2016/12/17/roof-of-africa-2016-the-mountain-kingdom-of-lesotho/"
+     }
+    ],
+    "tips": []
+   },
+   "trip": {
+    "start": {
+     "name": "Ladybrand",
+     "lat": -29.19271,
+     "lon": 27.45759
+    },
+    "end": null,
+    "round": true,
+    "days": [
+     {
+      "to": {
+       "name": "Semonkong",
+       "lat": -29.84001,
+       "lon": 28.0511
+      },
+      "vias": [
+       {
+        "name": "Maseru",
+        "lat": -29.31005,
+        "lon": 27.47822,
+        "fast": true
+       },
+       {
+        "name": "Roma",
+        "lat": -29.45055,
+        "lon": 27.71415
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "Malealea",
+       "lat": -29.82992,
+       "lon": 27.60693
+      },
+      "vias": [],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": null,
+      "vias": [
+       {
+        "name": "Maseru",
+        "lat": -29.31005,
+        "lon": 27.47822,
+        "fast": true
+       }
+      ],
+      "style": "default",
+      "legs": []
+     }
+    ]
+   }
+  },
+  {
    "id": "swartberg-loop",
    "title": "Swartberg Pass and Meiringspoort",
    "region": "Western Cape · Karoo",

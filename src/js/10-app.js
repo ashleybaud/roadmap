@@ -441,7 +441,7 @@ function tripTotals(){
   if(!plan) return "";
   const n=nDays(), tot=plan.days.reduce((t,d)=>t+(d?d.km:0),0), ride=plan.days.reduce((t,d,k)=>t+(d?dayMinutes(k):0),0);
   const fin=trip.round||!trip.end?(trip.start?trip.start.name:"?"):trip.end.name;
-  return `<div class="totals"><span>Back at <b>${esc(fin)}</b></span><span>${n} day${n>1?"s":""} · ${Math.round(tot).toLocaleString()} km · about ${fmtDur(ride)} ${VEH().ing}</span></div>${gradeBar(tripGrade(),true)}${typeof rateLine==="function"?rateLine():""}`;
+  return `<div class="totals"><span>Back at <b>${esc(fin)}</b></span><span>${n} day${n>1?"s":""} · ${Math.round(tot).toLocaleString()} km · about ${fmtDur(ride)} ${VEH().ing}</span></div>${gradeBar(tripGrade(),true)}${typeof founderLine==="function"?founderLine():""}${typeof rateLine==="function"?rateLine():""}`;
 }
 /* ---------- what kind of place to stay: set for the trip, changed per night ---------- */
 const STAY_TYPES=[{id:"any",n:"Anything"},{id:"camp",n:"⛺ Camping",rx:/^(camp_site|caravan_site)$/},{id:"guest",n:"Guesthouse / B&B",rx:/^guest_house$/},{id:"hotel",n:"Hotel / Lodge",rx:/^(hotel|motel)$/},{id:"self",n:"Self-catering",rx:/^(chalet|apartment)$/},{id:"back",n:"Backpackers",rx:/^hostel$/}];
@@ -662,7 +662,7 @@ function drawStopLayer(){
 function clearLink(){ return `<div class="btns clearrow">${clearArm?`<span class="note">Clear this trip?</span><button class="btn small" type="button" data-newtrip>Clear</button><button class="btn small ghost" type="button" data-nocancel>Cancel</button>`:`<button class="linkbtn small" type="button" data-newtrip>Clear trip</button>`}</div>`; }
 function overviewHtml(){
   let h=`<div class="tbslot"></div>`+gpxBar();
-  if(nDays()===1) return h+sumBox(0,false)+(plan&&!planStale&&typeof rateLine==="function"?rateLine():"")+(!planStale&&plan&&plan.days[0]?gtkHtml(0):"")+dayBody(0)+clearLink()+footNote();
+  if(nDays()===1) return h+sumBox(0,false)+(typeof founderLine==="function"?founderLine():"")+(plan&&!planStale&&typeof rateLine==="function"?rateLine():"")+(!planStale&&plan&&plan.days[0]?gtkHtml(0):"")+dayBody(0)+clearLink()+footNote();
   h+=`<div class="days">`;
   trip.days.forEach((d,k)=>{ h+=`<div class="ovday" data-gotoday="${k}">${sumBox(k,false)}</div>`; });
   h+=`</div>`;
@@ -693,7 +693,7 @@ $("details").addEventListener("click",e=>{
   if(t.closest("[data-tripedit]")){tripEdit=!tripEdit;renderDetails();return;}
   if(t.closest("[data-newtrip]")&&!clearArm){ clearArm=true; renderDetails(); return; }
   if(t.closest("[data-nocancel]")){ clearArm=false; renderDetails(); return; }
-  if(t.closest("[data-newtrip]")){ clearArm=false; snapTrip(true); const prev=JSON.parse(JSON.stringify(trip)); delete trip.gpx; Object.assign(trip,freshTrip()); tripEdit=true; ui.tab="ov"; plan=null; fp=null; changed(); locateIfAllowed();
+  if(t.closest("[data-newtrip]")){ clearArm=false; snapTrip(true); const prev=JSON.parse(JSON.stringify(trip)); delete trip.gpx; delete trip.pick; delete trip.founder; Object.assign(trip,freshTrip()); tripEdit=true; ui.tab="ov"; plan=null; fp=null; changed(); locateIfAllowed();
     const tt=$("toast"); tt.innerHTML=`Trip cleared. <button type="button" class="linkbtn">Undo</button>`; tt.hidden=false; tt.querySelector("button").onclick=()=>{Object.keys(trip).forEach(x=>delete trip[x]);Object.assign(trip,prev);tt.hidden=true;changed();}; clearTimeout(toastT); toastT=setTimeout(()=>tt.hidden=true,8000); return; }
   const avb=t.closest("[data-av]"); if(avb){ const [k2,j2,c]=avb.dataset.av.split(":"); const same=stopFocus&&stopFocus.k===+k2&&stopFocus.j===+j2&&stopFocus.cat===c; stopFocus=same?null:{k:+k2,j:+j2,cat:c}; if(!stopFocus) window._refit=true; renderDetails(); drawMap(); return; }
   const pl=t.closest("[data-ploc]"); if(pl&&!t.closest("a,button")&&map){ const [la,lo]=pl.dataset.ploc.split(",").map(Number); map.setView([la,lo],16); if(window.innerWidth<=1000) $("map").scrollIntoView({behavior:"smooth",block:"start"}); return; }

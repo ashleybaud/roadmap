@@ -4,6 +4,7 @@
 #        ./build.sh --no-test  build only
 set -euo pipefail
 cd "$(dirname "$0")"
+node scripts/make-pages.mjs
 tmp=$(mktemp)
 { cat src/page.html; echo "<script>"; for f in src/js/*.js; do cat "$f"; echo; done; echo "</script></body></html>"; } > "$tmp"
 sed -n '/<script>$/,/<\/script>/p' "$tmp" | sed '1d;$d' > "$tmp.js"

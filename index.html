@@ -5,7 +5,15 @@
 <meta name='impact-site-verification' value='b2c96c47-69eb-4d1d-9453-aa86bf1ccbb9'>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>OneTrackMind · Recce. Ride. Report.</title>
-<meta name="description" content="Plan multi-day rides and drives day by day: gravel or tar routes, fuel, night stops, sunset and weather. For motorbikes, 4x4s and cars.">
+<meta name="description" content="Free planner for multi-day motorbike, 4x4 and self-drive trips. Day by day on real roads: fuel gaps, night stops, camping and places to stay, sunset, weather and a grade for every road, read for your vehicle.">
+<link rel="canonical" href="https://onetrackmind.online/">
+<link rel="icon" href="/img/icon.svg" type="image/svg+xml">
+<meta property="og:type" content="website"><meta property="og:site_name" content="OneTrackMind">
+<meta property="og:title" content="OneTrackMind · Plan multi-day rides and drives">
+<meta property="og:description" content="Plan multi-day rides and drives on real roads. Fuel, night stops, and every road graded for your bike, 4x4 or car. Free.">
+<meta property="og:url" content="https://onetrackmind.online/"><meta property="og:image" content="https://onetrackmind.online/img/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","@id":"https://onetrackmind.online/#app","name":"OneTrackMind","url":"https://onetrackmind.online/","applicationCategory":"TravelApplication","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"ZAR"},"description":"Free planner for multi-day motorbike, 4x4 and self-drive trips: fuel stops and gaps, night stops and places to stay, sunset, weather, height profile and a road grade for every stretch, read for your vehicle.","publisher":{"@id":"https://onetrackmind.online/#org"}},{"@type":"Organization","@id":"https://onetrackmind.online/#org","name":"OneTrackMind","url":"https://onetrackmind.online/","logo":"https://onetrackmind.online/img/icon.svg","sameAs":["https://onetrackmind.co.za"],"founder":{"@type":"Person","name":"Ashley","url":"https://onetrackmind.online/about/"}}]}</script>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -407,6 +415,11 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .rrow .ract{display:flex;gap:6px;flex:none}
 .acctline{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding-top:10px}
 .pkb{font-size:.86rem;margin-top:4px}
+.hdrlinks a{color:var(--accent);font-weight:600}
+.fdr{font-size:.8rem;color:var(--accent);font-weight:600;margin-top:2px}
+.drafttag{font:600 .7rem var(--f-mono);background:var(--warn);color:var(--onfill);padding:1px 6px;border-radius:3px;vertical-align:middle}
+.fdrbox{border-left:3px solid var(--accent);background:var(--chip);padding:8px 10px;margin:10px 0;font-size:.88rem}
+.fdrbox ul{margin:6px 0 6px 18px;padding:0}.fdrbox li{margin:2px 0}.fdrbox a{color:var(--accent)}
 .stayfield{grid-column:1/-1}
 .staychips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 8px}
 .staychips button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:16px;padding:4px 10px;cursor:pointer;font:inherit;font-size:.82rem}
@@ -469,7 +482,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
 <body>
 <div class="wrap">
   <header>
-    <div><h1>OneTrackMind <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><div class="note">Every great route, graded for your skill, planned day by day. <b>Built by riders:</b> add your favourite routes, mark the places worth stopping.</div></div>
+    <div><h1>OneTrackMind <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><div class="note">Every great route, graded for your skill, planned day by day. <b>Built by riders:</b> add your favourite routes, mark the places worth stopping.</div><div class="note hdrlinks"><a href="/routes/">Routes</a> · <a href="/about/">About the founder</a> · <a href="https://onetrackmind.co.za" target="_blank" rel="noopener">Misadventures</a></div></div>
     <div class="btns"><span class="lbl mono" id="hdrSummary"></span><button class="btn ghost" id="feedback" type="button">Send feedback</button><button class="btn" id="addBtn" type="button" hidden>+ Add yours</button><button class="btn ghost" id="reviewBtn" type="button" hidden>Review</button><button class="btn ghost" id="acctBtn" type="button" hidden>Sign in</button><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
   </header>
 
@@ -1411,7 +1424,7 @@ function tripTotals(){
   if(!plan) return "";
   const n=nDays(), tot=plan.days.reduce((t,d)=>t+(d?d.km:0),0), ride=plan.days.reduce((t,d,k)=>t+(d?dayMinutes(k):0),0);
   const fin=trip.round||!trip.end?(trip.start?trip.start.name:"?"):trip.end.name;
-  return `<div class="totals"><span>Back at <b>${esc(fin)}</b></span><span>${n} day${n>1?"s":""} · ${Math.round(tot).toLocaleString()} km · about ${fmtDur(ride)} ${VEH().ing}</span></div>${gradeBar(tripGrade(),true)}${typeof rateLine==="function"?rateLine():""}`;
+  return `<div class="totals"><span>Back at <b>${esc(fin)}</b></span><span>${n} day${n>1?"s":""} · ${Math.round(tot).toLocaleString()} km · about ${fmtDur(ride)} ${VEH().ing}</span></div>${gradeBar(tripGrade(),true)}${typeof founderLine==="function"?founderLine():""}${typeof rateLine==="function"?rateLine():""}`;
 }
 /* ---------- what kind of place to stay: set for the trip, changed per night ---------- */
 const STAY_TYPES=[{id:"any",n:"Anything"},{id:"camp",n:"⛺ Camping",rx:/^(camp_site|caravan_site)$/},{id:"guest",n:"Guesthouse / B&B",rx:/^guest_house$/},{id:"hotel",n:"Hotel / Lodge",rx:/^(hotel|motel)$/},{id:"self",n:"Self-catering",rx:/^(chalet|apartment)$/},{id:"back",n:"Backpackers",rx:/^hostel$/}];
@@ -1632,7 +1645,7 @@ function drawStopLayer(){
 function clearLink(){ return `<div class="btns clearrow">${clearArm?`<span class="note">Clear this trip?</span><button class="btn small" type="button" data-newtrip>Clear</button><button class="btn small ghost" type="button" data-nocancel>Cancel</button>`:`<button class="linkbtn small" type="button" data-newtrip>Clear trip</button>`}</div>`; }
 function overviewHtml(){
   let h=`<div class="tbslot"></div>`+gpxBar();
-  if(nDays()===1) return h+sumBox(0,false)+(plan&&!planStale&&typeof rateLine==="function"?rateLine():"")+(!planStale&&plan&&plan.days[0]?gtkHtml(0):"")+dayBody(0)+clearLink()+footNote();
+  if(nDays()===1) return h+sumBox(0,false)+(typeof founderLine==="function"?founderLine():"")+(plan&&!planStale&&typeof rateLine==="function"?rateLine():"")+(!planStale&&plan&&plan.days[0]?gtkHtml(0):"")+dayBody(0)+clearLink()+footNote();
   h+=`<div class="days">`;
   trip.days.forEach((d,k)=>{ h+=`<div class="ovday" data-gotoday="${k}">${sumBox(k,false)}</div>`; });
   h+=`</div>`;
@@ -1663,7 +1676,7 @@ $("details").addEventListener("click",e=>{
   if(t.closest("[data-tripedit]")){tripEdit=!tripEdit;renderDetails();return;}
   if(t.closest("[data-newtrip]")&&!clearArm){ clearArm=true; renderDetails(); return; }
   if(t.closest("[data-nocancel]")){ clearArm=false; renderDetails(); return; }
-  if(t.closest("[data-newtrip]")){ clearArm=false; snapTrip(true); const prev=JSON.parse(JSON.stringify(trip)); delete trip.gpx; Object.assign(trip,freshTrip()); tripEdit=true; ui.tab="ov"; plan=null; fp=null; changed(); locateIfAllowed();
+  if(t.closest("[data-newtrip]")){ clearArm=false; snapTrip(true); const prev=JSON.parse(JSON.stringify(trip)); delete trip.gpx; delete trip.pick; delete trip.founder; Object.assign(trip,freshTrip()); tripEdit=true; ui.tab="ov"; plan=null; fp=null; changed(); locateIfAllowed();
     const tt=$("toast"); tt.innerHTML=`Trip cleared. <button type="button" class="linkbtn">Undo</button>`; tt.hidden=false; tt.querySelector("button").onclick=()=>{Object.keys(trip).forEach(x=>delete trip[x]);Object.assign(trip,prev);tt.hidden=true;changed();}; clearTimeout(toastT); toastT=setTimeout(()=>tt.hidden=true,8000); return; }
   const avb=t.closest("[data-av]"); if(avb){ const [k2,j2,c]=avb.dataset.av.split(":"); const same=stopFocus&&stopFocus.k===+k2&&stopFocus.j===+j2&&stopFocus.cat===c; stopFocus=same?null:{k:+k2,j:+j2,cat:c}; if(!stopFocus) window._refit=true; renderDetails(); drawMap(); return; }
   const pl=t.closest("[data-ploc]"); if(pl&&!t.closest("a,button")&&map){ const [la,lo]=pl.dataset.ploc.split(",").map(Number); map.setView([la,lo],16); if(window.innerWidth<=1000) $("map").scrollIntoView({behavior:"smooth",block:"start"}); return; }
@@ -2431,7 +2444,8 @@ function elevFor(k){
 /* ---------- Find a route: OneTrackMind picks, routes riders shared, and how to add yours ---------- */
 let picks=null, pkTab="picks";
 async function loadPicks(){
-  const list=(await (await fetch("/data/picks/picks.json")).json()).routes.map(r=>Object.assign(r,{kind:"pick"}));
+  const drafts=/[?&]drafts=1/.test(location.search)||acct.admin;
+  const list=(await (await fetch("/data/picks/picks.json")).json()).routes.filter(r=>!r.draft||drafts).map(r=>Object.assign(r,{kind:"pick"}));
   if(acct.ready) try{ ((await api("/api/routes/public")).routes||[]).forEach(r=>list.push({id:"db:"+r.id,dbId:r.id,kind:r.pick?"pick":"rider",title:r.title,region:r.pick?"OneTrackMind pick":"Shared by a rider",blurb:r.summary||"",vehicles:r.vehicle?[r.vehicle]:["bike","jeep","car"],trip:{days:new Array(r.days||1)},stars:r.stars,ratings:r.ratings})); }catch(e){}
   return list;
 }
@@ -2442,7 +2456,7 @@ async function openPicks(tab){
   const mine=settings.vehicle||"bike", vn=v=>(VEHICLES[v]||"").replace(/^\S+\s/,"");
   const list=picks.filter(r=>r.kind===(pkTab==="riders"?"rider":"pick")).sort((a,b)=>(b.vehicles.includes(mine)-a.vehicles.includes(mine)));
   $("pkList").innerHTML=list.length?list.map(r=>{ const n=r.trip.days.length, fits=r.vehicles.includes(mine);
-    return `<div class="rrow pk"><div><div class="rt">${esc(r.title)}</div><div class="note">${esc(r.region)} · ${n} day${n>1?"s":""} · ${r.vehicles.map(v=>esc(vn(v))).join(", ")}${r.ratings?` · ★ ${r.stars} (${r.ratings})`:""}</div>${r.blurb?`<div class="pkb">${esc(r.blurb)}</div>`:""}${fits?"":`<div class="warnt">Not suggested for a ${esc(vn(mine).toLowerCase())}.</div>`}</div>
+    return `<div class="rrow pk"><div><div class="rt">${esc(r.title)}${r.draft?` <span class="drafttag">Draft</span>`:""}</div>${r.founder?`<div class="fdr">Ridden by the founder${r.founder.year?` · ${r.founder.year}`:""} · ${esc(r.founder.ride)}</div>`:""}<div class="note">${esc(r.region)} · ${n} day${n>1?"s":""} · ${r.vehicles.map(v=>esc(vn(v))).join(", ")}${r.ratings?` · ★ ${r.stars} (${r.ratings})`:""}</div>${r.blurb?`<div class="pkb">${esc(r.blurb)}</div>`:""}${fits?"":`<div class="warnt">Not suggested for a ${esc(vn(mine).toLowerCase())}.</div>`}</div>
       <div class="ract"><button class="btn small" type="button" data-pkopen="${esc(r.id)}">Open</button></div></div>`; }).join("")
     :pkTab==="riders"?`<div class="note">No rider routes shared yet. Be the first: plan a road you love, save it and share it.</div><div class="btns"><button class="btn small" type="button" data-pktab="add">Add yours</button></div>`:`<div class="note">Nothing here yet.</div>`;
 }
@@ -2453,9 +2467,21 @@ $("picksDlg").addEventListener("click",e=>{
   const o=e.target.closest("[data-pkopen]"); if(!o) return; const r=picks.find(x=>x.id===o.dataset.pkopen); if(!r) return;
   $("picksDlg").close();
   if(r.dbId){ openRoute(r.dbId); return; }
-  const t=JSON.parse(JSON.stringify(r.trip)); t.sugV=5; t.days.forEach(d=>{ d.fresh=true; d.legs=d.legs||[]; d.vias=d.vias||[]; d.style=d.style||"default"; });
-  t.pick=r.id; applyTrip(t,{style:r.style},r.title);
+  openPick(r);
 });
+function openPick(r){
+  const t=JSON.parse(JSON.stringify(r.trip)); t.sugV=5; t.days.forEach(d=>{ d.fresh=true; d.legs=d.legs||[]; d.vias=d.vias||[]; d.style=d.style||"default"; });
+  t.pick=r.id; if(r.founder) t.founder={year:r.founder.year,ride:r.founder.ride,url:(r.founder.posts[0]||{}).u||"",page:r.draft?"":"/routes/"+r.id+"/",tips:r.founder.tips||[]};
+  applyTrip(t,{style:r.style},r.title);
+}
+// the founder's note on a trip opened from his picks
+function founderLine(){
+  const f=trip.founder; if(!f) return "";
+  return `<div class="fdrbox"><b>Ridden by the founder${f.year?" in "+f.year:""}</b> · ${esc(f.ride)}${f.tips&&f.tips.length?`<ul>${f.tips.map(x=>`<li>${esc(x)}</li>`).join("")}</ul>`:""}<div>${f.page?`<a href="${esc(f.page)}">About this route</a> · `:""}${f.url?`<a href="${esc(f.url)}" target="_blank" rel="noopener">Read the story on onetrackmind.co.za</a>`:""}</div></div>`;
+}
+// /?pick=<id> opens that pick (links from the route pages)
+{ const m=location.search.match(/[?&]pick=([\w-]+)/); if(m){ history.replaceState(null,"",location.pathname+(/[?&]drafts=1/.test(location.search)?"?drafts=1":""));
+  setTimeout(async()=>{ try{ picks=picks||await loadPicks(); const r=picks.find(x=>x.id===m[1]); if(r) openPick(r); }catch(e){} },300); } }
 document.addEventListener("click",e=>{ if(e.target.closest&&e.target.closest("[data-picks]")) openPicks("picks"); });
 
 /* ---------- rider reports and route ratings (need accounts switched on) ---------- */

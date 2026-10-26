@@ -1,0 +1,6 @@
+# Everyone welcome, search engines and AI assistants included.
+User-agent: *
+Allow: /
+Disallow: /api/
+
+Sitemap: https://onetrackmind.online/sitemap.xml
