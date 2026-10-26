@@ -16,7 +16,7 @@ $("picksDlg").addEventListener("click",e=>{
   const o=e.target.closest("[data-pkopen]"); if(!o) return; const r=picks.find(x=>x.id===o.dataset.pkopen); if(!r) return;
   $("picksDlg").close();
   if(r.dbId){ openRoute(r.dbId); return; }
-  const t=JSON.parse(JSON.stringify(r.trip)); t.sugV=4; t.days.forEach(d=>{ d.fresh=true; d.legs=d.legs||[]; d.vias=d.vias||[]; d.style=d.style||"default"; });
+  const t=JSON.parse(JSON.stringify(r.trip)); t.sugV=5; t.days.forEach(d=>{ d.fresh=true; d.legs=d.legs||[]; d.vias=d.vias||[]; d.style=d.style||"default"; });
   t.pick=r.id; applyTrip(t,{style:r.style},r.title);
 });
 document.addEventListener("click",e=>{ if(e.target.closest&&e.target.closest("[data-picks]")) openPicks(); });

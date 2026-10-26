@@ -49,7 +49,7 @@ function fakeBrouter(u) {
 }
 const day = n => { const d = new Date(); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
 const TRIP = {
-  startDate: day(1), endDate: day(2), round: false, sugV: 4,
+  startDate: day(1), endDate: day(2), round: false, sugV: 5,
   start: { name: "Malmesbury", lat: -33.4608, lon: 18.7271 },
   end: { name: "Calvinia", lat: -31.4707, lon: 19.776 },
   days: [

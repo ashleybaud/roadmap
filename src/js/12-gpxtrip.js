@@ -68,7 +68,7 @@ async function planFromGpx(file){
   var nameOf=function(p,fallback){ var t=nearTown(p,10); return t?t.name:fallback; };
   var prev=JSON.parse(JSON.stringify(trip)); snapTrip(true);
   var start=trip.startDate&&trip.startDate>=tomorrow?trip.startDate:tomorrow;
-  var nt={startDate:start,endDate:addDays(start,n-1),round:round,sugV:4,
+  var nt={startDate:start,endDate:addDays(start,n-1),round:round,sugV:5,
     start:pt(nameOf(a,"Start"),+a.lat.toFixed(5),+a.lon.toFixed(5)),
     end:round?null:pt(nameOf(b,"Finish"),+b.lat.toFixed(5),+b.lon.toFixed(5)),
     days:[], gpx:{name:file.name,title:parsed.name,pts:line.map(function(p){return [+p.lat.toFixed(5),+p.lon.toFixed(5)];})}};

@@ -21,7 +21,7 @@ function migrate(){
 }
 const freshTrip=()=>({startDate:tomorrow,endDate:tomorrow,start:pt("My location",null,null),end:null,round:true,days:[{to:null,style:"default",vias:[],legs:[]}]});
 const trip=store.get("rr4-trip")||migrate()||freshTrip();
-if(trip.sugV!==4){ (trip.days||[]).forEach(d=>{ const n=(d.vias||[]).length; d.vias=(d.vias||[]).filter(v=>!v.auto); if(d.vias.length!==n) d.legs=[]; d.fresh=true; delete d.noMore; }); trip.sugV=4; }
+if(trip.sugV!==5){ (trip.days||[]).forEach(d=>{ const n=(d.vias||[]).length; d.vias=(d.vias||[]).filter(v=>!v.auto); if(d.vias.length!==n) d.legs=[]; d.fresh=true; delete d.noMore; }); trip.sugV=5; }
 if(trip.startDate<ymd(new Date())){const n=trip.days.length;trip.startDate=tomorrow;trip.endDate=addDays(tomorrow,n-1);}
 
 const SET_FIELDS=["vehicle","range","leave","pace","corridor","style","maxHours","breakMin"];
@@ -111,12 +111,12 @@ function daySuggest(k,ignoreAuto){
     const choose=l=>{ const late=l.filter(t=>t.km>=pos+S*0.6);
       if(!late.length) return l.slice().sort((x,y)=>((x.off>2)-(y.off>2))||(y.km-x.km))[0];
       return late.slice().sort((x,y)=>((x.off>2)-(y.off>2))||((!x.food)-(!y.food))||(y.km-x.km))[0]; };
-    let pick=null, pi=-1; const mo=trip.gpx?5:40; // a followed GPX only takes towns on its line
+    let pick=null, pi=-1; const mo=2; // only towns on the route: a suggestion must never bend the route. Fuel off the route is shown with the gap warning, to add by hand
     const fuelL=cands.filter(t=>t.fuel&&t.off<=mo&&inWin(t,win));
-    if(fuelL.length){ pick=choose(fuelL); pi=0; } else { const anyL=cands.filter(t=>t.off<=Math.min(mo,7.5)&&inWin(t,win)); /* a town without fuel is only worth a short detour */ if(anyL.length){ pick=choose(anyL); pi=2; } }
+    if(fuelL.length){ pick=choose(fuelL); pi=0; } else { const anyL=cands.filter(t=>t.off<=mo&&inWin(t,win)); /* a town without fuel is only worth a short detour */ if(anyL.length){ pick=choose(anyL); pi=2; } }
     if(pick&&pi>=2){ const nf=cands.filter(t=>t.fuel&&t.off<=40&&t.km>win&&t.km<pd.b)[0]; probs.push({from:pos,to:nf?nf.km:pd.b,fromName:posName,toName:nf?nf.name:pd.pts[pd.pts.length-1].name}); }
     if(pick){ sugg.push(pick); pos=pick.km; posName=pick.name; continue; }
-    const next=cands.filter(t=>t.km>win&&t.km<pd.b&&(t.fuel?t.off<=40:t.off<=7.5)).sort((x,y)=>(x.off<=5?0:1)-(y.off<=5?0:1)||x.km-y.km)[0];
+    const next=cands.filter(t=>t.km>win&&t.km<pd.b&&t.off<=mo).sort((x,y)=>(x.off<=5?0:1)-(y.off<=5?0:1)||x.km-y.km)[0];
     probs.push({from:pos,to:next?next.km:pd.b,fromName:posName,toName:next?next.name:pd.pts[pd.pts.length-1].name});
     if(!next) break; sugg.push(next); pos=next.km; posName=next.name;
   }
@@ -621,7 +621,7 @@ function stopList(k){
           :`<label class="btn small ghost" style="cursor:pointer;align-self:flex-start">Use my GPX for this stretch<input type="file" accept=".gpx,application/gpx+xml" data-track="${j-1}" hidden></label>`}
       </div></details>`:"";
     const autoTag=p.auto?(p.fuelHere?`<span class="autotag" title="Fuel and food here. You asked to stop at least every ${esc(String(settings.range))} km.">Suggested stop${p.detour?` · +${p.detour} km`:""}</span>`
-      :`<span class="autotag nofuel" title="No fuel on our map here, and none closer. Ask locally or carry extra.">Suggested stop · fuel not confirmed${p.detour?` · +${p.detour} km`:""}</span>`):"";
+      :`<span class="autotag nofuel" title="No fuel on our map here, and none closer. Ask locally or carry extra.">Suggested stop · fuel not confirmed${p.detour?` · +${p.detour} km`:""}</span>`)+` <button class="linkbtn small" type="button" data-keep="${j-1}" title="Make it your own stop: it stays even if the route changes">Keep this stop</button>`:"";
     h+=`<li class="stop ${open?"open":""} ${p.auto?"auto":""} ${isTo&&!last?"night":""}"><div class="shead"><div class="sl1"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab">${lab}</span><b>${esc(p.name)}</b><span class="note">${isFrom?"":`km ${km}`}</span></button><span class="avail">${icons}</span></div>
       <div class="sl2"><span class="sl2l">${autoTag}</span><span class="stools">${way}${tools}${opts}</span></div></div>${open&&plan?stopDetail(k,j,stopFocus.cat):""}</li>`;
   });
@@ -712,13 +712,15 @@ $("details").addEventListener("click",e=>{
   if(t.closest("[data-print]")){printTrip();return;}
   const g=t.closest("[data-gpx]"); if(g){downloadGpx(+g.dataset.gpx);return;}
   const ls=t.closest("[data-legsty]"); if(ls&&k!=null){ const [j2,f2]=ls.dataset.legsty.split(":"), j=+j2, f=f2==="1", d2=trip.days[k], v=d2.vias[j];
-    if(v&&v.auto){ delete v.auto; v.fast=f; d2.legs[j]={}; changed(); return; } // using a suggestion makes it the rider's own stop
+    if(v&&v.auto){ let i=j; while(i<d2.vias.length&&d2.vias[i].auto) i++; if(i<d2.vias.length) d2.vias[i].fast=f; else d2.toFast=f; // the way belongs to the stretch, up to the next own stop
+      let a=j; while(a>0&&d2.vias[a-1].auto) a--; d2.vias.splice(a,i-a); d2.legs=[]; delete d2.noMore; changed(); return; }
     if(v) v.fast=f; else d2.toFast=f;
     let i=j-1, cut=false; while(i>=0&&d2.vias[i].auto){ d2.vias.splice(i,1); i--; cut=true; } // suggestions on this stretch were picked for the old way
     if(cut){ d2.legs=[]; delete d2.noMore; } else d2.legs[j]={wantAlts:(d2.legs[j]||{}).wantAlts};
     changed(); return; }
   const fl=t.closest("[data-focusleg]"); if(fl&&plan&&k!=null){const L=plan.days[k].legs[+fl.dataset.focusleg-1]; focusRange(L.a,L.b); return;}
   const fd=t.closest("[data-focusday]"); if(fd&&plan){const pd=plan.days[+fd.dataset.focusday]; focusRange(pd.a,pd.b); return;}
+  const kp=t.closest("[data-keep]"); if(kp&&k!=null){ const v=trip.days[k].vias[+kp.dataset.keep]; if(v&&v.auto){ delete v.auto; v.kept=true; save(); renderDetails(); drawMap(); $("status").textContent=`${v.name} is now one of your stops.`; } return; }
   const up=t.closest("[data-vup]"); if(up&&k!=null){const i=+up.dataset.vup,v=trip.days[k].vias; if(i>0){[v[i-1],v[i]]=[v[i],v[i-1]];trip.days[k].legs=[];changed();} return;}
   const del=t.closest("[data-vdel]"); if(del&&k!=null){ const d=trip.days[k], v=d.vias[+del.dataset.vdel]; if(v&&v.auto){ d.noAuto=[...(d.noAuto||[]),v.name]; d.noMore=true; } d.vias.splice(+del.dataset.vdel,1); d.legs=[]; changed(); return; }
   const wa=t.closest("[data-wantalts]"); if(wa&&k!=null){ const j2=+wa.dataset.wantalts; trip.days[k].legs[j2]=Object.assign({},trip.days[k].legs[j2],{wantAlts:true}); $("status").textContent="Looking for other ways…"; save(); recalc(); return; }

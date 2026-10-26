@@ -64,6 +64,7 @@ async function saveRoute(update){
 function applyTrip(nt,st,label){
   snapTrip(true); const prev=JSON.parse(JSON.stringify(trip)), prevS=Object.assign({},settings);
   Object.keys(trip).forEach(x=>delete trip[x]); Object.assign(trip,nt);
+  if(trip.sugV!==5){ trip.days.forEach(d=>{ d.vias=(d.vias||[]).filter(v=>!v.auto); d.legs=[]; d.fresh=true; delete d.noMore; }); trip.sugV=5; }
   if(!trip.startDate||trip.startDate<tomorrow){ trip.startDate=tomorrow; } trip.endDate=addDays(trip.startDate,trip.days.length-1);
   if(st) ["vehicle","style","range","maxHours","leave","pace","breakMin"].forEach(k=>{ if(st[k]!=null&&st[k]!=="") settings[k]=st[k]; });
   store.set("rr2-settings",settings); SET_FIELDS.forEach(k=>$(k).value=settings[k]); showStyle();
