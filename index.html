@@ -183,7 +183,9 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 .maplbl::before{display:none}
 .toast{font-size:.85rem;background:var(--ink);color:var(--bg);padding:4px 10px;border-radius:5px}
 .linkbtn{background:none;border:0;color:inherit;text-decoration:underline;cursor:pointer;font:inherit;font-weight:700}
-.motto{font-family:var(--f-display);font-weight:600;font-size:1rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:2px 0}
+header h1{font-size:2.7rem;font-weight:700;letter-spacing:-.005em;text-transform:uppercase}
+@media (max-width:640px){header h1{font-size:2rem}}
+.motto{font-family:var(--f-display);font-weight:700;font-size:1.2rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:2px 0}
 .testtag{font-family:var(--f-mono);font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;background:var(--warn);color:var(--onfill);padding:2px 6px;border-radius:4px;vertical-align:middle}
 a.btn{text-decoration:none;display:inline-flex;align-items:center}
 .print{display:none}
@@ -312,6 +314,9 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .schain{flex:1;min-width:0;display:flex;flex-wrap:wrap;align-items:baseline;column-gap:6px}
 .schain .ep{font-weight:500}
 .schain .ep.to{font-weight:700}
+.schain .ep.night{background:var(--ink);color:var(--bg);border-radius:6px;padding:0 8px;white-space:nowrap}
+.schain .ep.night .tolink{color:var(--bg);border-bottom-color:var(--bg)}
+.stop.night>.shead{background:color-mix(in srgb,var(--ink) 8%,transparent);border-left:4px solid var(--ink);padding-left:6px;border-radius:4px}
 .schain .ep.to .tolink{font-weight:700}
 .stopname{color:var(--muted)}
 .dway{margin-left:auto;flex:none;display:inline-flex;gap:3px;line-height:0;padding-top:3px}
@@ -376,6 +381,16 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .gpxbtn{cursor:pointer}
 .gpxnote{font-weight:700;border:1px solid var(--line);border-radius:4px;padding:1px 5px}
 .welcome{max-width:560px}
+.guide{border:2px solid var(--ink);border-radius:8px;background:var(--panel);padding:0 14px}
+.guide>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:10px 0}
+.guide>summary::-webkit-details-marker{display:none}
+.guide .gh{font-family:var(--f-display);font-weight:700;font-size:1.35rem;letter-spacing:.02em}
+.guide .gchev{font-size:1.1rem;transition:transform .15s}
+.guide[open] .gchev{transform:rotate(180deg)}
+.ggrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px 20px;padding:4px 0 10px}
+.ggrid h3{font-size:1.05rem;margin-bottom:2px}
+.ggrid p{margin:0;font-size:.88rem;color:var(--ink)}
+.guide .btns{padding-bottom:12px}
 .wsteps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:.92rem}
 #styleBanner .linkbtn{margin-left:6px}
 .pin{display:flex;align-items:center;justify-content:center;gap:2px;width:100%;height:100%;border-radius:50%;background:#fff;border:2.5px solid #18201C;font-size:13px;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.35);position:relative;color:#18201C}
@@ -386,15 +401,31 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .pin.pstop{width:20px;height:20px;font-size:11px}
 .pinday{position:absolute;top:-7px;right:-8px;min-width:14px;height:14px;border-radius:7px;color:#fff;font:700 9px/14px system-ui,sans-serif;text-align:center;font-style:normal;padding:0 2px}
 .mapemo{position:relative}
-.maplbl.mlnight{font-weight:800;border-width:2px}
+.maplbl.mlnight{font-weight:800;border-width:2px;background:#18201C;color:#fff;border-color:#18201C}
+.pin.pnight{background:#18201C;color:#fff}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div><h1>OneTrackMind <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><div class="note">Every great route, graded for your skill, planned day by day. <button type="button" class="linkbtn" id="howItWorks">How it works</button></div></div>
+    <div><h1>OneTrackMind <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><div class="note">Every great route, graded for your skill, planned day by day.</div></div>
     <div class="btns"><span class="lbl mono" id="hdrSummary"></span><a class="btn ghost" id="feedback" href="#" hidden>Send feedback</a><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
   </header>
+
+  <details class="guide" id="guide">
+    <summary><span class="gh">How it works</span><span class="gchev" aria-hidden="true">▾</span></summary>
+    <div class="ggrid">
+      <section><h3>1. Plan a trip</h3><p>Set where you start and your dates. Each day gets its own tab. Pick where you sleep each night, and add stops in between for a pass, a farm stall or a mate you want to see. The route is worked out for you.</p></section>
+      <section><h3>2. Pick your roads</h3><p><b>Road less travelled</b> takes gravel and back roads wherever they go. <b>Mixed</b> rides plenty of gravel and uses tar to link it up. <b>Tar</b> keeps you on sealed roads. Set it once, then change any stretch with its way icon: brown for your style, blue for the quick way.</p></section>
+      <section><h3>3. Fuel</h3><p>Tell it how far you go between fills ("Stop at least every"). Towns with fuel are suggested at about that spacing. "Fuel not confirmed" means there's none on our map. Know better? Open the stop and tick "Fuel here".</p></section>
+      <section><h3>4. Night stops</h3><p>🛏 marks where you sleep, on the map and in the list. Open a night stop for places to stay, with numbers and websites. Move a night stop and the days around it are worked out again.</p></section>
+      <section><h3>5. Before you go</h3><p>Every day shows distance, riding time, sunset and weather. Orange means have a look: a long day, arriving near dark, rain or heat. "Good to know" lists what to sort out first, like public holidays, border posts, and long stretches without fuel or a hospital.</p></section>
+      <section><h3>6. Got a route already?</h3><p>Use "Plan from a GPX file" with a route from a friend or your Garmin. It's followed exactly, split into days, and night stops and fuel are added.</p></section>
+      <section><h3>7. Take it with you</h3><p>Each day downloads as a GPX file for your GPS or phone. "Save as PDF" prints the whole trip with the warnings up front.</p></section>
+      <section><h3>Worth knowing</h3><p>Trips are saved on this device only, for now. Fuel, places and road surfaces come from OpenStreetMap and can be wrong, especially out in the sticks. Phone ahead on remote stretches, and tell us what's wrong with "Send feedback".</p></section>
+    </div>
+    <div class="btns"><button type="button" class="btn small ghost" id="howItWorks">Change my bike, roads and distances</button></div>
+  </details>
 
   <div class="banner" id="styleBanner"></div>
 
@@ -1311,7 +1342,7 @@ function sumBox(k,big){
   const date=`<span class="sdate">${esc(big?dayLong(k):dayName(k))}</span>`;
   const line=nDays()===1&&trip.round&&!trip.days[0].vias.length
     ?`<span class="schain">${fromCell(k)}${arr}<span class="wherebox">${searchBox("whereto-0","","Where to?",true)}</span>${arr}<span class="ep">⟲ back home</span></span>`
-    :`<span class="schain">${fromCell(k)}${arr}${chain?chain+arr:""}<span class="ep to">${toSym} ${toCell(k)}</span></span>${dayWay(k)}`;
+    :`<span class="schain">${fromCell(k)}${arr}${chain?chain+arr:""}<span class="ep to ${last?"":"night"}" ${last?"":`title="Night ${k+1}: where you sleep"`}>${toSym} ${toCell(k)}</span></span>${dayWay(k)}`;
   return `<div class="sumbox ${big?"big":""}">
     <div class="sumline">${date}<div class="sumrow">${line}</div></div>
     ${pd?`<div class="sicons"><span class="sl">${timePill(k,pd.km,dayMinutes(k),`data-focusday="${k}"`)+fuelBtn(k)}</span><span class="sr">${sunSpan(k)+wxLink(k)}<span class="flags">${flagIcons(r,k)}</span></span></div>${riskHtml(r,k)}${big?fuelList(k):""}${!big&&nDays()>1?gtkLine(k):""}`:`<div class="note">${msg}</div>`}
@@ -1392,7 +1423,7 @@ function stopList(k){
     if(j===0) return;
     const isFrom=j===0, isTo=j===pd.pts.length-1, vi=j-1, L=j>0?pd.legs[j-1]:null, lg=j>0?(d.legs[j-1]||{}):{};
     const open=stopFocus&&stopFocus.k===k&&stopFocus.j===j, km=j>0?Math.round(pd.legs[j-1].b-pd.a):0;
-    const lab=isFrom?"From":isTo?(last?(trip.round?"⟲ Home":"🏁 Finish"):"🛏 Night stop"):`Stop ${j}`;
+    const lab=isFrom?"From":isTo?(last?(trip.round?"⟲ Home":"🏁 Finish"):`🛏 Night ${k+1}`):`Stop ${j}`;
     const av=placesOk?stopAvail(p):null;
     const icons=av?AV.filter(a=>av[a[0]].length).map(a=>`<button type="button" class="avi ${open&&stopFocus.cat===a[0]?"on":""}" data-av="${k}:${j}:${a[0]}" title="${esc(a[2])}: ${av[a[0]].length}">${a[1]}</button>`).join(""):"";
     const fq=legFast(d,j-1), way=lg.track||(L&&L.gpx)?(L&&L.gpx?`<span class="note gpxnote" title="This stretch follows your GPX file">GPX</span>`:""):`<span class="seg2 legway" role="group" aria-label="Way to this stop"><button type="button" data-legsty="${j-1}:0" class="${fq?"":"on"}" title="${esc(styleName())} to here">${STYLE_ICON.default}</button><button type="button" data-legsty="${j-1}:1" class="${fq?"on":""}" title="Get me here quickly">${STYLE_ICON.fast}</button></span>`;
@@ -1404,7 +1435,7 @@ function stopList(k){
       </div></details>`:"";
     const autoTag=p.auto?(p.fuelHere?`<span class="autotag" title="Fuel and food here. You asked to stop at least every ${esc(String(settings.range))} km.">Suggested stop${p.detour?` · +${p.detour} km`:""}</span>`
       :`<span class="autotag nofuel" title="No fuel on our map here, and none closer. Ask locally or carry extra.">Suggested stop · fuel not confirmed${p.detour?` · +${p.detour} km`:""}</span>`):"";
-    h+=`<li class="stop ${open?"open":""} ${p.auto?"auto":""}"><div class="shead"><div class="sl1"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab">${lab}</span><b>${esc(p.name)}</b><span class="note">${isFrom?"":`km ${km}`}</span></button><span class="avail">${icons}</span></div>
+    h+=`<li class="stop ${open?"open":""} ${p.auto?"auto":""} ${isTo&&!last?"night":""}"><div class="shead"><div class="sl1"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab">${lab}</span><b>${esc(p.name)}</b><span class="note">${isFrom?"":`km ${km}`}</span></button><span class="avail">${icons}</span></div>
       <div class="sl2"><span class="sl2l">${autoTag}</span><span class="stools">${way}${tools}${opts}</span></div></div>${open&&plan?stopDetail(k,j,stopFocus.cat):""}</li>`;
   });
   h+=`</ol><div class="rname"><span class="lbl" style="white-space:nowrap">Add a stop</span>${searchBox("addvia-"+k,"","Town, pass or place on this day",true)}</div>`;

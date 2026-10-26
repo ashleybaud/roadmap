@@ -528,7 +528,7 @@ function sumBox(k,big){
   const date=`<span class="sdate">${esc(big?dayLong(k):dayName(k))}</span>`;
   const line=nDays()===1&&trip.round&&!trip.days[0].vias.length
     ?`<span class="schain">${fromCell(k)}${arr}<span class="wherebox">${searchBox("whereto-0","","Where to?",true)}</span>${arr}<span class="ep">⟲ back home</span></span>`
-    :`<span class="schain">${fromCell(k)}${arr}${chain?chain+arr:""}<span class="ep to">${toSym} ${toCell(k)}</span></span>${dayWay(k)}`;
+    :`<span class="schain">${fromCell(k)}${arr}${chain?chain+arr:""}<span class="ep to ${last?"":"night"}" ${last?"":`title="Night ${k+1}: where you sleep"`}>${toSym} ${toCell(k)}</span></span>${dayWay(k)}`;
   return `<div class="sumbox ${big?"big":""}">
     <div class="sumline">${date}<div class="sumrow">${line}</div></div>
     ${pd?`<div class="sicons"><span class="sl">${timePill(k,pd.km,dayMinutes(k),`data-focusday="${k}"`)+fuelBtn(k)}</span><span class="sr">${sunSpan(k)+wxLink(k)}<span class="flags">${flagIcons(r,k)}</span></span></div>${riskHtml(r,k)}${big?fuelList(k):""}${!big&&nDays()>1?gtkLine(k):""}`:`<div class="note">${msg}</div>`}
@@ -609,7 +609,7 @@ function stopList(k){
     if(j===0) return;
     const isFrom=j===0, isTo=j===pd.pts.length-1, vi=j-1, L=j>0?pd.legs[j-1]:null, lg=j>0?(d.legs[j-1]||{}):{};
     const open=stopFocus&&stopFocus.k===k&&stopFocus.j===j, km=j>0?Math.round(pd.legs[j-1].b-pd.a):0;
-    const lab=isFrom?"From":isTo?(last?(trip.round?"⟲ Home":"🏁 Finish"):"🛏 Night stop"):`Stop ${j}`;
+    const lab=isFrom?"From":isTo?(last?(trip.round?"⟲ Home":"🏁 Finish"):`🛏 Night ${k+1}`):`Stop ${j}`;
     const av=placesOk?stopAvail(p):null;
     const icons=av?AV.filter(a=>av[a[0]].length).map(a=>`<button type="button" class="avi ${open&&stopFocus.cat===a[0]?"on":""}" data-av="${k}:${j}:${a[0]}" title="${esc(a[2])}: ${av[a[0]].length}">${a[1]}</button>`).join(""):"";
     const fq=legFast(d,j-1), way=lg.track||(L&&L.gpx)?(L&&L.gpx?`<span class="note gpxnote" title="This stretch follows your GPX file">GPX</span>`:""):`<span class="seg2 legway" role="group" aria-label="Way to this stop"><button type="button" data-legsty="${j-1}:0" class="${fq?"":"on"}" title="${esc(styleName())} to here">${STYLE_ICON.default}</button><button type="button" data-legsty="${j-1}:1" class="${fq?"on":""}" title="Get me here quickly">${STYLE_ICON.fast}</button></span>`;
@@ -621,7 +621,7 @@ function stopList(k){
       </div></details>`:"";
     const autoTag=p.auto?(p.fuelHere?`<span class="autotag" title="Fuel and food here. You asked to stop at least every ${esc(String(settings.range))} km.">Suggested stop${p.detour?` · +${p.detour} km`:""}</span>`
       :`<span class="autotag nofuel" title="No fuel on our map here, and none closer. Ask locally or carry extra.">Suggested stop · fuel not confirmed${p.detour?` · +${p.detour} km`:""}</span>`):"";
-    h+=`<li class="stop ${open?"open":""} ${p.auto?"auto":""}"><div class="shead"><div class="sl1"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab">${lab}</span><b>${esc(p.name)}</b><span class="note">${isFrom?"":`km ${km}`}</span></button><span class="avail">${icons}</span></div>
+    h+=`<li class="stop ${open?"open":""} ${p.auto?"auto":""} ${isTo&&!last?"night":""}"><div class="shead"><div class="sl1"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab">${lab}</span><b>${esc(p.name)}</b><span class="note">${isFrom?"":`km ${km}`}</span></button><span class="avail">${icons}</span></div>
       <div class="sl2"><span class="sl2l">${autoTag}</span><span class="stools">${way}${tools}${opts}</span></div></div>${open&&plan?stopDetail(k,j,stopFocus.cat):""}</li>`;
   });
   h+=`</ol><div class="rname"><span class="lbl" style="white-space:nowrap">Add a stop</span>${searchBox("addvia-"+k,"","Town, pass or place on this day",true)}</div>`;
