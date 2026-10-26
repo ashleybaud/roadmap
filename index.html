@@ -1782,14 +1782,15 @@ async function planFromGpx(file){
   var dayKm=Math.max(80,(+settings.maxHours||8)*TRACK_KMH*0.85), n=Math.max(1,Math.ceil(total/dayKm));
   var step=Math.max(1,Math.floor(line.length/3000)), nights=[];
   for(var q=1;q<n;q++){
-    var ideal=total*q/n, win=0.2*total/n, best=null, bs=Infinity;
+    var ideal=total*q/n, best=null, bs=Infinity;
+    [0.2,0.35].forEach(function(f){ if(best) return; var win=f*total/n;
     towns.forEach(function(t){
       var lo=ideal-win, hi=ideal+win, bd=6, bk=0;
       for(var i=0;i<line.length;i+=step){ if(cum[i]<lo||cum[i]>hi) continue; var d=hav(line[i],t); if(d<bd){bd=d;bk=cum[i];} }
       if(bd>5) return;
       var stay=sleep.some(function(r){ return Math.abs(r[0]-t.lat)<0.05&&hav({lat:r[0],lon:r[1]},t)<=3; });
       var sc=Math.abs(bk-ideal)/win+(stay?0:0.6)+(t.place==="city"||t.place==="town"?0:0.3)+bd/10;
-      if(sc<bs){ bs=sc; best={name:t.name,lat:t.lat,lon:t.lon}; } });
+      if(sc<bs){ bs=sc; best={name:t.name,lat:t.lat,lon:t.lon}; } }); });
     if(!best){ var ix=cum.findIndex(function(c){return c>=ideal;}), p=line[Math.max(0,ix)], nt=nearTown(p,40); best={name:nt?"Near "+nt.name:"Night "+q,lat:+p.lat.toFixed(5),lon:+p.lon.toFixed(5)}; }
     nights.push(best);
   }
