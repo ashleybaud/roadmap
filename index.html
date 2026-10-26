@@ -2186,12 +2186,17 @@ function renderAcct(msg){
       <p class="note" style="margin:0">We keep your email and the routes you save, nothing else. See <a href="/privacy.html" target="_blank">privacy</a>.</p>`;
     $("aForm").onsubmit=async e=>{ e.preventDefault(); const email=$("aEmail").value.trim(), btn=e.target.querySelector("button[type=submit]")||e.target.querySelector(".btns button"); btn.disabled=true; btn.textContent="Sending…";
       try{ if($("aContrib").checked) localStorage.setItem("otm-wantcontrib","1"); else localStorage.removeItem("otm-wantcontrib"); }catch(err){}
-      try{ await api("/api/auth/start",{method:"POST",body:{email,back:"/"}}); acctMode="sent"; acct.sentTo=email; renderAcct(); }
+      try{ const j=await api("/api/auth/start",{method:"POST",body:{email,back:"/"}}); acctMode="sent"; acct.sentTo=email; startWaiting(j.poll); renderAcct(); }
       catch(err){ btn.disabled=false; btn.textContent="Email me a link"; renderAcct({err:1,text:err.message}); $("aEmail").value=email; } };
     setTimeout(()=>$("aEmail")&&$("aEmail").focus(),50);
   } else if(acctMode==="sent"){
     $("aTitle").textContent="Check your email";
-    B.innerHTML=`<p style="margin:0">We sent a sign-in link to <b>${esc(acct.sentTo)}</b>. Open it on this device. It works once and expires in 20 minutes.</p><p class="note" style="margin:0">Nothing after a few minutes? Check spam, or <button class="linkbtn" type="button" data-again>try again</button>. Your trip stays on this device while you sign in.</p>`;
+    B.innerHTML=`${m}<p style="margin:0">We sent a sign-in link and a code to <b>${esc(acct.sentTo)}</b>. Open the link on any device, your phone too, and this screen signs in by itself.</p>
+      <form id="cForm" class="dlgwrap"><div class="field"><label class="lbl" for="cCode">Or type the 6-digit code</label><input id="cCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="7" placeholder="123456" style="font-size:1.3rem;letter-spacing:.3em;max-width:12em"></div>
+      <div class="btns" style="justify-content:flex-end"><button class="btn" type="submit">Sign in</button></div></form>
+      <p class="note" style="margin:0">Waiting for the email to be opened… Nothing after a few minutes? Check spam, or <button class="linkbtn" type="button" data-again>try again</button>. Your trip stays on this device while you sign in.</p>`;
+    $("cForm").onsubmit=async e=>{ e.preventDefault(); const b=e.target.querySelector("button"); b.disabled=true;
+      try{ await api("/api/auth/code",{method:"POST",body:{poll:acct.poll,code:$("cCode").value}}); signedInHere(); }catch(err){ b.disabled=false; renderAcct({err:1,text:err.message}); } };
   } else if(acctMode==="save"){
     $("aTitle").textContent=trip.savedId?"Update saved route":"Save route";
     B.innerHTML=`${m}<form id="sForm" class="dlgwrap"><div class="field"><label class="lbl" for="sTitle">Name</label><input id="sTitle" type="text" maxlength="120" value="${esc(trip.savedTitle||defaultTitle())}"></div>
@@ -2256,6 +2261,18 @@ $("acctDlg").addEventListener("click",async e=>{
 document.addEventListener("click",e=>{ if(!e.target.closest("#details [data-saveroute]")) return;
   if(!acct.user){ acct.why="Sign in to save this route. Your trip stays on this device while you do."; openAcct("signin"); return; }
   openAcct("save"); });
+// the device that asked for the email waits; when the link is opened anywhere, it signs itself in
+let waitT=null;
+function startWaiting(poll){ acct.poll=poll; try{ sessionStorage.setItem("otm-poll",JSON.stringify({poll,at:Date.now()})); }catch(e){} clearTimeout(waitT); waitT=setTimeout(pollOnce,3000); }
+async function pollOnce(){
+  if(!acct.poll||acct.user) return;
+  try{ const j=await api("/api/auth/poll",{method:"POST",body:{poll:acct.poll}}); if(j.ok){ signedInHere(); return; } if(j.expired){ acct.poll=null; try{ sessionStorage.removeItem("otm-poll"); }catch(e){} return; } }catch(e){}
+  waitT=setTimeout(pollOnce,document.visibilityState==="visible"?3000:15000);
+}
+async function signedInHere(){ clearTimeout(waitT); acct.poll=null; try{ sessionStorage.removeItem("otm-poll"); }catch(e){} if($("acctDlg").open) $("acctDlg").close(); await loadMe();
+  const tt=$("toast"); tt.innerHTML=`You're signed in${acct.user?` as <b>${esc(acct.user.email)}</b>`:""}.`; tt.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>tt.hidden=true,6000); }
+// a reload while waiting carries on waiting
+try{ const w=JSON.parse(sessionStorage.getItem("otm-poll")||"null"); if(w&&Date.now()-w.at<25*60e3){ acct.poll=w.poll; setTimeout(()=>{ if(!acct.user) pollOnce(); },2000); } }catch(e){}
 // back from the email link
 if(/[?&]signedin=1/.test(location.search)){ history.replaceState(null,"",location.pathname); setTimeout(()=>{ if(acct.user){ const tt=$("toast"); tt.innerHTML=`You're signed in as <b>${esc(acct.user.email)}</b>. If OneTrackMind is open in another tab, you can close that one.`; tt.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>tt.hidden=true,12000); } },1500); }
 // signed in from the email in another tab? notice it when this tab is looked at again

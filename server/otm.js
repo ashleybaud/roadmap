@@ -31,6 +31,12 @@ const MIGRATIONS = [
   `ALTER TABLE users ADD COLUMN contributor INTEGER NOT NULL DEFAULT 0`,
   `ALTER TABLE users ADD COLUMN blocked INTEGER NOT NULL DEFAULT 0`,
   `ALTER TABLE users ADD COLUMN trusted INTEGER NOT NULL DEFAULT 0`,
+  // sign in on one device from an email opened on another: the asking device holds a secret (poll) and waits; the email also carries a 6-digit code
+  `ALTER TABLE login_tokens ADD COLUMN poll TEXT`,
+  `ALTER TABLE login_tokens ADD COLUMN code TEXT`,
+  `ALTER TABLE login_tokens ADD COLUMN approved_user TEXT`,
+  `ALTER TABLE login_tokens ADD COLUMN poll_used INTEGER NOT NULL DEFAULT 0`,
+  `ALTER TABLE login_tokens ADD COLUMN attempts INTEGER NOT NULL DEFAULT 0`,
 ];
 let schemaReady = null;
 export async function db(env) {
@@ -146,3 +152,11 @@ export function requireContributor(env, u) {
   if (!u.contributor && !isAdmin(env, u)) throw new HttpError(428, "contributor");
 }
 export const liveStatus = (env, u) => (isAdmin(env, u) || u.trusted ? "ok" : "pending");
+
+// find or create the user for an email address
+export async function userFor(D, email) {
+  let u = await D.prepare(`SELECT id FROM users WHERE email = ?`).bind(email).first(); const t = now();
+  if (!u) { u = { id: newId(12) }; await D.prepare(`INSERT INTO users (id, email, created, last_seen) VALUES (?, ?, ?, ?)`).bind(u.id, email, t, t).run(); }
+  else await D.prepare(`UPDATE users SET last_seen = ? WHERE id = ?`).bind(t, u.id).run();
+  return u;
+}
