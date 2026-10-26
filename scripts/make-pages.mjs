@@ -107,7 +107,7 @@ ${f.tips && f.tips.length ? `<h2>Good to know</h2><ul>${f.tips.map(t => `<li>${e
     provider: ORG, ...(f ? { author: FOUNDER } : {}),
     itinerary: { "@type": "ItemList", itemListElement: places(r).map((p, i) => ({ "@type": "ListItem", position: i + 1, item: { "@type": "Place", name: p.name, geo: { "@type": "GeoCoordinates", latitude: p.lat, longitude: p.lon } } })) },
   }, { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Routes", item: SITE + "/routes/" }, { "@type": "ListItem", position: 2, name: r.title, item: `${SITE}/routes/${r.id}/` }] }];
-  return page({ url: `/routes/${r.id}/`, title: `${r.title} · ${n}-day ${r.region.split(" · ")[0]} route · OneTrackMind`, desc, body, ld });
+  return page({ url: `/routes/${r.id}/`, title: `${r.title} · ${n}-day route · OneTrackMind`, desc, body, ld });
 }
 
 function routesIndex() {
