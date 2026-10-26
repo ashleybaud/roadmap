@@ -91,6 +91,18 @@ const TRIP = {
   await page.click('[data-day="1"]'); await page.waitForTimeout(500);
   ok(await page.$$eval("ol.stops li", b => b.length) >= 2, "second day stop list missing");
 
+  // plan a whole trip from a GPX file
+  await page.click('[data-day="ov"]'); await page.waitForTimeout(300);
+  await page.setInputFiles("[data-tripgpx]", { name: "test-west-coast.gpx", mimeType: "application/gpx+xml", buffer: Buffer.from(require("./fixtures-route.cjs")) });
+  await page.waitForFunction(() => trip.gpx && plan && !planStale && plan.days.filter(Boolean).length === trip.days.length && placesOk, null, { timeout: 30000 }).catch(() => fails.push("GPX trip not planned"));
+  const g = await page.evaluate(() => ({ days: trip.days.length, nights: trip.days.slice(0, -1).map(d => d.to && d.to.name), followed: plan.days.every(d => d.legs.every(l => l.gpx || false)), km: Math.round(plan.total), sym: (() => { let t = ""; const o = URL.createObjectURL; URL.createObjectURL = b => { b.text().then(x => window._gpxOut = x); return o.call(URL, b); }; downloadGpx(0); URL.createObjectURL = o; return 1; })() }));
+  await page.waitForTimeout(300);
+  const gpxOut = await page.evaluate(() => window._gpxOut || "");
+  ok(g.days >= 2, "GPX trip not split into days: " + JSON.stringify(g));
+  ok(g.followed, "GPX trip stretches are not following the file");
+  ok(/<sym>(Lodging|Gas Station)<\/sym>/.test(gpxOut), "GPX export has no Garmin symbols");
+  console.log("gpx trip:", JSON.stringify({ days: g.days, nights: g.nights, km: g.km }));
+
   ok(errors.length === 0, "page errors: " + errors.join(" | "));
   await browser.close(); srv.close();
   if (fails.length) { console.error("SMOKE TEST FAILED:\n - " + fails.join("\n - ")); process.exit(1); }

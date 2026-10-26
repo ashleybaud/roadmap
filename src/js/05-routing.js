@@ -4,7 +4,7 @@ const STYLE={rough:{use_highways:0,use_primary:0.2,use_trails:1},mixed:{use_high
 const lineKm=g=>{let k=0;for(let i=1;i<g.length;i++)k+=hav(g[i-1],g[i]);return k;};
 /* one leg: own GPX track, or motorcycle routing with up to 3 ways; falls back to car routing */
 async function routeLeg(a,b,lg){
-  if(lg&&lg.track){const geom=lg.track.map(([la,lo])=>({lat:la,lon:lo}));const km=lineKm(geom);return [{km,min:km/30*60,geom}];}
+  if(lg&&lg.track){const geom=lg.track.map(([la,lo])=>({lat:la,lon:lo}));const km=lineKm(geom);return [{km,min:km/TRACK_KMH*60,geom}];}
   const style=lg&&lg.fast?"tar":settings.style;
   const alts=!!(lg&&lg.alts);
   const key=style+(alts?"|alts":"")+"|"+[a,b].map(p=>p.lon.toFixed(5)+","+p.lat.toFixed(5)).join(";");

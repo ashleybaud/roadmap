@@ -54,14 +54,15 @@ async function recalc(){
   if(!trip.start||trip.start.lat==null){ plan=null; fp=null; if(!/Getting|Tap/.test($("status").textContent))$("status").textContent="Pick where you start."; renderAll(); return; }
   $("status").textContent="Working out the route…"; planStale=true; renderAll();
   try{
+    const gs=gpxSlices(), gtr=(k,j)=>gs&&gs[k]&&gs[k][j]||null;
     const res=await Promise.all(trip.days.map((d,k)=>{const pts=dayPts(k); if(!pts) return null; 
-      return Promise.all(pts.slice(0,-1).map((a,j)=>routeLeg(a,pts[j+1],{fast:legFast(d,j),track:d.legs[j]&&d.legs[j].track,alts:d.legs[j]&&d.legs[j].wantAlts}))).then(opts=>({pts,opts}));}));
+      return Promise.all(pts.slice(0,-1).map((a,j)=>routeLeg(a,pts[j+1],{fast:legFast(d,j),track:(d.legs[j]&&d.legs[j].track)||gtr(k,j),alts:d.legs[j]&&d.legs[j].wantAlts}))).then(opts=>({pts,opts}));}));
     if(my!==seq) return;
     const geom=[],cum=[],ptKm=new Map(),days=[]; let acc=0;
     res.forEach((r,k)=>{
       if(!r){days.push(null);return;}
       const d=trip.days[k];
-      const legs=r.opts.map((o,j)=>{const ch=o[Math.min((d.legs[j]&&d.legs[j].alt)||0,o.length-1)];return {km:ch.km,min:ch.min,geom:ch.geom,n:o.length,alts:o.map(x=>x.km)};});
+      const legs=r.opts.map((o,j)=>{const ch=o[Math.min((d.legs[j]&&d.legs[j].alt)||0,o.length-1)];return {km:ch.km,min:ch.min,geom:ch.geom,n:o.length,alts:o.map(x=>x.km),gpx:!(d.legs[j]&&d.legs[j].track)&&!!gtr(k,j)};});
       if(!ptKm.has(r.pts[0])) ptKm.set(r.pts[0],acc);
       legs.forEach((L,j)=>{L.a=acc; L.geom.forEach((g,i)=>{if(geom.length&&i>0)acc+=hav(geom[geom.length-1],g); geom.push(g);cum.push(acc);}); L.b=acc; ptKm.set(r.pts[j+1],acc);});
       days.push({pts:r.pts,legs,km:legs.reduce((t,x)=>t+x.km,0),min:legs.reduce((t,x)=>t+x.min,0),a:legs[0].a,b:legs[legs.length-1].b});
@@ -110,8 +111,9 @@ function daySuggest(k,ignoreAuto){
     const choose=l=>{ const late=l.filter(t=>t.km>=pos+S*0.6);
       if(!late.length) return l.slice().sort((x,y)=>((x.off>2)-(y.off>2))||(y.km-x.km))[0];
       return late.slice().sort((x,y)=>((x.off>2)-(y.off>2))||((!x.food)-(!y.food))||(y.km-x.km))[0]; };
-    let pick=null, pi=-1; const fuelL=cands.filter(t=>t.fuel&&t.off<=40&&inWin(t,win));
-    if(fuelL.length){ pick=choose(fuelL); pi=0; } else { const anyL=cands.filter(t=>t.off<=40&&inWin(t,win)); if(anyL.length){ pick=choose(anyL); pi=2; } }
+    let pick=null, pi=-1; const mo=trip.gpx?5:40; // a followed GPX only takes towns on its line
+    const fuelL=cands.filter(t=>t.fuel&&t.off<=mo&&inWin(t,win));
+    if(fuelL.length){ pick=choose(fuelL); pi=0; } else { const anyL=cands.filter(t=>t.off<=mo&&inWin(t,win)); if(anyL.length){ pick=choose(anyL); pi=2; } }
     if(pick&&pi>=2){ const nf=cands.filter(t=>t.fuel&&t.off<=40&&t.km>win&&t.km<pd.b)[0]; probs.push({from:pos,to:nf?nf.km:pd.b,fromName:posName,toName:nf?nf.name:pd.pts[pd.pts.length-1].name}); }
     if(pick){ sugg.push(pick); pos=pick.km; posName=pick.name; continue; }
     const next=cands.filter(t=>t.km>win&&t.km<pd.b).sort((x,y)=>(x.off<=5?0:1)-(y.off<=5?0:1)||x.km-y.km)[0];
@@ -595,7 +597,7 @@ function stopList(k){
     const lab=isFrom?"From":isTo?(last?"Finish":"Night stop"):`Stop ${j}`;
     const av=placesOk?stopAvail(p):null;
     const icons=av?AV.filter(a=>av[a[0]].length).map(a=>`<button type="button" class="avi ${open&&stopFocus.cat===a[0]?"on":""}" data-av="${k}:${j}:${a[0]}" title="${esc(a[2])}: ${av[a[0]].length}">${a[1]}</button>`).join(""):"";
-    const fq=legFast(d,j-1), way=lg.track?"":`<span class="seg2 legway" role="group" aria-label="Way to this stop"><button type="button" data-legsty="${j-1}:0" class="${fq?"":"on"}" title="${esc(styleName())} to here">${STYLE_ICON.default}</button><button type="button" data-legsty="${j-1}:1" class="${fq?"on":""}" title="Get me here quickly">${STYLE_ICON.fast}</button></span>`;
+    const fq=legFast(d,j-1), way=lg.track||(L&&L.gpx)?(L&&L.gpx?`<span class="note gpxnote" title="This stretch follows your GPX file">GPX</span>`:""):`<span class="seg2 legway" role="group" aria-label="Way to this stop"><button type="button" data-legsty="${j-1}:0" class="${fq?"":"on"}" title="${esc(styleName())} to here">${STYLE_ICON.default}</button><button type="button" data-legsty="${j-1}:1" class="${fq?"on":""}" title="Get me here quickly">${STYLE_ICON.fast}</button></span>`;
     const tools=!isFrom&&!isTo?`<button class="icon" type="button" title="Move up" data-vup="${vi}">↑</button><button class="icon" type="button" title="Remove" data-vdel="${vi}">✕</button>`:"";
     const opts=L?`<details class="legopts"><summary class="icon" title="Options for the way in">⋯</summary><div class="legmenu">
         ${L.n>1&&!lg.track?`<label class="chk">Way <select data-alt="${j-1}">${L.alts.map((km2,x)=>`<option value="${x}" ${(lg.alt||0)===x?"selected":""}>Way ${x+1} · ${Math.round(km2)} km</option>`).join("")}</select></label>`:lg.track?"":lg.wantAlts?`<span class="note">No other ways found for this stretch.</span>`:`<button class="btn small ghost" type="button" data-wantalts="${j-1}">Find other ways</button>`}
@@ -635,7 +637,7 @@ function drawStopLayer(){
 }
 function clearLink(){ return `<div class="btns clearrow">${clearArm?`<span class="note">Clear this trip?</span><button class="btn small" type="button" data-newtrip>Clear</button><button class="btn small ghost" type="button" data-nocancel>Cancel</button>`:`<button class="linkbtn small" type="button" data-newtrip>Clear trip</button>`}</div>`; }
 function overviewHtml(){
-  let h=`<div class="tbslot"></div>`;
+  let h=`<div class="tbslot"></div>`+gpxBar();
   if(nDays()===1) return h+sumBox(0,false)+(!planStale&&plan&&plan.days[0]?gtkHtml(0):"")+dayBody(0)+clearLink()+footNote();
   h+=`<div class="days">`;
   trip.days.forEach((d,k)=>{ h+=`<div class="ovday" data-gotoday="${k}">${sumBox(k,false)}</div>`; });
@@ -667,7 +669,7 @@ $("details").addEventListener("click",e=>{
   if(t.closest("[data-tripedit]")){tripEdit=!tripEdit;renderDetails();return;}
   if(t.closest("[data-newtrip]")&&!clearArm){ clearArm=true; renderDetails(); return; }
   if(t.closest("[data-nocancel]")){ clearArm=false; renderDetails(); return; }
-  if(t.closest("[data-newtrip]")){ clearArm=false; snapTrip(true); const prev=JSON.parse(JSON.stringify(trip)); Object.assign(trip,freshTrip()); tripEdit=true; ui.tab="ov"; plan=null; fp=null; changed(); locateIfAllowed();
+  if(t.closest("[data-newtrip]")){ clearArm=false; snapTrip(true); const prev=JSON.parse(JSON.stringify(trip)); delete trip.gpx; Object.assign(trip,freshTrip()); tripEdit=true; ui.tab="ov"; plan=null; fp=null; changed(); locateIfAllowed();
     const tt=$("toast"); tt.innerHTML=`Trip cleared. <button type="button" class="linkbtn">Undo</button>`; tt.hidden=false; tt.querySelector("button").onclick=()=>{Object.keys(trip).forEach(x=>delete trip[x]);Object.assign(trip,prev);tt.hidden=true;changed();}; clearTimeout(toastT); toastT=setTimeout(()=>tt.hidden=true,8000); return; }
   const avb=t.closest("[data-av]"); if(avb){ const [k2,j2,c]=avb.dataset.av.split(":"); const same=stopFocus&&stopFocus.k===+k2&&stopFocus.j===+j2&&stopFocus.cat===c; stopFocus=same?null:{k:+k2,j:+j2,cat:c}; if(!stopFocus) window._refit=true; renderDetails(); drawMap(); return; }
   const pl=t.closest("[data-ploc]"); if(pl&&!t.closest("a,button")&&map){ const [la,lo]=pl.dataset.ploc.split(",").map(Number); map.setView([la,lo],16); if(window.innerWidth<=1000) $("map").scrollIntoView({behavior:"smooth",block:"start"}); return; }
@@ -688,6 +690,7 @@ $("details").addEventListener("click",e=>{
   const ap=t.closest("[data-addpoi]"); if(ap){const [k2,id]=ap.dataset.addpoi.split(":"); const x=pois.find(q=>q.id===id); if(x){insertVia(+k2,pt(x.name,x.lat,x.lon,{}));$("status").textContent=`Added ${x.name}.`;changed();} return;}
   const go=t.closest("[data-gotoday]"); if(go&&!t.closest("button,input,a")){ui.tab=+go.dataset.gotoday;saveUi();renderAll();return;}
   const pn=t.closest("[data-panel]"); if(pn){hidePeek();const [dk,j,tab]=pn.dataset.panel.split(":");openPanel(+dk,j==="last"?"last":+j,tab);return;}
+  if(t.closest("[data-ungpx]")){ delete trip.gpx; gpxCache=null; $("status").textContent="Not following the GPX any more. The route is worked out between your stops."; changed(); return; }
   const gb=t.closest("[data-gtk]"); if(gb){ const k2=+gb.dataset.gtk; gtkOpen.has(k2)?gtkOpen.delete(k2):gtkOpen.add(k2); renderDetails(); return; }
   const rb=t.closest("[data-risk]"); if(rb){const k2=+rb.dataset.risk; riskOpen.has(k2)?riskOpen.delete(k2):riskOpen.add(k2); renderDetails(); return;}
   if(t.closest("[data-print]")){printTrip();return;}
@@ -713,6 +716,7 @@ $("details").addEventListener("change",async e=>{
   if(t.dataset.fuelhere!==undefined){ const [k2,i]=t.dataset.fuelhere.split(":").map(Number); const v=trip.days[k2].vias[i]; if(v){ v.fuelHere=t.checked; if(!t.checked&&v.type==="fuel") delete v.type; save(); recalc(); } return; }
   if(t.dataset.breakmin!==undefined){ const [k2,i]=t.dataset.breakmin.split(":").map(Number); const v=trip.days[k2].vias[i]; if(v){ v.mins=Math.max(0,+t.value||0); save(); renderAll(); } return; }
   if(t.dataset.nightfill!==undefined){const to=trip.days[+t.dataset.nightfill].to; if(to){to.fill=t.checked;changed();} return;}
+  if(t.dataset.tripgpx!==undefined&&t.files[0]){ await planFromGpx(t.files[0]); t.value=""; return; }
   const k=curDay(); if(k==null) return; const d=trip.days[k];
   if(t.dataset.vtype!==undefined){d.vias[+t.dataset.vtype].type=t.value;changed();}
   if(t.dataset.alt!==undefined){const j=+t.dataset.alt; d.legs[j]=Object.assign({},d.legs[j],{alt:+t.value}); changed();}
@@ -842,10 +846,12 @@ document.addEventListener("click",e=>{ document.querySelectorAll(".legopts[open]
 function downloadGpx(k){
   const pd=plan.days[k]; if(!pd) return; const from=pd.pts[0], to=pd.pts[pd.pts.length-1];
   const name=`${dayName(k)} ${from.name} to ${to.name}`, g=seg(pd.a,pd.b);
-  const w=[...pd.pts.slice(1).map(p=>({lat:p.lat,lon:p.lon,n:p.name})),...(fp?fp.fills.filter(f=>f.km>pd.a&&f.km<=pd.b).map(f=>({lat:f.lat,lon:f.lon,n:"Fuel "+f.name})):[])];
+  const last=k===nDays()-1, sym=(p,j)=>j===pd.pts.length-1?(last?"Flag, Red":"Lodging"):stopFuel(p)?"Gas Station":p.type==="sight"||p.type==="pass"?"Scenic Area":"Flag, Blue";
+  const fuelW=fp?fuelGroups(fp.fills.filter(f=>f.km>pd.a&&f.km<=pd.b)).filter(g=>!pd.pts.some(p=>hav(p,g.st[0])<2)).map(g=>({lat:g.st[0].lat,lon:g.st[0].lon,n:"Fuel "+(g.town?g.town.name:g.st[0].name),s:"Gas Station"})):[];
+  const w=[...pd.pts.slice(1).map((p,i)=>({lat:p.lat,lon:p.lon,n:p.name,s:sym(p,i+1)})),...fuelW];
   const text=`<?xml version="1.0" encoding="UTF-8"?>
 <gpx version="1.1" creator="Route and Range" xmlns="http://www.topografix.com/GPX/1/1">
-${w.map(p=>`  <wpt lat="${p.lat.toFixed(5)}" lon="${p.lon.toFixed(5)}"><name>${esc(p.n)}</name></wpt>`).join("\n")}
+${w.map(p=>`  <wpt lat="${p.lat.toFixed(5)}" lon="${p.lon.toFixed(5)}"><name>${esc(p.n)}</name><sym>${esc(p.s)}</sym></wpt>`).join("\n")}
   <trk>
     <name>${esc(name)}</name>
     <trkseg>

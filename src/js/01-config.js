@@ -19,3 +19,5 @@ const hav=(a,b)=>{const dl=rad(b.lat-a.lat),dn=rad(b.lon-a.lon);const h=Math.sin
 const fmtT=m=>{m=Math.round(m);return String(Math.floor(m/60)%24).padStart(2,"0")+":"+String(((m%60)+60)%60).padStart(2,"0");};
 const fmtDur=m=>{m=Math.round(m);return Math.floor(m/60)+"h"+String(m%60).padStart(2,"0");};
 const toMin=t=>{const [h,m]=(t||"0:0").split(":").map(Number);return h*60+m;};
+
+const TRACK_KMH=45; // average speed assumed on a followed GPX track (no router to ask)
