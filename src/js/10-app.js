@@ -24,8 +24,8 @@ const trip=store.get("rr4-trip")||migrate()||freshTrip();
 if(trip.sugV!==4){ (trip.days||[]).forEach(d=>{ const n=(d.vias||[]).length; d.vias=(d.vias||[]).filter(v=>!v.auto); if(d.vias.length!==n) d.legs=[]; d.fresh=true; delete d.noMore; }); trip.sugV=4; }
 if(trip.startDate<ymd(new Date())){const n=trip.days.length;trip.startDate=tomorrow;trip.endDate=addDays(tomorrow,n-1);}
 
-const SET_FIELDS=["range","leave","pace","corridor","style","maxHours","breakMin"];
-const settings=Object.assign({range:200,reserve:30,leave:"08:00",pace:0,corridor:5,style:"rough",fuelMode:"suggest",maxHours:8,breakMin:20},store.get("rr2-settings")||{});
+const SET_FIELDS=["vehicle","range","leave","pace","corridor","style","maxHours","breakMin"];
+const settings=Object.assign({range:200,reserve:30,leave:"08:00",pace:0,corridor:5,style:"rough",vehicle:"bike",fuelMode:"suggest",maxHours:8,breakMin:20},store.get("rr2-settings")||{});
 const ui=Object.assign({types:Object.fromEntries(TYPES.map(t=>[t.id,t.on])),max:"10",sleep:false},store.get("rr4-ui")||{});
 ui.tab=ui.tab??"ov"; delete ui._lastSel;
 let plan=null, pois=[], fuelStations=[], fuelAll=[], stays=[], placesOk=false, dataDate="", seq=0, panel=null, fp=null;
@@ -348,10 +348,10 @@ function printHtml(){
   const G=plan.days.map((d,k)=>d?goodToKnow(k):[]);
   // ---- page 1: the whole trip, critical first
   let h=`<section class="pcover"><h1>${esc(trip.start.name)} → ${esc(fin)}</h1>
-    <p class="pmeta">${esc(dayLong(0))}${n>1?` to ${esc(dayLong(n-1))}`:""} · ${n} day${n>1?"s":""} · ${Math.round(tot).toLocaleString()} km · about ${fmtDur(ride)} riding · leave each day ${fmtT(lv)}</p>`;
+    <p class="pmeta">${esc(dayLong(0))}${n>1?` to ${esc(dayLong(n-1))}`:""} · ${n} day${n>1?"s":""} · ${Math.round(tot).toLocaleString()} km · about ${fmtDur(ride)} ${VEH().ing} · leave each day ${fmtT(lv)}</p>`;
   const crit=[]; G.forEach((g,k)=>g.filter(x=>x.lvl!=="info").forEach(x=>crit.push(Object.assign({},x,{text:dayName(k)+": "+x.text}))));
   h+=`<div class="pcrit"><h2>Before you go</h2>${crit.length?`<ul class="pwarn">${crit.map(li).join("")}</ul>`:`<p>Nothing flagged. Still phone ahead on remote legs.</p>`}</div>`;
-  h+=`<table class="ptable"><thead><tr><th>Day</th><th>Route</th><th>km</th><th>Riding</th><th>Arrive</th><th>Sunset</th><th>Weather</th><th>To know</th></tr></thead><tbody>`;
+  h+=`<table class="ptable"><thead><tr><th>Day</th><th>Route</th><th>km</th><th>${VEH().Ing}</th><th>Arrive</th><th>Sunset</th><th>Weather</th><th>To know</th></tr></thead><tbody>`;
   plan.days.forEach((d,k)=>{ if(!d) return;
     const to=d.pts[d.pts.length-1], vias=d.pts.slice(1,-1), w=dayWx(k), s=sunMin(k), arr=arrMin(k,d.pts.length-1), nk=G[k].filter(x=>x.lvl!=="info").length, bad=G[k].some(x=>x.lvl==="bad");
     h+=`<tr class="${bad?"bad":nk?"warn":""}"><td><b>${esc(dayName(k))}</b></td><td>${vias.length?`via ${vias.map(v=>esc(v.name)).join(", ")} → `:"→ "}<b>${esc(to.name)}</b>${k<n-1?" (night)":""}</td>
@@ -364,7 +364,7 @@ function printHtml(){
     const from=d.pts[0], to=d.pts[d.pts.length-1], last=k===n-1, m=dayMed(k), w=dayWx(k), s=sunMin(k), g=G[k], arr=arrMin(k,d.pts.length-1), date=dayDate(k);
     const info=sec=>g.filter(x=>x.lvl==="info"&&x.sec===sec);
     h+=`<section class="pday"><h2>${esc(dayLong(k))}: ${esc(from.name)} → ${esc(to.name)}</h2>
-      <p class="pmeta">${Math.round(d.km)} km · about ${fmtDur(dayMinutes(k))} riding · leave ${fmtT(lv)}, arrive about ${fmtT(arr)} · sunset ${s!=null?fmtT(s):"?"}${w&&!w.none?" · "+esc(wxText(w)):""}</p>`;
+      <p class="pmeta">${Math.round(d.km)} km · about ${fmtDur(dayMinutes(k))} ${VEH().ing} · leave ${fmtT(lv)}, arrive about ${fmtT(arr)} · sunset ${s!=null?fmtT(s):"?"}${w&&!w.none?" · "+esc(wxText(w)):""}</p>`;
     const cr=g.filter(x=>x.lvl!=="info"); if(cr.length) h+=`<div class="pcrit"><h3>Needs attention</h3><ul class="pwarn">${cr.map(li).join("")}</ul></div>`;
     // destination
     h+=`<h3>At your destination: ${esc(to.name)}</h3>`; const di=info("dest"); if(di.length) h+=`<ul>${di.map(li).join("")}</ul>`;
@@ -439,7 +439,7 @@ function tripTotals(){
   if(!plan) return "";
   const n=nDays(), tot=plan.days.reduce((t,d)=>t+(d?d.km:0),0), ride=plan.days.reduce((t,d,k)=>t+(d?dayMinutes(k):0),0);
   const fin=trip.round||!trip.end?(trip.start?trip.start.name:"?"):trip.end.name;
-  return `<div class="totals"><span>Back at <b>${esc(fin)}</b></span><span>${n} day${n>1?"s":""} · ${Math.round(tot).toLocaleString()} km · about ${fmtDur(ride)} riding</span></div>`;
+  return `<div class="totals"><span>Back at <b>${esc(fin)}</b></span><span>${n} day${n>1?"s":""} · ${Math.round(tot).toLocaleString()} km · about ${fmtDur(ride)} ${VEH().ing}</span></div>`;
 }
 function stayRows(k){
   const last=k===nDays()-1, to=dayTo(k); if(!to||(last&&trip.round)) return "";
@@ -863,19 +863,31 @@ ${simplify(g,20).map(x=>`      <trkpt lat="${x.lat.toFixed(5)}" lon="${x.lon.toF
   const file=name.replace(/[^\w]+/g,"-").replace(/-+$/,"")+".gpx";
   const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([text],{type:"application/gpx+xml"})); a.download=file; document.body.appendChild(a); a.click();
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);
-  $("status").textContent=`Saved ${file}. Open it from your downloads and share it to your bike's app.`;
+  $("status").textContent=`Saved ${file}. Open it from your downloads and share it to your ${VEH().thing}'s or phone's app.`;
 }
 
 /* ---------- settings + glue ---------- */
 SET_FIELDS.forEach(id=>$(id).value=settings[id]);
 $("openSettings").addEventListener("click",()=>{ renderHist(); $("settings").showModal(); });
 $("settings").addEventListener("close",()=>{
-  const reroute=+$("corridor").value!==+settings.corridor||$("style").value!==settings.style;
+  const reroute=+$("corridor").value!==+settings.corridor||$("style").value!==settings.style||$("vehicle").value!==settings.vehicle;
   SET_FIELDS.forEach(id=>settings[id]=$(id).value); store.set("rr2-settings",settings);
   showStyle(); reroute?recalc():renderAll();
 });
-const STYLE_TEXT={rough:"<b>Road less travelled:</b> gravel and back roads first. For the quick way, pick the motorway sign on that day.",mixed:"<b>Mixed:</b> gravel where it saves time, tar where it doesn't.",tar:"<b>Tar:</b> main roads and highways."};
-function showStyle(){ $("styleBanner").innerHTML=STYLE_TEXT[settings.style]||STYLE_TEXT.rough; }
+/* ---------- first visit: what this is and how to start (shown once; "How it works" brings it back) ---------- */
+function openWelcome(){ $("wVehicle").value=settings.vehicle; $("wStyle").value=settings.style; $("wHours").value=settings.maxHours; $("wRange").value=settings.range; $("welcome").showModal(); }
+$("welcome").addEventListener("close",()=>{
+  const was=[settings.vehicle,settings.style].join();
+  settings.vehicle=$("wVehicle").value; settings.style=$("wStyle").value; settings.maxHours=$("wHours").value; settings.range=$("wRange").value;
+  store.set("rr2-settings",settings); SET_FIELDS.forEach(id=>$(id).value=settings[id]); try{localStorage.setItem("rr-welcome","1");}catch(e){}
+  showStyle(); was!==[settings.vehicle,settings.style].join()?recalc():renderAll();
+  if(!trip.start||trip.start.lat==null) $("startPlace").focus();
+});
+$("howItWorks").addEventListener("click",openWelcome);
+try{ if(!localStorage.getItem("rr-welcome")) setTimeout(openWelcome,300); }catch(e){}
+const STYLE_TEXT={rough:"<b>Road less travelled</b>: gravel and back roads first",mixed:"<b>Mixed</b>: gravel where it saves time, tar where it doesn't",tar:"<b>Tar</b>: main roads and highways"};
+function showStyle(){ $("styleBanner").innerHTML=`${settings.vehicle==="car"?"🚙 Car or 4x4":"🏍 Motorbike"} · ${STYLE_TEXT[settings.style]||STYLE_TEXT.rough}. Change any stretch with its way icons. <button type="button" class="linkbtn" id="bannerEdit">Change</button>`; }
+document.addEventListener("click",e=>{ if(e.target.id==="bannerEdit") openWelcome(); });
 function render(){ renderAll(); }
 function renderAll(){
   fp=plan?fuelPlan():null;

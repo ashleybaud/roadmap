@@ -80,11 +80,11 @@ function goodToKnow(k){
 
   // ---- route and weather
   var f=rangeFuel(pd.a,pd.b); if(f) add("warn","route",f.text+". Small towns may still have fuel: ask locally or carry extra.");
-  var mins=dayMinutes(k); if(mins>+settings.maxHours*60) add("warn","route","Riding time "+fmtDur(mins)+", over your "+settings.maxHours+"h limit.");
+  var mins=dayMinutes(k); if(mins>+settings.maxHours*60) add("warn","route",VEH().Ing+" time "+fmtDur(mins)+", over your "+settings.maxHours+"h limit.");
   if(w&&!w.none){
     if(w.code>=95) add("warn","route","Thunderstorms forecast.");
     if(w.gust>=80) add("bad","route","Wind gusts to "+Math.round(w.gust)+" km/h."); else if(w.gust>=60) add("warn","route","Strong wind, gusts to "+Math.round(w.gust)+" km/h.");
-    if(w.tmax>=42) add("bad","route","Extreme heat: "+Math.round(w.tmax)+"°C. Ride early, carry lots of water."); else if(w.tmax>=37) add("warn","route","Hot: "+Math.round(w.tmax)+"°C. Carry extra water.");
+    if(w.tmax>=42) add("bad","route","Extreme heat: "+Math.round(w.tmax)+"°C. Leave early, carry lots of water."); else if(w.tmax>=37) add("warn","route","Hot: "+Math.round(w.tmax)+"°C. Carry extra water.");
     if(w.rain>=25) add("bad","route","Heavy rain: "+Math.round(w.rain)+" mm. Gravel and river crossings may be impassable."); else if(w.rain>=8&&w.prob>=50) add("warn","route","Rain likely: "+Math.round(w.rain)+" mm. Gravel gets slippery.");
     if(w.tmin<=2) add("warn","route","Near freezing in the morning: "+Math.round(w.tmin)+"°C. Watch for ice early.");
   } else if(w&&w.none) add("info","route","Weather forecast available from "+fmtDate(new Date(w.opens+"T12:00:00"))+".");

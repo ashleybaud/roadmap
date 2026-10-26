@@ -364,12 +364,15 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .gpxbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0}
 .gpxbtn{cursor:pointer}
 .gpxnote{font-weight:700;border:1px solid var(--line);border-radius:4px;padding:1px 5px}
+.welcome{max-width:560px}
+.wsteps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:.92rem}
+#styleBanner .linkbtn{margin-left:6px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div><h1>Route and Range <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="note">Plan the ride, the fuel and the night stops. Trips are saved on this device only.</div></div>
+    <div><h1>Route and Range <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="note">Plan multi-day rides and drives, day by day: routes, fuel and night stops. <button type="button" class="linkbtn" id="howItWorks">How it works</button></div></div>
     <div class="btns"><span class="lbl mono" id="hdrSummary"></span><a class="btn ghost" id="feedback" href="#" hidden>Send feedback</a><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
   </header>
 
@@ -409,7 +412,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
     <div><b>Suggested stops:</b> towns with fuel (⛽), and food (🍴) where possible, spaced by your "Stop at least every" setting. Tap Add to route through them.</div>
     <div><span class="pill fwarn">FUEL Check fuel</span> No town with fuel on our map within that distance. Small towns may still have fuel: ask locally or carry extra.</div>
     <div>Know a place has fuel? Open the stop and tick "Fuel here (not on our map)".</div>
-    <div><span class="pill dist long">526 km · 9h30</span> Orange: more riding than your daily limit in Settings.</div>
+    <div><span class="pill dist long">526 km · 9h30</span> Orange: more time on the road than your daily limit in Settings.</div>
     <div><span class="sun swarn">☼ 19:02</span> Orange: you'd arrive within an hour of sunset. <span class="sun sbad">☼ 19:02</span> Red: after dark.</div>
     <div><span class="flag fwarn">☂</span> Weather: storms, strong wind, heat, near freezing or rain. Red is serious.</div>
     <div><span class="flag fwarn">≈</span> River crossings on the route, with rain forecast.</div>
@@ -420,6 +423,28 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
     <div><b>On the map</b> (green = shown): ⛽ fuel stations on the route · 🛏 places to stay at night stops · 🍴 food · ★ sights, viewpoints and passes · 🏥 hospitals and clinics · 🛣 road type, tar to single track (coming soon)</div>
     <p class="note">We show where fuel is; we don't track your tank. Suggested stops use your "Stop at least every" setting. Fuel, places and hospitals come from OpenStreetMap and can be wrong. Phone ahead on remote legs.</p>
     <div class="btns"><button class="btn" value="close">Close</button></div>
+  </form>
+</dialog>
+<dialog id="welcome" class="welcome" aria-labelledby="wTitle">
+  <form method="dialog" style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="wTitle">Plan a trip, day by day</h2>
+    <p class="note" style="margin:0">Pick where you start, your dates and where you sleep each night. The app works out the route, fuel stops, sunset, weather and what to watch for, for every day.</p>
+    <div class="row2">
+      <div class="field"><label class="lbl" for="wVehicle">Travelling by</label><select id="wVehicle"><option value="bike">Motorbike</option><option value="car">Car or 4x4</option></select></div>
+      <div class="field"><label class="lbl" for="wStyle">Roads you like</label><select id="wStyle"><option value="rough">Road less travelled: gravel and back roads</option><option value="mixed">Mixed</option><option value="tar">Tar: main roads</option></select></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label class="lbl" for="wHours">Longest day on the road (hours)</label><input id="wHours" type="number" min="2" max="16" step="0.5"></div>
+      <div class="field"><label class="lbl" for="wRange">Stop at least every (km)</label><input id="wRange" type="number" min="0" max="1200" step="5"></div>
+    </div>
+    <ol class="wsteps">
+      <li><b>From and dates:</b> where you start, when you leave and when you're back.</li>
+      <li><b>Night stops:</b> where you sleep each night. Add stops along the way if you like.</li>
+      <li><b>Each day:</b> open its tab for fuel stops, what's open when you arrive, and anything to watch for.</li>
+      <li><b>Take it with you:</b> a GPX file for your GPS or phone, and a PDF to print.</li>
+    </ol>
+    <p class="note" style="margin:0">Have a route already? Use <b>Plan from a GPX file</b> and it's split into days for you. Trips are saved on this device only. You can change all of this later in Settings.</p>
+    <div class="btns" style="justify-content:flex-end"><button class="btn" value="ok">Start planning</button></div>
   </form>
 </dialog>
 <dialog id="settings">
@@ -433,9 +458,10 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
       <div class="field"><label class="lbl" for="pace">Slower than normal by (%)</label><input id="pace" type="number" min="0" max="100" step="5" value="0"></div>
     </div>
     <div class="row2">
-      <div class="field"><label class="lbl" for="maxHours">Longest riding day (hours)</label><input id="maxHours" type="number" min="2" max="16" step="0.5" value="8"></div>
+      <div class="field"><label class="lbl" for="maxHours">Longest day on the road (hours)</label><input id="maxHours" type="number" min="2" max="16" step="0.5" value="8"></div>
       <div class="field"><label class="lbl" for="breakMin">Each stop takes (minutes)</label><input id="breakMin" type="number" min="0" max="240" step="5" value="20"></div>
     </div>
+    <div class="field"><label class="lbl" for="vehicle">Travelling by</label><select id="vehicle"><option value="bike">Motorbike</option><option value="car">Car or 4x4</option></select></div>
     <div class="field"><label class="lbl" for="style">Route style</label><select id="style"><option value="rough">Road less travelled: back roads and gravel first</option><option value="mixed">Mixed: gravel when it saves time</option><option value="tar">Tar: main roads and highways</option></select><span class="note">Road less travelled is often the shortest and toughest way. Check your bike, tyres and skills match it. Any day can be switched to Liaison.</span></div>
     <div class="field"><label class="lbl" for="corridor">Show places up to (km) off the route</label><input id="corridor" type="number" min="1" max="20" step="1" value="5"></div>
     <div class="field"><span class="lbl">Earlier versions of this trip</span><div id="histList" class="stable"></div><span class="note">The last 5 versions are kept on this device.</span></div>
@@ -467,6 +493,10 @@ const fmtDur=m=>{m=Math.round(m);return Math.floor(m/60)+"h"+String(m%60).padSta
 const toMin=t=>{const [h,m]=(t||"0:0").split(":").map(Number);return h*60+m;};
 
 const TRACK_KMH=45; // average speed assumed on a followed GPX track (no router to ask)
+// car / 4x4 routing: same three styles as the motorcycle
+const STYLE_CAR={rough:{use_highways:0,use_tracks:0.8},mixed:{use_highways:0.5,use_tracks:0.3},tar:{use_highways:1,use_tracks:0}};
+// words that depend on what you travel on
+const VEH=()=>settings.vehicle==="car"?{ing:"driving",Ing:"Driving",noun:"drive",who:"driver",thing:"car"}:{ing:"riding",Ing:"Riding",noun:"ride",who:"rider",thing:"bike"};
 
 const ICON={
   fuel:`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 3h9a1 1 0 0 1 1 1v8h1.5A2.5 2.5 0 0 1 18 14.5V18a1 1 0 0 0 2 0V9.4l-2.7-2.7 1.4-1.4 3 3c.2.2.3.5.3.7V18a3 3 0 0 1-6 0v-3.5a.5.5 0 0 0-.5-.5H14v7h1v2H2v-2h1V4a1 1 0 0 1 1-1zm1 2v5h7V5H5z"/></svg>`,
@@ -516,11 +546,12 @@ async function routeLeg(a,b,lg){
   if(lg&&lg.track){const geom=lg.track.map(([la,lo])=>({lat:la,lon:lo}));const km=lineKm(geom);return [{km,min:km/TRACK_KMH*60,geom}];}
   const style=lg&&lg.fast?"tar":settings.style;
   const alts=!!(lg&&lg.alts);
-  const key=style+(alts?"|alts":"")+"|"+[a,b].map(p=>p.lon.toFixed(5)+","+p.lat.toFixed(5)).join(";");
+  const car=settings.vehicle==="car";
+  const key=(car?"car|":"")+style+(alts?"|alts":"")+"|"+[a,b].map(p=>p.lon.toFixed(5)+","+p.lat.toFixed(5)).join(";");
   if(cache.has(key)) return cache.get(key);
   let out;
   try{
-    const body={locations:[a,b].map(p=>({lat:p.lat,lon:p.lon,type:"break"})),costing:"motorcycle",costing_options:{motorcycle:STYLE[style]||STYLE.rough},...(alts?{alternates:2}:{}),units:"kilometers",directions_type:"none"};
+    const body={locations:[a,b].map(p=>({lat:p.lat,lon:p.lon,type:"break"})),costing:car?"auto":"motorcycle",costing_options:car?{auto:STYLE_CAR[style]||STYLE_CAR.rough}:{motorcycle:STYLE[style]||STYLE.rough},...(alts?{alternates:2}:{}),units:"kilometers",directions_type:"none"};
     const ctl=new AbortController(), tm=setTimeout(()=>ctl.abort(),alts?15000:10000);
     const r=await fetch(ROUTER,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body),signal:ctl.signal}); clearTimeout(tm);
     const j=await r.json(); if(!j.trip) throw new Error(j.error||"no route");
@@ -722,8 +753,8 @@ const trip=store.get("rr4-trip")||migrate()||freshTrip();
 if(trip.sugV!==4){ (trip.days||[]).forEach(d=>{ const n=(d.vias||[]).length; d.vias=(d.vias||[]).filter(v=>!v.auto); if(d.vias.length!==n) d.legs=[]; d.fresh=true; delete d.noMore; }); trip.sugV=4; }
 if(trip.startDate<ymd(new Date())){const n=trip.days.length;trip.startDate=tomorrow;trip.endDate=addDays(tomorrow,n-1);}
 
-const SET_FIELDS=["range","leave","pace","corridor","style","maxHours","breakMin"];
-const settings=Object.assign({range:200,reserve:30,leave:"08:00",pace:0,corridor:5,style:"rough",fuelMode:"suggest",maxHours:8,breakMin:20},store.get("rr2-settings")||{});
+const SET_FIELDS=["vehicle","range","leave","pace","corridor","style","maxHours","breakMin"];
+const settings=Object.assign({range:200,reserve:30,leave:"08:00",pace:0,corridor:5,style:"rough",vehicle:"bike",fuelMode:"suggest",maxHours:8,breakMin:20},store.get("rr2-settings")||{});
 const ui=Object.assign({types:Object.fromEntries(TYPES.map(t=>[t.id,t.on])),max:"10",sleep:false},store.get("rr4-ui")||{});
 ui.tab=ui.tab??"ov"; delete ui._lastSel;
 let plan=null, pois=[], fuelStations=[], fuelAll=[], stays=[], placesOk=false, dataDate="", seq=0, panel=null, fp=null;
@@ -1046,10 +1077,10 @@ function printHtml(){
   const G=plan.days.map((d,k)=>d?goodToKnow(k):[]);
   // ---- page 1: the whole trip, critical first
   let h=`<section class="pcover"><h1>${esc(trip.start.name)} → ${esc(fin)}</h1>
-    <p class="pmeta">${esc(dayLong(0))}${n>1?` to ${esc(dayLong(n-1))}`:""} · ${n} day${n>1?"s":""} · ${Math.round(tot).toLocaleString()} km · about ${fmtDur(ride)} riding · leave each day ${fmtT(lv)}</p>`;
+    <p class="pmeta">${esc(dayLong(0))}${n>1?` to ${esc(dayLong(n-1))}`:""} · ${n} day${n>1?"s":""} · ${Math.round(tot).toLocaleString()} km · about ${fmtDur(ride)} ${VEH().ing} · leave each day ${fmtT(lv)}</p>`;
   const crit=[]; G.forEach((g,k)=>g.filter(x=>x.lvl!=="info").forEach(x=>crit.push(Object.assign({},x,{text:dayName(k)+": "+x.text}))));
   h+=`<div class="pcrit"><h2>Before you go</h2>${crit.length?`<ul class="pwarn">${crit.map(li).join("")}</ul>`:`<p>Nothing flagged. Still phone ahead on remote legs.</p>`}</div>`;
-  h+=`<table class="ptable"><thead><tr><th>Day</th><th>Route</th><th>km</th><th>Riding</th><th>Arrive</th><th>Sunset</th><th>Weather</th><th>To know</th></tr></thead><tbody>`;
+  h+=`<table class="ptable"><thead><tr><th>Day</th><th>Route</th><th>km</th><th>${VEH().Ing}</th><th>Arrive</th><th>Sunset</th><th>Weather</th><th>To know</th></tr></thead><tbody>`;
   plan.days.forEach((d,k)=>{ if(!d) return;
     const to=d.pts[d.pts.length-1], vias=d.pts.slice(1,-1), w=dayWx(k), s=sunMin(k), arr=arrMin(k,d.pts.length-1), nk=G[k].filter(x=>x.lvl!=="info").length, bad=G[k].some(x=>x.lvl==="bad");
     h+=`<tr class="${bad?"bad":nk?"warn":""}"><td><b>${esc(dayName(k))}</b></td><td>${vias.length?`via ${vias.map(v=>esc(v.name)).join(", ")} → `:"→ "}<b>${esc(to.name)}</b>${k<n-1?" (night)":""}</td>
@@ -1062,7 +1093,7 @@ function printHtml(){
     const from=d.pts[0], to=d.pts[d.pts.length-1], last=k===n-1, m=dayMed(k), w=dayWx(k), s=sunMin(k), g=G[k], arr=arrMin(k,d.pts.length-1), date=dayDate(k);
     const info=sec=>g.filter(x=>x.lvl==="info"&&x.sec===sec);
     h+=`<section class="pday"><h2>${esc(dayLong(k))}: ${esc(from.name)} → ${esc(to.name)}</h2>
-      <p class="pmeta">${Math.round(d.km)} km · about ${fmtDur(dayMinutes(k))} riding · leave ${fmtT(lv)}, arrive about ${fmtT(arr)} · sunset ${s!=null?fmtT(s):"?"}${w&&!w.none?" · "+esc(wxText(w)):""}</p>`;
+      <p class="pmeta">${Math.round(d.km)} km · about ${fmtDur(dayMinutes(k))} ${VEH().ing} · leave ${fmtT(lv)}, arrive about ${fmtT(arr)} · sunset ${s!=null?fmtT(s):"?"}${w&&!w.none?" · "+esc(wxText(w)):""}</p>`;
     const cr=g.filter(x=>x.lvl!=="info"); if(cr.length) h+=`<div class="pcrit"><h3>Needs attention</h3><ul class="pwarn">${cr.map(li).join("")}</ul></div>`;
     // destination
     h+=`<h3>At your destination: ${esc(to.name)}</h3>`; const di=info("dest"); if(di.length) h+=`<ul>${di.map(li).join("")}</ul>`;
@@ -1137,7 +1168,7 @@ function tripTotals(){
   if(!plan) return "";
   const n=nDays(), tot=plan.days.reduce((t,d)=>t+(d?d.km:0),0), ride=plan.days.reduce((t,d,k)=>t+(d?dayMinutes(k):0),0);
   const fin=trip.round||!trip.end?(trip.start?trip.start.name:"?"):trip.end.name;
-  return `<div class="totals"><span>Back at <b>${esc(fin)}</b></span><span>${n} day${n>1?"s":""} · ${Math.round(tot).toLocaleString()} km · about ${fmtDur(ride)} riding</span></div>`;
+  return `<div class="totals"><span>Back at <b>${esc(fin)}</b></span><span>${n} day${n>1?"s":""} · ${Math.round(tot).toLocaleString()} km · about ${fmtDur(ride)} ${VEH().ing}</span></div>`;
 }
 function stayRows(k){
   const last=k===nDays()-1, to=dayTo(k); if(!to||(last&&trip.round)) return "";
@@ -1561,19 +1592,31 @@ ${simplify(g,20).map(x=>`      <trkpt lat="${x.lat.toFixed(5)}" lon="${x.lon.toF
   const file=name.replace(/[^\w]+/g,"-").replace(/-+$/,"")+".gpx";
   const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([text],{type:"application/gpx+xml"})); a.download=file; document.body.appendChild(a); a.click();
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);
-  $("status").textContent=`Saved ${file}. Open it from your downloads and share it to your bike's app.`;
+  $("status").textContent=`Saved ${file}. Open it from your downloads and share it to your ${VEH().thing}'s or phone's app.`;
 }
 
 /* ---------- settings + glue ---------- */
 SET_FIELDS.forEach(id=>$(id).value=settings[id]);
 $("openSettings").addEventListener("click",()=>{ renderHist(); $("settings").showModal(); });
 $("settings").addEventListener("close",()=>{
-  const reroute=+$("corridor").value!==+settings.corridor||$("style").value!==settings.style;
+  const reroute=+$("corridor").value!==+settings.corridor||$("style").value!==settings.style||$("vehicle").value!==settings.vehicle;
   SET_FIELDS.forEach(id=>settings[id]=$(id).value); store.set("rr2-settings",settings);
   showStyle(); reroute?recalc():renderAll();
 });
-const STYLE_TEXT={rough:"<b>Road less travelled:</b> gravel and back roads first. For the quick way, pick the motorway sign on that day.",mixed:"<b>Mixed:</b> gravel where it saves time, tar where it doesn't.",tar:"<b>Tar:</b> main roads and highways."};
-function showStyle(){ $("styleBanner").innerHTML=STYLE_TEXT[settings.style]||STYLE_TEXT.rough; }
+/* ---------- first visit: what this is and how to start (shown once; "How it works" brings it back) ---------- */
+function openWelcome(){ $("wVehicle").value=settings.vehicle; $("wStyle").value=settings.style; $("wHours").value=settings.maxHours; $("wRange").value=settings.range; $("welcome").showModal(); }
+$("welcome").addEventListener("close",()=>{
+  const was=[settings.vehicle,settings.style].join();
+  settings.vehicle=$("wVehicle").value; settings.style=$("wStyle").value; settings.maxHours=$("wHours").value; settings.range=$("wRange").value;
+  store.set("rr2-settings",settings); SET_FIELDS.forEach(id=>$(id).value=settings[id]); try{localStorage.setItem("rr-welcome","1");}catch(e){}
+  showStyle(); was!==[settings.vehicle,settings.style].join()?recalc():renderAll();
+  if(!trip.start||trip.start.lat==null) $("startPlace").focus();
+});
+$("howItWorks").addEventListener("click",openWelcome);
+try{ if(!localStorage.getItem("rr-welcome")) setTimeout(openWelcome,300); }catch(e){}
+const STYLE_TEXT={rough:"<b>Road less travelled</b>: gravel and back roads first",mixed:"<b>Mixed</b>: gravel where it saves time, tar where it doesn't",tar:"<b>Tar</b>: main roads and highways"};
+function showStyle(){ $("styleBanner").innerHTML=`${settings.vehicle==="car"?"🚙 Car or 4x4":"🏍 Motorbike"} · ${STYLE_TEXT[settings.style]||STYLE_TEXT.rough}. Change any stretch with its way icons. <button type="button" class="linkbtn" id="bannerEdit">Change</button>`; }
+document.addEventListener("click",e=>{ if(e.target.id==="bannerEdit") openWelcome(); });
 function render(){ renderAll(); }
 function renderAll(){
   fp=plan?fuelPlan():null;
@@ -1690,11 +1733,11 @@ function goodToKnow(k){
 
   // ---- route and weather
   var f=rangeFuel(pd.a,pd.b); if(f) add("warn","route",f.text+". Small towns may still have fuel: ask locally or carry extra.");
-  var mins=dayMinutes(k); if(mins>+settings.maxHours*60) add("warn","route","Riding time "+fmtDur(mins)+", over your "+settings.maxHours+"h limit.");
+  var mins=dayMinutes(k); if(mins>+settings.maxHours*60) add("warn","route",VEH().Ing+" time "+fmtDur(mins)+", over your "+settings.maxHours+"h limit.");
   if(w&&!w.none){
     if(w.code>=95) add("warn","route","Thunderstorms forecast.");
     if(w.gust>=80) add("bad","route","Wind gusts to "+Math.round(w.gust)+" km/h."); else if(w.gust>=60) add("warn","route","Strong wind, gusts to "+Math.round(w.gust)+" km/h.");
-    if(w.tmax>=42) add("bad","route","Extreme heat: "+Math.round(w.tmax)+"°C. Ride early, carry lots of water."); else if(w.tmax>=37) add("warn","route","Hot: "+Math.round(w.tmax)+"°C. Carry extra water.");
+    if(w.tmax>=42) add("bad","route","Extreme heat: "+Math.round(w.tmax)+"°C. Leave early, carry lots of water."); else if(w.tmax>=37) add("warn","route","Hot: "+Math.round(w.tmax)+"°C. Carry extra water.");
     if(w.rain>=25) add("bad","route","Heavy rain: "+Math.round(w.rain)+" mm. Gravel and river crossings may be impassable."); else if(w.rain>=8&&w.prob>=50) add("warn","route","Rain likely: "+Math.round(w.rain)+" mm. Gravel gets slippery.");
     if(w.tmin<=2) add("warn","route","Near freezing in the morning: "+Math.round(w.tmin)+"°C. Watch for ice early.");
   } else if(w&&w.none) add("info","route","Weather forecast available from "+fmtDate(new Date(w.opens+"T12:00:00"))+".");

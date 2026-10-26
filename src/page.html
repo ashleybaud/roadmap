@@ -364,12 +364,15 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .gpxbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:8px 0}
 .gpxbtn{cursor:pointer}
 .gpxnote{font-weight:700;border:1px solid var(--line);border-radius:4px;padding:1px 5px}
+.welcome{max-width:560px}
+.wsteps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:.92rem}
+#styleBanner .linkbtn{margin-left:6px}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div><h1>Route and Range <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="note">Plan the ride, the fuel and the night stops. Trips are saved on this device only.</div></div>
+    <div><h1>Route and Range <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="note">Plan multi-day rides and drives, day by day: routes, fuel and night stops. <button type="button" class="linkbtn" id="howItWorks">How it works</button></div></div>
     <div class="btns"><span class="lbl mono" id="hdrSummary"></span><a class="btn ghost" id="feedback" href="#" hidden>Send feedback</a><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
   </header>
 
@@ -409,7 +412,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
     <div><b>Suggested stops:</b> towns with fuel (⛽), and food (🍴) where possible, spaced by your "Stop at least every" setting. Tap Add to route through them.</div>
     <div><span class="pill fwarn">FUEL Check fuel</span> No town with fuel on our map within that distance. Small towns may still have fuel: ask locally or carry extra.</div>
     <div>Know a place has fuel? Open the stop and tick "Fuel here (not on our map)".</div>
-    <div><span class="pill dist long">526 km · 9h30</span> Orange: more riding than your daily limit in Settings.</div>
+    <div><span class="pill dist long">526 km · 9h30</span> Orange: more time on the road than your daily limit in Settings.</div>
     <div><span class="sun swarn">☼ 19:02</span> Orange: you'd arrive within an hour of sunset. <span class="sun sbad">☼ 19:02</span> Red: after dark.</div>
     <div><span class="flag fwarn">☂</span> Weather: storms, strong wind, heat, near freezing or rain. Red is serious.</div>
     <div><span class="flag fwarn">≈</span> River crossings on the route, with rain forecast.</div>
@@ -420,6 +423,28 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
     <div><b>On the map</b> (green = shown): ⛽ fuel stations on the route · 🛏 places to stay at night stops · 🍴 food · ★ sights, viewpoints and passes · 🏥 hospitals and clinics · 🛣 road type, tar to single track (coming soon)</div>
     <p class="note">We show where fuel is; we don't track your tank. Suggested stops use your "Stop at least every" setting. Fuel, places and hospitals come from OpenStreetMap and can be wrong. Phone ahead on remote legs.</p>
     <div class="btns"><button class="btn" value="close">Close</button></div>
+  </form>
+</dialog>
+<dialog id="welcome" class="welcome" aria-labelledby="wTitle">
+  <form method="dialog" style="display:flex;flex-direction:column;gap:12px">
+    <h2 id="wTitle">Plan a trip, day by day</h2>
+    <p class="note" style="margin:0">Pick where you start, your dates and where you sleep each night. The app works out the route, fuel stops, sunset, weather and what to watch for, for every day.</p>
+    <div class="row2">
+      <div class="field"><label class="lbl" for="wVehicle">Travelling by</label><select id="wVehicle"><option value="bike">Motorbike</option><option value="car">Car or 4x4</option></select></div>
+      <div class="field"><label class="lbl" for="wStyle">Roads you like</label><select id="wStyle"><option value="rough">Road less travelled: gravel and back roads</option><option value="mixed">Mixed</option><option value="tar">Tar: main roads</option></select></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label class="lbl" for="wHours">Longest day on the road (hours)</label><input id="wHours" type="number" min="2" max="16" step="0.5"></div>
+      <div class="field"><label class="lbl" for="wRange">Stop at least every (km)</label><input id="wRange" type="number" min="0" max="1200" step="5"></div>
+    </div>
+    <ol class="wsteps">
+      <li><b>From and dates:</b> where you start, when you leave and when you're back.</li>
+      <li><b>Night stops:</b> where you sleep each night. Add stops along the way if you like.</li>
+      <li><b>Each day:</b> open its tab for fuel stops, what's open when you arrive, and anything to watch for.</li>
+      <li><b>Take it with you:</b> a GPX file for your GPS or phone, and a PDF to print.</li>
+    </ol>
+    <p class="note" style="margin:0">Have a route already? Use <b>Plan from a GPX file</b> and it's split into days for you. Trips are saved on this device only. You can change all of this later in Settings.</p>
+    <div class="btns" style="justify-content:flex-end"><button class="btn" value="ok">Start planning</button></div>
   </form>
 </dialog>
 <dialog id="settings">
@@ -433,9 +458,10 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
       <div class="field"><label class="lbl" for="pace">Slower than normal by (%)</label><input id="pace" type="number" min="0" max="100" step="5" value="0"></div>
     </div>
     <div class="row2">
-      <div class="field"><label class="lbl" for="maxHours">Longest riding day (hours)</label><input id="maxHours" type="number" min="2" max="16" step="0.5" value="8"></div>
+      <div class="field"><label class="lbl" for="maxHours">Longest day on the road (hours)</label><input id="maxHours" type="number" min="2" max="16" step="0.5" value="8"></div>
       <div class="field"><label class="lbl" for="breakMin">Each stop takes (minutes)</label><input id="breakMin" type="number" min="0" max="240" step="5" value="20"></div>
     </div>
+    <div class="field"><label class="lbl" for="vehicle">Travelling by</label><select id="vehicle"><option value="bike">Motorbike</option><option value="car">Car or 4x4</option></select></div>
     <div class="field"><label class="lbl" for="style">Route style</label><select id="style"><option value="rough">Road less travelled: back roads and gravel first</option><option value="mixed">Mixed: gravel when it saves time</option><option value="tar">Tar: main roads and highways</option></select><span class="note">Road less travelled is often the shortest and toughest way. Check your bike, tyres and skills match it. Any day can be switched to Liaison.</span></div>
     <div class="field"><label class="lbl" for="corridor">Show places up to (km) off the route</label><input id="corridor" type="number" min="1" max="20" step="1" value="5"></div>
     <div class="field"><span class="lbl">Earlier versions of this trip</span><div id="histList" class="stable"></div><span class="note">The last 5 versions are kept on this device.</span></div>

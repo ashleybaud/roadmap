@@ -59,13 +59,14 @@ const TRIP = {
     if (u.includes("unpkg.com/leaflet")) return route.continue();
     return route.abort();
   });
-  await page.addInitScript(t => { if (!sessionStorage.getItem("seeded")) { localStorage.clear(); localStorage.setItem("rr4-trip", t); sessionStorage.setItem("seeded", "1"); } }, JSON.stringify(TRIP));
+  await page.addInitScript(t => { if (!sessionStorage.getItem("seeded")) { localStorage.clear(); localStorage.setItem("rr4-trip", t); localStorage.setItem("rr-welcome", "1"); sessionStorage.setItem("seeded", "1"); } }, JSON.stringify(TRIP));
   await page.goto(base);
   const ok = (c, m) => { if (!c) fails.push(m); };
   await page.waitForFunction(() => typeof plan !== "undefined" && plan && !planStale && plan.days.filter(Boolean).length === 2, null, { timeout: 30000 }).catch(() => fails.push("route not worked out"));
   await page.waitForFunction(() => placesOk && typeof townList !== "undefined" && townList, null, { timeout: 30000 }).catch(() => fails.push("places/towns not loaded"));
   await page.waitForTimeout(1500);
 
+  ok(await page.evaluate(() => !document.getElementById("welcome").open), "welcome card shows again after it was closed");
   ok(await page.$$eval("#iconbar .ib", b => b.length) === 6, "map buttons missing");
   ok(await page.$$eval("#iconbar [data-key]", b => b.length) === 1, "key (?) button missing from the map box");
   ok(await page.evaluate(() => trip.days.every(d => !d.fresh)), "suggestions not settled after one pass");
