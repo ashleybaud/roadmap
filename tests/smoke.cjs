@@ -74,6 +74,11 @@ const TRIP = {
 
   await page.click('[data-day="0"]'); await page.waitForTimeout(500);
   ok(await page.$$eval("ol.stops li", b => b.length) >= 2, "day stop list missing");
+  ok(await page.$$eval(".gtk", b => b.length) === 1, "Good to know section missing on the day view");
+  const gtk = await page.evaluate(() => goodToKnow(0).map(x => x.lvl + ":" + x.sec + ":" + x.text));
+  ok(gtk.some(x => x.startsWith("info:dest:Arrive at") || /dest:You arrive/.test(x)), "Good to know has no arrival line");
+  const pdf = await page.evaluate(() => printHtml());
+  ok(/Before you go/.test(pdf) && /At your destination/.test(pdf), "PDF is missing the critical-first sections");
   const title = await page.$eval(".fbtn", b => b.title).catch(() => "");
   ok(/fuel stops? en route/.test(title), "fuel pill hover text wrong: " + title);
 

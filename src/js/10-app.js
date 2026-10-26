@@ -340,42 +340,50 @@ function routeSketch(){
 }
 function printHtml(){
   const n=nDays(), tot=plan.days.reduce((t,d)=>t+(d?d.km:0),0), ride=plan.days.reduce((t,d,k)=>t+(d?dayMinutes(k):0),0);
-  const fin=trip.round?trip.start.name:endPt().name;
-  const fuelTxt=f=>f?f.short:"—";
+  const fin=trip.round?trip.start.name:endPt().name, lv=toMin(settings.leave);
   const lnk=(t,name,town)=>{ t=t||{}; const w=t.website?(/^https?:/.test(t.website)?t.website:"https://"+t.website):`https://www.google.com/search?q=${encodeURIComponent(name+" "+(town||""))}`; return `${t.phone?esc(t.phone)+" · ":""}<a href="${esc(w)}">${t.website?"website":"find online"}</a>`; };
+  const li=x=>`<li class="${x.lvl}">${esc(x.text)}</li>`;
+  const G=plan.days.map((d,k)=>d?goodToKnow(k):[]);
+  // ---- page 1: the whole trip, critical first
   let h=`<section class="pcover"><h1>${esc(trip.start.name)} → ${esc(fin)}</h1>
-    <p class="pmeta">${esc(dayLong(0))}${n>1?` to ${esc(dayLong(n-1))}`:""} · ${n} day${n>1?"s":""} · ${Math.round(tot).toLocaleString()} km · about ${fmtDur(ride)} riding</p>
-    <div class="psketch">${routeSketch()}</div>
-    <table class="ptable"><thead><tr><th>Day</th><th>Route</th><th>km</th><th>Riding</th><th>Fuel</th><th>Sunset</th><th>Weather</th><th>Watch out</th></tr></thead><tbody>`;
+    <p class="pmeta">${esc(dayLong(0))}${n>1?` to ${esc(dayLong(n-1))}`:""} · ${n} day${n>1?"s":""} · ${Math.round(tot).toLocaleString()} km · about ${fmtDur(ride)} riding · leave each day ${fmtT(lv)}</p>`;
+  const crit=[]; G.forEach((g,k)=>g.filter(x=>x.lvl!=="info").forEach(x=>crit.push(Object.assign({},x,{text:dayName(k)+": "+x.text}))));
+  h+=`<div class="pcrit"><h2>Before you go</h2>${crit.length?`<ul class="pwarn">${crit.map(li).join("")}</ul>`:`<p>Nothing flagged. Still phone ahead on remote legs.</p>`}</div>`;
+  h+=`<table class="ptable"><thead><tr><th>Day</th><th>Route</th><th>km</th><th>Riding</th><th>Arrive</th><th>Sunset</th><th>Weather</th><th>To know</th></tr></thead><tbody>`;
   plan.days.forEach((d,k)=>{ if(!d) return;
-    const to=d.pts[d.pts.length-1], vias=d.pts.slice(1,-1), w=dayWx(k), s=sunMin(k), r=dayRisk(k), f=rangeFuel(d.a,d.b);
-    const notes=r?r.reasons.filter(x=>x.lvl!=="info"&&x.kind!=="fuel").map(x=>x.short):[];
-    h+=`<tr class="${r&&r.level!=="ok"?r.level:""}"><td><b>${esc(dayName(k))}</b></td><td>${vias.length?`<b class="via">via</b> <b>${vias.map(v=>esc(v.name)).join(", ")}</b> → `:"→ "}<b>${esc(to.name)}</b>${k<n-1?" (night)":""}</td>
-      <td class="num">${Math.round(d.km)}</td><td class="num">${fmtDur(dayMinutes(k))}</td><td class="${f&&f.level?f.level:""}">${esc(fuelTxt(f))}</td><td>${s!=null?fmtT(s):"?"}</td><td>${w&&!w.none?`${esc(WXW(w.code))} ${Math.round(w.tmin)}–${Math.round(w.tmax)}°C`:"—"}</td><td>${esc(notes.join(", "))||"—"}</td></tr>`;
+    const to=d.pts[d.pts.length-1], vias=d.pts.slice(1,-1), w=dayWx(k), s=sunMin(k), arr=arrMin(k,d.pts.length-1), nk=G[k].filter(x=>x.lvl!=="info").length, bad=G[k].some(x=>x.lvl==="bad");
+    h+=`<tr class="${bad?"bad":nk?"warn":""}"><td><b>${esc(dayName(k))}</b></td><td>${vias.length?`via ${vias.map(v=>esc(v.name)).join(", ")} → `:"→ "}<b>${esc(to.name)}</b>${k<n-1?" (night)":""}</td>
+      <td class="num">${Math.round(d.km)}</td><td class="num">${fmtDur(dayMinutes(k))}</td><td class="num">${fmtT(arr)}</td><td class="num">${s!=null?fmtT(s):"?"}</td><td>${w&&!w.none?`${esc(WXW(w.code))} ${Math.round(w.tmin)}–${Math.round(w.tmax)}°C`:"—"}</td><td>${nk?nk+" item"+(nk>1?"s":""):"—"}</td></tr>`;
   });
-  h+=`</tbody></table><p class="pnote">Fuel is shown where the map knows it. Suggested stops are towns with fuel about every ${esc(String(settings.range))} km. "Check" marks a stretch with no town with fuel on our map: small towns may still have fuel, so ask locally. Places and hospitals come from OpenStreetMap and can be wrong: phone ahead on remote legs. Emergency from a mobile: 112.</p></section>`;
+  h+=`</tbody></table><div class="psketch">${routeSketch()}</div>
+    <p class="pnote">Arrival times assume you leave at ${fmtT(lv)}, your pace setting and ${esc(String(settings.breakMin))} min at each stop. Suggested stops are towns with fuel about every ${esc(String(settings.range))} km. Fuel, hours, places and hospitals come from OpenStreetMap and can be wrong: phone ahead on remote legs. Emergency from a mobile: 112.</p></section>`;
+  // ---- one page per day: key facts, what needs attention, then detail
   plan.days.forEach((d,k)=>{ if(!d) return;
-    const from=d.pts[0], to=d.pts[d.pts.length-1], last=k===n-1, r=dayRisk(k), m=dayMed(k);
-    const fills=fp?fp.fills.filter(f=>f.km>d.a+0.3&&f.km<=d.b+0.3):[];
-    h+=`<section class="pday"><h2>${esc(dayLong(k))}</h2><p class="pmeta">${esc(from.name)} → ${d.pts.slice(1,-1).map(v=>`<b>${esc(v.name)}</b> → `).join("")}<b>${esc(to.name)}</b> · ${Math.round(d.km)} km · about ${fmtDur(dayMinutes(k))} riding${trip.days[k].style==="fast"?" · quickest way":""}</p>`;
-    const warn=r?r.reasons:[]; if(warn.length) h+=`<ul class="pwarn">${warn.map(x=>`<li class="${x.lvl}">${esc(x.text)}</li>`).join("")}</ul>`;
-    // stops with what's there
-    h+=`<h3>Stops</h3><table class="ptable"><thead><tr><th>Stop</th><th>km</th><th>At the stop</th></tr></thead><tbody>`;
-    d.pts.forEach((p,j)=>{ if(j===0) return; const av=stopAvail(p), here=AV.filter(a=>av[a[0]].length).map(a=>a[2]).join(", ");
-      h+=`<tr><td><b>${esc(p.name)}</b>${p.auto?" (suggested for fuel)":""}${j===d.pts.length-1?(last?" (finish)":" (night stop)"):""}</td><td class="num">${Math.round(d.legs[j-1].b-d.a)}</td><td>${esc(here)||"Nothing known within 1 km"}</td></tr>`; });
-    h+=`</tbody></table>`;
-    // fuel
-    const ds=fp&&fp.days&&fp.days[k];
-    h+=`<h3>Fuel on the way</h3>`+(fills.length?`<ul>${fills.map(f=>{ const x=fuelAll.find(q=>hav(q,f)<0.3)||f, t=x.tags||{}, g=gradesTxt(t); return `<li>km ${Math.round(f.km-d.a)}: <b>${esc(f.name&&f.name!=="Fuel"?f.name:"Fuel station")}</b>${g?" · "+esc(g):""}${t.hours?" · "+esc(t.hours):""}${t.phone?" · "+esc(t.phone):""}</li>`; }).join("")}</ul>`:`<p>None known on the route.</p>`);
-    // night
+    const from=d.pts[0], to=d.pts[d.pts.length-1], last=k===n-1, m=dayMed(k), w=dayWx(k), s=sunMin(k), g=G[k], arr=arrMin(k,d.pts.length-1), date=dayDate(k);
+    const info=sec=>g.filter(x=>x.lvl==="info"&&x.sec===sec);
+    h+=`<section class="pday"><h2>${esc(dayLong(k))}: ${esc(from.name)} → ${esc(to.name)}</h2>
+      <p class="pmeta">${Math.round(d.km)} km · about ${fmtDur(dayMinutes(k))} riding · leave ${fmtT(lv)}, arrive about ${fmtT(arr)} · sunset ${s!=null?fmtT(s):"?"}${w&&!w.none?" · "+esc(wxText(w)):""}</p>`;
+    const cr=g.filter(x=>x.lvl!=="info"); if(cr.length) h+=`<div class="pcrit"><h3>Needs attention</h3><ul class="pwarn">${cr.map(li).join("")}</ul></div>`;
+    // destination
+    h+=`<h3>At your destination: ${esc(to.name)}</h3>`; const di=info("dest"); if(di.length) h+=`<ul>${di.map(li).join("")}</ul>`;
     if(!(last&&trip.round)){ const sf=stayFor(to), pl=sf?sf.places:[], chosen=pl.find(p=>hav(p,to)<0.2);
-      h+=`<h3>${last?"Finish":"Night"}: ${esc(to.name)}</h3>`;
-      if(chosen) h+=`<p><b>${esc(chosen.name)}</b> (${esc((chosen.tags.tourism||"").replace("_"," "))}) · ${lnk(chosen.tags,chosen.name,to.name)}</p>`;
+      if(chosen) h+=`<p>Staying at <b>${esc(chosen.name)}</b> (${esc((chosen.tags.tourism||"").replace("_"," "))}) · ${lnk(chosen.tags,chosen.name,to.name)}</p>`;
       const alt=pl.filter(p=>p!==chosen).slice(0,3);
       if(alt.length) h+=`<p>${chosen?"Other options":"Places to stay"}:</p><ul>${alt.map(p=>`<li><b>${esc(p.name)}</b> (${esc((p.tags.tourism||"").replace("_"," "))}, ${p.dist.toFixed(1)} km) · ${lnk(p.tags,p.name,to.name)}</li>`).join("")}</ul>`;
-      else if(!chosen) h+=`<p>No places to stay listed nearby.</p>`; }
-    if(m){ const hs=m.near.slice().sort((a,b)=>(a.type==="hospital"?0:1)-(b.type==="hospital"?0:1)).slice(0,3);
-      h+=`<h3>Medical</h3><p>${hs.length?hs.map(x=>`${esc(x.name||(x.type==="hospital"?"Hospital":"Clinic"))}${x.phone?" "+esc(x.phone):""}`).join(" · "):"None within 25 km of the route"}. Furthest point from a hospital: ${fmtFar(m.far)} km.</p>`; }
+      else if(!chosen&&!last) h+=`<p>No places to stay listed nearby.</p>`; }
+    // stops
+    h+=`<h3>Stops along the way</h3><table class="ptable"><thead><tr><th>Stop</th><th>km</th><th>Arrive</th><th>At the stop</th><th>Fuel when you pass</th></tr></thead><tbody>`;
+    d.pts.forEach((p,j)=>{ if(j===0) return; const av=stopAvail(p), here=AV.filter(a=>av[a[0]].length).map(a=>a[2]).join(", "), t=arrMin(k,j), fo=av.fuel.length?groupOpen(av.fuel,date,t):undefined;
+      h+=`<tr><td><b>${esc(p.name)}</b>${p.auto?(p.fuelHere?" (suggested stop)":" (suggested, fuel not confirmed)"):""}${j===d.pts.length-1?(last?" (finish)":" (night stop)"):""}</td><td class="num">${Math.round(d.legs[j-1].b-d.a)}</td><td class="num">${fmtT(t)}</td><td>${esc(here)||"Nothing known within 1 km"}</td><td class="${fo===false?"warn":""}">${fo===undefined?"—":fo===true?"Open":fo===false?"Closed":"Hours unknown"}</td></tr>`; });
+    h+=`</tbody></table>`; const si=info("stops"); if(si.length) h+=`<ul>${si.map(li).join("")}</ul>`;
+    // fuel by town
+    const fills=fp?fp.fills.filter(f=>f.km>=d.a-0.3&&f.km<=d.b+0.3):[], groups=fuelGroups(fills);
+    h+=`<h3>Fuel stops: ${groups.length}</h3>`+(groups.length?`<table class="ptable"><tbody>${groups.map(gr=>{ const f=gr.st[0], t=f.tags||{}, all=gr.st.map(x=>[x.name,gradesTxt(x.tags||{}),(x.tags||{}).hours,(x.tags||{}).phone].filter(Boolean).join(" · ")).join("; ");
+      return `<tr><td class="num">km ${Math.max(0,Math.round(gr.km-d.a))}</td><td><b>${esc(gr.town?gr.town.name:f.name)}</b>${gr.st.length>1?` · ${gr.st.length} stations`:""}</td><td>${esc(all)}</td></tr>`; }).join("")}</tbody></table>`:`<p>None known on the route.</p>`);
+    // route
+    const ri=info("route"); if(ri.length) h+=`<h3>The route and weather</h3><ul>${ri.map(li).join("")}</ul>`;
+    if(m){ const hs=m.near.slice().sort((a,b)=>(a.type==="hospital"?0:1)-(b.type==="hospital"?0:1)).slice(0,4);
+      h+=`<h3>Medical</h3><p>${hs.length?hs.map(x=>`${esc(x.name||(x.type==="hospital"?"Hospital":"Clinic"))} (km ${Math.round(x.km-d.a)})${x.phone?" "+esc(x.phone):""}`).join(" · "):"None within 25 km of the route"}. Furthest point from a hospital: ${fmtFar(m.far)} km. Emergency from a mobile: 112.</p>`; }
     h+=`</section>`;
   });
   h+=`<p class="pmeta pfoot">Route and Range · routeandrange.pages.dev · printed ${esc(new Date().toLocaleDateString(undefined,{day:"numeric",month:"long",year:"numeric"}))}</p>`;
@@ -504,13 +512,14 @@ function sumBox(k,big){
   const pd=!planStale&&plan&&plan.days[k], d=trip.days[k], r=pd?dayRisk(k):null, from=dayFrom(k);
   const msg=!trip.start||trip.start.lat==null?(k===0?"Set From above to see the route":""):!from?"Pick the night stop before this day":!dayTo(k)?"Pick where you sleep":!dayPts(k)?"Add a stop or a finish":"Working out the route…";
   const chain=stopsChain(k), ds=fp&&fp.days&&fp.days[k];
-  const warn=ds&&+settings.range>0?ds.probs.map(p=>`<div class="wmin">⚠ No town within reach: ${Math.round(p.to-p.from)} km, ${esc(p.fromName)} to ${esc(p.toName)}.</div>`).join(""):"";
   return `<div class="sumbox ${big?"big":""}">
     ${nDays()===1&&trip.round&&!trip.days[0].vias.length?`<div class="sumline"><span class="sdate">${esc(big?dayLong(k):dayName(k))}:</span> ${esc(from?from.name:"?")} <span class="arr">→</span> <span class="wherebox">${searchBox("whereto-0","","Where to?",true)}</span> <span class="arr">→</span> back home</div>`:`<div class="sumline"><span class="sdate">${esc(big?dayLong(k):dayName(k))}:</span> ${esc(from?from.name:"?")} <span class="arr">→</span> ${chain?chain+` <span class="arr">→</span> `:""}${toCell(k)}${dayPts(k)&&dayPts(k).slice(1).some((_,j)=>legFast(d,j))?` <span class="sty" title="Quick way on some or all of this day">${STYLE_ICON.fast}</span>`:""}</div>`}
-    ${pd?`<div class="sicons"><span class="sl">${timePill(k,pd.km,dayMinutes(k),`data-focusday="${k}"`)+fuelBtn(k)}</span><span class="sr">${sunSpan(k)+wxLink(k)}<span class="flags">${flagIcons(r,k)}</span></span></div>${big?warn:""}${riskHtml(r,k)}${big?fuelList(k):""}`:`<div class="note">${msg}</div>`}
+    ${pd?`<div class="sicons"><span class="sl">${timePill(k,pd.km,dayMinutes(k),`data-focusday="${k}"`)+fuelBtn(k)}</span><span class="sr">${sunSpan(k)+wxLink(k)}<span class="flags">${flagIcons(r,k)}</span></span></div>${riskHtml(r,k)}${big?fuelList(k):""}${!big&&nDays()>1?gtkLine(k):""}`:`<div class="note">${msg}</div>`}
   </div>`;
 }
-function dayHead(k){ return sumBox(k,true)+`<h3 class="detailh">Stops</h3>`; }
+function dayHead(k){ return sumBox(k,true)+(!planStale&&plan&&plan.days[k]?gtkHtml(k):"")+`<h3 class="detailh">Stops</h3>`; }
+function gtkLine(k){ if(planStale||!plan||!plan.days[k]) return ""; const g=goodToKnow(k), n=g.filter(x=>x.lvl!=="info").length, bad=g.some(x=>x.lvl==="bad");
+  return n?`<div class="gtkline ${bad?"gbad":"gwarn"}">⚠ ${n} thing${n>1?"s":""} to know ›</div>`:""; }
 
 /* ---------- fuel towns added for the rider (marked, removable, can be kept) ---------- */
 let autoRounds=0;
@@ -627,7 +636,7 @@ function drawStopLayer(){
 function clearLink(){ return `<div class="btns clearrow">${clearArm?`<span class="note">Clear this trip?</span><button class="btn small" type="button" data-newtrip>Clear</button><button class="btn small ghost" type="button" data-nocancel>Cancel</button>`:`<button class="linkbtn small" type="button" data-newtrip>Clear trip</button>`}</div>`; }
 function overviewHtml(){
   let h=`<div class="tbslot"></div>`;
-  if(nDays()===1) return h+sumBox(0,false)+dayBody(0)+clearLink()+footNote();
+  if(nDays()===1) return h+sumBox(0,false)+(!planStale&&plan&&plan.days[0]?gtkHtml(0):"")+dayBody(0)+clearLink()+footNote();
   h+=`<div class="days">`;
   trip.days.forEach((d,k)=>{ h+=`<div class="ovday" data-gotoday="${k}">${sumBox(k,false)}</div>`; });
   h+=`</div>`;
@@ -679,6 +688,7 @@ $("details").addEventListener("click",e=>{
   const ap=t.closest("[data-addpoi]"); if(ap){const [k2,id]=ap.dataset.addpoi.split(":"); const x=pois.find(q=>q.id===id); if(x){insertVia(+k2,pt(x.name,x.lat,x.lon,{}));$("status").textContent=`Added ${x.name}.`;changed();} return;}
   const go=t.closest("[data-gotoday]"); if(go&&!t.closest("button,input,a")){ui.tab=+go.dataset.gotoday;saveUi();renderAll();return;}
   const pn=t.closest("[data-panel]"); if(pn){hidePeek();const [dk,j,tab]=pn.dataset.panel.split(":");openPanel(+dk,j==="last"?"last":+j,tab);return;}
+  const gb=t.closest("[data-gtk]"); if(gb){ const k2=+gb.dataset.gtk; gtkOpen.has(k2)?gtkOpen.delete(k2):gtkOpen.add(k2); renderDetails(); return; }
   const rb=t.closest("[data-risk]"); if(rb){const k2=+rb.dataset.risk; riskOpen.has(k2)?riskOpen.delete(k2):riskOpen.add(k2); renderDetails(); return;}
   if(t.closest("[data-print]")){printTrip();return;}
   const g=t.closest("[data-gpx]"); if(g){downloadGpx(+g.dataset.gpx);return;}
