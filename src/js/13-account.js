@@ -9,7 +9,8 @@ async function api(path,opt){
 }
 async function loadMe(){
   try{ const j=await api("/api/auth/me"); acct.ready=!!(j&&j.ready); acct.user=j&&j.user||null; acct.admin=!!(j&&j.admin); }catch(e){ acct.ready=false; acct.user=null; }
-  const b=$("acctBtn"); b.hidden=!acct.ready; b.textContent=acct.user?"My routes":"Sign in";
+  const b=$("acctBtn"); b.hidden=!acct.ready; b.textContent=acct.user?"My routes":"Sign in"; $("addBtn").hidden=!acct.ready;
+  if(typeof refreshReview==="function") refreshReview();
   renderAll();
 }
 function saveRouteBtn(){ return acct.ready?`<button class="btn small ghost" type="button" data-saveroute>${trip.savedId&&acct.user?"Update saved route":"Save route"}</button>`:""; }
@@ -46,7 +47,7 @@ function renderAcct(msg){
     const R=acct.routes;
     B.innerHTML=`${m}${plan?`<div class="btns"><button class="btn small" type="button" data-saveroute>${trip.savedId?"Update this route":"Save this trip"}</button></div>`:""}
       <div class="rlist">${R==null?`<div class="note">Loading…</div>`:R.length?R.map(r=>`<div class="rrow"><div><div class="rt">${esc(r.title)}</div><div class="note">${r.km?r.km.toLocaleString()+" km · ":""}${r.days} day${r.days>1?"s":""}${r.vehicle?" · "+esc((VEHICLES[r.vehicle]||"").replace(/^\S+\s/,"")):""} · ${esc(new Date(r.updated).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}))}</div></div>
-        <div class="ract">${acct.admin?`<button class="btn small ghost" type="button" data-rpick="${r.id}:${r.pick?0:1}">${r.pick?"Unpick":"Make pick"}</button>`:r.visibility==="public"?`<span class="note">Public</span>`:`<button class="btn small ghost" type="button" data-rpub="${r.id}" title="Let other riders find and rate it">Share publicly</button>`}<button class="btn small" type="button" data-ropen="${r.id}">Open</button><button class="icon" type="button" title="Delete" data-rdel="${r.id}">✕</button></div></div>`).join(""):`<div class="note">Nothing saved yet. Plan a trip, then tap Save route.</div>`}</div>
+        <div class="ract">${acct.admin?`<button class="btn small ghost" type="button" data-rpick="${r.id}:${r.pick?0:1}">${r.pick?"Unpick":"Make pick"}</button>`:r.visibility==="public"?`<span class="note">Public</span>`:r.visibility==="review"?`<span class="note" title="We check every shared route before other riders see it">Waiting for approval</span>`:`<button class="btn small ghost" type="button" data-rpub="${r.id}" title="Let other riders find and rate it">Share publicly</button>`}<button class="btn small" type="button" data-ropen="${r.id}">Open</button><button class="icon" type="button" title="Delete" data-rdel="${r.id}">✕</button></div></div>`).join(""):`<div class="note">Nothing saved yet. Plan a trip, then tap Save route.</div>`}</div>
       <div class="acctline"><span class="note">Signed in as <b>${esc(acct.user.email)}</b></span><span class="btns"><button class="linkbtn" type="button" data-signout>Sign out</button><button class="linkbtn" type="button" data-delacct>${acct.delArm?"Tap again to delete your account and routes":"Delete account"}</button></span></div>`;
   }
 }
@@ -88,7 +89,7 @@ $("acctDlg").addEventListener("click",async e=>{
   if(t.closest("[data-saveroute]")){ acctMode="save"; renderAcct(); return; }
   const o=t.closest("[data-ropen]"); if(o){ openRoute(o.dataset.ropen); return; }
   const pk=t.closest("[data-rpick]"); if(pk){ const [id,v]=pk.dataset.rpick.split(":"); try{ await api("/api/routes/"+id,{method:"PUT",body:{pick:+v}}); acct.routes=null; loadRoutes(); picks=null; }catch(err){ renderAcct({err:1,text:err.message}); } return; }
-  const pb=t.closest("[data-rpub]"); if(pb){ if(pb.dataset.arm!=="1"){ pb.dataset.arm="1"; pb.textContent="Share? Tap again"; return; } try{ await api("/api/routes/"+pb.dataset.rpub,{method:"PUT",body:{visibility:"public"}}); acct.routes=null; loadRoutes(); }catch(err){ renderAcct({err:1,text:err.message}); } return; }
+  const pb=t.closest("[data-rpub]"); if(pb){ if(pb.dataset.arm!=="1"){ pb.dataset.arm="1"; pb.textContent="Share? Tap again"; return; } try{ await api("/api/routes/"+pb.dataset.rpub,{method:"PUT",body:{visibility:"public"}}); acct.routes=null; loadRoutes(); $("status").textContent=acct.admin?"Shared.":"Sent for approval. Other riders see it once we've checked it."; }catch(err){ renderAcct({err:1,text:err.message}); } return; }
   const d=t.closest("[data-rdel]"); if(d){ if(d.dataset.arm!=="1"){ d.dataset.arm="1"; d.textContent="Delete?"; d.classList.add("btn","small"); return; }
     try{ await api("/api/routes/"+d.dataset.rdel,{method:"DELETE"}); if(trip.savedId===d.dataset.rdel){ delete trip.savedId; delete trip.savedTitle; save(); renderDetails(); } acct.routes=acct.routes.filter(r=>r.id!==d.dataset.rdel); renderAcct({text:"Route deleted."}); }catch(err){ renderAcct({err:1,text:err.message}); } return; }
   if(t.closest("[data-signout]")){ try{ await api("/api/auth/logout",{method:"POST"}); }catch(err){} acct.user=null; acct.routes=null; $("acctDlg").close(); loadMe(); $("status").textContent="Signed out."; return; }
@@ -102,7 +103,7 @@ document.addEventListener("click",e=>{ if(!e.target.closest("#details [data-save
 if(/[?&]signedin=1/.test(location.search)){ history.replaceState(null,"",location.pathname); setTimeout(()=>{ if(acct.user){ const tt=$("toast"); tt.innerHTML=`You're signed in as <b>${esc(acct.user.email)}</b>. If OneTrackMind is open in another tab, you can close that one.`; tt.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>tt.hidden=true,12000); } },1500); }
 // signed in from the email in another tab? notice it when this tab is looked at again
 { let lastCheck=0; const recheck=()=>{ if(document.visibilityState!=="visible"||acct.user||!acct.ready||Date.now()-lastCheck<3000) return; lastCheck=Date.now();
-    api("/api/auth/me").then(j=>{ if(j&&j.user){ acct.user=j.user; acct.admin=!!j.admin; $("acctBtn").textContent="My routes"; if($("acctDlg").open&&acctMode==="sent"){ $("acctDlg").close(); } renderAll(); $("status").textContent=`Signed in as ${j.user.email}.`; } }).catch(()=>{}); };
+    api("/api/auth/me").then(j=>{ if(j&&j.user){ acct.user=j.user; acct.admin=!!j.admin; $("acctBtn").textContent="My routes"; if(typeof refreshReview==="function") refreshReview(); if($("acctDlg").open&&acctMode==="sent"){ $("acctDlg").close(); } renderAll(); $("status").textContent=`Signed in as ${j.user.email}.`; } }).catch(()=>{}); };
   document.addEventListener("visibilitychange",recheck); window.addEventListener("focus",recheck); }
 
 /* ---------- feedback and suggested changes: stored and emailed to us; plain email if the server can't take it ---------- */

@@ -589,7 +589,7 @@ function stopDetail(k,j,cat){
   h+=any?AV.filter(a=>av[a[0]].length).map(a=>listBlock(a[2],a[1],av[a[0]],`${a[0]}-${k}-${j}`,x=>placeRow(x,k,j))).join(""):`<div class="note">Nothing known within 1 km. Small places are often missing from the map, so ask locally.</div>`;
   { const auto=fuelAll.some(f=>hav(f,p)<=1);
     h+=`<div class="sopts">${auto?`<span class="note">Fuel here, on our map.</span>`:`<label class="chk"><input type="checkbox" data-fuelpt="${k}:${j}" ${p.fuelHere||p.type==="fuel"?"checked":""}> Fuel here (not on our map)</label>`}
-      ${isVia?`<label class="chk">Break <input type="number" min="0" max="600" step="5" value="${breakOf(p)}" data-breakmin="${k}:${j-1}" style="width:5em"> min</label>`:""}${acct.ready?`<button class="linkbtn small" type="button" data-repat="${p.lat},${p.lon},${esc(p.name)}">Report the road here</button>`:""}<button class="linkbtn small" type="button" data-fixat="${p.lat},${p.lon},${esc(p.name)}">Something wrong on our map? Suggest a change</button></div>`;
+      ${isVia?`<label class="chk">Break <input type="number" min="0" max="600" step="5" value="${breakOf(p)}" data-breakmin="${k}:${j-1}" style="width:5em"> min</label>`:""}${acct.ready?`<button class="linkbtn small" type="button" data-repat="${p.lat},${p.lon},${esc(p.name)}">Report the road here</button><button class="linkbtn small" type="button" data-spotat="${p.lat},${p.lon},${esc(p.name)}">Mark a place here</button>`:""}<button class="linkbtn small" type="button" data-fixat="${p.lat},${p.lon},${esc(p.name)}">Something wrong on our map? Suggest a change</button></div>`;
   }
   if(isTo&&!(last&&trip.round)) h+=stayRows(k).replace('<section class="dsec">','<section class="dsec in">');
   if(j>0){
@@ -835,6 +835,7 @@ function drawMap(){
     L.polyline(seg(d.a,d.b).map(g=>[g.lat,g.lon]),st).addTo(layer); });
   if(ui.lay.road) drawGradeLayer(sel);
   if(ui.lay.rep&&typeof drawReports==="function") drawReports(sel);
+  if(ui.lay.spots&&typeof drawSpots==="function") drawSpots();
   if(panel){ drawPanelLayer(); return; }
   if(stopFocus&&sel&&stopFocus.k===ui.tab&&drawStopLayer()) return;
   if(focusR){ const s=seg(focusR.a,focusR.b); if(s.length>1){L.polyline(s.map(g=>[g.lat,g.lon]),{color:"#B26A00",weight:7}).addTo(layer); map.fitBounds(L.latLngBounds(s.map(g=>[g.lat,g.lon])),{padding:[30,30]});} }
@@ -879,8 +880,8 @@ function drawPanelLayer(){
 }
 
 /* ---------- icon bar: what to show on the map ---------- */
-const LAY=[["fuel","⛽","Fuel","Fuel stations on the route"],["stay","🛏","Stay","Places to stay at night stops"],["food","🍴","Food","Places to eat"],["sights","★","Sights","Sights, viewpoints and passes"],["med","🏥","Medical","Hospitals and clinics"],["rep","📣","Rider reports","What riders reported on the road lately"],["road","🛣","Road grade","The route coloured by grade, G1 tar to G5 expert"]];
-ui.lay=Object.assign({fuel:true,stay:!!ui.sleep,food:!!ui.types.food,sights:true,med:false,rep:true},ui.lay||{}); if(ui.lay.rep===undefined) ui.lay.rep=true;
+const LAY=[["fuel","⛽","Fuel","Fuel stations on the route"],["stay","🛏","Stay","Places to stay at night stops"],["food","🍴","Food","Places to eat"],["sights","★","Sights","Sights, viewpoints and passes"],["med","🏥","Medical","Hospitals and clinics"],["rep","📣","Rider reports","What riders reported on the road lately"],["spots","📍","Riders' places","Places riders marked: viewpoints, farm stalls, stays"],["road","🛣","Road grade","The route coloured by grade, G1 tar to G5 expert"]];
+ui.lay=Object.assign({fuel:true,stay:!!ui.sleep,food:!!ui.types.food,sights:true,med:false,rep:true,spots:true},ui.lay||{}); if(ui.lay.rep===undefined) ui.lay.rep=true; if(ui.lay.spots===undefined) ui.lay.spots=true;
 function renderLayers(){
   $("iconbar").innerHTML=`<span class="ibhead">On the map</span>`+LAY.map(([id,ic,w,t])=>{ const on=!!ui.lay[id];
     return `<button type="button" class="ib ${on?"on":""}" data-lay="${id}" title="${esc(w)}: ${esc(t)}" aria-label="${esc(w)}" aria-pressed="${on}">${ic}</button>`; }).join("")

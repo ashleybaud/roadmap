@@ -81,7 +81,7 @@ const TRIP = {
   await page.waitForTimeout(1500);
 
   ok(await page.evaluate(() => !document.getElementById("welcome").open), "welcome card shows again after it was closed");
-  ok(await page.$$eval("#iconbar .ib", b => b.length) === 7, "map buttons missing");
+  ok(await page.$$eval("#iconbar .ib", b => b.length) === 8, "map buttons missing");
   ok(await page.$$eval("#iconbar [data-key]", b => b.length) === 1, "key (?) button missing from the map box");
   ok(await page.evaluate(() => trip.days.every(d => !d.fresh)), "suggestions not settled after one pass");
   ok(await page.$$eval(".sumbox", b => b.length) >= 2, "overview day boxes missing");

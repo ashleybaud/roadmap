@@ -8,7 +8,8 @@ export const onRequestPost = handle(async ({ request, env }) => {
   if (text.length < 3) throw new HttpError(400, "Write a few words first.");
   const u = await currentUser(env, request).catch(() => null);
   const email = u ? u.email : (validEmail(String(b.email || "").trim()) ? String(b.email).trim().toLowerCase() : null);
-  const lat = Number.isFinite(+b.lat) ? +b.lat : null, lon = Number.isFinite(+b.lon) ? +b.lon : null;
+  const has = v => v !== null && v !== undefined && v !== "" && Number.isFinite(+v);
+  const lat = has(b.lat) && has(b.lon) ? +b.lat : null, lon = lat != null ? +b.lon : null;
   const id = newId(8), D = await db(env);
   const recent = await D.prepare(`SELECT COUNT(*) AS n FROM feedback WHERE created > ? AND (email = ? OR ? IS NULL)`).bind(now() - 3600e3, email, email).first();
   if (recent && recent.n >= (email ? 20 : 200)) throw new HttpError(429, "Thanks, that's plenty for now. Try again later.");

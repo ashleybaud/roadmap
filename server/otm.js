@@ -20,11 +20,21 @@ const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS route_ratings (route_id TEXT NOT NULL, user_id TEXT NOT NULL, stars INTEGER, grade INTEGER, rode_on TEXT, vehicle TEXT, created INTEGER NOT NULL, PRIMARY KEY (route_id, user_id))`,
   `CREATE TABLE IF NOT EXISTS reports (id TEXT PRIMARY KEY, route_id TEXT, user_id TEXT NOT NULL, kind TEXT NOT NULL, text TEXT, lat REAL, lon REAL, seen_on TEXT, expires INTEGER, created INTEGER NOT NULL)`,
   `CREATE INDEX IF NOT EXISTS reports_route ON reports(route_id, created)`,
+  // places riders mark (viewpoints, farm stalls, bike-friendly stays...); shown to others once approved
+  `CREATE TABLE IF NOT EXISTS spots (id TEXT PRIMARY KEY, user_id TEXT NOT NULL, kind TEXT NOT NULL, name TEXT NOT NULL, note TEXT, lat REAL NOT NULL, lon REAL NOT NULL, status TEXT NOT NULL DEFAULT 'pending', created INTEGER NOT NULL, reviewed INTEGER)`,
+  `CREATE INDEX IF NOT EXISTS spots_pos ON spots(status, lat, lon)`,
+  `CREATE TABLE IF NOT EXISTS spot_votes (spot_id TEXT NOT NULL, user_id TEXT NOT NULL, created INTEGER NOT NULL, PRIMARY KEY (spot_id, user_id))`,
+];
+// columns added after tables already existed (each runs once; "duplicate column" errors are expected afterwards)
+const MIGRATIONS = [
+  `ALTER TABLE reports ADD COLUMN status TEXT NOT NULL DEFAULT 'ok'`,
 ];
 let schemaReady = null;
 export async function db(env) {
   if (!env.DB) throw new HttpError(503, "The database isn't connected yet.");
-  if (!schemaReady) schemaReady = env.DB.batch(SCHEMA.map(s => env.DB.prepare(s))).catch(e => { schemaReady = null; throw e; });
+  if (!schemaReady) schemaReady = env.DB.batch(SCHEMA.map(s => env.DB.prepare(s)))
+    .then(async () => { for (const m of MIGRATIONS) { try { await env.DB.prepare(m).run(); } catch (e) {} } })
+    .catch(e => { schemaReady = null; throw e; });
   await schemaReady;
   return env.DB;
 }
@@ -124,3 +134,5 @@ export const REPORT_KINDS = {
   danger: { label: "Danger: crime or unsafe stop", days: 30 },
   good_stay: { label: "Good place to stay or eat", days: 365 },
 };
+
+export const SPOT_KINDS = { view: "Viewpoint", pass: "Pass", farmstall: "Farm stall", coffee: "Coffee or food", stay: "Bike-friendly stay", camp: "Camping", workshop: "Workshop or tyres", fuel: "Fuel", water: "Water", other: "Worth a stop" };

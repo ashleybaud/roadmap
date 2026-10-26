@@ -404,6 +404,18 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .rrow .ract{display:flex;gap:6px;flex:none}
 .acctline{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding-top:10px}
 .pkb{font-size:.86rem;margin-top:4px}
+.pktabs{display:flex;gap:4px;border-bottom:2px solid var(--ink)}
+.pktabs button{border:1px solid var(--line);border-bottom:0;background:var(--bg);color:var(--ink);padding:6px 10px;border-radius:6px 6px 0 0;cursor:pointer;font:inherit;font-weight:600;font-size:.88rem}
+.pktabs button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.addgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.addcard{display:flex;flex-direction:column;gap:4px;text-align:left;border:2px solid var(--ink);border-radius:8px;background:var(--panel);color:var(--ink);padding:12px;cursor:pointer;font:inherit}
+.addcard b{font-family:var(--f-display);font-size:1.2rem}.addcard span{font-size:.86rem;color:var(--muted)}
+.addcard:hover{background:color-mix(in srgb,var(--accent) 10%,var(--panel))}
+dialog.wide{max-width:760px;width:calc(100vw - 32px)}
+.spotmk{width:24px;height:24px;border-radius:6px;background:#fff;border:2px solid #6B4E9B;display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,.35)}
+.spotmk.pend{border-style:dashed;opacity:.8}
+#map.picking{cursor:crosshair}
+.rvh{font-family:var(--f-mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:8px}
 .repkinds{display:flex;flex-wrap:wrap;gap:6px}
 .repkinds button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:16px;padding:5px 10px;cursor:pointer;font:inherit;font-size:.86rem}
 .repkinds button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -440,8 +452,8 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 <body>
 <div class="wrap">
   <header>
-    <div><h1>OneTrackMind <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><div class="note">Every great route, graded for your skill, planned day by day.</div></div>
-    <div class="btns"><span class="lbl mono" id="hdrSummary"></span><button class="btn ghost" id="feedback" type="button">Send feedback</button><button class="btn ghost" id="acctBtn" type="button" hidden>Sign in</button><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
+    <div><h1>OneTrackMind <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><div class="note">Every great route, graded for your skill, planned day by day. <b>Built by riders:</b> add your favourite routes, mark the places worth stopping.</div></div>
+    <div class="btns"><span class="lbl mono" id="hdrSummary"></span><button class="btn ghost" id="feedback" type="button">Send feedback</button><button class="btn" id="addBtn" type="button" hidden>+ Add yours</button><button class="btn ghost" id="reviewBtn" type="button" hidden>Review</button><button class="btn ghost" id="acctBtn" type="button" hidden>Sign in</button><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
   </header>
 
   <details class="guide" id="guide">
@@ -455,6 +467,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
       <section><h3>5. Before you go</h3><p>Every day shows distance, riding time, sunset and weather. Orange means have a look: a long day, arriving near dark, rain or heat. "Good to know" lists what to sort out first, like public holidays, border posts, and long stretches without fuel or a hospital.</p></section>
       <section><h3>6. Got a route already?</h3><p>Use "Plan from a GPX file" with a route from a friend or your Garmin. It's followed exactly, split into days, and night stops and fuel are added.</p></section>
       <section><h3>7. Take it with you</h3><p>Each day downloads as a GPX file for your GPS or phone. "Save as PDF" prints the whole trip with the warnings up front.</p></section>
+      <section><h3>Built by riders</h3><p>Tap <b>+ Add yours</b> to share a road you love or mark a place worth stopping. We check everything before other riders see it. Find riders' routes under "Find a route".</p></section>
       <section><h3>Recce. Ride. Report.</h3><p>Sign in to save routes and open them on any device. On the road, open a stop and tap "Report the road here": washaways, no fuel, roadworks, a good stay. Riders planning that road see it on the map 📣 and under "Good to know". Rode a route? Rate it and say how hard you found it.</p></section>
       <section><h3>Worth knowing</h3><p>Trips are saved on this device only, for now. Fuel, places and road surfaces come from OpenStreetMap and can be wrong, especially out in the sticks. Phone ahead on remote stretches, and tell us what's wrong with "Send feedback".</p></section>
     </div>
@@ -506,7 +519,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
     <div><span class="flag finfo">◷</span> The clocks change during the day.</div>
     <div><span class="sty">STYLE_FAST</span> Get me there quickly. <span class="sty">STYLE_ROUGH</span> Road less travelled, or the style set in Settings.</div>
     <div><span class="tdot" style="background:var(--warn)"></span> A dot on a day tab: something on that day needs a look.</div>
-    <div><b>On the map</b> (green = shown): ⛽ fuel stations on the route · 🛏 places to stay at night stops · 🍴 food · ★ sights, viewpoints and passes · 🏥 hospitals and clinics · 📣 what riders reported on the road lately · 🛣 the route coloured by grade</div>
+    <div><b>On the map</b> (green = shown): ⛽ fuel stations on the route · 🛏 places to stay at night stops · 🍴 food · ★ sights, viewpoints and passes · 🏥 hospitals and clinics · 📣 what riders reported on the road lately · 📍 places riders marked · 🛣 the route coloured by grade</div>
     <h3 style="margin-top:6px">Route grades</h3><div id="gradeKey" class="keylist" style="gap:6px"></div><p class="note">Graded from what OpenStreetMap says about each road. Roads change after rain and grading, so check locally. Riders' reports will sharpen this.</p>
     <p class="note">We show where fuel is; we don't track your tank. Suggested stops use your "Stop at least every" setting. Fuel, places and hospitals come from OpenStreetMap and can be wrong. Phone ahead on remote legs.</p>
     <div class="btns"><button class="btn" value="close">Close</button></div>
@@ -530,6 +543,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
       <li><b>Each day:</b> open its tab for fuel stops, what's open when you arrive, and anything to watch for.</li>
       <li><b>Take it with you:</b> a GPX file for your GPS or phone, and a PDF to print.</li>
     </ol>
+    <p class="note" style="margin:0"><b>Built by riders:</b> open riders' routes under <b>Find a route</b>, and tap <b>+ Add yours</b> to share a road you love or mark a place worth stopping.</p>
     <p class="note" style="margin:0">Have a route already? Use <b>Plan from a GPX file</b> and it's split into days for you. Trips are saved on this device only. You can change all of this later in Settings.</p>
     <div class="btns" style="justify-content:flex-end"><button class="btn" value="ok">Start planning</button></div>
   </form>
@@ -553,7 +567,8 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 </dialog>
 <dialog id="picksDlg" class="welcome" aria-labelledby="pkTitle">
   <div class="dlgwrap">
-    <div class="dlghead"><div><h2 id="pkTitle">OneTrackMind picks</h2><div class="note">Real roads we rate. Open one, then change anything: dates, night stops, the way.</div></div><button class="icon" type="button" data-pkclose aria-label="Close">✕</button></div>
+    <div class="dlghead"><div><h2 id="pkTitle">Find a route</h2><div class="note">Open one, then change anything: dates, night stops, the way.</div></div><button class="icon" type="button" data-pkclose aria-label="Close">✕</button></div>
+    <div class="pktabs" role="tablist"><button type="button" data-pktab="picks" class="on">OneTrackMind picks</button><button type="button" data-pktab="riders">Riders' routes</button><button type="button" data-pktab="add">Add yours</button></div>
     <div class="rlist" id="pkList"></div>
   </div>
 </dialog>
@@ -574,6 +589,31 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
     <div class="row2"><div class="field"><label class="lbl" for="rtDate">When did you ride it?</label><input id="rtDate" type="date"></div><div class="field"><label class="lbl" for="rtVeh">On</label><select id="rtVeh"><option value="bike">Motorbike</option><option value="jeep">Jeep / 4x4</option><option value="car">Car</option></select></div></div>
     <div class="btns" style="justify-content:flex-end"><span class="note" id="rtMsg"></span><button class="btn" type="submit">Save rating</button></div>
   </form>
+</dialog>
+<dialog id="addDlg" class="welcome" aria-labelledby="adTitle">
+  <div class="dlgwrap">
+    <div class="dlghead"><div><h2 id="adTitle">Add yours</h2><div class="note">OneTrackMind is built by riders. Everything you add is checked by us before other riders see it.</div></div><button class="icon" type="button" data-adclose aria-label="Close">✕</button></div>
+    <div class="addgrid">
+      <button type="button" class="addcard" data-addroute><b>Add a route</b><span>A road you love. Plan it here or load a GPX file, save it, then share it.</span></button>
+      <button type="button" class="addcard" data-addspot><b>Mark a place</b><span>A viewpoint, farm stall, coffee stop, bike-friendly stay, workshop. Tap the map where it is.</span></button>
+    </div>
+    <div class="note" id="adMsg"></div>
+  </div>
+</dialog>
+<dialog id="spotDlg" class="welcome" aria-labelledby="spTitle">
+  <form class="dlgwrap" id="spotForm">
+    <div class="dlghead"><div><h2 id="spTitle">Mark a place</h2><div class="note" id="spWhere"></div></div><button class="icon" type="button" data-spclose aria-label="Close">✕</button></div>
+    <div class="field"><label class="lbl" for="spKind">What is it?</label><select id="spKind"></select></div>
+    <div class="field"><label class="lbl" for="spName">Name</label><input id="spName" type="text" maxlength="80" required placeholder="e.g. Ou Meul Padstal"></div>
+    <div class="field"><label class="lbl" for="spNote">Why stop here?</label><input id="spNote" type="text" maxlength="400" placeholder="e.g. best pies on the R62, bikes welcome, open till 5"></div>
+    <div class="btns" style="justify-content:flex-end"><span class="note" id="spMsg"></span><button class="btn" type="submit">Send</button></div>
+  </form>
+</dialog>
+<dialog id="revDlg" class="welcome wide" aria-labelledby="rvTitle">
+  <div class="dlgwrap">
+    <div class="dlghead"><h2 id="rvTitle">Waiting for approval</h2><button class="icon" type="button" data-rvclose aria-label="Close">✕</button></div>
+    <div id="rvBody" class="rlist"></div>
+  </div>
 </dialog>
 <dialog id="settings">
   <form method="dialog" style="display:flex;flex-direction:column;gap:12px">
@@ -1481,7 +1521,7 @@ function stopDetail(k,j,cat){
   h+=any?AV.filter(a=>av[a[0]].length).map(a=>listBlock(a[2],a[1],av[a[0]],`${a[0]}-${k}-${j}`,x=>placeRow(x,k,j))).join(""):`<div class="note">Nothing known within 1 km. Small places are often missing from the map, so ask locally.</div>`;
   { const auto=fuelAll.some(f=>hav(f,p)<=1);
     h+=`<div class="sopts">${auto?`<span class="note">Fuel here, on our map.</span>`:`<label class="chk"><input type="checkbox" data-fuelpt="${k}:${j}" ${p.fuelHere||p.type==="fuel"?"checked":""}> Fuel here (not on our map)</label>`}
-      ${isVia?`<label class="chk">Break <input type="number" min="0" max="600" step="5" value="${breakOf(p)}" data-breakmin="${k}:${j-1}" style="width:5em"> min</label>`:""}${acct.ready?`<button class="linkbtn small" type="button" data-repat="${p.lat},${p.lon},${esc(p.name)}">Report the road here</button>`:""}<button class="linkbtn small" type="button" data-fixat="${p.lat},${p.lon},${esc(p.name)}">Something wrong on our map? Suggest a change</button></div>`;
+      ${isVia?`<label class="chk">Break <input type="number" min="0" max="600" step="5" value="${breakOf(p)}" data-breakmin="${k}:${j-1}" style="width:5em"> min</label>`:""}${acct.ready?`<button class="linkbtn small" type="button" data-repat="${p.lat},${p.lon},${esc(p.name)}">Report the road here</button><button class="linkbtn small" type="button" data-spotat="${p.lat},${p.lon},${esc(p.name)}">Mark a place here</button>`:""}<button class="linkbtn small" type="button" data-fixat="${p.lat},${p.lon},${esc(p.name)}">Something wrong on our map? Suggest a change</button></div>`;
   }
   if(isTo&&!(last&&trip.round)) h+=stayRows(k).replace('<section class="dsec">','<section class="dsec in">');
   if(j>0){
@@ -1727,6 +1767,7 @@ function drawMap(){
     L.polyline(seg(d.a,d.b).map(g=>[g.lat,g.lon]),st).addTo(layer); });
   if(ui.lay.road) drawGradeLayer(sel);
   if(ui.lay.rep&&typeof drawReports==="function") drawReports(sel);
+  if(ui.lay.spots&&typeof drawSpots==="function") drawSpots();
   if(panel){ drawPanelLayer(); return; }
   if(stopFocus&&sel&&stopFocus.k===ui.tab&&drawStopLayer()) return;
   if(focusR){ const s=seg(focusR.a,focusR.b); if(s.length>1){L.polyline(s.map(g=>[g.lat,g.lon]),{color:"#B26A00",weight:7}).addTo(layer); map.fitBounds(L.latLngBounds(s.map(g=>[g.lat,g.lon])),{padding:[30,30]});} }
@@ -1771,8 +1812,8 @@ function drawPanelLayer(){
 }
 
 /* ---------- icon bar: what to show on the map ---------- */
-const LAY=[["fuel","⛽","Fuel","Fuel stations on the route"],["stay","🛏","Stay","Places to stay at night stops"],["food","🍴","Food","Places to eat"],["sights","★","Sights","Sights, viewpoints and passes"],["med","🏥","Medical","Hospitals and clinics"],["rep","📣","Rider reports","What riders reported on the road lately"],["road","🛣","Road grade","The route coloured by grade, G1 tar to G5 expert"]];
-ui.lay=Object.assign({fuel:true,stay:!!ui.sleep,food:!!ui.types.food,sights:true,med:false,rep:true},ui.lay||{}); if(ui.lay.rep===undefined) ui.lay.rep=true;
+const LAY=[["fuel","⛽","Fuel","Fuel stations on the route"],["stay","🛏","Stay","Places to stay at night stops"],["food","🍴","Food","Places to eat"],["sights","★","Sights","Sights, viewpoints and passes"],["med","🏥","Medical","Hospitals and clinics"],["rep","📣","Rider reports","What riders reported on the road lately"],["spots","📍","Riders' places","Places riders marked: viewpoints, farm stalls, stays"],["road","🛣","Road grade","The route coloured by grade, G1 tar to G5 expert"]];
+ui.lay=Object.assign({fuel:true,stay:!!ui.sleep,food:!!ui.types.food,sights:true,med:false,rep:true,spots:true},ui.lay||{}); if(ui.lay.rep===undefined) ui.lay.rep=true; if(ui.lay.spots===undefined) ui.lay.spots=true;
 function renderLayers(){
   $("iconbar").innerHTML=`<span class="ibhead">On the map</span>`+LAY.map(([id,ic,w,t])=>{ const on=!!ui.lay[id];
     return `<button type="button" class="ib ${on?"on":""}" data-lay="${id}" title="${esc(w)}: ${esc(t)}" aria-label="${esc(w)}" aria-pressed="${on}">${ic}</button>`; }).join("")
@@ -2072,7 +2113,7 @@ async function planFromGpx(file){
 }
 function gpxBar(){
   if(trip.gpx) return '<div class="gpxbar note">Following <b>'+esc(trip.gpx.title||trip.gpx.name)+'</b> exactly. <button class="linkbtn" type="button" data-ungpx>Stop following it</button></div>';
-  return '<div class="gpxbar note"><button type="button" class="linkbtn" data-picks>Start from a OneTrackMind pick</button> · Got a route already? <label class="linkbtn gpxbtn" title="Load any route from a friend or your GPS. It\'s split into days with night stops and fuel.">Plan from a GPX file<input type="file" accept=".gpx,application/gpx+xml" data-tripgpx hidden></label></div>';
+  return '<div class="gpxbar note"><button type="button" class="linkbtn" data-picks>Find a route</button> · Got a route already? <label class="linkbtn gpxbtn" title="Load any route from a friend or your GPS. It\'s split into days with night stops and fuel.">Plan from a GPX file<input type="file" accept=".gpx,application/gpx+xml" data-tripgpx hidden></label></div>';
 }
 
 /* ---------- accounts: sign in with an email link, save routes, feedback ----------
@@ -2086,7 +2127,8 @@ async function api(path,opt){
 }
 async function loadMe(){
   try{ const j=await api("/api/auth/me"); acct.ready=!!(j&&j.ready); acct.user=j&&j.user||null; acct.admin=!!(j&&j.admin); }catch(e){ acct.ready=false; acct.user=null; }
-  const b=$("acctBtn"); b.hidden=!acct.ready; b.textContent=acct.user?"My routes":"Sign in";
+  const b=$("acctBtn"); b.hidden=!acct.ready; b.textContent=acct.user?"My routes":"Sign in"; $("addBtn").hidden=!acct.ready;
+  if(typeof refreshReview==="function") refreshReview();
   renderAll();
 }
 function saveRouteBtn(){ return acct.ready?`<button class="btn small ghost" type="button" data-saveroute>${trip.savedId&&acct.user?"Update saved route":"Save route"}</button>`:""; }
@@ -2123,7 +2165,7 @@ function renderAcct(msg){
     const R=acct.routes;
     B.innerHTML=`${m}${plan?`<div class="btns"><button class="btn small" type="button" data-saveroute>${trip.savedId?"Update this route":"Save this trip"}</button></div>`:""}
       <div class="rlist">${R==null?`<div class="note">Loading…</div>`:R.length?R.map(r=>`<div class="rrow"><div><div class="rt">${esc(r.title)}</div><div class="note">${r.km?r.km.toLocaleString()+" km · ":""}${r.days} day${r.days>1?"s":""}${r.vehicle?" · "+esc((VEHICLES[r.vehicle]||"").replace(/^\S+\s/,"")):""} · ${esc(new Date(r.updated).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}))}</div></div>
-        <div class="ract">${acct.admin?`<button class="btn small ghost" type="button" data-rpick="${r.id}:${r.pick?0:1}">${r.pick?"Unpick":"Make pick"}</button>`:r.visibility==="public"?`<span class="note">Public</span>`:`<button class="btn small ghost" type="button" data-rpub="${r.id}" title="Let other riders find and rate it">Share publicly</button>`}<button class="btn small" type="button" data-ropen="${r.id}">Open</button><button class="icon" type="button" title="Delete" data-rdel="${r.id}">✕</button></div></div>`).join(""):`<div class="note">Nothing saved yet. Plan a trip, then tap Save route.</div>`}</div>
+        <div class="ract">${acct.admin?`<button class="btn small ghost" type="button" data-rpick="${r.id}:${r.pick?0:1}">${r.pick?"Unpick":"Make pick"}</button>`:r.visibility==="public"?`<span class="note">Public</span>`:r.visibility==="review"?`<span class="note" title="We check every shared route before other riders see it">Waiting for approval</span>`:`<button class="btn small ghost" type="button" data-rpub="${r.id}" title="Let other riders find and rate it">Share publicly</button>`}<button class="btn small" type="button" data-ropen="${r.id}">Open</button><button class="icon" type="button" title="Delete" data-rdel="${r.id}">✕</button></div></div>`).join(""):`<div class="note">Nothing saved yet. Plan a trip, then tap Save route.</div>`}</div>
       <div class="acctline"><span class="note">Signed in as <b>${esc(acct.user.email)}</b></span><span class="btns"><button class="linkbtn" type="button" data-signout>Sign out</button><button class="linkbtn" type="button" data-delacct>${acct.delArm?"Tap again to delete your account and routes":"Delete account"}</button></span></div>`;
   }
 }
@@ -2165,7 +2207,7 @@ $("acctDlg").addEventListener("click",async e=>{
   if(t.closest("[data-saveroute]")){ acctMode="save"; renderAcct(); return; }
   const o=t.closest("[data-ropen]"); if(o){ openRoute(o.dataset.ropen); return; }
   const pk=t.closest("[data-rpick]"); if(pk){ const [id,v]=pk.dataset.rpick.split(":"); try{ await api("/api/routes/"+id,{method:"PUT",body:{pick:+v}}); acct.routes=null; loadRoutes(); picks=null; }catch(err){ renderAcct({err:1,text:err.message}); } return; }
-  const pb=t.closest("[data-rpub]"); if(pb){ if(pb.dataset.arm!=="1"){ pb.dataset.arm="1"; pb.textContent="Share? Tap again"; return; } try{ await api("/api/routes/"+pb.dataset.rpub,{method:"PUT",body:{visibility:"public"}}); acct.routes=null; loadRoutes(); }catch(err){ renderAcct({err:1,text:err.message}); } return; }
+  const pb=t.closest("[data-rpub]"); if(pb){ if(pb.dataset.arm!=="1"){ pb.dataset.arm="1"; pb.textContent="Share? Tap again"; return; } try{ await api("/api/routes/"+pb.dataset.rpub,{method:"PUT",body:{visibility:"public"}}); acct.routes=null; loadRoutes(); $("status").textContent=acct.admin?"Shared.":"Sent for approval. Other riders see it once we've checked it."; }catch(err){ renderAcct({err:1,text:err.message}); } return; }
   const d=t.closest("[data-rdel]"); if(d){ if(d.dataset.arm!=="1"){ d.dataset.arm="1"; d.textContent="Delete?"; d.classList.add("btn","small"); return; }
     try{ await api("/api/routes/"+d.dataset.rdel,{method:"DELETE"}); if(trip.savedId===d.dataset.rdel){ delete trip.savedId; delete trip.savedTitle; save(); renderDetails(); } acct.routes=acct.routes.filter(r=>r.id!==d.dataset.rdel); renderAcct({text:"Route deleted."}); }catch(err){ renderAcct({err:1,text:err.message}); } return; }
   if(t.closest("[data-signout]")){ try{ await api("/api/auth/logout",{method:"POST"}); }catch(err){} acct.user=null; acct.routes=null; $("acctDlg").close(); loadMe(); $("status").textContent="Signed out."; return; }
@@ -2179,7 +2221,7 @@ document.addEventListener("click",e=>{ if(!e.target.closest("#details [data-save
 if(/[?&]signedin=1/.test(location.search)){ history.replaceState(null,"",location.pathname); setTimeout(()=>{ if(acct.user){ const tt=$("toast"); tt.innerHTML=`You're signed in as <b>${esc(acct.user.email)}</b>. If OneTrackMind is open in another tab, you can close that one.`; tt.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>tt.hidden=true,12000); } },1500); }
 // signed in from the email in another tab? notice it when this tab is looked at again
 { let lastCheck=0; const recheck=()=>{ if(document.visibilityState!=="visible"||acct.user||!acct.ready||Date.now()-lastCheck<3000) return; lastCheck=Date.now();
-    api("/api/auth/me").then(j=>{ if(j&&j.user){ acct.user=j.user; acct.admin=!!j.admin; $("acctBtn").textContent="My routes"; if($("acctDlg").open&&acctMode==="sent"){ $("acctDlg").close(); } renderAll(); $("status").textContent=`Signed in as ${j.user.email}.`; } }).catch(()=>{}); };
+    api("/api/auth/me").then(j=>{ if(j&&j.user){ acct.user=j.user; acct.admin=!!j.admin; $("acctBtn").textContent="My routes"; if(typeof refreshReview==="function") refreshReview(); if($("acctDlg").open&&acctMode==="sent"){ $("acctDlg").close(); } renderAll(); $("status").textContent=`Signed in as ${j.user.email}.`; } }).catch(()=>{}); };
   document.addEventListener("visibilitychange",recheck); window.addEventListener("focus",recheck); }
 
 /* ---------- feedback and suggested changes: stored and emailed to us; plain email if the server can't take it ---------- */
@@ -2258,28 +2300,35 @@ function drawGradeLayer(sel){
 function gradeKeyHtml(){ return GRADES.slice(1).concat(GRADES[0]).map(x=>`<div><span class="gbadge g${x.g}">${x.short==="?"?"?":x.short}</span> <b>${x.name}.</b> ${x.text}</div>`).join(""); }
 $("gradeKey").innerHTML=gradeKeyHtml();
 
-/* ---------- OneTrackMind picks: real routes we rate, as ready-made trips ---------- */
-let picks=null;
-async function openPicks(){
-  $("picksDlg").showModal();
-  if(!picks){ $("pkList").innerHTML=`<div class="note">Loading…</div>`; try{ picks=(await (await fetch("/data/picks/picks.json")).json()).routes; }catch(e){ $("pkList").innerHTML=`<div class="errmsg">Couldn't load the picks. Check your connection.</div>`; return; }
-    // routes riders shared, and ones OneTrackMind made picks from saved routes
-    if(acct.ready) try{ const pub=(await api("/api/routes/public")).routes||[]; pub.forEach(r=>picks.push({id:"db:"+r.id,dbId:r.id,title:r.title,region:r.pick?"OneTrackMind pick":"Shared by a rider",blurb:r.summary||"",vehicles:r.vehicle?[r.vehicle]:["bike","jeep","car"],trip:{days:new Array(r.days||1)},stars:r.stars,ratings:r.ratings,pick:!!r.pick})); const rk=x=>!x.dbId?0:x.pick?1:2; picks.sort((a,b)=>rk(a)-rk(b)); }catch(e){} }
-  const mine=settings.vehicle||"bike";
-  const list=picks.slice().sort((a,b)=>(b.vehicles.includes(mine)-a.vehicles.includes(mine)));
-  $("pkList").innerHTML=list.map(r=>{ const n=r.trip.days.length, fits=r.vehicles.includes(mine);
-    return `<div class="rrow pk"><div><div class="rt">${esc(r.title)}</div><div class="note">${esc(r.region)} · ${n} day${n>1?"s":""}${r.ratings?` · ★ ${r.stars} (${r.ratings})`:""} · ${r.vehicles.map(v=>esc((VEHICLES[v]||"").replace(/^\S+\s/,""))).join(", ")}</div><div class="pkb">${esc(r.blurb)}</div>${fits?"":`<div class="warnt">Not suggested for a ${esc((VEHICLES[mine]||"").replace(/^\S+\s/,"").toLowerCase())}.</div>`}</div>
-      <div class="ract"><button class="btn small" type="button" data-pkopen="${esc(r.id)}">Open</button></div></div>`; }).join("");
+/* ---------- Find a route: OneTrackMind picks, routes riders shared, and how to add yours ---------- */
+let picks=null, pkTab="picks";
+async function loadPicks(){
+  const list=(await (await fetch("/data/picks/picks.json")).json()).routes.map(r=>Object.assign(r,{kind:"pick"}));
+  if(acct.ready) try{ ((await api("/api/routes/public")).routes||[]).forEach(r=>list.push({id:"db:"+r.id,dbId:r.id,kind:r.pick?"pick":"rider",title:r.title,region:r.pick?"OneTrackMind pick":"Shared by a rider",blurb:r.summary||"",vehicles:r.vehicle?[r.vehicle]:["bike","jeep","car"],trip:{days:new Array(r.days||1)},stars:r.stars,ratings:r.ratings})); }catch(e){}
+  return list;
 }
+async function openPicks(tab){
+  pkTab=tab||pkTab||"picks"; if(!$("picksDlg").open) $("picksDlg").showModal(); renderPkTabs();
+  if(pkTab==="add"){ $("pkList").innerHTML=`<div class="addgrid"><button type="button" class="addcard" data-addroute><b>Add a route</b><span>Plan it here or load a GPX file, save it, then share it. We check it before other riders see it.</span></button><button type="button" class="addcard" data-addspot><b>Mark a place</b><span>A viewpoint, farm stall, coffee stop, bike-friendly stay, workshop.</span></button></div>`; return; }
+  if(!picks){ $("pkList").innerHTML=`<div class="note">Loading…</div>`; try{ picks=await loadPicks(); }catch(e){ $("pkList").innerHTML=`<div class="errmsg">Couldn't load the routes. Check your connection.</div>`; return; } }
+  const mine=settings.vehicle||"bike", vn=v=>(VEHICLES[v]||"").replace(/^\S+\s/,"");
+  const list=picks.filter(r=>r.kind===(pkTab==="riders"?"rider":"pick")).sort((a,b)=>(b.vehicles.includes(mine)-a.vehicles.includes(mine)));
+  $("pkList").innerHTML=list.length?list.map(r=>{ const n=r.trip.days.length, fits=r.vehicles.includes(mine);
+    return `<div class="rrow pk"><div><div class="rt">${esc(r.title)}</div><div class="note">${esc(r.region)} · ${n} day${n>1?"s":""} · ${r.vehicles.map(v=>esc(vn(v))).join(", ")}${r.ratings?` · ★ ${r.stars} (${r.ratings})`:""}</div>${r.blurb?`<div class="pkb">${esc(r.blurb)}</div>`:""}${fits?"":`<div class="warnt">Not suggested for a ${esc(vn(mine).toLowerCase())}.</div>`}</div>
+      <div class="ract"><button class="btn small" type="button" data-pkopen="${esc(r.id)}">Open</button></div></div>`; }).join("")
+    :pkTab==="riders"?`<div class="note">No rider routes shared yet. Be the first: plan a road you love, save it and share it.</div><div class="btns"><button class="btn small" type="button" data-pktab="add">Add yours</button></div>`:`<div class="note">Nothing here yet.</div>`;
+}
+function renderPkTabs(){ document.querySelectorAll("[data-pktab]").forEach(b=>b.classList.toggle("on",b.dataset.pktab===pkTab)); }
 $("picksDlg").addEventListener("click",e=>{
   if(e.target===$("picksDlg")||e.target.closest("[data-pkclose]")){ $("picksDlg").close(); return; }
+  const tb=e.target.closest("[data-pktab]"); if(tb){ openPicks(tb.dataset.pktab); return; }
   const o=e.target.closest("[data-pkopen]"); if(!o) return; const r=picks.find(x=>x.id===o.dataset.pkopen); if(!r) return;
   $("picksDlg").close();
   if(r.dbId){ openRoute(r.dbId); return; }
   const t=JSON.parse(JSON.stringify(r.trip)); t.sugV=5; t.days.forEach(d=>{ d.fresh=true; d.legs=d.legs||[]; d.vias=d.vias||[]; d.style=d.style||"default"; });
   t.pick=r.id; applyTrip(t,{style:r.style},r.title);
 });
-document.addEventListener("click",e=>{ if(e.target.closest&&e.target.closest("[data-picks]")) openPicks(); });
+document.addEventListener("click",e=>{ if(e.target.closest&&e.target.closest("[data-picks]")) openPicks("picks"); });
 
 /* ---------- rider reports and route ratings (need accounts switched on) ---------- */
 const REP_ICON={fuel_ok:"⛽",no_fuel:"⛽",road_closed:"⛔",washaway:"🌊",bad_road:"〰",graded:"✓",roadworks:"🚧",river_high:"≈",animals:"🐄",danger:"⚠",good_stay:"🛏"};
@@ -2362,5 +2411,80 @@ document.addEventListener("click",e=>{ if(e.target.closest&&e.target.closest("[d
 
 // after every render: fetch what's missing (cheap; each loads once per route)
 { const _ra=renderAll; renderAll=function(){ _ra(); if(acct.ready&&plan&&!planStale){ loadReports(); loadRating(); } }; }
+
+/* ---------- Add yours: share a route, mark a place; and OneTrackMind's approval list ---------- */
+const SPOT_ICON={view:"👁",pass:"⛰",farmstall:"🥧",coffee:"☕",stay:"🛏",camp:"⛺",workshop:"🔧",fuel:"⛽",water:"💧",other:"📍"};
+let spots={key:"",list:[],kinds:null};
+$("addBtn").addEventListener("click",()=>{ $("adMsg").textContent=""; $("addDlg").showModal(); });
+$("addDlg").addEventListener("click",e=>{ if(e.target===$("addDlg")||e.target.closest("[data-adclose]")) $("addDlg").close(); });
+document.addEventListener("click",e=>{
+  if(!e.target.closest) return;
+  if(e.target.closest("[data-addroute]")){ closeAllAdd();
+    if(!acct.user){ acct.why="Sign in to add your route. Your trip stays on this device while you do."; openAcct("signin"); return; }
+    if(plan&&!planStale){ openAcct("save"); $("status").textContent="Save it, then open My routes and tap Share publicly."; }
+    else { ui.tab="ov"; renderAll(); const t=$("toast"); t.innerHTML=`Plan the route first (set From, then your stops or a GPX file), then tap <b>Save route</b> and <b>Share publicly</b> in My routes.`; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,12000); }
+    return; }
+  if(e.target.closest("[data-addspot]")){ closeAllAdd(); startPicking(); return; }
+  const sa=e.target.closest("[data-spotat]"); if(sa){ const [lat,lon,...n]=sa.dataset.spotat.split(","); openSpot({lat:+lat,lon:+lon},n.join(",")); return; }
+  const v=e.target.closest("[data-spotvote]"); if(v){ voteSpot(v.dataset.spotvote,v.dataset.undo==="1"); return; }
+});
+function closeAllAdd(){ ["addDlg","picksDlg"].forEach(id=>{ if($(id).open) $(id).close(); }); }
+function startPicking(){
+  if(!acct.user){ acct.why="Sign in to mark a place. It takes a minute."; openAcct("signin"); return; }
+  if(!window.L||!map){ return; }
+  $("map").classList.add("picking"); $("status").textContent="Tap the map where the place is.";
+  if(window.innerWidth<=1000) $("map").scrollIntoView({behavior:"smooth",block:"start"});
+  map.once("click",ev=>{ $("map").classList.remove("picking"); openSpot({lat:+ev.latlng.lat.toFixed(5),lon:+ev.latlng.lng.toFixed(5)},""); });
+}
+let spotAt=null;
+function openSpot(at,name){
+  if(!acct.user){ acct.why="Sign in to mark a place. It takes a minute."; openAcct("signin"); return; }
+  spotAt=at; const K=spots.kinds||{view:"Viewpoint",pass:"Pass",farmstall:"Farm stall",coffee:"Coffee or food",stay:"Bike-friendly stay",camp:"Camping",workshop:"Workshop or tyres",fuel:"Fuel",water:"Water",other:"Worth a stop"};
+  $("spKind").innerHTML=Object.entries(K).map(([k,v])=>`<option value="${k}">${SPOT_ICON[k]||""} ${esc(v)}</option>`).join("");
+  $("spName").value=name||""; $("spNote").value=""; $("spMsg").textContent=""; $("spWhere").textContent=`At ${at.lat.toFixed(4)}, ${at.lon.toFixed(4)}`;
+  $("spotDlg").showModal(); setTimeout(()=>$("spName").focus(),50);
+}
+$("spotDlg").addEventListener("click",e=>{ if(e.target===$("spotDlg")||e.target.closest("[data-spclose]")) $("spotDlg").close(); });
+$("spotForm").addEventListener("submit",async e=>{ e.preventDefault(); $("spMsg").textContent="Sending…";
+  try{ const j=await api("/api/spots",{method:"POST",body:{kind:$("spKind").value,name:$("spName").value.trim(),note:$("spNote").value.trim(),lat:spotAt.lat,lon:spotAt.lon}});
+    $("spotDlg").close(); spots.key=""; loadSpots(true); $("status").textContent=j.status==="ok"?"Place added.":"Thanks. Other riders see it once we've checked it."; }
+  catch(err){ $("spMsg").textContent=err.message; } });
+async function loadSpots(force){
+  if(!acct.ready||!map) return;
+  const b=plan&&plan.geom.length?L.latLngBounds(plan.geom.map(p=>[p.lat,p.lon])).pad(0.1):map.getBounds(); if(!b) return;
+  const s=b.getSouth(),w=b.getWest(),n=b.getNorth(),e=b.getEast(); if(n-s>25||e-w>25) return;
+  const key=[s,w,n,e].map(x=>x.toFixed(2)).join(","); if(key===spots.key&&!force) return; spots.key=key;
+  try{ const j=await api(`/api/spots?s=${s.toFixed(3)}&w=${w.toFixed(3)}&n=${n.toFixed(3)}&e=${e.toFixed(3)}`); spots.kinds=j.kinds; spots.list=j.spots||[]; drawMap(); }catch(err){ spots.key=""; }
+}
+function drawSpots(){
+  spots.list.forEach(p=>{ const pend=p.status!=="ok";
+    const html=`<b>${esc(p.name)}</b><br><span class="note">${esc((spots.kinds||{})[p.kind]||p.kind)}${pend?" · waiting for approval":""}</span>${p.note?`<br>${esc(p.note)}`:""}<br>${pend?"":`<button class="btn small ${p.beenme?"":"ghost"}" type="button" data-spotvote="${p.id}" data-undo="${p.beenme?1:0}">${p.beenme?"✓ Been here":"Been here"}${p.been?` · ${p.been}`:""}</button>`}`;
+    L.marker([p.lat,p.lon],{icon:L.divIcon({className:"",html:`<div class="spotmk ${pend?"pend":""}">${SPOT_ICON[p.kind]||"📍"}</div>`,iconSize:[24,24],iconAnchor:[12,12]}),zIndexOffset:800}).bindTooltip(p.name).bindPopup(html).addTo(layer); });
+}
+async function voteSpot(id,undo){ if(!acct.user){ acct.why="Sign in to say you've been here."; openAcct("signin"); return; }
+  try{ await api("/api/spots",{method:"POST",body:{vote:id,undo}}); map.closePopup(); loadSpots(true); }catch(e){ $("status").textContent=e.message; } }
+{ const _ra=renderAll; renderAll=function(){ _ra(); if(acct.ready&&map&&!planStale) loadSpots(); }; }
+
+/* ---------- approval list (OneTrackMind only) ---------- */
+let revQ=null;
+async function refreshReview(){ const b=$("reviewBtn"); if(!acct.admin){ b.hidden=true; return; }
+  try{ revQ=await api("/api/admin/queue"); const n=revQ.routes.length+revQ.spots.length+revQ.reports.length+revQ.feedback.length; b.hidden=false; b.textContent=n?`Review (${n})`:"Review"; }catch(e){ b.hidden=true; } }
+$("reviewBtn").addEventListener("click",async()=>{ await refreshReview(); renderReview(); $("revDlg").showModal(); });
+function renderReview(){
+  const q=revQ||{routes:[],spots:[],reports:[],feedback:[]}, when=t=>new Date(t).toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+  const act=(type,id)=>`<div class="ract"><button class="btn small" type="button" data-rv="${type}:${id}:approve">${type==="feedback"?"Done":"Approve"}</button>${type==="feedback"?"":`<button class="btn small ghost" type="button" data-rv="${type}:${id}:reject">Reject</button>`}</div>`;
+  let h="";
+  h+=`<div class="rvh">Routes to share (${q.routes.length})</div>`+q.routes.map(r=>`<div class="rrow"><div><div class="rt">${esc(r.title)}</div><div class="note">${esc(r.email)} · ${r.km||"?"} km · ${r.days} day${r.days>1?"s":""} · ${when(r.updated)}</div>${r.summary?`<div class="pkb">${esc(r.summary)}</div>`:""}<button class="linkbtn small" type="button" data-rvopen="${r.id}">Open it in the planner</button></div>${act("route",r.id)}</div>`).join("");
+  h+=`<div class="rvh">Places (${q.spots.length})</div>`+q.spots.map(p=>`<div class="rrow"><div><div class="rt">${SPOT_ICON[p.kind]||""} ${esc(p.name)}</div><div class="note">${esc(p.label)} · ${esc(p.email)} · ${when(p.created)}</div>${p.note?`<div class="pkb">${esc(p.note)}</div>`:""}<button class="linkbtn small" type="button" data-rvmap="${p.lat},${p.lon}">Show on the map</button></div>${act("spot",p.id)}</div>`).join("");
+  h+=`<div class="rvh">Road reports (${q.reports.length})</div>`+q.reports.map(r=>`<div class="rrow"><div><div class="rt">${esc(r.label)}</div><div class="note">${esc(r.email)} · seen ${esc(r.seen_on)}</div>${r.text?`<div class="pkb">${esc(r.text)}</div>`:""}<button class="linkbtn small" type="button" data-rvmap="${r.lat},${r.lon}">Show on the map</button></div>${act("report",r.id)}</div>`).join("");
+  h+=`<div class="rvh">Feedback (${q.feedback.length})</div>`+q.feedback.map(f=>`<div class="rrow"><div><div class="rt">${esc({feedback:"Feedback",fix:"Suggested change",bug:"Something broke"}[f.kind]||f.kind)}</div><div class="note">${esc(f.email||"not signed in")} · ${when(f.created)}</div><div class="pkb">${esc(f.text)}</div>${f.lat!=null?`<button class="linkbtn small" type="button" data-rvmap="${f.lat},${f.lon}">Show on the map</button>`:""}</div>${act("feedback",f.id)}</div>`).join("");
+  $("rvBody").innerHTML=h;
+}
+$("revDlg").addEventListener("click",async e=>{
+  if(e.target===$("revDlg")||e.target.closest("[data-rvclose]")){ $("revDlg").close(); return; }
+  const a=e.target.closest("[data-rv]"); if(a){ const [type,id,action]=a.dataset.rv.split(":"); a.disabled=true; try{ await api("/api/admin/queue",{method:"POST",body:{type,id,action}}); await refreshReview(); renderReview(); spots.key=""; reps.key=""; picks=null; renderAll(); }catch(err){ a.disabled=false; $("status").textContent=err.message; } return; }
+  const m=e.target.closest("[data-rvmap]"); if(m){ const [la,lo]=m.dataset.rvmap.split(",").map(Number); $("revDlg").close(); map.setView([la,lo],14); L.marker([la,lo]).addTo(layer); return; }
+  const o=e.target.closest("[data-rvopen]"); if(o){ $("revDlg").close(); openRoute(o.dataset.rvopen); }
+});
 
 </script></body></html>

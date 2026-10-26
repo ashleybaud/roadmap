@@ -1,14 +1,14 @@
 // Rider reports from a fixed list, each with a place and the day it was seen; old ones drop off by themselves.
 // GET ?s=&w=&n=&e= → recent reports in that box. POST {kind, text, lat, lon, seen_on, route}. DELETE ?id= (your own).
-import { handle, json, body, db, currentUser, requireUser, sameOrigin, clean, newId, now, HttpError, REPORT_KINDS } from "../../server/otm.js";
+import { handle, json, body, db, currentUser, requireUser, sameOrigin, clean, newId, now, HttpError, REPORT_KINDS, isAdmin } from "../../server/otm.js";
 
 export const onRequestGet = handle(async ({ request, env }) => {
   const q = new URL(request.url).searchParams, n = k => +q.get(k);
   const [s, w, nn, e] = [n("s"), n("w"), n("n"), n("e")];
   if (![s, w, nn, e].every(Number.isFinite) || nn - s > 25 || e - w > 25) throw new HttpError(400, "Give a smaller area.");
   const D = await db(env), u = await currentUser(env, request);
-  const r = await D.prepare(`SELECT id, kind, text, lat, lon, seen_on, created, user_id FROM reports WHERE lat BETWEEN ? AND ? AND lon BETWEEN ? AND ? AND expires > ? ORDER BY created DESC LIMIT 300`)
-    .bind(s, nn, w, e, now()).all();
+  const r = await D.prepare(`SELECT id, kind, text, lat, lon, seen_on, created, user_id, status FROM reports WHERE lat BETWEEN ? AND ? AND lon BETWEEN ? AND ? AND expires > ? AND (status = 'ok' OR user_id = ?) ORDER BY created DESC LIMIT 300`)
+    .bind(s, nn, w, e, now(), u ? u.id : "").all();
   return json({ kinds: Object.fromEntries(Object.entries(REPORT_KINDS).map(([k, v]) => [k, v.label])),
     reports: (r.results || []).map(({ user_id, ...x }) => ({ ...x, label: (REPORT_KINDS[x.kind] || {}).label || x.kind, mine: !!(u && user_id === u.id) })) });
 });
@@ -20,9 +20,10 @@ export const onRequestPost = handle(async ({ request, env }) => {
   const recent = await D.prepare(`SELECT COUNT(*) AS n FROM reports WHERE user_id = ? AND created > ?`).bind(u.id, now() - 3600e3).first();
   if (recent && recent.n >= 30) throw new HttpError(429, "That's a lot of reports in an hour. Try again later.");
   const id = newId(8), from = Date.parse(seen + "T12:00:00Z");
-  await D.prepare(`INSERT INTO reports (id, route_id, user_id, kind, text, lat, lon, seen_on, expires, created) VALUES (?,?,?,?,?,?,?,?,?,?)`)
-    .bind(id, clean(b.route, 80) || null, u.id, b.kind, clean(b.text, 500) || null, lat, lon, seen, from + k.days * 864e5, now()).run();
-  return json({ ok: true, id });
+  const status = isAdmin(env, u) ? "ok" : "pending";
+  await D.prepare(`INSERT INTO reports (id, route_id, user_id, kind, text, lat, lon, seen_on, expires, created, status) VALUES (?,?,?,?,?,?,?,?,?,?,?)`)
+    .bind(id, clean(b.route, 80) || null, u.id, b.kind, clean(b.text, 500) || null, lat, lon, seen, from + k.days * 864e5, now(), status).run();
+  return json({ ok: true, id, status });
 });
 export const onRequestDelete = handle(async ({ request, env }) => {
   sameOrigin(request); const u = await requireUser(env, request), id = new URL(request.url).searchParams.get("id") || "";

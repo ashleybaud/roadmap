@@ -1,3 +1,5 @@
+import { onRequestGet as __api_admin_queue_js_onRequestGet } from "/home/claude/roadmap/functions/api/admin/queue.js"
+import { onRequestPost as __api_admin_queue_js_onRequestPost } from "/home/claude/roadmap/functions/api/admin/queue.js"
 import { onRequestPost as __api_auth_logout_js_onRequestPost } from "/home/claude/roadmap/functions/api/auth/logout.js"
 import { onRequestGet as __api_auth_me_js_onRequestGet } from "/home/claude/roadmap/functions/api/auth/me.js"
 import { onRequestPost as __api_auth_start_js_onRequestPost } from "/home/claude/roadmap/functions/api/auth/start.js"
@@ -17,10 +19,27 @@ import { onRequestGet as __api_reports_js_onRequestGet } from "/home/claude/road
 import { onRequestPost as __api_reports_js_onRequestPost } from "/home/claude/roadmap/functions/api/reports.js"
 import { onRequestGet as __api_routes_index_js_onRequestGet } from "/home/claude/roadmap/functions/api/routes/index.js"
 import { onRequestPost as __api_routes_index_js_onRequestPost } from "/home/claude/roadmap/functions/api/routes/index.js"
+import { onRequestDelete as __api_spots_js_onRequestDelete } from "/home/claude/roadmap/functions/api/spots.js"
+import { onRequestGet as __api_spots_js_onRequestGet } from "/home/claude/roadmap/functions/api/spots.js"
+import { onRequestPost as __api_spots_js_onRequestPost } from "/home/claude/roadmap/functions/api/spots.js"
 import { onRequest as ___middleware_js_onRequest } from "/home/claude/roadmap/functions/_middleware.js"
 
 export const routes = [
     {
+      routePath: "/api/admin/queue",
+      mountPath: "/api/admin",
+      method: "GET",
+      middlewares: [],
+      modules: [__api_admin_queue_js_onRequestGet],
+    },
+  {
+      routePath: "/api/admin/queue",
+      mountPath: "/api/admin",
+      method: "POST",
+      middlewares: [],
+      modules: [__api_admin_queue_js_onRequestPost],
+    },
+  {
       routePath: "/api/auth/logout",
       mountPath: "/api/auth",
       method: "POST",
@@ -152,6 +171,27 @@ export const routes = [
       method: "POST",
       middlewares: [],
       modules: [__api_routes_index_js_onRequestPost],
+    },
+  {
+      routePath: "/api/spots",
+      mountPath: "/api",
+      method: "DELETE",
+      middlewares: [],
+      modules: [__api_spots_js_onRequestDelete],
+    },
+  {
+      routePath: "/api/spots",
+      mountPath: "/api",
+      method: "GET",
+      middlewares: [],
+      modules: [__api_spots_js_onRequestGet],
+    },
+  {
+      routePath: "/api/spots",
+      mountPath: "/api",
+      method: "POST",
+      middlewares: [],
+      modules: [__api_spots_js_onRequestPost],
     },
   {
       routePath: "/",

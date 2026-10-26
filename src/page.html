@@ -404,6 +404,18 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .rrow .ract{display:flex;gap:6px;flex:none}
 .acctline{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding-top:10px}
 .pkb{font-size:.86rem;margin-top:4px}
+.pktabs{display:flex;gap:4px;border-bottom:2px solid var(--ink)}
+.pktabs button{border:1px solid var(--line);border-bottom:0;background:var(--bg);color:var(--ink);padding:6px 10px;border-radius:6px 6px 0 0;cursor:pointer;font:inherit;font-weight:600;font-size:.88rem}
+.pktabs button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.addgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px}
+.addcard{display:flex;flex-direction:column;gap:4px;text-align:left;border:2px solid var(--ink);border-radius:8px;background:var(--panel);color:var(--ink);padding:12px;cursor:pointer;font:inherit}
+.addcard b{font-family:var(--f-display);font-size:1.2rem}.addcard span{font-size:.86rem;color:var(--muted)}
+.addcard:hover{background:color-mix(in srgb,var(--accent) 10%,var(--panel))}
+dialog.wide{max-width:760px;width:calc(100vw - 32px)}
+.spotmk{width:24px;height:24px;border-radius:6px;background:#fff;border:2px solid #6B4E9B;display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,.35)}
+.spotmk.pend{border-style:dashed;opacity:.8}
+#map.picking{cursor:crosshair}
+.rvh{font-family:var(--f-mono);font-size:.74rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-top:8px}
 .repkinds{display:flex;flex-wrap:wrap;gap:6px}
 .repkinds button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:16px;padding:5px 10px;cursor:pointer;font:inherit;font-size:.86rem}
 .repkinds button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -440,8 +452,8 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 <body>
 <div class="wrap">
   <header>
-    <div><h1>OneTrackMind <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><div class="note">Every great route, graded for your skill, planned day by day.</div></div>
-    <div class="btns"><span class="lbl mono" id="hdrSummary"></span><button class="btn ghost" id="feedback" type="button">Send feedback</button><button class="btn ghost" id="acctBtn" type="button" hidden>Sign in</button><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
+    <div><h1>OneTrackMind <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><div class="note">Every great route, graded for your skill, planned day by day. <b>Built by riders:</b> add your favourite routes, mark the places worth stopping.</div></div>
+    <div class="btns"><span class="lbl mono" id="hdrSummary"></span><button class="btn ghost" id="feedback" type="button">Send feedback</button><button class="btn" id="addBtn" type="button" hidden>+ Add yours</button><button class="btn ghost" id="reviewBtn" type="button" hidden>Review</button><button class="btn ghost" id="acctBtn" type="button" hidden>Sign in</button><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
   </header>
 
   <details class="guide" id="guide">
@@ -455,6 +467,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
       <section><h3>5. Before you go</h3><p>Every day shows distance, riding time, sunset and weather. Orange means have a look: a long day, arriving near dark, rain or heat. "Good to know" lists what to sort out first, like public holidays, border posts, and long stretches without fuel or a hospital.</p></section>
       <section><h3>6. Got a route already?</h3><p>Use "Plan from a GPX file" with a route from a friend or your Garmin. It's followed exactly, split into days, and night stops and fuel are added.</p></section>
       <section><h3>7. Take it with you</h3><p>Each day downloads as a GPX file for your GPS or phone. "Save as PDF" prints the whole trip with the warnings up front.</p></section>
+      <section><h3>Built by riders</h3><p>Tap <b>+ Add yours</b> to share a road you love or mark a place worth stopping. We check everything before other riders see it. Find riders' routes under "Find a route".</p></section>
       <section><h3>Recce. Ride. Report.</h3><p>Sign in to save routes and open them on any device. On the road, open a stop and tap "Report the road here": washaways, no fuel, roadworks, a good stay. Riders planning that road see it on the map 📣 and under "Good to know". Rode a route? Rate it and say how hard you found it.</p></section>
       <section><h3>Worth knowing</h3><p>Trips are saved on this device only, for now. Fuel, places and road surfaces come from OpenStreetMap and can be wrong, especially out in the sticks. Phone ahead on remote stretches, and tell us what's wrong with "Send feedback".</p></section>
     </div>
@@ -506,7 +519,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
     <div><span class="flag finfo">◷</span> The clocks change during the day.</div>
     <div><span class="sty">STYLE_FAST</span> Get me there quickly. <span class="sty">STYLE_ROUGH</span> Road less travelled, or the style set in Settings.</div>
     <div><span class="tdot" style="background:var(--warn)"></span> A dot on a day tab: something on that day needs a look.</div>
-    <div><b>On the map</b> (green = shown): ⛽ fuel stations on the route · 🛏 places to stay at night stops · 🍴 food · ★ sights, viewpoints and passes · 🏥 hospitals and clinics · 📣 what riders reported on the road lately · 🛣 the route coloured by grade</div>
+    <div><b>On the map</b> (green = shown): ⛽ fuel stations on the route · 🛏 places to stay at night stops · 🍴 food · ★ sights, viewpoints and passes · 🏥 hospitals and clinics · 📣 what riders reported on the road lately · 📍 places riders marked · 🛣 the route coloured by grade</div>
     <h3 style="margin-top:6px">Route grades</h3><div id="gradeKey" class="keylist" style="gap:6px"></div><p class="note">Graded from what OpenStreetMap says about each road. Roads change after rain and grading, so check locally. Riders' reports will sharpen this.</p>
     <p class="note">We show where fuel is; we don't track your tank. Suggested stops use your "Stop at least every" setting. Fuel, places and hospitals come from OpenStreetMap and can be wrong. Phone ahead on remote legs.</p>
     <div class="btns"><button class="btn" value="close">Close</button></div>
@@ -530,6 +543,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
       <li><b>Each day:</b> open its tab for fuel stops, what's open when you arrive, and anything to watch for.</li>
       <li><b>Take it with you:</b> a GPX file for your GPS or phone, and a PDF to print.</li>
     </ol>
+    <p class="note" style="margin:0"><b>Built by riders:</b> open riders' routes under <b>Find a route</b>, and tap <b>+ Add yours</b> to share a road you love or mark a place worth stopping.</p>
     <p class="note" style="margin:0">Have a route already? Use <b>Plan from a GPX file</b> and it's split into days for you. Trips are saved on this device only. You can change all of this later in Settings.</p>
     <div class="btns" style="justify-content:flex-end"><button class="btn" value="ok">Start planning</button></div>
   </form>
@@ -553,7 +567,8 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 </dialog>
 <dialog id="picksDlg" class="welcome" aria-labelledby="pkTitle">
   <div class="dlgwrap">
-    <div class="dlghead"><div><h2 id="pkTitle">OneTrackMind picks</h2><div class="note">Real roads we rate. Open one, then change anything: dates, night stops, the way.</div></div><button class="icon" type="button" data-pkclose aria-label="Close">✕</button></div>
+    <div class="dlghead"><div><h2 id="pkTitle">Find a route</h2><div class="note">Open one, then change anything: dates, night stops, the way.</div></div><button class="icon" type="button" data-pkclose aria-label="Close">✕</button></div>
+    <div class="pktabs" role="tablist"><button type="button" data-pktab="picks" class="on">OneTrackMind picks</button><button type="button" data-pktab="riders">Riders' routes</button><button type="button" data-pktab="add">Add yours</button></div>
     <div class="rlist" id="pkList"></div>
   </div>
 </dialog>
@@ -574,6 +589,31 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
     <div class="row2"><div class="field"><label class="lbl" for="rtDate">When did you ride it?</label><input id="rtDate" type="date"></div><div class="field"><label class="lbl" for="rtVeh">On</label><select id="rtVeh"><option value="bike">Motorbike</option><option value="jeep">Jeep / 4x4</option><option value="car">Car</option></select></div></div>
     <div class="btns" style="justify-content:flex-end"><span class="note" id="rtMsg"></span><button class="btn" type="submit">Save rating</button></div>
   </form>
+</dialog>
+<dialog id="addDlg" class="welcome" aria-labelledby="adTitle">
+  <div class="dlgwrap">
+    <div class="dlghead"><div><h2 id="adTitle">Add yours</h2><div class="note">OneTrackMind is built by riders. Everything you add is checked by us before other riders see it.</div></div><button class="icon" type="button" data-adclose aria-label="Close">✕</button></div>
+    <div class="addgrid">
+      <button type="button" class="addcard" data-addroute><b>Add a route</b><span>A road you love. Plan it here or load a GPX file, save it, then share it.</span></button>
+      <button type="button" class="addcard" data-addspot><b>Mark a place</b><span>A viewpoint, farm stall, coffee stop, bike-friendly stay, workshop. Tap the map where it is.</span></button>
+    </div>
+    <div class="note" id="adMsg"></div>
+  </div>
+</dialog>
+<dialog id="spotDlg" class="welcome" aria-labelledby="spTitle">
+  <form class="dlgwrap" id="spotForm">
+    <div class="dlghead"><div><h2 id="spTitle">Mark a place</h2><div class="note" id="spWhere"></div></div><button class="icon" type="button" data-spclose aria-label="Close">✕</button></div>
+    <div class="field"><label class="lbl" for="spKind">What is it?</label><select id="spKind"></select></div>
+    <div class="field"><label class="lbl" for="spName">Name</label><input id="spName" type="text" maxlength="80" required placeholder="e.g. Ou Meul Padstal"></div>
+    <div class="field"><label class="lbl" for="spNote">Why stop here?</label><input id="spNote" type="text" maxlength="400" placeholder="e.g. best pies on the R62, bikes welcome, open till 5"></div>
+    <div class="btns" style="justify-content:flex-end"><span class="note" id="spMsg"></span><button class="btn" type="submit">Send</button></div>
+  </form>
+</dialog>
+<dialog id="revDlg" class="welcome wide" aria-labelledby="rvTitle">
+  <div class="dlgwrap">
+    <div class="dlghead"><h2 id="rvTitle">Waiting for approval</h2><button class="icon" type="button" data-rvclose aria-label="Close">✕</button></div>
+    <div id="rvBody" class="rlist"></div>
+  </div>
 </dialog>
 <dialog id="settings">
   <form method="dialog" style="display:flex;flex-direction:column;gap:12px">
