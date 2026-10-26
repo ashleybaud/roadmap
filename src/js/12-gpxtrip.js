@@ -20,6 +20,7 @@ function gpxLine(tracks){
   if(chain) return joined;
   return tracks.map(function(t){ return {t:t,km:lineKm(t)}; }).sort(function(a,b){ return b.km-a.km; })[0].t;
 }
+function densify(pts,maxKm){ var out=[pts[0]]; for(var i=1;i<pts.length;i++){ var a=pts[i-1],b=pts[i],n=Math.floor(hav(a,b)/maxKm); for(var j=1;j<=n;j++) out.push({lat:a.lat+(b.lat-a.lat)*j/(n+1),lon:a.lon+(b.lon-a.lon)*j/(n+1)}); out.push(b); } return out; }
 var gpxCache=null;
 function gpxPts(){ if(!trip.gpx) return null; if(!gpxCache||gpxCache.src!==trip.gpx.pts){ gpxCache={src:trip.gpx.pts,pts:trip.gpx.pts.map(function(a){return {lat:a[0],lon:a[1]};})}; } return gpxCache.pts; }
 // first place, from index `from` on, where the line comes within 5 km of p, then the closest point of that pass
@@ -41,7 +42,7 @@ async function planFromGpx(file){
   var parsed; try{ parsed=gpxTracks(await file.text()); }catch(e){ parsed={tracks:[]}; }
   var line=gpxLine(parsed.tracks);
   if(line.length<2){ $("status").textContent="That file has no track or route in it."; return; }
-  line=simplify(line,15);
+  line=densify(simplify(line,15),1); // straight stretches keep a point every km, so towns and stops along them are found
   var cum=[0]; for(var i=1;i<line.length;i++) cum.push(cum[i-1]+hav(line[i-1],line[i]));
   var total=cum[cum.length-1]; if(total<1){ $("status").textContent="That track is too short to plan."; return; }
   $("status").textContent="Reading "+file.name+"…";
