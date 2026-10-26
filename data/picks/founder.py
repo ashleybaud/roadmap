@@ -40,7 +40,7 @@ TRIPS = [
   blurb="Cape Town to Canyon Village in one 850 km day, the Fish River Canyon, the hot tar to Aus, then the Orange River road from Rosh Pinah to Noordoewer. Back over Piekenierskloof.",
   founder=dict(year=2020, ride="KTM 1290 Super Adventure, four riders",
    story="A spontaneous baby shower for a riding mate. In Namibia, obviously. Day one was 850 km and my kind of day. Then the Fish River Canyon, Canyon Roadhouse and the straightest, hottest tar to Klein Aus at 41 degrees. Day three is the reason to go: the Orange River between Rosh Pinah and Noordoewer, my favourite piece of riding anywhere in the world. Fast, flowing, wheel to wheel with mates. TKC80s gave me grip to choose my lines while the General's tyres kept trying to put him in the river.",
-   posts=[("Day 1", "/2020/02/01/namibia-2-day-1/"), ("Day 2", "/2020/02/02/namibia-2-day-2/"), ("Day 3", "/2020/02/03/namibia-2-day-3/"), ("Day 4", "/2020/02/04/namibia-2-day-4/")],
+   posts=[("Namibia 2, Day 1", "/2020/02/01/namibia-2-day-1/"), ("Namibia 2, Day 2", "/2020/02/02/namibia-2-day-2/"), ("Namibia 2, Day 3", "/2020/02/03/namibia-2-day-3/"), ("Namibia 2, Day 4", "/2020/02/04/namibia-2-day-4/")],
    tips=["Day 1 is 850 km. Split it at Springbok if you want to enjoy it.", "Fill up at every town on the way home: Steinkopf, Springbok, Vanrhynsdorp, Klawer.", "Tyre choice matters on the river road; knobblies win."]),
   trip=dict(start=CPT, end=CPT, round=False, days=[
    day(P("Canyon Village", -27.65535, 17.76667), [P("Piekenierskloof Pass", -32.64294, 18.94755, type="pass"), P("Springbok", -29.66609, 17.8831, fast=True), P("Noordoewer", -28.72197, 17.61798, fast=True)], toFast=True),

@@ -168,6 +168,62 @@
       "legs": []
      }
     ]
+   },
+   "stats": {
+    "km": 2606,
+    "gravelPct": 67,
+    "grade": 5,
+    "highM": 1989,
+    "days": [
+     {
+      "km": 418,
+      "gravelPct": 95,
+      "grade": 3,
+      "highM": 1989
+     },
+     {
+      "km": 279,
+      "gravelPct": 71,
+      "grade": 4,
+      "highM": 1366
+     },
+     {
+      "km": 495,
+      "gravelPct": 92,
+      "grade": 3,
+      "highM": 1345
+     },
+     {
+      "km": 174,
+      "gravelPct": 100,
+      "grade": 3,
+      "highM": 1401
+     },
+     {
+      "km": 430,
+      "gravelPct": 99,
+      "grade": 3,
+      "highM": 1676
+     },
+     {
+      "km": 388,
+      "gravelPct": 13,
+      "grade": 2,
+      "highM": null
+     },
+     {
+      "km": 114,
+      "gravelPct": 38,
+      "grade": 5,
+      "highM": 46
+     },
+     {
+      "km": 308,
+      "gravelPct": 0,
+      "grade": 0,
+      "highM": null
+     }
+    ]
    }
   },
   {
@@ -187,19 +243,19 @@
     "story": "A spontaneous baby shower for a riding mate. In Namibia, obviously. Day one was 850 km and my kind of day. Then the Fish River Canyon, Canyon Roadhouse and the straightest, hottest tar to Klein Aus at 41 degrees. Day three is the reason to go: the Orange River between Rosh Pinah and Noordoewer, my favourite piece of riding anywhere in the world. Fast, flowing, wheel to wheel with mates. TKC80s gave me grip to choose my lines while the General's tyres kept trying to put him in the river.",
     "posts": [
      {
-      "t": "Day 1",
+      "t": "Namibia 2, Day 1",
       "u": "https://onetrackmind.co.za/2020/02/01/namibia-2-day-1/"
      },
      {
-      "t": "Day 2",
+      "t": "Namibia 2, Day 2",
       "u": "https://onetrackmind.co.za/2020/02/02/namibia-2-day-2/"
      },
      {
-      "t": "Day 3",
+      "t": "Namibia 2, Day 3",
       "u": "https://onetrackmind.co.za/2020/02/03/namibia-2-day-3/"
      },
      {
-      "t": "Day 4",
+      "t": "Namibia 2, Day 4",
       "u": "https://onetrackmind.co.za/2020/02/04/namibia-2-day-4/"
      }
     ],
@@ -319,6 +375,38 @@
       "style": "default",
       "legs": [],
       "toFast": true
+     }
+    ]
+   },
+   "stats": {
+    "km": 2249,
+    "gravelPct": 27,
+    "grade": 3,
+    "highM": 1566,
+    "days": [
+     {
+      "km": 899,
+      "gravelPct": 22,
+      "grade": 3,
+      "highM": 996
+     },
+     {
+      "km": 332,
+      "gravelPct": 89,
+      "grade": 3,
+      "highM": 1524
+     },
+     {
+      "km": 331,
+      "gravelPct": 36,
+      "grade": 3,
+      "highM": 1566
+     },
+     {
+      "km": 687,
+      "gravelPct": 0,
+      "grade": 2,
+      "highM": 996
      }
     ]
    }
@@ -460,6 +548,56 @@
       "vias": [],
       "style": "default",
       "legs": []
+     }
+    ]
+   },
+   "stats": {
+    "km": 2908,
+    "gravelPct": 94,
+    "grade": 4,
+    "highM": 1989,
+    "days": [
+     {
+      "km": 159,
+      "gravelPct": 69,
+      "grade": 3,
+      "highM": 821
+     },
+     {
+      "km": 509,
+      "gravelPct": 97,
+      "grade": 3,
+      "highM": 1530
+     },
+     {
+      "km": 414,
+      "gravelPct": 92,
+      "grade": 3,
+      "highM": 1433
+     },
+     {
+      "km": 440,
+      "gravelPct": 86,
+      "grade": 3,
+      "highM": 1630
+     },
+     {
+      "km": 434,
+      "gravelPct": 100,
+      "grade": 3,
+      "highM": 1676
+     },
+     {
+      "km": 174,
+      "gravelPct": 100,
+      "grade": 3,
+      "highM": 1401
+     },
+     {
+      "km": 778,
+      "gravelPct": 97,
+      "grade": 3,
+      "highM": 1989
      }
     ]
    }
@@ -605,6 +743,44 @@
       "toFast": true
      }
     ]
+   },
+   "stats": {
+    "km": 1914,
+    "gravelPct": 20,
+    "grade": 4,
+    "highM": 1134,
+    "days": [
+     {
+      "km": 360,
+      "gravelPct": 0,
+      "grade": 1,
+      "highM": 1134
+     },
+     {
+      "km": 265,
+      "gravelPct": 88,
+      "grade": 4,
+      "highM": 514
+     },
+     {
+      "km": 272,
+      "gravelPct": 27,
+      "grade": 3,
+      "highM": 405
+     },
+     {
+      "km": 530,
+      "gravelPct": 14,
+      "grade": 3,
+      "highM": null
+     },
+     {
+      "km": 488,
+      "gravelPct": 2,
+      "grade": 2,
+      "highM": null
+     }
+    ]
    }
   },
   {
@@ -687,6 +863,20 @@
       "style": "default",
       "legs": [],
       "toFast": true
+     }
+    ]
+   },
+   "stats": {
+    "km": 295,
+    "gravelPct": 59,
+    "grade": 3,
+    "highM": 1039,
+    "days": [
+     {
+      "km": 295,
+      "gravelPct": 59,
+      "grade": 3,
+      "highM": 1039
      }
     ]
    }
@@ -784,6 +974,38 @@
       "style": "default",
       "legs": [],
       "toFast": true
+     }
+    ]
+   },
+   "stats": {
+    "km": 2409,
+    "gravelPct": 44,
+    "grade": 4,
+    "highM": 1595,
+    "days": [
+     {
+      "km": 883,
+      "gravelPct": 37,
+      "grade": 2,
+      "highM": 1595
+     },
+     {
+      "km": 274,
+      "gravelPct": 99,
+      "grade": 4,
+      "highM": 920
+     },
+     {
+      "km": 680,
+      "gravelPct": 69,
+      "grade": 4,
+      "highM": 1083
+     },
+     {
+      "km": 573,
+      "gravelPct": 0,
+      "grade": 0,
+      "highM": null
      }
     ]
    }
@@ -1102,6 +1324,59 @@
       "toFast": true
      }
     ]
+   },
+   "stats": {
+    "km": 5669,
+    "gravelPct": 0,
+    "grade": 0,
+    "highM": null,
+    "days": [
+     {
+      "km": 402
+     },
+     {
+      "km": 327
+     },
+     {
+      "km": 271
+     },
+     {
+      "km": 542
+     },
+     {
+      "km": 193
+     },
+     {
+      "km": 193
+     },
+     {
+      "km": 428
+     },
+     {
+      "km": 75
+     },
+     {
+      "km": 1212
+     },
+     {
+      "km": 416
+     },
+     {
+      "km": 471
+     },
+     {
+      "km": 331
+     },
+     {
+      "km": 214
+     },
+     {
+      "km": 362
+     },
+     {
+      "km": 233
+     }
+    ]
    }
   },
   {
@@ -1228,6 +1503,29 @@
       "style": "default",
       "legs": [],
       "toFast": true
+     }
+    ]
+   },
+   "stats": {
+    "km": 1754,
+    "gravelPct": 0,
+    "grade": 0,
+    "highM": null,
+    "days": [
+     {
+      "km": 201
+     },
+     {
+      "km": 745
+     },
+     {
+      "km": 16
+     },
+     {
+      "km": 744
+     },
+     {
+      "km": 48
      }
     ]
    }
@@ -1371,6 +1669,29 @@
       "toFast": true
      }
     ]
+   },
+   "stats": {
+    "km": 1011,
+    "gravelPct": 0,
+    "grade": 0,
+    "highM": null,
+    "days": [
+     {
+      "km": 275
+     },
+     {
+      "km": 98
+     },
+     {
+      "km": 159
+     },
+     {
+      "km": 266
+     },
+     {
+      "km": 213
+     }
+    ]
    }
   },
   {
@@ -1432,6 +1753,17 @@
       ],
       "style": "default",
       "legs": []
+     }
+    ]
+   },
+   "stats": {
+    "km": 822,
+    "gravelPct": 0,
+    "grade": 0,
+    "highM": null,
+    "days": [
+     {
+      "km": 822
      }
     ]
    }
@@ -1505,6 +1837,20 @@
       "legs": []
      }
     ]
+   },
+   "stats": {
+    "km": 553,
+    "gravelPct": 0,
+    "grade": 0,
+    "highM": null,
+    "days": [
+     {
+      "km": 429
+     },
+     {
+      "km": 124
+     }
+    ]
    }
   },
   {
@@ -1554,6 +1900,20 @@
       "vias": [],
       "style": "default",
       "legs": []
+     }
+    ]
+   },
+   "stats": {
+    "km": 382,
+    "gravelPct": 0,
+    "grade": 0,
+    "highM": null,
+    "days": [
+     {
+      "km": 191
+     },
+     {
+      "km": 190
      }
     ]
    }
@@ -1636,6 +1996,32 @@
       "legs": []
      }
     ]
+   },
+   "stats": {
+    "km": 360,
+    "gravelPct": 44,
+    "grade": 3,
+    "highM": 2750,
+    "days": [
+     {
+      "km": 141,
+      "gravelPct": 47,
+      "grade": 3,
+      "highM": 2750
+     },
+     {
+      "km": 108,
+      "gravelPct": 62,
+      "grade": 3,
+      "highM": 2750
+     },
+     {
+      "km": 112,
+      "gravelPct": 23,
+      "grade": 3,
+      "highM": 2023
+     }
+    ]
    }
   },
   {
@@ -1696,6 +2082,26 @@
       "toFast": true
      }
     ]
+   },
+   "stats": {
+    "km": 306,
+    "gravelPct": 16,
+    "grade": 2,
+    "highM": 1571,
+    "days": [
+     {
+      "km": 71,
+      "gravelPct": 35,
+      "grade": 2,
+      "highM": 1571
+     },
+     {
+      "km": 235,
+      "gravelPct": 11,
+      "grade": 2,
+      "highM": 1571
+     }
+    ]
    }
   },
   {
@@ -1728,6 +2134,20 @@
       ],
       "style": "default",
       "legs": []
+     }
+    ]
+   },
+   "stats": {
+    "km": 132,
+    "gravelPct": 93,
+    "grade": 3,
+    "highM": 1440,
+    "days": [
+     {
+      "km": 132,
+      "gravelPct": 93,
+      "grade": 3,
+      "highM": 1440
      }
     ]
    }
@@ -1788,6 +2208,26 @@
       "legs": []
      }
     ]
+   },
+   "stats": {
+    "km": 556,
+    "gravelPct": 83,
+    "grade": 3,
+    "highM": 1614,
+    "days": [
+     {
+      "km": 311,
+      "gravelPct": 83,
+      "grade": 2,
+      "highM": 1525
+     },
+     {
+      "km": 245,
+      "gravelPct": 84,
+      "grade": 2,
+      "highM": 1614
+     }
+    ]
    }
   },
   {
@@ -1844,6 +2284,26 @@
       "legs": []
      }
     ]
+   },
+   "stats": {
+    "km": 216,
+    "gravelPct": 70,
+    "grade": 4,
+    "highM": 1087,
+    "days": [
+     {
+      "km": 47,
+      "gravelPct": 60,
+      "grade": 4,
+      "highM": 1009
+     },
+     {
+      "km": 169,
+      "gravelPct": 72,
+      "grade": 4,
+      "highM": 1087
+     }
+    ]
    }
   },
   {
@@ -1874,6 +2334,20 @@
       "vias": [],
       "style": "default",
       "legs": []
+     }
+    ]
+   },
+   "stats": {
+    "km": 181,
+    "gravelPct": 98,
+    "grade": 4,
+    "highM": 1097,
+    "days": [
+     {
+      "km": 181,
+      "gravelPct": 98,
+      "grade": 4,
+      "highM": 1097
      }
     ]
    }
@@ -1909,6 +2383,20 @@
       ],
       "style": "default",
       "legs": []
+     }
+    ]
+   },
+   "stats": {
+    "km": 84,
+    "gravelPct": 19,
+    "grade": 4,
+    "highM": 2876,
+    "days": [
+     {
+      "km": 84,
+      "gravelPct": 19,
+      "grade": 4,
+      "highM": 2876
      }
     ]
    }
@@ -1968,6 +2456,26 @@
       "legs": []
      }
     ]
+   },
+   "stats": {
+    "km": 332,
+    "gravelPct": 89,
+    "grade": 3,
+    "highM": 1112,
+    "days": [
+     {
+      "km": 117,
+      "gravelPct": 89,
+      "grade": 2,
+      "highM": 943
+     },
+     {
+      "km": 215,
+      "gravelPct": 89,
+      "grade": 3,
+      "highM": 1112
+     }
+    ]
    }
   },
   {
@@ -2025,6 +2533,26 @@
       "legs": []
      }
     ]
+   },
+   "stats": {
+    "km": 254,
+    "gravelPct": 72,
+    "grade": 3,
+    "highM": 1201,
+    "days": [
+     {
+      "km": 118,
+      "gravelPct": 62,
+      "grade": 3,
+      "highM": 1201
+     },
+     {
+      "km": 137,
+      "gravelPct": 80,
+      "grade": 3,
+      "highM": 1014
+     }
+    ]
    }
   },
   {
@@ -2066,6 +2594,26 @@
       "vias": [],
       "style": "default",
       "legs": []
+     }
+    ]
+   },
+   "stats": {
+    "km": 306,
+    "gravelPct": 93,
+    "grade": 3,
+    "highM": 2061,
+    "days": [
+     {
+      "km": 222,
+      "gravelPct": 95,
+      "grade": 3,
+      "highM": 2061
+     },
+     {
+      "km": 83,
+      "gravelPct": 87,
+      "grade": 2,
+      "highM": 1163
      }
     ]
    }
@@ -2110,6 +2658,20 @@
       ],
       "style": "default",
       "legs": []
+     }
+    ]
+   },
+   "stats": {
+    "km": 153,
+    "gravelPct": 57,
+    "grade": 3,
+    "highM": 254,
+    "days": [
+     {
+      "km": 153,
+      "gravelPct": 57,
+      "grade": 3,
+      "highM": 254
      }
     ]
    }
