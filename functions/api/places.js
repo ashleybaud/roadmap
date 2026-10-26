@@ -16,7 +16,7 @@ async function ask(url, body, signal) {
     signal,
     headers: {
       "Content-Type": "application/x-www-form-urlencoded",
-      "User-Agent": "RouteAndRange/0.2 (+https://routeandrange.pages.dev)",
+      "User-Agent": "OneTrackMind/0.3 (+https://onetrackmind.online)",
       "Accept": "application/json",
     },
   });

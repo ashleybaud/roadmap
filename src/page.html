@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Route and Range</title>
+<title>OneTrackMind · Recce. Ride. Report.</title>
+<meta name="description" content="Plan multi-day rides and drives day by day: gravel or tar routes, fuel, night stops, sunset and weather. For motorbikes, 4x4s and cars.">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -182,6 +183,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 .maplbl::before{display:none}
 .toast{font-size:.85rem;background:var(--ink);color:var(--bg);padding:4px 10px;border-radius:5px}
 .linkbtn{background:none;border:0;color:inherit;text-decoration:underline;cursor:pointer;font:inherit;font-weight:700}
+.motto{font-family:var(--f-display);font-weight:600;font-size:1rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:2px 0}
 .testtag{font-family:var(--f-mono);font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;background:var(--warn);color:var(--onfill);padding:2px 6px;border-radius:4px;vertical-align:middle}
 a.btn{text-decoration:none;display:inline-flex;align-items:center}
 .print{display:none}
@@ -381,7 +383,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 <body>
 <div class="wrap">
   <header>
-    <div><h1>Route and Range <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="note">Plan multi-day rides and drives, day by day: routes, fuel and night stops. <button type="button" class="linkbtn" id="howItWorks">How it works</button></div></div>
+    <div><h1>OneTrackMind <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><div class="note">Every great route, graded for your skill, planned day by day. <button type="button" class="linkbtn" id="howItWorks">How it works</button></div></div>
     <div class="btns"><span class="lbl mono" id="hdrSummary"></span><a class="btn ghost" id="feedback" href="#" hidden>Send feedback</a><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
   </header>
 

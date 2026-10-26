@@ -3,7 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Route and Range</title>
+<title>OneTrackMind · Recce. Ride. Report.</title>
+<meta name="description" content="Plan multi-day rides and drives day by day: gravel or tar routes, fuel, night stops, sunset and weather. For motorbikes, 4x4s and cars.">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -182,6 +183,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 .maplbl::before{display:none}
 .toast{font-size:.85rem;background:var(--ink);color:var(--bg);padding:4px 10px;border-radius:5px}
 .linkbtn{background:none;border:0;color:inherit;text-decoration:underline;cursor:pointer;font:inherit;font-weight:700}
+.motto{font-family:var(--f-display);font-weight:600;font-size:1rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:2px 0}
 .testtag{font-family:var(--f-mono);font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;background:var(--warn);color:var(--onfill);padding:2px 6px;border-radius:4px;vertical-align:middle}
 a.btn{text-decoration:none;display:inline-flex;align-items:center}
 .print{display:none}
@@ -381,7 +383,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 <body>
 <div class="wrap">
   <header>
-    <div><h1>Route and Range <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="note">Plan multi-day rides and drives, day by day: routes, fuel and night stops. <button type="button" class="linkbtn" id="howItWorks">How it works</button></div></div>
+    <div><h1>OneTrackMind <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><div class="note">Every great route, graded for your skill, planned day by day. <button type="button" class="linkbtn" id="howItWorks">How it works</button></div></div>
     <div class="btns"><span class="lbl mono" id="hdrSummary"></span><a class="btn ghost" id="feedback" href="#" hidden>Send feedback</a><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
   </header>
 
@@ -1099,7 +1101,7 @@ function timePill(k,km,mins,attrs){ const long=mins>+settings.maxHours*60; retur
 
 
 /* ---------- printable trip summary (Save as PDF) ---------- */
-const FEEDBACK_EMAIL="";
+const FEEDBACK_EMAIL="feedback@onetrackmind.online";
 function routeSketch(){
   const g=plan.geom; let s=90,w=180,n=-90,e=-180; g.forEach(p=>{s=Math.min(s,p.lat);n=Math.max(n,p.lat);w=Math.min(w,p.lon);e=Math.max(e,p.lon);});
   const kx=Math.cos(rad((s+n)/2)), W=680, H=Math.max(220,Math.min(520,W*(n-s)/Math.max(1e-6,(e-w)*kx))), pad=40;
@@ -1160,7 +1162,7 @@ function printHtml(){
       h+=`<h3>Medical</h3><p>${hs.length?hs.map(x=>`${esc(x.name||(x.type==="hospital"?"Hospital":"Clinic"))} (km ${Math.round(x.km-d.a)})${x.phone?" "+esc(x.phone):""}`).join(" · "):"None within 25 km of the route"}. Furthest point from a hospital: ${fmtFar(m.far)} km. Emergency from a mobile: 112.</p>`; }
     h+=`</section>`;
   });
-  h+=`<p class="pmeta pfoot">Route and Range · routeandrange.pages.dev · printed ${esc(new Date().toLocaleDateString(undefined,{day:"numeric",month:"long",year:"numeric"}))}</p>`;
+  h+=`<p class="pmeta pfoot">OneTrackMind · onetrackmind.online · printed ${esc(new Date().toLocaleDateString(undefined,{day:"numeric",month:"long",year:"numeric"}))}</p>`;
   return h;
 }
 function printTrip(){
@@ -1173,7 +1175,7 @@ function feedbackLink(){
   if(!FEEDBACK_EMAIL) return "";
   const nights=trip.days.slice(0,-1).map(d=>d.to?d.to.name:"?").join(", ");
   const body=`What worked:\n\nWhat didn't:\n\nPhone or computer:\n\n---\nTrip: ${trip.start?.name||"?"} → ${trip.round?"same as start":trip.end?.name||"?"}, ${trip.startDate} to ${trip.endDate}. Nights: ${nights||"none"}.`;
-  return `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent("Route and Range feedback")}&body=${encodeURIComponent(body)}`;
+  return `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent("OneTrackMind feedback")}&body=${encodeURIComponent(body)}`;
 }
 
 /* ---------- story layout: one line per day, same block on Overview and day views ---------- */
@@ -1634,7 +1636,7 @@ function downloadGpx(k){
   const fuelW=fp?fuelGroups(fp.fills.filter(f=>f.km>pd.a&&f.km<=pd.b)).filter(g=>!pd.pts.some(p=>hav(p,g.st[0])<2)).map(g=>({lat:g.st[0].lat,lon:g.st[0].lon,n:"Fuel "+(g.town?g.town.name:g.st[0].name),s:"Gas Station"})):[];
   const w=[...pd.pts.slice(1).map((p,i)=>({lat:p.lat,lon:p.lon,n:p.name,s:sym(p,i+1)})),...fuelW];
   const text=`<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="Route and Range" xmlns="http://www.topografix.com/GPX/1/1">
+<gpx version="1.1" creator="OneTrackMind" xmlns="http://www.topografix.com/GPX/1/1">
 ${w.map(p=>`  <wpt lat="${p.lat.toFixed(5)}" lon="${p.lon.toFixed(5)}"><name>${esc(p.n)}</name><sym>${esc(p.s)}</sym></wpt>`).join("\n")}
   <trk>
     <name>${esc(name)}</name>

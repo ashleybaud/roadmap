@@ -327,7 +327,7 @@ function timePill(k,km,mins,attrs){ const long=mins>+settings.maxHours*60; retur
 
 
 /* ---------- printable trip summary (Save as PDF) ---------- */
-const FEEDBACK_EMAIL="";
+const FEEDBACK_EMAIL="feedback@onetrackmind.online";
 function routeSketch(){
   const g=plan.geom; let s=90,w=180,n=-90,e=-180; g.forEach(p=>{s=Math.min(s,p.lat);n=Math.max(n,p.lat);w=Math.min(w,p.lon);e=Math.max(e,p.lon);});
   const kx=Math.cos(rad((s+n)/2)), W=680, H=Math.max(220,Math.min(520,W*(n-s)/Math.max(1e-6,(e-w)*kx))), pad=40;
@@ -388,7 +388,7 @@ function printHtml(){
       h+=`<h3>Medical</h3><p>${hs.length?hs.map(x=>`${esc(x.name||(x.type==="hospital"?"Hospital":"Clinic"))} (km ${Math.round(x.km-d.a)})${x.phone?" "+esc(x.phone):""}`).join(" · "):"None within 25 km of the route"}. Furthest point from a hospital: ${fmtFar(m.far)} km. Emergency from a mobile: 112.</p>`; }
     h+=`</section>`;
   });
-  h+=`<p class="pmeta pfoot">Route and Range · routeandrange.pages.dev · printed ${esc(new Date().toLocaleDateString(undefined,{day:"numeric",month:"long",year:"numeric"}))}</p>`;
+  h+=`<p class="pmeta pfoot">OneTrackMind · onetrackmind.online · printed ${esc(new Date().toLocaleDateString(undefined,{day:"numeric",month:"long",year:"numeric"}))}</p>`;
   return h;
 }
 function printTrip(){
@@ -401,7 +401,7 @@ function feedbackLink(){
   if(!FEEDBACK_EMAIL) return "";
   const nights=trip.days.slice(0,-1).map(d=>d.to?d.to.name:"?").join(", ");
   const body=`What worked:\n\nWhat didn't:\n\nPhone or computer:\n\n---\nTrip: ${trip.start?.name||"?"} → ${trip.round?"same as start":trip.end?.name||"?"}, ${trip.startDate} to ${trip.endDate}. Nights: ${nights||"none"}.`;
-  return `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent("Route and Range feedback")}&body=${encodeURIComponent(body)}`;
+  return `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent("OneTrackMind feedback")}&body=${encodeURIComponent(body)}`;
 }
 
 /* ---------- story layout: one line per day, same block on Overview and day views ---------- */
@@ -862,7 +862,7 @@ function downloadGpx(k){
   const fuelW=fp?fuelGroups(fp.fills.filter(f=>f.km>pd.a&&f.km<=pd.b)).filter(g=>!pd.pts.some(p=>hav(p,g.st[0])<2)).map(g=>({lat:g.st[0].lat,lon:g.st[0].lon,n:"Fuel "+(g.town?g.town.name:g.st[0].name),s:"Gas Station"})):[];
   const w=[...pd.pts.slice(1).map((p,i)=>({lat:p.lat,lon:p.lon,n:p.name,s:sym(p,i+1)})),...fuelW];
   const text=`<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="Route and Range" xmlns="http://www.topografix.com/GPX/1/1">
+<gpx version="1.1" creator="OneTrackMind" xmlns="http://www.topografix.com/GPX/1/1">
 ${w.map(p=>`  <wpt lat="${p.lat.toFixed(5)}" lon="${p.lon.toFixed(5)}"><name>${esc(p.n)}</name><sym>${esc(p.s)}</sym></wpt>`).join("\n")}
   <trk>
     <name>${esc(name)}</name>
