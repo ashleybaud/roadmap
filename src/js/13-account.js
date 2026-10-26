@@ -99,7 +99,11 @@ document.addEventListener("click",e=>{ if(!e.target.closest("#details [data-save
   if(!acct.user){ acct.why="Sign in to save this route. Your trip stays on this device while you do."; openAcct("signin"); return; }
   openAcct("save"); });
 // back from the email link
-if(/[?&]signedin=1/.test(location.search)){ history.replaceState(null,"",location.pathname); setTimeout(()=>{ $("status").textContent=acct.user?`Signed in as ${acct.user.email}.`:""; },1500); }
+if(/[?&]signedin=1/.test(location.search)){ history.replaceState(null,"",location.pathname); setTimeout(()=>{ if(acct.user){ const tt=$("toast"); tt.innerHTML=`You're signed in as <b>${esc(acct.user.email)}</b>. If OneTrackMind is open in another tab, you can close that one.`; tt.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>tt.hidden=true,12000); } },1500); }
+// signed in from the email in another tab? notice it when this tab is looked at again
+{ let lastCheck=0; const recheck=()=>{ if(document.visibilityState!=="visible"||acct.user||!acct.ready||Date.now()-lastCheck<3000) return; lastCheck=Date.now();
+    api("/api/auth/me").then(j=>{ if(j&&j.user){ acct.user=j.user; acct.admin=!!j.admin; $("acctBtn").textContent="My routes"; if($("acctDlg").open&&acctMode==="sent"){ $("acctDlg").close(); } renderAll(); $("status").textContent=`Signed in as ${j.user.email}.`; } }).catch(()=>{}); };
+  document.addEventListener("visibilitychange",recheck); window.addEventListener("focus",recheck); }
 
 /* ---------- feedback and suggested changes: stored and emailed to us; plain email if the server can't take it ---------- */
 let fbAt=null;
