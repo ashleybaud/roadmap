@@ -169,12 +169,13 @@ function hook(id,onPick){const el=document.getElementById(id); if(el) wireSearch
 
 /* ---------- trip bar ---------- */
 function renderTripBar(){
-  $("startDate").value=trip.startDate; $("endDate").value=trip.endDate; $("endDate").min=trip.startDate;
+  $("startDate").value=trip.startDate; $("endDate").value=trip.endDate; $("stayType").value=trip.stayType||"any"; $("endDate").min=trip.startDate;
   if(document.activeElement!==$("startPlace")) $("startPlace").value=trip.start&&trip.start.lat!=null?trip.start.name:"";
   const noStart=!trip.start||trip.start.lat==null; $("startPlace").classList.toggle("need",noStart); $("startPlace").placeholder=noStart?"Tap ⌖ or type a town":"My location or a town";
   if(document.activeElement!==$("endPlace")) $("endPlace").value=trip.round||!trip.end?"":trip.end.name;
   $("sameStart").hidden=!!trip.round||!trip.end; $("clearStart").hidden=!trip.start||trip.start.lat==null;
 }
+$("stayType").addEventListener("change",e=>{ trip.stayType=e.target.value; trip.days.forEach(d=>{ if(d.stayType===trip.stayType) delete d.stayType; }); save(); renderDetails(); drawMap(); });
 $("startDate").addEventListener("change",e=>{const n=nDays();trip.startDate=e.target.value||tomorrow;if(trip.endDate<trip.startDate)trip.endDate=addDays(trip.startDate,n-1);changed();});
 $("endDate").addEventListener("change",e=>{trip.endDate=e.target.value<trip.startDate?trip.startDate:e.target.value;changed();});
 wireSearch($("startPlace"),$("startPlace").parentElement.nextElementSibling,p=>{trip.start=p;changed();});
@@ -371,7 +372,7 @@ function printHtml(){
     h+=`<h3>At your destination: ${esc(to.name)}</h3>`; const di=info("dest"); if(di.length) h+=`<ul>${di.map(li).join("")}</ul>`;
     if(!(last&&trip.round)){ const sf=stayFor(to), pl=sf?sf.places:[], chosen=pl.find(p=>hav(p,to)<0.2);
       if(chosen) h+=`<p>Staying at <b>${esc(chosen.name)}</b> (${esc((chosen.tags.tourism||"").replace("_"," "))}) · ${lnk(chosen.tags,chosen.name,to.name)}</p>`;
-      const alt=pl.filter(p=>p!==chosen).slice(0,3);
+      const alt=pl.filter(p=>p!==chosen&&stayMatch(p,stayTypeOf(k))).slice(0,3);
       if(alt.length) h+=`<p>${chosen?"Other options":"Places to stay"}:</p><ul>${alt.map(p=>`<li><b>${esc(p.name)}</b> (${esc((p.tags.tourism||"").replace("_"," "))}, ${p.dist.toFixed(1)} km) · ${lnk(p.tags,p.name,to.name)}</li>`).join("")}</ul>`;
       else if(!chosen&&!last) h+=`<p>No places to stay listed nearby.</p>`; }
     // stops
@@ -442,13 +443,20 @@ function tripTotals(){
   const fin=trip.round||!trip.end?(trip.start?trip.start.name:"?"):trip.end.name;
   return `<div class="totals"><span>Back at <b>${esc(fin)}</b></span><span>${n} day${n>1?"s":""} · ${Math.round(tot).toLocaleString()} km · about ${fmtDur(ride)} ${VEH().ing}</span></div>${gradeBar(tripGrade(),true)}${typeof rateLine==="function"?rateLine():""}`;
 }
+/* ---------- what kind of place to stay: set for the trip, changed per night ---------- */
+const STAY_TYPES=[{id:"any",n:"Anything"},{id:"camp",n:"⛺ Camping",rx:/^(camp_site|caravan_site)$/},{id:"guest",n:"Guesthouse / B&B",rx:/^guest_house$/},{id:"hotel",n:"Hotel / Lodge",rx:/^(hotel|motel)$/},{id:"self",n:"Self-catering",rx:/^(chalet|apartment)$/},{id:"back",n:"Backpackers",rx:/^hostel$/}];
+const stayTypeOf=k=>(trip.days[k]&&trip.days[k].stayType)||trip.stayType||"any";
+const stayMatch=(p,id)=>{ const t=STAY_TYPES.find(x=>x.id===id); return !t||!t.rx||t.rx.test((p.tags&&p.tags.tourism)||""); };
+function staysFor(k){ const to=dayTo(k), sf=to&&stayFor(to); return sf?sf.places.filter(p=>stayMatch(p,stayTypeOf(k))):[]; }
+function stayChips(k){ const to=dayTo(k), sf=to&&stayFor(to), all=sf?sf.places:[], cur=stayTypeOf(k);
+  return `<div class="staychips" role="group" aria-label="Kind of place to stay">${STAY_TYPES.map(t=>{ const n=t.rx?all.filter(p=>stayMatch(p,t.id)).length:all.length; return `<button type="button" class="${t.id===cur?"on":""}" data-staytype="${k}:${t.id}" ${n||t.id==="any"||t.id===cur?"":"disabled"}>${esc(t.n)}${placesOk?` <span>${n}</span>`:""}</button>`; }).join("")}</div>`; }
 function stayRows(k){
   const last=k===nDays()-1, to=dayTo(k); if(!to||(last&&trip.round)) return "";
-  const sf=stayFor(to), all=sf?sf.places:[], key="stay-"+k, list=showAll.has(key)?all:all.slice(0,10);
-  let h=`<section class="dsec"><h3>Where to stay in ${esc(to.name)} <span class="note">${placesOk?all.length:"…"}</span></h3>`;
+  const all=staysFor(k), key="stay-"+k, list=showAll.has(key)?all:all.slice(0,10), ty=STAY_TYPES.find(t=>t.id===stayTypeOf(k));
+  let h=`<section class="dsec"><h3>Where to stay in ${esc(to.name)} <span class="note">${placesOk?all.length:"…"}</span></h3>${stayChips(k)}`;
   h+=list.length?`<div class="stable">${list.map(p=>`<div class="srow"><div><b>${esc(p.name)}</b><span class="note">${esc((p.tags.tourism||"").replace("_"," "))} · ${p.dist.toFixed(1)} km</span></div>
       <div class="sact">${linksHtml(p.tags,p.name,to.name)}${!last?`<button class="linkbtn" type="button" data-staynight="${k}:${esc(p.id)}">Stay here</button>`:""}</div></div>`).join("")}</div>`
-    :`<div class="note">${placesOk?"Nothing listed within 15 km. Phone the town's info office or check booking sites.":"Loading…"}</div>`;
+    :`<div class="note">${placesOk?(ty&&ty.rx?`No ${esc(ty.n.replace(/^\S+ /,"").toLowerCase())} listed within 15 km. Try Anything, or check booking sites.`:"Nothing listed within 15 km. Phone the town's info office or check booking sites."):"Loading…"}</div>`;
   if(all.length>10) h+=`<button class="linkbtn" type="button" data-more="${key}">${showAll.has(key)?"Show fewer":`Show all ${all.length}`}</button>`;
   return h+`</section>`;
 }
@@ -720,6 +728,7 @@ $("details").addEventListener("click",e=>{
     changed(); return; }
   const fl=t.closest("[data-focusleg]"); if(fl&&plan&&k!=null){const L=plan.days[k].legs[+fl.dataset.focusleg-1]; focusRange(L.a,L.b); return;}
   const fd=t.closest("[data-focusday]"); if(fd&&plan){const pd=plan.days[+fd.dataset.focusday]; focusRange(pd.a,pd.b); return;}
+  const stb=t.closest("[data-staytype]"); if(stb){ const [k2,id]=stb.dataset.staytype.split(":"), d2=trip.days[+k2]; if(id===(trip.stayType||"any")) delete d2.stayType; else d2.stayType=id; showAll.delete("stay-"+k2); save(); renderDetails(); drawMap(); return; }
   const kp=t.closest("[data-keep]"); if(kp&&k!=null){ const v=trip.days[k].vias[+kp.dataset.keep]; if(v&&v.auto){ delete v.auto; v.kept=true; save(); renderDetails(); drawMap(); $("status").textContent=`${v.name} is now one of your stops.`; } return; }
   const up=t.closest("[data-vup]"); if(up&&k!=null){const i=+up.dataset.vup,v=trip.days[k].vias; if(i>0){[v[i-1],v[i]]=[v[i],v[i-1]];trip.days[k].legs=[];changed();} return;}
   const del=t.closest("[data-vdel]"); if(del&&k!=null){ const d=trip.days[k], v=d.vias[+del.dataset.vdel]; if(v&&v.auto){ d.noAuto=[...(d.noAuto||[]),v.name]; d.noMore=true; } d.vias.splice(+del.dataset.vdel,1); d.legs=[]; changed(); return; }
@@ -757,7 +766,7 @@ function panelItems(k,j,tab){
   const sc=scope(k,j); if(!sc||sc.b==null) return [];
   const {a,b,p}=sc, inLeg=x=>x.km!=null&&x.km>=a-0.5&&x.km<=b+0.5, near=x=>hav(x,p)<=5;
   if(tab==="fuel") return fuelAll.filter(f=>inLeg(f)||near(f)).filter((f,i,arr)=>arr.findIndex(x=>x.id===f.id)===i).sort((x,y)=>x.km-y.km);
-  if(tab==="stay") return stayFor(p)?.places||[];
+  if(tab==="stay"){ const kk=trip.days.findIndex((d,i)=>d.to===p&&i<nDays()-1); return (stayFor(p)?.places||[]).filter(x=>stayMatch(x,kk>=0?stayTypeOf(kk):(trip.stayType||"any"))); }
   if(tab==="food") return pois.filter(x=>x.kind==="food"&&(inLeg(x)||near(x))).sort((x,y)=>x.km-y.km);
   return pois.filter(x=>x.kind!=="food"&&ui.types[x.kind]&&(inLeg(x)||near(x))).sort((x,y)=>x.km-y.km);
 }
@@ -865,7 +874,7 @@ function drawMap(){
   }
   if(ui.lay.med&&meds) meds.filter(m=>m.off<=25&&inR(m)).forEach(m=>L.marker([m.lat,m.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:#B3261E">🏥</div>`,iconSize:[22,22],iconAnchor:[11,11]})}).bindTooltip(`${m.name||(m.type==="hospital"?"Hospital":"Clinic")}${m.phone?" · "+m.phone:""}`).addTo(layer));
   pois.filter(p=>ui.types[p.kind]&&inR(p)).sort((a,b)=>a.off-b.off).slice(0,+ui.max).forEach(p=>{const t=TYPES.find(x=>x.id===p.kind); L.marker([p.lat,p.lon],{icon:dotIcon(t.c,10)}).bindTooltip(`${p.name} · ${t.n}`).addTo(layer);});
-  if(ui.lay.stay) stays.forEach(s=>{ if(!trip.days.some((d,k)=>d.to===s.night&&k<nDays()-1)) return; s.places.forEach(p=>L.marker([p.lat,p.lon],{icon:dotIcon("#2F5BA8",9)}).bindTooltip(p.name).addTo(layer)); });
+  if(ui.lay.stay) stays.forEach(s=>{ const k=trip.days.findIndex((d,i)=>d.to===s.night&&i<nDays()-1); if(k<0) return; s.places.filter(p=>stayMatch(p,stayTypeOf(k))).forEach(p=>L.marker([p.lat,p.lon],{icon:dotIcon("#2F5BA8",9)}).bindTooltip(p.name).addTo(layer)); });
   if(!focusR){ const g=sel?seg(sel.a,sel.b):plan.geom; if(g.length>1&&(window._refit||sel||lastSel!==ui.tab)){map.fitBounds(L.latLngBounds(g.map(x=>[x.lat,x.lon])),{padding:[24,24]});} if(!planStale) window._refit=false; lastSel=ui.tab; }
 }
 function drawPanelLayer(){

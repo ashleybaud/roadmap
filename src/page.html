@@ -406,6 +406,12 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .rrow .ract{display:flex;gap:6px;flex:none}
 .acctline{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding-top:10px}
 .pkb{font-size:.86rem;margin-top:4px}
+.stayfield{grid-column:1/-1}
+.staychips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 8px}
+.staychips button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:16px;padding:4px 10px;cursor:pointer;font:inherit;font-size:.82rem}
+.staychips button span{color:var(--muted);font-family:var(--f-mono);font-size:.72rem;margin-left:2px}
+.staychips button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}.staychips button.on span{color:var(--bg)}
+.staychips button:disabled{opacity:.45;cursor:default}
 .pktabs{display:flex;gap:4px;border-bottom:2px solid var(--ink)}
 .pktabs button{border:1px solid var(--line);border-bottom:0;background:var(--bg);color:var(--ink);padding:6px 10px;border-radius:6px 6px 0 0;cursor:pointer;font:inherit;font-weight:600;font-size:.88rem}
 .pktabs button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
@@ -512,6 +518,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
     <div class="field"><label class="lbl" for="endDate">Back</label><input id="endDate" type="date"></div>
     <div class="field ac"><label class="lbl" for="startPlace">From</label><div class="inbtn"><input id="startPlace" type="text" autocomplete="off" placeholder="My location or a town"><button class="icon" id="clearStart" type="button" title="Clear" aria-label="Clear" hidden>✕</button><button class="icon" id="useLoc" type="button" title="Use my location" aria-label="Use my location">⌖</button></div><div class="sugg" hidden></div></div>
     <div class="field ac"><label class="lbl" for="endPlace">Finish</label><div class="inbtn"><input id="endPlace" type="text" autocomplete="off" placeholder="Back where I started"><button class="icon" id="sameStart" type="button" title="Finish where I started" aria-label="Finish where I started" hidden>✕</button></div><div class="sugg" hidden></div></div>
+      <div class="field stayfield"><label class="lbl" for="stayType">Stay in</label><select id="stayType"><option value="any">Anything</option><option value="camp">⛺ Camping</option><option value="guest">Guesthouse / B&amp;B</option><option value="hotel">Hotel / Lodge</option><option value="self">Self-catering</option><option value="back">Backpackers</option></select></div>
   </section>
 </div>
 
