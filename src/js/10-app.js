@@ -129,7 +129,7 @@ function rangeFuel(a,b){
   if(!fp||!fp.days) return null;
   const k=plan.days.findIndex(d=>d&&Math.abs(d.a-a)<0.5&&Math.abs(d.b-b)<0.5); if(k<0) return null;
   const pr=fp.days[k]&&fp.days[k].probs[0]; if(!pr) return null; const len=Math.round(pr.to-pr.from);
-  return {level:"warn",short:`No town within reach: ${len} km`,text:`No town within reach: ${len} km, ${pr.fromName} to ${pr.toName}`};
+  return {level:"warn",short:`No fuel for ${len} km`,text:`No fuel on our map for ${len} km, ${pr.fromName} to ${pr.toName}`};
 }
 function fuelPill(f){
   if(!f) return "";
