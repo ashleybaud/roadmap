@@ -353,6 +353,7 @@ function printHtml(){
     <p class="pmeta">${esc(dayLong(0))}${n>1?` to ${esc(dayLong(n-1))}`:""} · ${n} day${n>1?"s":""} · ${Math.round(tot).toLocaleString()} km · about ${fmtDur(ride)} ${VEH().ing} · leave each day ${fmtT(lv)}</p>`;
   const crit=[]; G.forEach((g,k)=>g.filter(x=>x.lvl!=="info").forEach(x=>crit.push(Object.assign({},x,{text:dayName(k)+": "+x.text}))));
   h+=`<div class="pcrit"><h2>Before you go</h2>${crit.length?`<ul class="pwarn">${crit.map(li).join("")}</ul>`:`<p>Nothing flagged. Still phone ahead on remote legs.</p>`}</div>`;
+  if(n>1) h+=`<div class="pcrit"><h2>Where you sleep</h2><table class="ptable"><tbody>${trip.days.slice(0,n-1).map((d,k)=>{ const to=d.to; return `<tr class="${to&&to.stay&&to.booked?"":"warn"}"><td><b>${esc(dayName(k))}</b></td><td>${to?`<b>${esc(to.name)}</b>${to.stay?(to.town?", "+esc(to.town.name):""):" (town: place to stay not chosen)"}`:"not set"}</td><td>${to&&to.stay?esc([to.phone,to.web,to.email].filter(Boolean).join(" · ")):""}</td><td>${to&&to.stay?(to.booked?"Booked":"Not booked"):""}</td></tr>`; }).join("")}</tbody></table></div>`;
   h+=`<table class="ptable"><thead><tr><th>Day</th><th>Route</th><th>km</th><th>${VEH().Ing}</th><th>Arrive</th><th>Sunset</th><th>Weather</th><th>To know</th></tr></thead><tbody>`;
   plan.days.forEach((d,k)=>{ if(!d) return;
     const to=d.pts[d.pts.length-1], vias=d.pts.slice(1,-1), w=dayWx(k), s=sunMin(k), arr=arrMin(k,d.pts.length-1), nk=G[k].filter(x=>x.lvl!=="info").length, bad=G[k].some(x=>x.lvl==="bad");
@@ -413,8 +414,12 @@ const viaOpen=new Set();
 function toCell(k){
   const last=k===nDays()-1, d=trip.days[k], to=dayTo(k), id=(last?"finish-":"night-")+k, cur=last?(to?to.name:""):(d.to?d.to.name:"");
   if(editTo.has(k)||!cur) return searchBox(id,cur,last?"Pick where you finish":"Pick where you sleep");
-  return `<button type="button" class="tolink" data-editto="${k}" title="Tap to change">${esc(cur)}</button>`;
+  return `<button type="button" class="tolink" data-editto="${k}" title="Tap to change">${esc(cur)}</button>${last?"":nightBadge(k)}`;
 }
+// is tonight a town or a place to stay, and is it booked
+function nightBadge(k){ const to=trip.days[k]&&trip.days[k].to; if(!to) return "";
+  if(!to.stay) return ` <span class="nbadge warn" title="This is a town, not a place to stay. Pick where you sleep under Where to stay.">town</span>`;
+  return to.booked?` <span class="nbadge ok" title="You've marked this booked">booked ✓</span>`:` <span class="nbadge warn" title="Chosen, not booked yet">not booked</span>`; }
 function fuelBtn(k){ const pd=plan.days[k], f=rangeFuel(pd.a,pd.b), n=fp?fuelGroups(fp.fills.filter(x=>x.km>=pd.a-0.3&&x.km<=pd.b+0.3)).length:0;
   if(!placesOk) return `<span class="pill foff" title="Fuel stations are still loading">${ICON.fuel}Checking fuel…</span>`;
   return `<button type="button" class="fbtn" data-fuelk="${k}" title="${n} fuel stop${n===1?"":"s"} en route">${f?fuelPill(f):`<span class="pill foff">${ICON.fuel}${n}</span>`}</button>`; }
@@ -453,12 +458,47 @@ function stayChips(k){ const to=dayTo(k), sf=to&&stayFor(to), all=sf?sf.places:[
 function stayRows(k){
   const last=k===nDays()-1, to=dayTo(k); if(!to||(last&&trip.round)) return "";
   const all=staysFor(k), key="stay-"+k, list=showAll.has(key)?all:all.slice(0,10), ty=STAY_TYPES.find(t=>t.id===stayTypeOf(k));
-  let h=`<section class="dsec"><h3>Where to stay in ${esc(to.name)} <span class="note">${placesOk?all.length:"…"}</span></h3>${stayChips(k)}`;
-  h+=list.length?`<div class="stable">${list.map(p=>`<div class="srow"><div><b>${esc(p.name)}</b><span class="note">${esc((p.tags.tourism||"").replace("_"," "))} · ${p.dist.toFixed(1)} km</span></div>
-      <div class="sact">${linksHtml(p.tags,p.name,to.name)}${!last?`<button class="linkbtn" type="button" data-staynight="${k}:${esc(p.id)}">Stay here</button>`:""}</div></div>`).join("")}</div>`
+  const town=to.stay?(to.town&&to.town.name)||"":to.name, mine=p=>to.stay&&p.name===to.name&&hav(p,to)<0.1;
+  let h=`<section class="dsec" id="stays-${k}"><h3>Where to stay${town?" in "+esc(town):" near "+esc(to.name)} <span class="note">${placesOk?all.length:"…"}</span></h3>`;
+  if(!last) h+=to.stay?`<div class="mystay"><div><span class="lbl">Your stay tonight</span><b>${esc(to.name)}</b>${to.kind?` <span class="note">${esc(to.kind)}</span>`:""}<div class="sact">${stayContacts(to,town)}</div></div>
+      <div class="btns"><button class="btn small ${to.booked?"":"ghost"}" type="button" data-booked="${k}">${to.booked?"Booked ✓":"Mark booked"}</button>${to.town?`<button class="linkbtn" type="button" data-staytown="${k}">Back to ${esc(to.town.name)}</button>`:""}</div></div>`
+    :`<div class="note stayhint">Tonight is set to the town of ${esc(to.name)}, not a place to stay. Choose one below or tap a blue dot on the map. You can change it later.</div>`;
+  h+=stayChips(k);
+  h+=list.length?`<div class="stable">${list.map(p=>`<div class="srow ${mine(p)?"on":""}"><div><b>${esc(p.name)}</b><span class="note">${esc((p.tags.tourism||"").replace("_"," "))} · ${p.dist.toFixed(1)} km</span></div>
+      <div class="sact">${linksHtml(p.tags,p.name,town||to.name)}${last?"":mine(p)?`<span class="okt">✓ Your stay</span>`:`<button class="linkbtn" type="button" data-staynight="${k}:${esc(p.id)}">Stay here</button>`}</div></div>`).join("")}</div>`
     :`<div class="note">${placesOk?(ty&&ty.rx?`No ${esc(ty.n.replace(/^\S+ /,"").toLowerCase())} listed within 15 km. Try Anything, or check booking sites.`:"Nothing listed within 15 km. Phone the town's info office or check booking sites."):"Loading…"}</div>`;
   if(all.length>10) h+=`<button class="linkbtn" type="button" data-more="${key}">${showAll.has(key)?"Show fewer":`Show all ${all.length}`}</button>`;
   return h+`</section>`;
+}
+
+/* ---------- where you sleep: a town, or a place to stay you've chosen (and booked) ---------- */
+function chooseStay(k,p){
+  const d=trip.days[k], cur=d.to; if(!p) return;
+  const town=cur&&cur.stay?(cur.town||null):cur?{name:cur.name,lat:cur.lat,lon:cur.lon}:null, tg=p.tags||{};
+  d.to=pt(p.name,p.lat,p.lon,{stay:true,town,kind:(tg.tourism||"").replace(/_/g," "),phone:tg.phone||"",web:tg.website||"",email:tg.email||"",booked:false});
+  $("status").textContent=`${dayName(k)} night: ${p.name}. Tap Mark booked once it's booked.`; changed();
+}
+function stayContacts(s,town){
+  const web=s.web?(/^https?:/.test(s.web)?s.web:"https://"+s.web):"";
+  return [s.phone?`<a href="tel:${esc(String(s.phone).replace(/[^\d+]/g,""))}">${esc(s.phone)}</a>`:"", web?`<a href="${esc(web)}" target="_blank" rel="noopener">Website</a>`:"", s.email?`<a href="mailto:${esc(s.email)}">${esc(s.email)}</a>`:"",
+    !s.phone&&!web&&!s.email?`<a href="https://www.google.com/search?q=${encodeURIComponent(s.name+" "+(town||""))}" target="_blank" rel="noopener">Find online</a>`:""].filter(Boolean).join(" · ");
+}
+// the to-do list: every night, where you sleep, how to reach them, booked or not
+function sleepList(){
+  const n=nDays(); if(n<2) return "";
+  const rows=trip.days.slice(0,n-1).map((d,k)=>{ const to=d.to;
+    if(!to) return `<div class="slrow"><span class="sln">${esc(dayName(k))}</span><span class="warnt">No night stop yet</span></div>`;
+    if(!to.stay) return `<div class="slrow"><span class="sln">${esc(dayName(k))}</span><span><b>${esc(to.name)}</b> <span class="nbadge warn">town</span><br><button class="linkbtn" type="button" data-pickstay="${k}">Choose where you sleep</button></span></div>`;
+    const town=to.town&&to.town.name;
+    return `<div class="slrow"><span class="sln">${esc(dayName(k))}</span><span><b>${esc(to.name)}</b>${town?` <span class="note">${esc(town)}</span>`:""}${to.kind?` <span class="note">· ${esc(to.kind)}</span>`:""}<br><span class="sact">${stayContacts(to,town)}</span></span>
+      <button class="btn small ${to.booked?"":"ghost"}" type="button" data-booked="${k}">${to.booked?"Booked ✓":"Mark booked"}</button></div>`; }).join("");
+  const nb=trip.days.slice(0,n-1).filter(d=>d.to&&d.to.stay&&d.to.booked).length;
+  return `<section class="sleeplist"><h3>Where you sleep <span class="note">${nb} of ${n-1} booked</span></h3>${rows}<button class="linkbtn small" type="button" data-copysleep>Copy the list</button></section>`;
+}
+function sleepText(){
+  return trip.days.slice(0,nDays()-1).map((d,k)=>{ const to=d.to; if(!to) return `${dayName(k)}: no night stop yet`;
+    if(!to.stay) return `${dayName(k)}: ${to.name} (town, place to stay not chosen)`;
+    return `${dayName(k)}: ${to.name}${to.town?", "+to.town.name:""} · ${[to.phone,to.web,to.email].filter(Boolean).join(" · ")||"no contact details"} · ${to.booked?"BOOKED":"not booked"}`; }).join("\n");
 }
 
 /* ---------- what's at a stop: fuel, food, shop, toilets, cash, repair ---------- */
@@ -599,7 +639,6 @@ function stopDetail(k,j,cat){
     h+=`<div class="sopts">${auto?`<span class="note">Fuel here, on our map.</span>`:`<label class="chk"><input type="checkbox" data-fuelpt="${k}:${j}" ${p.fuelHere||p.type==="fuel"?"checked":""}> Fuel here (not on our map)</label>`}
       ${isVia?`<label class="chk">Break <input type="number" min="0" max="600" step="5" value="${breakOf(p)}" data-breakmin="${k}:${j-1}" style="width:5em"> min</label>`:""}${acct.ready?`<button class="linkbtn small" type="button" data-repat="${p.lat},${p.lon},${esc(p.name)}">Report the road here</button><button class="linkbtn small" type="button" data-spotat="${p.lat},${p.lon},${esc(p.name)}">Mark a place here</button>`:""}<button class="linkbtn small" type="button" data-fixat="${p.lat},${p.lon},${esc(p.name)}">Something wrong on our map? Suggest a change</button></div>`;
   }
-  if(isTo&&!(last&&trip.round)) h+=stayRows(k).replace('<section class="dsec">','<section class="dsec in">');
   if(j>0){
     const sc=scope(k,j), way=fuelAll.filter(f=>f.km!=null&&f.km>=sc.a-0.5&&f.km<=sc.b+0.5&&hav(f,p)>1).sort((a,b)=>a.km-b.km);
     const sights=panelItems(k,j,"sight");
@@ -642,6 +681,7 @@ function dayBody(k){
   if(!pd) return h;
   if(!placesOk) h+=`<div class="verdict v-warn">Fuel stations didn't load, so long stretches without fuel can't be checked. Check your connection and reload.</div>`;
   const m=dayMed(k);
+  if(k<nDays()-1) h+=stayRows(k);
   if(m) h+=`<details class="medbox"><summary><span class="lbl">Medical</span> ${m.near.length} hospital${m.near.length===1?"":"s"} and clinics near the route · furthest point ${fmtFar(m.far)} km from a hospital</summary>
     ${m.near.map(x=>`<div class="item"><div class="meta"><b>${esc(x.name||(x.type==="hospital"?"Hospital":"Clinic"))}</b><span class="note">${x.type==="hospital"?"Hospital":"Clinic"} · km ${Math.round(x.km-pd.a)} · ${x.off<0.5?"on the route":x.off.toFixed(1)+" km off"}${x.phone?` · <a href="tel:${esc(x.phone.replace(/[^\d+]/g,""))}">${esc(x.phone)}</a>`:""}</span></div></div>`).join("")||`<div class="note">None listed within 25 km of the route.</div>`}
     <div class="note">Emergency from a mobile: 112. Check the local numbers before you go.</div></details>`;
@@ -667,6 +707,7 @@ function overviewHtml(){
   trip.days.forEach((d,k)=>{ h+=`<div class="ovday" data-gotoday="${k}">${sumBox(k,false)}</div>`; });
   h+=`</div>`;
   h+=tripTotals();
+  h+=sleepList();
   if(plan&&!planStale) h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px">${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">${esc(dayName(k))} GPX</button>`:"").join("")}<button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}</div></div>`;
   return h+clearLink()+footNote();
 }
@@ -710,7 +751,11 @@ $("details").addEventListener("click",e=>{
   const af=t.closest("[data-addfill]"); if(af){const f=fp.fills.find(x=>x.id===af.dataset.addfill); if(f){insertVia(+af.dataset.day,pt(f.name&&f.name!=="Fuel"?f.name:"Fuel stop",f.lat,f.lon,{fuelHere:true}));changed();} return;}
   const er=t.closest("[data-editroute]"); if(er){const k2=+er.dataset.editroute; editOpen.has(k2)?editOpen.delete(k2):editOpen.add(k2); renderDetails(); return;}
   const mo=t.closest("[data-more]"); if(mo){const key=mo.dataset.more; showAll.has(key)?showAll.delete(key):showAll.add(key); renderDetails(); return;}
-  const sn=t.closest("[data-staynight]"); if(sn){const [k2,id]=sn.dataset.staynight.split(":"); const to=dayTo(+k2), x=(stayFor(to)?.places||[]).find(q=>q.id===id); if(x){trip.days[+k2].to=pt(x.name,x.lat,x.lon,{stay:true});$("status").textContent=`Night stop: ${x.name}.`;changed();} return;}
+  const sn=t.closest("[data-staynight]"); if(sn){const [k2,id]=sn.dataset.staynight.split(":"); const to=dayTo(+k2), x=(stayFor(to)?.places||[]).find(q=>q.id===id); if(x){ if(map) map.closePopup(); chooseStay(+k2,x); } return;}
+  const bk=t.closest("[data-booked]"); if(bk){ const d2=trip.days[+bk.dataset.booked]; if(d2&&d2.to&&d2.to.stay){ d2.to.booked=!d2.to.booked; save(); renderAll(); $("status").textContent=d2.to.booked?`${d2.to.name} marked booked.`:`${d2.to.name}: not booked.`; } return; }
+  const stn=t.closest("[data-staytown]"); if(stn){ const d2=trip.days[+stn.dataset.staytown], tw=d2&&d2.to&&d2.to.town; if(tw){ d2.to=pt(tw.name,tw.lat,tw.lon); $("status").textContent=`Night stop back to ${tw.name}.`; changed(); } return; }
+  const ps=t.closest("[data-pickstay]"); if(ps){ const k2=+ps.dataset.pickstay; ui.tab=k2; saveUi(); renderAll(); setTimeout(()=>{ const el=$("stays-"+k2); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); },60); return; }
+  if(t.closest("[data-copysleep]")){ const txt=sleepText(); (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>{ $("status").textContent="List copied. Paste it into a note or message."; },()=>{ $("status").textContent="Couldn't copy here. Use Save as PDF instead."; }); return; }
   const ap=t.closest("[data-addpoi]"); if(ap){const [k2,id]=ap.dataset.addpoi.split(":"); const x=pois.find(q=>q.id===id); if(x){insertVia(+k2,pt(x.name,x.lat,x.lon,{}));$("status").textContent=`Added ${x.name}.`;changed();} return;}
   const go=t.closest("[data-gotoday]"); if(go&&!t.closest("button,input,a")){ui.tab=+go.dataset.gotoday;saveUi();renderAll();return;}
   const pn=t.closest("[data-panel]"); if(pn){hidePeek();const [dk,j,tab]=pn.dataset.panel.split(":");openPanel(+dk,j==="last"?"last":+j,tab);return;}
@@ -796,7 +841,7 @@ $("pBody").addEventListener("click",e=>{
   if(!panel) return; const {k,j}=panel, sc=scope(k,j), d=trip.days[k], at=Math.max(0,sc.jj-1);
   const f=e.target.closest("[data-pfuel]"),sy=e.target.closest("[data-pstay]"),ad=e.target.closest("[data-padd]");
   if(f){const x=fuelAll.find(q=>q.id===f.dataset.pfuel); if(!x) return; if(!addStop(k,at,pt(x.name&&x.name!=="Fuel"?x.name:"Fuel stop",x.lat,x.lon,{fuelHere:true}))) return; closePanel(true); $("status").textContent="Fuel stop added."; changed();}
-  if(sy){const x=(stayFor(sc.p)?.places||[]).find(q=>q.id===sy.dataset.pstay); if(!x) return; d.to=pt(x.name,x.lat,x.lon); closePanel(true); $("status").textContent=`${dayDate(k).toLocaleDateString(undefined,{weekday:"long"})} night: ${x.name}.`; changed();}
+  if(sy){const x=(stayFor(sc.p)?.places||[]).find(q=>q.id===sy.dataset.pstay); if(!x) return; closePanel(true); chooseStay(k,x);}
   if(ad){const x=pois.find(q=>q.id===ad.dataset.padd); if(!x) return; if(!addStop(k,at,pt(x.name,x.lat,x.lon,{}))) return; closePanel(true); $("status").textContent=`Added ${x.name}.`; changed();}
 });
 const canHover=window.matchMedia("(hover: hover) and (pointer: fine)").matches;
@@ -874,7 +919,8 @@ function drawMap(){
   }
   if(ui.lay.med&&meds) meds.filter(m=>m.off<=25&&inR(m)).forEach(m=>L.marker([m.lat,m.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:#B3261E">🏥</div>`,iconSize:[22,22],iconAnchor:[11,11]})}).bindTooltip(`${m.name||(m.type==="hospital"?"Hospital":"Clinic")}${m.phone?" · "+m.phone:""}`).addTo(layer));
   pois.filter(p=>ui.types[p.kind]&&inR(p)).sort((a,b)=>a.off-b.off).slice(0,+ui.max).forEach(p=>{const t=TYPES.find(x=>x.id===p.kind); L.marker([p.lat,p.lon],{icon:dotIcon(t.c,10)}).bindTooltip(`${p.name} · ${t.n}`).addTo(layer);});
-  if(ui.lay.stay) stays.forEach(s=>{ const k=trip.days.findIndex((d,i)=>d.to===s.night&&i<nDays()-1); if(k<0) return; s.places.filter(p=>stayMatch(p,stayTypeOf(k))).forEach(p=>L.marker([p.lat,p.lon],{icon:dotIcon("#2F5BA8",9)}).bindTooltip(p.name).addTo(layer)); });
+  if(ui.lay.stay) stays.forEach(s=>{ const k=trip.days.findIndex((d,i)=>d.to===s.night&&i<nDays()-1); if(k<0) return; s.places.filter(p=>stayMatch(p,stayTypeOf(k))).forEach(p=>{ const on=trip.days[k].to&&trip.days[k].to.stay&&trip.days[k].to.name===p.name&&hav(p,trip.days[k].to)<0.1;
+    L.marker([p.lat,p.lon],{icon:dotIcon(on?"#0B6E4F":"#2F5BA8",on?13:9)}).bindTooltip(p.name).bindPopup(`<b>${esc(p.name)}</b><br><span class="note">${esc((p.tags.tourism||"").replace(/_/g," "))}</span><br>${on?`<span class="okt">✓ Your stay, ${esc(dayName(k))}</span>`:`<button class="btn small" type="button" data-staynight="${k}:${esc(p.id)}">Stay here, ${esc(dayName(k))}</button>`}`).addTo(layer); }); });
   if(!focusR){ const g=sel?seg(sel.a,sel.b):plan.geom; if(g.length>1&&(window._refit||sel||lastSel!==ui.tab)){map.fitBounds(L.latLngBounds(g.map(x=>[x.lat,x.lon])),{padding:[24,24]});} if(!planStale) window._refit=false; lastSel=ui.tab; }
 }
 function drawPanelLayer(){
@@ -982,3 +1028,6 @@ $("keyDlg").innerHTML=$("keyDlg").innerHTML.replace("STYLE_FAST",STYLE_ICON.fast
 
 snapTrip(true);
 renderLayers(); showStyle(); syncDays(); renderAll(); recalc();
+// "Stay here" in a map popup (the map isn't inside the details panel)
+$("map").addEventListener("click",e=>{ const sn=e.target.closest&&e.target.closest("[data-staynight]"); if(!sn) return;
+  const [k2,id]=sn.dataset.staynight.split(":"), x=(stayFor(dayTo(+k2))?.places||[]).find(q=>q.id===id); if(x){ map.closePopup(); chooseStay(+k2,x); } });

@@ -34,7 +34,7 @@ const CSS = `:root{--bg:#EEF0EA;--panel:#fff;--ink:#18201C;--muted:#5C6660;--lin
 a{color:var(--accent)}.wrap{max-width:820px;margin:0 auto;padding:0 16px}
 header{border-bottom:2px solid var(--ink);padding:14px 0 10px;display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;justify-content:space-between}
 .logo{font:700 1.7rem/1 "Barlow Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.02em;color:var(--ink);text-decoration:none}
-.motto{font:500 .85rem "IBM Plex Mono",monospace;color:var(--muted)}nav a{margin-left:14px;font-weight:600;text-decoration:none}
+.motto{font:500 .85rem "IBM Plex Mono",monospace;color:var(--muted)}nav{display:flex;flex-wrap:wrap;gap:8px}nav a{font:700 1.05rem "Barlow Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;color:#fff;background:#0B6E4F;padding:5px 14px;border-radius:5px}
 h1,h2{font-family:"Barlow Condensed","Arial Narrow",sans-serif;line-height:1.1;text-transform:uppercase;letter-spacing:.01em}
 h1{font-size:2.4rem;margin:28px 0 6px}h2{font-size:1.5rem;margin:30px 0 8px}
 .meta{color:var(--muted);font-size:.95rem}.fdr{color:var(--accent);font-weight:600;margin:6px 0 0}
@@ -129,7 +129,7 @@ function aboutPage() {
 <p>I've been adventuring Namibia since 2003. The Fish River Canyon, Epupa Falls, the Skeleton Coast, and the Orange River road between Rosh Pinah and Noordoewer, which is still my favourite piece of riding anywhere. I've done Europe on a 790 Duke, the Nürburgring on a public Sunday, and a Wild Coast that tried to take me out with goats, taxis and potholes in equal measure. We ran adventure bootcamps because we'd learnt, the hard way, how quickly a small problem in the desert turns into a big one.</p>
 <p>In 2021 I sold the business. These days I live on a farm in the Swartland, build and race old Alfa Romeos at the Simola Hill Climb (class champion in 2023), and write about the wins and the scars on <a href="${BLOG}">onetrackmind.co.za</a>.</p>
 <h2>Riding and the mind</h2>
-<p>A few years ago life gave me a proper panel beating. I'm an overthinker, and I learnt I'd been looking after my bikes better than I looked after myself. Getting back on a motorcycle showed me how much riding does for my head: a long road, a full tank and the noise in your head goes quiet. I'm not shy about saying it, because plenty of riders feel the same and don't. Look after the machine. Look after the rider too.</p>
+<p>After too many years of unregulated stress management, something had to give. I'm an overthinker, and I learnt I'd been looking after my bikes better than I looked after myself. Getting back on a motorcycle showed me how much riding does for my head: a long road, a full tank and the noise in your head goes quiet. I'm not shy about saying it, because plenty of riders feel the same and don't. Look after the machine. Look after the rider too.</p>
 <h2>Why this planner</h2>
 <p>Every trip I've done started with a paper map, a mate who knew the way and a lot of guessing about fuel and where to sleep. OneTrackMind is the planner I wish I'd had: real roads graded for your vehicle, fuel gaps, night stops, sunset and the things that bite you in the middle of nowhere. Free for riders and drivers. Built by riders, who add their routes and mark the places worth stopping.</p>
 <blockquote><p>Four wheels move the body, two wheels move the soul, road trips clear the mind.</p></blockquote>
