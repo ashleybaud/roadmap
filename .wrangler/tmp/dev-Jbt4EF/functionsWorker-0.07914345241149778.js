@@ -208,7 +208,8 @@ var onRequestPost = handle(async ({ request, env }) => {
 });
 var onRequestGet = handle(async ({ request, env }) => {
   const ready = !!(env.DB && env.RESEND_API_KEY);
-  return json({ ready, user: ready ? await currentUser(env, request) : null });
+  const user = ready ? await currentUser(env, request) : null;
+  return json({ ready, user, admin: isAdmin(env, user) });
 });
 var onRequestPost2 = handle(async ({ request, env }) => {
   sameOrigin(request);
