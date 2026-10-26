@@ -88,6 +88,8 @@ function goodToKnow(k){
     if(w.rain>=25) add("bad","route","Heavy rain: "+Math.round(w.rain)+" mm. Gravel and river crossings may be impassable."); else if(w.rain>=8&&w.prob>=50) add("warn","route","Rain likely: "+Math.round(w.rain)+" mm. Gravel gets slippery.");
     if(w.tmin<=2) add("warn","route","Near freezing in the morning: "+Math.round(w.tmin)+"°C. Watch for ice early.");
   } else if(w&&w.none) add("info","route","Weather forecast available from "+fmtDate(new Date(w.opens+"T12:00:00"))+".");
+  var gk=pd.legs.reduce(function(t,l){return t+(l.gravelKm||0);},0), known=pd.legs.every(function(l){return l.gravelKm!=null;});
+  if(known&&pd.km>0) add("info","route","Surface: about "+Math.round(gk)+" km gravel or dirt ("+Math.round(100*gk/pd.km)+"%), "+Math.round(pd.km-gk)+" km tar.");
   var fdn=dayFords(k); if(fdn) add(w&&!w.none&&w.rain>=5?"warn":"info","route",fdn+" river crossing"+(fdn>1?"s":"")+" on the route"+(w&&!w.none&&w.rain>=5?", with rain forecast. Check levels before crossing.":"."));
   var m=dayMed(k); if(m&&m.far>120) add("warn","route","Remote: parts of the day are up to "+fmtFar(m.far)+" km from a hospital. Emergency from a mobile: 112.");
   // longest stretch with no town within 5 km of the route

@@ -62,7 +62,7 @@ async function recalc(){
     res.forEach((r,k)=>{
       if(!r){days.push(null);return;}
       const d=trip.days[k];
-      const legs=r.opts.map((o,j)=>{const ch=o[Math.min((d.legs[j]&&d.legs[j].alt)||0,o.length-1)];return {km:ch.km,min:ch.min,geom:ch.geom,n:o.length,alts:o.map(x=>x.km),gpx:!(d.legs[j]&&d.legs[j].track)&&!!gtr(k,j)};});
+      const legs=r.opts.map((o,j)=>{const ch=o[Math.min((d.legs[j]&&d.legs[j].alt)||0,o.length-1)];return {km:ch.km,min:ch.min,geom:ch.geom,gravelKm:ch.gravelKm,n:o.length,alts:o.map(x=>x.km),gpx:!(d.legs[j]&&d.legs[j].track)&&!!gtr(k,j)};});
       if(!ptKm.has(r.pts[0])) ptKm.set(r.pts[0],acc);
       legs.forEach((L,j)=>{L.a=acc; L.geom.forEach((g,i)=>{if(geom.length&&i>0)acc+=hav(geom[geom.length-1],g); geom.push(g);cum.push(acc);}); L.b=acc; ptKm.set(r.pts[j+1],acc);});
       days.push({pts:r.pts,legs,km:legs.reduce((t,x)=>t+x.km,0),min:legs.reduce((t,x)=>t+x.min,0),a:legs[0].a,b:legs[legs.length-1].b});
@@ -897,7 +897,7 @@ $("welcome").addEventListener("close",()=>{
 });
 $("howItWorks").addEventListener("click",openWelcome);
 try{ if(!localStorage.getItem("rr-welcome")) setTimeout(openWelcome,300); }catch(e){}
-const STYLE_TEXT={rough:"<b>Road less travelled</b>: gravel and back roads first",mixed:"<b>Mixed</b>: gravel where it saves time, tar where it doesn't",tar:"<b>Tar</b>: main roads and highways"};
+const STYLE_TEXT={rough:"<b>Road less travelled</b>: gravel and back roads wherever they go",mixed:"<b>Mixed</b>: plenty of gravel, tar to link it up",tar:"<b>Tar</b>: sealed roads, gravel avoided"};
 function showStyle(){ $("styleBanner").innerHTML=`${VEHICLES[settings.vehicle]||VEHICLES.bike} · ${STYLE_TEXT[settings.style]||STYLE_TEXT.rough}. Change any stretch with its way icons. <button type="button" class="linkbtn" id="bannerEdit">Change</button>`; }
 document.addEventListener("click",e=>{ if(e.target.id==="bannerEdit") openWelcome(); });
 function render(){ renderAll(); }

@@ -440,7 +440,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
     <p class="note" style="margin:0">Pick where you start, your dates and where you sleep each night. The app works out the route, fuel stops, sunset, weather and what to watch for, for every day.</p>
     <div class="row2">
       <div class="field"><label class="lbl" for="wVehicle">Travelling by</label><select id="wVehicle"><option value="bike">Motorbike</option><option value="jeep">Jeep / 4x4</option><option value="car">Car</option></select></div>
-      <div class="field"><label class="lbl" for="wStyle">Roads you like</label><select id="wStyle"><option value="rough">Road less travelled: gravel and back roads</option><option value="mixed">Mixed</option><option value="tar">Tar: main roads</option></select></div>
+      <div class="field"><label class="lbl" for="wStyle">Roads you like</label><select id="wStyle"><option value="rough">Road less travelled: gravel and back roads</option><option value="mixed">Mixed: plenty of gravel, tar to link it up</option><option value="tar">Tar: main roads</option></select></div>
     </div>
     <div class="row2">
       <div class="field"><label class="lbl" for="wHours">Longest day on the road (hours)</label><input id="wHours" type="number" min="2" max="16" step="0.5"></div>
@@ -471,7 +471,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
       <div class="field"><label class="lbl" for="breakMin">Each stop takes (minutes)</label><input id="breakMin" type="number" min="0" max="240" step="5" value="20"></div>
     </div>
     <div class="field"><label class="lbl" for="vehicle">Travelling by</label><select id="vehicle"><option value="bike">Motorbike</option><option value="jeep">Jeep / 4x4</option><option value="car">Car</option></select></div>
-    <div class="field"><label class="lbl" for="style">Route style</label><select id="style"><option value="rough">Road less travelled: back roads and gravel first</option><option value="mixed">Mixed: gravel when it saves time</option><option value="tar">Tar: main roads and highways</option></select><span class="note">Road less travelled is often the shortest and toughest way. Check your bike, tyres and skills match it. Any day can be switched to Liaison.</span></div>
+    <div class="field"><label class="lbl" for="style">Route style</label><select id="style"><option value="rough">Road less travelled: back roads and gravel first</option><option value="mixed">Mixed: plenty of gravel, tar to link it up</option><option value="tar">Tar: main roads and highways</option></select><span class="note">Road less travelled is often the shortest and toughest way. Check your bike, tyres and skills match it. Any day can be switched to Liaison.</span></div>
     <div class="field"><label class="lbl" for="corridor">Show places up to (km) off the route</label><input id="corridor" type="number" min="1" max="20" step="1" value="5"></div>
     <div class="field"><span class="lbl">Earlier versions of this trip</span><div id="histList" class="stable"></div><span class="note">The last 5 versions are kept on this device.</span></div>
     <div class="btns" style="justify-content:flex-end"><button class="btn" value="ok">Done</button></div>
@@ -552,6 +552,37 @@ const cache=new Map();
 function decode6(str){let i=0,lat=0,lon=0;const out=[];while(i<str.length){let b,sh=0,r=0;do{b=str.charCodeAt(i++)-63;r|=(b&31)<<sh;sh+=5;}while(b>=32);lat+=r&1?~(r>>1):r>>1;sh=0;r=0;do{b=str.charCodeAt(i++)-63;r|=(b&31)<<sh;sh+=5;}while(b>=32);lon+=r&1?~(r>>1):r>>1;out.push({lat:lat/1e6,lon:lon/1e6});}return out;}
 const STYLE={rough:{use_highways:0,use_primary:0.2,use_trails:1},mixed:{use_highways:0.5,use_primary:0.5,use_trails:0.5},tar:{use_highways:1,use_primary:1,use_trails:0}};
 const lineKm=g=>{let k=0;for(let i=1;i<g.length;i++)k+=hav(g[i-1],g[i]);return k;};
+/* BRouter: profiles that really prefer gravel (Road less travelled), mix it (Mixed) or avoid it (Tar),
+   per vehicle. Profiles live in /routing/*.brf and are uploaded once per visit. Free public server = testing only. */
+const BROUTER="https://brouter.de/brouter";
+const brIds={};
+async function brProfile(name,fresh){
+  if(!fresh&&brIds[name]) return brIds[name];
+  const txt=await (await fetch(`/routing/${name}.brf`)).text();
+  const j=await (await fetch(BROUTER+"/profile",{method:"POST",body:txt})).json(); if(!j.profileid||j.error) throw new Error(j.error||"profile");
+  return brIds[name]=j.profileid;
+}
+// time from the road types and surfaces BRouter reports, since its own times are for bicycles
+const SPD={bike:{motorway:110,trunk:100,primary:90,secondary:80,tertiary:70,unclassified:60,res:35,gravel:65,track:40,rough:25},
+  jeep:{motorway:110,trunk:100,primary:90,secondary:80,tertiary:70,unclassified:60,res:35,gravel:60,track:40,rough:20},
+  car:{motorway:120,trunk:110,primary:100,secondary:90,tertiary:80,unclassified:70,res:35,gravel:60,track:30,rough:10}};
+function brSpeed(w,veh){ const S=SPD[veh]||SPD.bike, h=(w.match(/highway=(\w+)/)||[])[1]||"", unp=/surface=(unpaved|gravel|fine_gravel|compacted|dirt|earth|ground|sand|pebblestone|grass|mud)/.test(w);
+  if(h==="track") return /tracktype=grade(4|5)/.test(w)?S.rough:S.track;
+  if(unp) return S.gravel;
+  const base=h.replace("_link",""); return S[base]||(/residential|living_street|service/.test(h)?S.res:50); }
+async function brouterLeg(a,b,veh,style,alts){
+  const name=`${veh}-${style}`; let pid=await brProfile(name);
+  const get=async(idx)=>{ const ctl=new AbortController(), tm=setTimeout(()=>ctl.abort(),12000);
+    let r=await fetch(`${BROUTER}?lonlats=${a.lon.toFixed(5)},${a.lat.toFixed(5)}|${b.lon.toFixed(5)},${b.lat.toFixed(5)}&profile=${pid}&alternativeidx=${idx}&format=geojson`,{signal:ctl.signal}); clearTimeout(tm);
+    let t=await r.text(); if(!t.startsWith("{")&&/profile/i.test(t)){ pid=await brProfile(name,true); return get(idx); }
+    if(!t.startsWith("{")) throw new Error(t.slice(0,80));
+    const f=JSON.parse(t).features[0], msgs=f.properties.messages||[], hd=msgs[0]||[], iD=hd.indexOf("Distance"), iW=hd.indexOf("WayTags");
+    let min=0, grav=0; msgs.slice(1).forEach(m=>{ const d=(+m[iD]||0)/1000, w=m[iW]||""; min+=d/brSpeed(w,veh)*60; if(/surface=(unpaved|gravel|fine_gravel|compacted|dirt|earth|ground|sand)|highway=track/.test(w)&&!/surface=(paved|asphalt|concrete)/.test(w)) grav+=d; });
+    return {km:(+f.properties["track-length"]||0)/1000,min,gravelKm:grav,geom:f.geometry.coordinates.map(([lo,la])=>({lat:la,lon:lo}))}; };
+  const out=[await get(0)];
+  if(alts) for(const i of [1,2]){ try{ const x=await get(i); if(Math.abs(x.km-out[0].km)>1) out.push(x); }catch(e){} }
+  return out;
+}
 /* one leg: own GPX track, or motorcycle routing with up to 3 ways; falls back to car routing */
 async function routeLeg(a,b,lg){
   if(lg&&lg.track){const geom=lg.track.map(([la,lo])=>({lat:la,lon:lo}));const km=lineKm(geom);return [{km,min:km/TRACK_KMH*60,geom}];}
@@ -561,7 +592,8 @@ async function routeLeg(a,b,lg){
   const key=(car?veh+"|":"")+style+(alts?"|alts":"")+"|"+[a,b].map(p=>p.lon.toFixed(5)+","+p.lat.toFixed(5)).join(";");
   if(cache.has(key)) return cache.get(key);
   let out;
-  try{
+  try{ out=await brouterLeg(a,b,veh,style,alts); }catch(e){ out=null; } // road-surface aware routing first
+  if(!out) try{
     const body={locations:[a,b].map(p=>({lat:p.lat,lon:p.lon,type:"break"})),costing:car?"auto":"motorcycle",costing_options:car?{auto:(veh==="jeep"?STYLE_CAR:STYLE_SEDAN)[style]||STYLE_CAR.rough}:{motorcycle:STYLE[style]||STYLE.rough},...(alts?{alternates:2}:{}),units:"kilometers",directions_type:"none"};
     const ctl=new AbortController(), tm=setTimeout(()=>ctl.abort(),alts?15000:10000);
     const r=await fetch(ROUTER,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body),signal:ctl.signal}); clearTimeout(tm);
@@ -802,7 +834,7 @@ async function recalc(){
     res.forEach((r,k)=>{
       if(!r){days.push(null);return;}
       const d=trip.days[k];
-      const legs=r.opts.map((o,j)=>{const ch=o[Math.min((d.legs[j]&&d.legs[j].alt)||0,o.length-1)];return {km:ch.km,min:ch.min,geom:ch.geom,n:o.length,alts:o.map(x=>x.km),gpx:!(d.legs[j]&&d.legs[j].track)&&!!gtr(k,j)};});
+      const legs=r.opts.map((o,j)=>{const ch=o[Math.min((d.legs[j]&&d.legs[j].alt)||0,o.length-1)];return {km:ch.km,min:ch.min,geom:ch.geom,gravelKm:ch.gravelKm,n:o.length,alts:o.map(x=>x.km),gpx:!(d.legs[j]&&d.legs[j].track)&&!!gtr(k,j)};});
       if(!ptKm.has(r.pts[0])) ptKm.set(r.pts[0],acc);
       legs.forEach((L,j)=>{L.a=acc; L.geom.forEach((g,i)=>{if(geom.length&&i>0)acc+=hav(geom[geom.length-1],g); geom.push(g);cum.push(acc);}); L.b=acc; ptKm.set(r.pts[j+1],acc);});
       days.push({pts:r.pts,legs,km:legs.reduce((t,x)=>t+x.km,0),min:legs.reduce((t,x)=>t+x.min,0),a:legs[0].a,b:legs[legs.length-1].b});
@@ -1637,7 +1669,7 @@ $("welcome").addEventListener("close",()=>{
 });
 $("howItWorks").addEventListener("click",openWelcome);
 try{ if(!localStorage.getItem("rr-welcome")) setTimeout(openWelcome,300); }catch(e){}
-const STYLE_TEXT={rough:"<b>Road less travelled</b>: gravel and back roads first",mixed:"<b>Mixed</b>: gravel where it saves time, tar where it doesn't",tar:"<b>Tar</b>: main roads and highways"};
+const STYLE_TEXT={rough:"<b>Road less travelled</b>: gravel and back roads wherever they go",mixed:"<b>Mixed</b>: plenty of gravel, tar to link it up",tar:"<b>Tar</b>: sealed roads, gravel avoided"};
 function showStyle(){ $("styleBanner").innerHTML=`${VEHICLES[settings.vehicle]||VEHICLES.bike} · ${STYLE_TEXT[settings.style]||STYLE_TEXT.rough}. Change any stretch with its way icons. <button type="button" class="linkbtn" id="bannerEdit">Change</button>`; }
 document.addEventListener("click",e=>{ if(e.target.id==="bannerEdit") openWelcome(); });
 function render(){ renderAll(); }
@@ -1764,6 +1796,8 @@ function goodToKnow(k){
     if(w.rain>=25) add("bad","route","Heavy rain: "+Math.round(w.rain)+" mm. Gravel and river crossings may be impassable."); else if(w.rain>=8&&w.prob>=50) add("warn","route","Rain likely: "+Math.round(w.rain)+" mm. Gravel gets slippery.");
     if(w.tmin<=2) add("warn","route","Near freezing in the morning: "+Math.round(w.tmin)+"°C. Watch for ice early.");
   } else if(w&&w.none) add("info","route","Weather forecast available from "+fmtDate(new Date(w.opens+"T12:00:00"))+".");
+  var gk=pd.legs.reduce(function(t,l){return t+(l.gravelKm||0);},0), known=pd.legs.every(function(l){return l.gravelKm!=null;});
+  if(known&&pd.km>0) add("info","route","Surface: about "+Math.round(gk)+" km gravel or dirt ("+Math.round(100*gk/pd.km)+"%), "+Math.round(pd.km-gk)+" km tar.");
   var fdn=dayFords(k); if(fdn) add(w&&!w.none&&w.rain>=5?"warn":"info","route",fdn+" river crossing"+(fdn>1?"s":"")+" on the route"+(w&&!w.none&&w.rain>=5?", with rain forecast. Check levels before crossing.":"."));
   var m=dayMed(k); if(m&&m.far>120) add("warn","route","Remote: parts of the day are up to "+fmtFar(m.far)+" km from a hospital. Emergency from a mobile: 112.");
   // longest stretch with no town within 5 km of the route
