@@ -1,0 +1,482 @@
+{
+ "v": 1,
+ "note": "OneTrackMind picks: real roads, first drafts to be ridden and checked",
+ "routes": [
+  {
+   "id": "swartberg-loop",
+   "title": "Swartberg Pass and Meiringspoort",
+   "region": "Western Cape · Karoo",
+   "style": "rough",
+   "vehicles": [
+    "bike",
+    "jeep",
+    "car"
+   ],
+   "blurb": "Over the Swartberg Pass on gravel to Prince Albert for the night, then back through Meiringspoort on tar. The pass is narrow with steep hairpins; take it slowly and give way to cars coming down.",
+   "trip": {
+    "start": {
+     "name": "Oudtshoorn",
+     "lat": -33.5903,
+     "lon": 22.20421
+    },
+    "end": null,
+    "round": true,
+    "days": [
+     {
+      "to": {
+       "name": "Prince Albert",
+       "lat": -33.22263,
+       "lon": 22.03033
+      },
+      "vias": [
+       {
+        "name": "Swartberg Pass",
+        "lat": -33.35225,
+        "lon": 22.04614,
+        "type": "pass"
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": null,
+      "vias": [
+       {
+        "name": "Klaarstroom",
+        "lat": -33.33107,
+        "lon": 22.53631,
+        "fast": true
+       },
+       {
+        "name": "De Rust",
+        "lat": -33.48959,
+        "lon": 22.53527,
+        "fast": true
+       }
+      ],
+      "style": "default",
+      "legs": [],
+      "toFast": true
+     }
+    ]
+   }
+  },
+  {
+   "id": "die-hel",
+   "title": "Die Hel (Gamkaskloof)",
+   "region": "Western Cape · Swartberg",
+   "style": "rough",
+   "vehicles": [
+    "bike",
+    "jeep"
+   ],
+   "blurb": "Out and back from Prince Albert over the top of the Swartberg Pass and down the long, steep zigzags of the Elands Pass into Gamkaskloof. A dead end, so you ride it twice. Allow a full day, carry water and don't try it after heavy rain.",
+   "trip": {
+    "start": {
+     "name": "Prince Albert",
+     "lat": -33.22263,
+     "lon": 22.03033
+    },
+    "end": null,
+    "round": true,
+    "days": [
+     {
+      "to": null,
+      "vias": [
+       {
+        "name": "Gamkaskloof (Die Hel)",
+        "lat": -33.3712,
+        "lon": 21.6268
+       }
+      ],
+      "style": "default",
+      "legs": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "tankwa-gannaga",
+   "title": "Tankwa Karoo and the Gannaga Pass",
+   "region": "Northern Cape · Tankwa",
+   "style": "rough",
+   "vehicles": [
+    "bike",
+    "jeep",
+    "car"
+   ],
+   "blurb": "Out of Ceres onto the long gravel of the Tankwa, up the Gannaga Pass to the Roggeveld and on to Sutherland for the night. Back down the Ouberg Pass the next day. Long stretches with no fuel: fill up in Ceres and Sutherland.",
+   "trip": {
+    "start": {
+     "name": "Ceres",
+     "lat": -33.36833,
+     "lon": 19.30917
+    },
+    "end": null,
+    "round": true,
+    "days": [
+     {
+      "to": {
+       "name": "Sutherland",
+       "lat": -32.39389,
+       "lon": 20.66111
+      },
+      "vias": [
+       {
+        "name": "Gannaga Pass",
+        "lat": -32.12722,
+        "lon": 20.09417,
+        "type": "pass"
+       },
+       {
+        "name": "Middelpos",
+        "lat": -31.9056,
+        "lon": 20.23119
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": null,
+      "vias": [
+       {
+        "name": "Ouberg Pass",
+        "lat": -32.40933,
+        "lon": 20.35685,
+        "type": "pass"
+       }
+      ],
+      "style": "default",
+      "legs": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "cederberg-traverse",
+   "title": "Cederberg traverse",
+   "region": "Western Cape · Cederberg",
+   "style": "rough",
+   "vehicles": [
+    "bike",
+    "jeep"
+   ],
+   "blurb": "Clanwilliam over the Pakhuis Pass and down into Wupperthal, then south through the Cederberg to Ceres over the Katbakkies Pass. Sandy and rocky in places; easier on an adventure bike or a 4x4 than a road car.",
+   "trip": {
+    "start": {
+     "name": "Clanwilliam",
+     "lat": -32.17855,
+     "lon": 18.89104
+    },
+    "end": {
+     "name": "Ceres",
+     "lat": -33.36833,
+     "lon": 19.30917
+    },
+    "round": false,
+    "days": [
+     {
+      "to": {
+       "name": "Wupperthal",
+       "lat": -32.27671,
+       "lon": 19.21511
+      },
+      "vias": [
+       {
+        "name": "Pakhuis Pass",
+        "lat": -32.14912,
+        "lon": 19.02814,
+        "type": "pass"
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": null,
+      "vias": [
+       {
+        "name": "Katbakkies Pass",
+        "lat": -32.89263,
+        "lon": 19.54812,
+        "type": "pass"
+       }
+      ],
+      "style": "default",
+      "legs": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "baviaanskloof",
+   "title": "Baviaanskloof",
+   "region": "Eastern Cape",
+   "style": "rough",
+   "vehicles": [
+    "bike",
+    "jeep"
+   ],
+   "blurb": "Willowmore to Patensie through the Baviaanskloof: mountain passes, river crossings and very few people. It's a long, slow day; most people stay a night in the kloof. Check conditions after rain, when the crossings can be deep.",
+   "trip": {
+    "start": {
+     "name": "Willowmore",
+     "lat": -33.29533,
+     "lon": 23.4883
+    },
+    "end": {
+     "name": "Patensie",
+     "lat": -33.75823,
+     "lon": 24.81309
+    },
+    "round": false,
+    "days": [
+     {
+      "to": null,
+      "vias": [],
+      "style": "default",
+      "legs": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "sani-pass",
+   "title": "Sani Pass",
+   "region": "KwaZulu-Natal · Lesotho border",
+   "style": "rough",
+   "vehicles": [
+    "bike",
+    "jeep"
+   ],
+   "blurb": "From Underberg up the Sani Pass to the Lesotho border post at the top, and back down. Bring your passport. The top switchbacks are steep and loose; conditions change fast in winter.",
+   "trip": {
+    "start": {
+     "name": "Underberg",
+     "lat": -29.79196,
+     "lon": 29.49415
+    },
+    "end": null,
+    "round": true,
+    "days": [
+     {
+      "to": null,
+      "vias": [
+       {
+        "name": "Sani Pass",
+        "lat": -29.5852,
+        "lon": 29.28702,
+        "type": "pass"
+       }
+      ],
+      "style": "default",
+      "legs": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "namaqua-coast",
+   "title": "Namaqualand coast",
+   "region": "Northern Cape · Namaqualand",
+   "style": "rough",
+   "vehicles": [
+    "bike",
+    "jeep",
+    "car"
+   ],
+   "blurb": "Springbok down the Wildeperdehoek Pass to the coast at Hondeklipbaai for the night, then back inland via Garies and Kamieskroon. Best in flower season (August to September). Sand on the coastal tracks.",
+   "trip": {
+    "start": {
+     "name": "Springbok",
+     "lat": -29.66609,
+     "lon": 17.8831
+    },
+    "end": null,
+    "round": true,
+    "days": [
+     {
+      "to": {
+       "name": "Hondeklipbaai",
+       "lat": -30.31639,
+       "lon": 17.27722
+      },
+      "vias": [
+       {
+        "name": "Wildeperdehoek Pass",
+        "lat": -29.94431,
+        "lon": 17.63301,
+        "type": "pass"
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": null,
+      "vias": [
+       {
+        "name": "Garies",
+        "lat": -30.56087,
+        "lon": 17.98967
+       },
+       {
+        "name": "Kamieskroon",
+        "lat": -30.20964,
+        "lon": 17.93454
+       }
+      ],
+      "style": "default",
+      "legs": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "seweweekspoort-ouberg",
+   "title": "Seweweekspoort and the Ouberg Pass",
+   "region": "Western Cape · Klein Karoo",
+   "style": "rough",
+   "vehicles": [
+    "bike",
+    "jeep",
+    "car"
+   ],
+   "blurb": "From Ladismith through the high walls of Seweweekspoort to Laingsburg for the night, then south over the Ouberg Pass to Montagu. Good gravel most of the way.",
+   "trip": {
+    "start": {
+     "name": "Ladismith",
+     "lat": -33.49222,
+     "lon": 21.26667
+    },
+    "end": {
+     "name": "Montagu",
+     "lat": -33.78699,
+     "lon": 20.11783
+    },
+    "round": false,
+    "days": [
+     {
+      "to": {
+       "name": "Laingsburg",
+       "lat": -33.195,
+       "lon": 20.85917
+      },
+      "vias": [
+       {
+        "name": "Seweweekspoort",
+        "lat": -33.405,
+        "lon": 21.405,
+        "type": "pass"
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": null,
+      "vias": [
+       {
+        "name": "Ouberg Pass",
+        "lat": -33.68137,
+        "lon": 20.25225,
+        "type": "pass"
+       }
+      ],
+      "style": "default",
+      "legs": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "namib-sesriem",
+   "title": "Windhoek to Sesriem",
+   "region": "Namibia",
+   "style": "rough",
+   "vehicles": [
+    "bike",
+    "jeep",
+    "car"
+   ],
+   "blurb": "Down off the Khomas Highland to Solitaire for the night, then on to Sesriem and the dunes. Gravel all the way after Windhoek. Tyre pressures down, speeds down: corrugations and loose shoulders cause most accidents here.",
+   "trip": {
+    "start": {
+     "name": "Windhoek",
+     "lat": -22.57761,
+     "lon": 17.07727
+    },
+    "end": {
+     "name": "Sesriem",
+     "lat": -24.4862,
+     "lon": 15.8006
+    },
+    "round": false,
+    "days": [
+     {
+      "to": {
+       "name": "Solitaire",
+       "lat": -23.89365,
+       "lon": 16.00632
+      },
+      "vias": [],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": null,
+      "vias": [],
+      "style": "default",
+      "legs": []
+     }
+    ]
+   }
+  },
+  {
+   "id": "west-coast-gravel",
+   "title": "West Coast gravel",
+   "region": "Western Cape · West Coast",
+   "style": "rough",
+   "vehicles": [
+    "bike",
+    "jeep",
+    "car"
+   ],
+   "blurb": "Elandsbaai up the coast to Lambert's Bay and Doringbaai, then inland to Vanrhynsdorp. Sandy in patches and windy most afternoons.",
+   "trip": {
+    "start": {
+     "name": "Elandsbaai",
+     "lat": -32.31083,
+     "lon": 18.345
+    },
+    "end": {
+     "name": "Vanrhynsdorp",
+     "lat": -31.60889,
+     "lon": 18.74167
+    },
+    "round": false,
+    "days": [
+     {
+      "to": null,
+      "vias": [
+       {
+        "name": "Lambert's Bay",
+        "lat": -32.09341,
+        "lon": 18.30727
+       },
+       {
+        "name": "Doringbaai",
+        "lat": -31.81737,
+        "lon": 18.23604
+       }
+      ],
+      "style": "default",
+      "legs": []
+     }
+    ]
+   }
+  }
+ ]
+}

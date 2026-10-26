@@ -60,17 +60,22 @@ async function saveRoute(update){
     trip.savedTitle=body.title; save(); acct.routes=null; acctMode="routes"; renderAcct({text:update?"Route updated.":"Route saved."}); loadRoutes(); renderDetails();
   }catch(e){ if(/Sign in/.test(e.message)){ acct.user=null; acct.why="Sign in to save this route."; openAcct("signin"); return; } renderAcct({err:1,text:e.message}); }
 }
+// put a trip into the planner (with Undo): from your saved routes or a pick
+function applyTrip(nt,st,label){
+  snapTrip(true); const prev=JSON.parse(JSON.stringify(trip)), prevS=Object.assign({},settings);
+  Object.keys(trip).forEach(x=>delete trip[x]); Object.assign(trip,nt);
+  if(!trip.startDate||trip.startDate<tomorrow){ trip.startDate=tomorrow; } trip.endDate=addDays(trip.startDate,trip.days.length-1);
+  if(st) ["vehicle","style","range","maxHours","leave","pace","breakMin"].forEach(k=>{ if(st[k]!=null&&st[k]!=="") settings[k]=st[k]; });
+  store.set("rr2-settings",settings); SET_FIELDS.forEach(k=>$(k).value=settings[k]); showStyle();
+  ui.tab="ov"; plan=null; fp=null; if(typeof gpxCache!=="undefined") gpxCache=null; changed();
+  const tt=$("toast"); tt.innerHTML=`Opened ${esc(label)}. <button type="button" class="linkbtn">Undo</button>`; tt.hidden=false;
+  tt.querySelector("button").onclick=()=>{ Object.keys(trip).forEach(x=>delete trip[x]); Object.assign(trip,prev); Object.assign(settings,prevS); store.set("rr2-settings",settings); SET_FIELDS.forEach(k=>$(k).value=settings[k]); showStyle(); tt.hidden=true; plan=null; changed(); };
+  clearTimeout(toastT); toastT=setTimeout(()=>tt.hidden=true,10000);
+}
 async function openRoute(id){
   try{
     const r=(await api("/api/routes/"+id)).route; if(!r||!r.trip) throw new Error("That route couldn't be opened.");
-    snapTrip(true); const prev=JSON.parse(JSON.stringify(trip)), prevS=Object.assign({},settings);
-    Object.keys(trip).forEach(x=>delete trip[x]); Object.assign(trip,r.trip,r.mine?{savedId:r.id,savedTitle:r.title}:{});
-    if(r.settings) ["vehicle","style","range","maxHours","leave","pace","breakMin"].forEach(k=>{ if(r.settings[k]!=null&&r.settings[k]!=="") settings[k]=r.settings[k]; });
-    store.set("rr2-settings",settings); SET_FIELDS.forEach(k=>$(k).value=settings[k]); showStyle();
-    $("acctDlg").close(); ui.tab="ov"; plan=null; fp=null; if(typeof gpxCache!=="undefined") gpxCache=null; changed();
-    const tt=$("toast"); tt.innerHTML=`Opened ${esc(r.title)}. <button type="button" class="linkbtn">Undo</button>`; tt.hidden=false;
-    tt.querySelector("button").onclick=()=>{ Object.keys(trip).forEach(x=>delete trip[x]); Object.assign(trip,prev); Object.assign(settings,prevS); store.set("rr2-settings",settings); SET_FIELDS.forEach(k=>$(k).value=settings[k]); showStyle(); tt.hidden=true; plan=null; changed(); };
-    clearTimeout(toastT); toastT=setTimeout(()=>tt.hidden=true,10000);
+    $("acctDlg").close(); applyTrip(Object.assign({},r.trip,r.mine?{savedId:r.id,savedTitle:r.title}:{}),r.settings,r.title);
   }catch(e){ renderAcct({err:1,text:e.message}); }
 }
 $("acctBtn").addEventListener("click",()=>{ acct.why=""; openAcct(); });

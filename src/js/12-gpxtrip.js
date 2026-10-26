@@ -82,5 +82,5 @@ async function planFromGpx(file){
 }
 function gpxBar(){
   if(trip.gpx) return '<div class="gpxbar note">Following <b>'+esc(trip.gpx.title||trip.gpx.name)+'</b> exactly. <button class="linkbtn" type="button" data-ungpx>Stop following it</button></div>';
-  return '<div class="gpxbar note">Got a route already? <label class="linkbtn gpxbtn" title="Load any route from a friend or your GPS. It\'s split into days with night stops and fuel.">Plan from a GPX file<input type="file" accept=".gpx,application/gpx+xml" data-tripgpx hidden></label></div>';
+  return '<div class="gpxbar note"><button type="button" class="linkbtn" data-picks>Start from a OneTrackMind pick</button> · Got a route already? <label class="linkbtn gpxbtn" title="Load any route from a friend or your GPS. It\'s split into days with night stops and fuel.">Plan from a GPX file<input type="file" accept=".gpx,application/gpx+xml" data-tripgpx hidden></label></div>';
 }

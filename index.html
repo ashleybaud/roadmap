@@ -403,6 +403,8 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .rrow .rt{font-weight:600}
 .rrow .ract{display:flex;gap:6px;flex:none}
 .acctline{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding-top:10px}
+.pkb{font-size:.86rem;margin-top:4px}
+.rrow.pk{align-items:flex-start}
 .okmsg{color:var(--ok);font-weight:600}.errmsg{color:var(--bad);font-weight:600}
 .guide{border:2px solid var(--ink);border-radius:8px;background:var(--panel);padding:0 14px}
 .guide>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:10px 0}
@@ -440,7 +442,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
     <div class="ggrid">
       <section><h3>1. Plan a trip</h3><p>Set where you start and your dates. Each day gets its own tab. Pick where you sleep each night, and add stops in between for a pass, a farm stall or a mate you want to see. The route is worked out for you.</p></section>
       <section><h3>2. Pick your roads</h3><p><b>Road less travelled</b> takes gravel and back roads wherever they go. <b>Mixed</b> rides plenty of gravel and uses tar to link it up. <b>Tar</b> keeps you on sealed roads. Set it once, then change any stretch with its way icon: brown for your style, blue for the quick way.</p></section>
-      <section><h3>Route grades</h3><p><b>G1</b> tar · <b>G2</b> good gravel, any car · <b>G3</b> rough gravel, corrugations and loose stones · <b>G4</b> 4x4 or adventure bike: rocks, sand, steep · <b>G5</b> expert: technical, river crossings. Each day shows a bar of how much is at each grade and a badge for the hardest bit. Tap 🛣 on the map to colour the route by grade.</p></section>
+      <section><h3>Route grades</h3><p><b>G1</b> tar · <b>G2</b> good gravel, any car · <b>G3</b> rough gravel, corrugations and loose stones · <b>G4</b> 4x4 or adventure bike: rocks, sand, steep, river crossings · <b>G5</b> expert: technical, steep and loose. Each day shows a bar of how much is at each grade and a badge for the hardest bit. Tap 🛣 on the map to colour the route by grade.</p></section>
       <section><h3>3. Fuel</h3><p>Tell it how far you go between fills ("Stop at least every"). Towns with fuel are suggested at about that spacing. "Fuel not confirmed" means there's none on our map. Know better? Open the stop and tick "Fuel here".</p></section>
       <section><h3>4. Night stops</h3><p>🛏 marks where you sleep, on the map and in the list. Open a night stop for places to stay, with numbers and websites. Move a night stop and the days around it are worked out again.</p></section>
       <section><h3>5. Before you go</h3><p>Every day shows distance, riding time, sunset and weather. Orange means have a look: a long day, arriving near dark, rain or heat. "Good to know" lists what to sort out first, like public holidays, border posts, and long stretches without fuel or a hospital.</p></section>
@@ -540,6 +542,12 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
     <label class="chk"><input type="checkbox" id="fTrip" checked> Include this trip so we can see what you saw</label>
     <div class="btns" style="justify-content:flex-end"><span class="note" id="fMsg"></span><button class="btn" type="submit" id="fSend">Send</button></div>
   </form>
+</dialog>
+<dialog id="picksDlg" class="welcome" aria-labelledby="pkTitle">
+  <div class="dlgwrap">
+    <div class="dlghead"><div><h2 id="pkTitle">OneTrackMind picks</h2><div class="note">Real roads we rate. Open one, then change anything: dates, night stops, the way.</div></div><button class="icon" type="button" data-pkclose aria-label="Close">✕</button></div>
+    <div class="rlist" id="pkList"></div>
+  </div>
 </dialog>
 <dialog id="settings">
   <form method="dialog" style="display:flex;flex-direction:column;gap:12px">
@@ -2034,7 +2042,7 @@ async function planFromGpx(file){
 }
 function gpxBar(){
   if(trip.gpx) return '<div class="gpxbar note">Following <b>'+esc(trip.gpx.title||trip.gpx.name)+'</b> exactly. <button class="linkbtn" type="button" data-ungpx>Stop following it</button></div>';
-  return '<div class="gpxbar note">Got a route already? <label class="linkbtn gpxbtn" title="Load any route from a friend or your GPS. It\'s split into days with night stops and fuel.">Plan from a GPX file<input type="file" accept=".gpx,application/gpx+xml" data-tripgpx hidden></label></div>';
+  return '<div class="gpxbar note"><button type="button" class="linkbtn" data-picks>Start from a OneTrackMind pick</button> · Got a route already? <label class="linkbtn gpxbtn" title="Load any route from a friend or your GPS. It\'s split into days with night stops and fuel.">Plan from a GPX file<input type="file" accept=".gpx,application/gpx+xml" data-tripgpx hidden></label></div>';
 }
 
 /* ---------- accounts: sign in with an email link, save routes, feedback ----------
@@ -2099,17 +2107,22 @@ async function saveRoute(update){
     trip.savedTitle=body.title; save(); acct.routes=null; acctMode="routes"; renderAcct({text:update?"Route updated.":"Route saved."}); loadRoutes(); renderDetails();
   }catch(e){ if(/Sign in/.test(e.message)){ acct.user=null; acct.why="Sign in to save this route."; openAcct("signin"); return; } renderAcct({err:1,text:e.message}); }
 }
+// put a trip into the planner (with Undo): from your saved routes or a pick
+function applyTrip(nt,st,label){
+  snapTrip(true); const prev=JSON.parse(JSON.stringify(trip)), prevS=Object.assign({},settings);
+  Object.keys(trip).forEach(x=>delete trip[x]); Object.assign(trip,nt);
+  if(!trip.startDate||trip.startDate<tomorrow){ trip.startDate=tomorrow; } trip.endDate=addDays(trip.startDate,trip.days.length-1);
+  if(st) ["vehicle","style","range","maxHours","leave","pace","breakMin"].forEach(k=>{ if(st[k]!=null&&st[k]!=="") settings[k]=st[k]; });
+  store.set("rr2-settings",settings); SET_FIELDS.forEach(k=>$(k).value=settings[k]); showStyle();
+  ui.tab="ov"; plan=null; fp=null; if(typeof gpxCache!=="undefined") gpxCache=null; changed();
+  const tt=$("toast"); tt.innerHTML=`Opened ${esc(label)}. <button type="button" class="linkbtn">Undo</button>`; tt.hidden=false;
+  tt.querySelector("button").onclick=()=>{ Object.keys(trip).forEach(x=>delete trip[x]); Object.assign(trip,prev); Object.assign(settings,prevS); store.set("rr2-settings",settings); SET_FIELDS.forEach(k=>$(k).value=settings[k]); showStyle(); tt.hidden=true; plan=null; changed(); };
+  clearTimeout(toastT); toastT=setTimeout(()=>tt.hidden=true,10000);
+}
 async function openRoute(id){
   try{
     const r=(await api("/api/routes/"+id)).route; if(!r||!r.trip) throw new Error("That route couldn't be opened.");
-    snapTrip(true); const prev=JSON.parse(JSON.stringify(trip)), prevS=Object.assign({},settings);
-    Object.keys(trip).forEach(x=>delete trip[x]); Object.assign(trip,r.trip,r.mine?{savedId:r.id,savedTitle:r.title}:{});
-    if(r.settings) ["vehicle","style","range","maxHours","leave","pace","breakMin"].forEach(k=>{ if(r.settings[k]!=null&&r.settings[k]!=="") settings[k]=r.settings[k]; });
-    store.set("rr2-settings",settings); SET_FIELDS.forEach(k=>$(k).value=settings[k]); showStyle();
-    $("acctDlg").close(); ui.tab="ov"; plan=null; fp=null; if(typeof gpxCache!=="undefined") gpxCache=null; changed();
-    const tt=$("toast"); tt.innerHTML=`Opened ${esc(r.title)}. <button type="button" class="linkbtn">Undo</button>`; tt.hidden=false;
-    tt.querySelector("button").onclick=()=>{ Object.keys(trip).forEach(x=>delete trip[x]); Object.assign(trip,prev); Object.assign(settings,prevS); store.set("rr2-settings",settings); SET_FIELDS.forEach(k=>$(k).value=settings[k]); showStyle(); tt.hidden=true; plan=null; changed(); };
-    clearTimeout(toastT); toastT=setTimeout(()=>tt.hidden=true,10000);
+    $("acctDlg").close(); applyTrip(Object.assign({},r.trip,r.mine?{savedId:r.id,savedTitle:r.title}:{}),r.settings,r.title);
   }catch(e){ renderAcct({err:1,text:e.message}); }
 }
 $("acctBtn").addEventListener("click",()=>{ acct.why=""; openAcct(); });
@@ -2169,14 +2182,14 @@ const GRADES=[
   {g:1,short:"G1",name:"Tar",text:"Sealed road.",col:"#7A847D"},
   {g:2,short:"G2",name:"Good gravel",text:"Graded gravel. Fine in any car, easy on any bike.",col:"#D9A441"},
   {g:3,short:"G3",name:"Rough gravel",text:"Corrugations, loose stones, ruts. Take it slower; road tyres struggle.",col:"#D9702B"},
-  {g:4,short:"G4",name:"4x4 / adventure",text:"Rocks, sand, steep climbs. High clearance or an adventure bike and some skill.",col:"#B3261E"},
-  {g:5,short:"G5",name:"Expert",text:"Technical: big rocks, deep sand, river crossings. Experienced riders and proper 4x4s only.",col:"#2A0F0D"},
+  {g:4,short:"G4",name:"4x4 / adventure",text:"Rocks, sand, steep climbs, river crossings. High clearance or an adventure bike and some skill.",col:"#B3261E"},
+  {g:5,short:"G5",name:"Expert",text:"Technical: big rocks, deep sand, steep and loose. Experienced riders and proper 4x4s only.",col:"#2A0F0D"},
 ];
 function wayGrade(w){
   const tag=k=>{ const m=w.match(new RegExp("(?:^|\\s)"+k+"=([^\\s]+)")); return m?m[1]:""; };
   const h=tag("highway"), s=tag("surface"), tt=(tag("tracktype").match(/\d/)||[])[0], sm=tag("smoothness");
-  if(tag("sac_scale")||h==="path"||h==="bridleway"||tag("ford")==="yes"||tt==="5"||/very_horrible|impassable/.test(sm)) return 5;
-  if(tt==="4"||tag("4wd_only")==="yes"||/^(very_bad|horrible)$/.test(sm)||/^(sand|mud|rock)$/.test(s)) return 4;
+  if(tag("sac_scale")||h==="path"||h==="bridleway"||tt==="5"||/very_horrible|impassable/.test(sm)) return 5;
+  if(tt==="4"||tag("4wd_only")==="yes"||tag("ford")==="yes"||/^(very_bad|horrible)$/.test(sm)||/^(sand|mud|rock)$/.test(s)) return 4;
   if(/^(paved|asphalt|concrete|paving_stones|sett|chipseal|metal)/.test(s)) return /^(bad)$/.test(sm)?2:1;
   if(tt==="3"||/^(dirt|earth|ground|grass|pebblestone|unpaved)$/.test(s)&&h==="track"||/^(dirt|earth|ground|grass)$/.test(s)||sm==="bad") return 3;
   if(/^(gravel|fine_gravel|compacted|unpaved|pebblestone)$/.test(s)||tt==="1"||tt==="2") return 2;
@@ -2207,5 +2220,25 @@ function drawGradeLayer(sel){
 }
 function gradeKeyHtml(){ return GRADES.slice(1).concat(GRADES[0]).map(x=>`<div><span class="gbadge g${x.g}">${x.short==="?"?"?":x.short}</span> <b>${x.name}.</b> ${x.text}</div>`).join(""); }
 $("gradeKey").innerHTML=gradeKeyHtml();
+
+/* ---------- OneTrackMind picks: real routes we rate, as ready-made trips ---------- */
+let picks=null;
+async function openPicks(){
+  $("picksDlg").showModal();
+  if(!picks){ $("pkList").innerHTML=`<div class="note">Loading…</div>`; try{ picks=(await (await fetch("/data/picks/picks.json")).json()).routes; }catch(e){ $("pkList").innerHTML=`<div class="errmsg">Couldn't load the picks. Check your connection.</div>`; return; } }
+  const mine=settings.vehicle||"bike";
+  const list=picks.slice().sort((a,b)=>(b.vehicles.includes(mine)-a.vehicles.includes(mine)));
+  $("pkList").innerHTML=list.map(r=>{ const n=r.trip.days.length, fits=r.vehicles.includes(mine);
+    return `<div class="rrow pk"><div><div class="rt">${esc(r.title)}</div><div class="note">${esc(r.region)} · ${n} day${n>1?"s":""} · ${r.vehicles.map(v=>esc((VEHICLES[v]||"").replace(/^\S+\s/,""))).join(", ")}</div><div class="pkb">${esc(r.blurb)}</div>${fits?"":`<div class="warnt">Not suggested for a ${esc((VEHICLES[mine]||"").replace(/^\S+\s/,"").toLowerCase())}.</div>`}</div>
+      <div class="ract"><button class="btn small" type="button" data-pkopen="${esc(r.id)}">Open</button></div></div>`; }).join("");
+}
+$("picksDlg").addEventListener("click",e=>{
+  if(e.target===$("picksDlg")||e.target.closest("[data-pkclose]")){ $("picksDlg").close(); return; }
+  const o=e.target.closest("[data-pkopen]"); if(!o) return; const r=picks.find(x=>x.id===o.dataset.pkopen); if(!r) return;
+  $("picksDlg").close();
+  const t=JSON.parse(JSON.stringify(r.trip)); t.sugV=4; t.days.forEach(d=>{ d.fresh=true; d.legs=d.legs||[]; d.vias=d.vias||[]; d.style=d.style||"default"; });
+  t.pick=r.id; applyTrip(t,{style:r.style},r.title);
+});
+document.addEventListener("click",e=>{ if(e.target.closest&&e.target.closest("[data-picks]")) openPicks(); });
 
 </script></body></html>

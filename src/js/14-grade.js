@@ -7,14 +7,14 @@ const GRADES=[
   {g:1,short:"G1",name:"Tar",text:"Sealed road.",col:"#7A847D"},
   {g:2,short:"G2",name:"Good gravel",text:"Graded gravel. Fine in any car, easy on any bike.",col:"#D9A441"},
   {g:3,short:"G3",name:"Rough gravel",text:"Corrugations, loose stones, ruts. Take it slower; road tyres struggle.",col:"#D9702B"},
-  {g:4,short:"G4",name:"4x4 / adventure",text:"Rocks, sand, steep climbs. High clearance or an adventure bike and some skill.",col:"#B3261E"},
-  {g:5,short:"G5",name:"Expert",text:"Technical: big rocks, deep sand, river crossings. Experienced riders and proper 4x4s only.",col:"#2A0F0D"},
+  {g:4,short:"G4",name:"4x4 / adventure",text:"Rocks, sand, steep climbs, river crossings. High clearance or an adventure bike and some skill.",col:"#B3261E"},
+  {g:5,short:"G5",name:"Expert",text:"Technical: big rocks, deep sand, steep and loose. Experienced riders and proper 4x4s only.",col:"#2A0F0D"},
 ];
 function wayGrade(w){
   const tag=k=>{ const m=w.match(new RegExp("(?:^|\\s)"+k+"=([^\\s]+)")); return m?m[1]:""; };
   const h=tag("highway"), s=tag("surface"), tt=(tag("tracktype").match(/\d/)||[])[0], sm=tag("smoothness");
-  if(tag("sac_scale")||h==="path"||h==="bridleway"||tag("ford")==="yes"||tt==="5"||/very_horrible|impassable/.test(sm)) return 5;
-  if(tt==="4"||tag("4wd_only")==="yes"||/^(very_bad|horrible)$/.test(sm)||/^(sand|mud|rock)$/.test(s)) return 4;
+  if(tag("sac_scale")||h==="path"||h==="bridleway"||tt==="5"||/very_horrible|impassable/.test(sm)) return 5;
+  if(tt==="4"||tag("4wd_only")==="yes"||tag("ford")==="yes"||/^(very_bad|horrible)$/.test(sm)||/^(sand|mud|rock)$/.test(s)) return 4;
   if(/^(paved|asphalt|concrete|paving_stones|sett|chipseal|metal)/.test(s)) return /^(bad)$/.test(sm)?2:1;
   if(tt==="3"||/^(dirt|earth|ground|grass|pebblestone|unpaved)$/.test(s)&&h==="track"||/^(dirt|earth|ground|grass)$/.test(s)||sm==="bad") return 3;
   if(/^(gravel|fine_gravel|compacted|unpaved|pebblestone)$/.test(s)||tt==="1"||tt==="2") return 2;

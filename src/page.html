@@ -403,6 +403,8 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .rrow .rt{font-weight:600}
 .rrow .ract{display:flex;gap:6px;flex:none}
 .acctline{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding-top:10px}
+.pkb{font-size:.86rem;margin-top:4px}
+.rrow.pk{align-items:flex-start}
 .okmsg{color:var(--ok);font-weight:600}.errmsg{color:var(--bad);font-weight:600}
 .guide{border:2px solid var(--ink);border-radius:8px;background:var(--panel);padding:0 14px}
 .guide>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:8px;padding:10px 0}
@@ -440,7 +442,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
     <div class="ggrid">
       <section><h3>1. Plan a trip</h3><p>Set where you start and your dates. Each day gets its own tab. Pick where you sleep each night, and add stops in between for a pass, a farm stall or a mate you want to see. The route is worked out for you.</p></section>
       <section><h3>2. Pick your roads</h3><p><b>Road less travelled</b> takes gravel and back roads wherever they go. <b>Mixed</b> rides plenty of gravel and uses tar to link it up. <b>Tar</b> keeps you on sealed roads. Set it once, then change any stretch with its way icon: brown for your style, blue for the quick way.</p></section>
-      <section><h3>Route grades</h3><p><b>G1</b> tar · <b>G2</b> good gravel, any car · <b>G3</b> rough gravel, corrugations and loose stones · <b>G4</b> 4x4 or adventure bike: rocks, sand, steep · <b>G5</b> expert: technical, river crossings. Each day shows a bar of how much is at each grade and a badge for the hardest bit. Tap 🛣 on the map to colour the route by grade.</p></section>
+      <section><h3>Route grades</h3><p><b>G1</b> tar · <b>G2</b> good gravel, any car · <b>G3</b> rough gravel, corrugations and loose stones · <b>G4</b> 4x4 or adventure bike: rocks, sand, steep, river crossings · <b>G5</b> expert: technical, steep and loose. Each day shows a bar of how much is at each grade and a badge for the hardest bit. Tap 🛣 on the map to colour the route by grade.</p></section>
       <section><h3>3. Fuel</h3><p>Tell it how far you go between fills ("Stop at least every"). Towns with fuel are suggested at about that spacing. "Fuel not confirmed" means there's none on our map. Know better? Open the stop and tick "Fuel here".</p></section>
       <section><h3>4. Night stops</h3><p>🛏 marks where you sleep, on the map and in the list. Open a night stop for places to stay, with numbers and websites. Move a night stop and the days around it are worked out again.</p></section>
       <section><h3>5. Before you go</h3><p>Every day shows distance, riding time, sunset and weather. Orange means have a look: a long day, arriving near dark, rain or heat. "Good to know" lists what to sort out first, like public holidays, border posts, and long stretches without fuel or a hospital.</p></section>
@@ -540,6 +542,12 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
     <label class="chk"><input type="checkbox" id="fTrip" checked> Include this trip so we can see what you saw</label>
     <div class="btns" style="justify-content:flex-end"><span class="note" id="fMsg"></span><button class="btn" type="submit" id="fSend">Send</button></div>
   </form>
+</dialog>
+<dialog id="picksDlg" class="welcome" aria-labelledby="pkTitle">
+  <div class="dlgwrap">
+    <div class="dlghead"><div><h2 id="pkTitle">OneTrackMind picks</h2><div class="note">Real roads we rate. Open one, then change anything: dates, night stops, the way.</div></div><button class="icon" type="button" data-pkclose aria-label="Close">✕</button></div>
+    <div class="rlist" id="pkList"></div>
+  </div>
 </dialog>
 <dialog id="settings">
   <form method="dialog" style="display:flex;flex-direction:column;gap:12px">

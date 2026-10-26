@@ -109,6 +109,12 @@ const TRIP = {
   await page.click('[data-day="1"]'); await page.waitForTimeout(500);
   ok(await page.$$eval("ol.stops li", b => b.length) >= 2, "second day stop list missing");
 
+  // open a OneTrackMind pick
+  await page.click('[data-day="ov"]'); await page.waitForTimeout(300);
+  await page.click("[data-picks]"); await page.waitForSelector("[data-pkopen]", { timeout: 10000 }).catch(() => fails.push("picks list didn't load"));
+  await page.click('[data-pkopen="tankwa-gannaga"]').catch(() => {});
+  await page.waitForFunction(() => trip.pick === "tankwa-gannaga" && plan && !planStale && plan.days.filter(Boolean).length === 2, null, { timeout: 20000 }).catch(() => fails.push("pick route didn't open and route"));
+
   // plan a whole trip from a GPX file
   await page.click('[data-day="ov"]'); await page.waitForTimeout(300);
   await page.setInputFiles("[data-tripgpx]", { name: "test-west-coast.gpx", mimeType: "application/gpx+xml", buffer: Buffer.from(require("./fixtures-route.cjs")) });
