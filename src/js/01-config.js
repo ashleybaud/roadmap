@@ -21,7 +21,9 @@ const fmtDur=m=>{m=Math.round(m);return Math.floor(m/60)+"h"+String(m%60).padSta
 const toMin=t=>{const [h,m]=(t||"0:0").split(":").map(Number);return h*60+m;};
 
 const TRACK_KMH=45; // average speed assumed on a followed GPX track (no router to ask)
-// car / 4x4 routing: same three styles as the motorcycle
+// car routing: Jeep / 4x4 takes jeep tracks; an ordinary car keeps to roads (graded gravel only on "road less travelled")
 const STYLE_CAR={rough:{use_highways:0,use_tracks:0.8},mixed:{use_highways:0.5,use_tracks:0.3},tar:{use_highways:1,use_tracks:0}};
+const STYLE_SEDAN={rough:{use_highways:0.2,use_tracks:0},mixed:{use_highways:0.6,use_tracks:0,exclude_unpaved:false},tar:{use_highways:1,use_tracks:0,exclude_unpaved:true}};
+const VEHICLES={bike:"🏍 Motorbike",jeep:"🚙 Jeep / 4x4",car:"🚗 Car"};
 // words that depend on what you travel on
-const VEH=()=>settings.vehicle==="car"?{ing:"driving",Ing:"Driving",noun:"drive",who:"driver",thing:"car"}:{ing:"riding",Ing:"Riding",noun:"ride",who:"rider",thing:"bike"};
+const VEH=()=>settings.vehicle==="car"||settings.vehicle==="jeep"?{ing:"driving",Ing:"Driving",noun:"drive",who:"driver",thing:"car"}:{ing:"riding",Ing:"Riding",noun:"ride",who:"rider",thing:"bike"};

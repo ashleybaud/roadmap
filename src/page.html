@@ -367,6 +367,15 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .welcome{max-width:560px}
 .wsteps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:.92rem}
 #styleBanner .linkbtn{margin-left:6px}
+.pin{display:flex;align-items:center;justify-content:center;gap:2px;width:100%;height:100%;border-radius:50%;background:#fff;border:2.5px solid #18201C;font-size:13px;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.35);position:relative;color:#18201C}
+.pin.pstart{background:#0B6E4F;border-color:#fff;color:#fff;font-size:14px}
+.pin.pend{background:#fff;font-size:15px}
+.pin.pnight{border-radius:14px;border-width:3px;font-size:14px;padding:0 4px}
+.pin.pnight b{font-size:12px}
+.pin.pstop{width:20px;height:20px;font-size:11px}
+.pinday{position:absolute;top:-7px;right:-8px;min-width:14px;height:14px;border-radius:7px;color:#fff;font:700 9px/14px system-ui,sans-serif;text-align:center;font-style:normal;padding:0 2px}
+.mapemo{position:relative}
+.maplbl.mlnight{font-weight:800;border-width:2px}
 </style>
 </head>
 <body>
@@ -430,7 +439,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
     <h2 id="wTitle">Plan a trip, day by day</h2>
     <p class="note" style="margin:0">Pick where you start, your dates and where you sleep each night. The app works out the route, fuel stops, sunset, weather and what to watch for, for every day.</p>
     <div class="row2">
-      <div class="field"><label class="lbl" for="wVehicle">Travelling by</label><select id="wVehicle"><option value="bike">Motorbike</option><option value="car">Car or 4x4</option></select></div>
+      <div class="field"><label class="lbl" for="wVehicle">Travelling by</label><select id="wVehicle"><option value="bike">Motorbike</option><option value="jeep">Jeep / 4x4</option><option value="car">Car</option></select></div>
       <div class="field"><label class="lbl" for="wStyle">Roads you like</label><select id="wStyle"><option value="rough">Road less travelled: gravel and back roads</option><option value="mixed">Mixed</option><option value="tar">Tar: main roads</option></select></div>
     </div>
     <div class="row2">
@@ -461,7 +470,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
       <div class="field"><label class="lbl" for="maxHours">Longest day on the road (hours)</label><input id="maxHours" type="number" min="2" max="16" step="0.5" value="8"></div>
       <div class="field"><label class="lbl" for="breakMin">Each stop takes (minutes)</label><input id="breakMin" type="number" min="0" max="240" step="5" value="20"></div>
     </div>
-    <div class="field"><label class="lbl" for="vehicle">Travelling by</label><select id="vehicle"><option value="bike">Motorbike</option><option value="car">Car or 4x4</option></select></div>
+    <div class="field"><label class="lbl" for="vehicle">Travelling by</label><select id="vehicle"><option value="bike">Motorbike</option><option value="jeep">Jeep / 4x4</option><option value="car">Car</option></select></div>
     <div class="field"><label class="lbl" for="style">Route style</label><select id="style"><option value="rough">Road less travelled: back roads and gravel first</option><option value="mixed">Mixed: gravel when it saves time</option><option value="tar">Tar: main roads and highways</option></select><span class="note">Road less travelled is often the shortest and toughest way. Check your bike, tyres and skills match it. Any day can be switched to Liaison.</span></div>
     <div class="field"><label class="lbl" for="corridor">Show places up to (km) off the route</label><input id="corridor" type="number" min="1" max="20" step="1" value="5"></div>
     <div class="field"><span class="lbl">Earlier versions of this trip</span><div id="histList" class="stable"></div><span class="note">The last 5 versions are kept on this device.</span></div>

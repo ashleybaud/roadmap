@@ -780,7 +780,8 @@ window.addEventListener("scroll",hidePeek,{passive:true});
 let map,layer,focusR=null,lastSel=null;
 function focusRange(a,b){focusR={a:Math.min(a,b),b:Math.max(a,b)}; drawMap(); if(window.innerWidth<=1000) $("map").scrollIntoView({behavior:"smooth",block:"start"});}
 const dotIcon=(c,sz,sq)=>L.divIcon({className:"",html:`<div style="width:${sz}px;height:${sz}px;background:${c};border:2px solid #18201C;border-radius:${sq?"2px":"50%"}"></div>`,iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]});
-let lblLayer=null;
+let lblLayer=null, ovHi=null;
+document.addEventListener("mouseover",e=>{ const o=e.target.closest&&e.target.closest(".ovday"); const k=o?+o.dataset.gotoday:null; if(k!==ovHi&&ui.tab==="ov"){ ovHi=k; drawMap(); } });
 function townLabels(){ if(!map||!lblLayer||!townList) return; lblLayer.clearLayers(); const z=map.getZoom(), bb=map.getBounds().pad(-0.03);
   const want=z<7?["city"]:["city","town"]; const list=townList.filter(t=>want.includes(t.place)&&bb.contains([t.lat,t.lon])).sort((a,b)=>(a.place==="city"?0:1)-(b.place==="city"?0:1)).slice(0,z<9?25:45);
   const own=plan?townPoints():[];
@@ -791,15 +792,26 @@ const seg=(a,b)=>plan.geom.filter((g,i)=>plan.cum[i]>=a-0.01&&plan.cum[i]<=b+0.0
 function drawMap(){
   if(!window.L) return; ensureMap(); if(!plan) return; townLabels();
   const sel=ui.tab==="ov"?null:plan.days[ui.tab];
-  plan.days.forEach((d,k)=>{ if(!d) return; const on=!sel||k===ui.tab; L.polyline(seg(d.a,d.b).map(g=>[g.lat,g.lon]),{color:on?DAYCOL[k%DAYCOL.length]:"#5C6660",weight:on?5:3,opacity:on?.9:.3}).addTo(layer); });
+  const hl=sel?null:ovHi;
+  plan.days.forEach((d,k)=>{ if(!d) return; const on=sel?k===ui.tab:(hl==null||hl===k), col=DAYCOL[k%DAYCOL.length];
+    const st=sel?{color:on?col:"#5C6660",weight:on?5:3,opacity:on?.9:.3}:{color:on?col:"#5C6660",weight:on?(k===0?7:5):3,opacity:on?.95:.25,dashArray:k>0?"10 8":null,lineCap:"butt"};
+    L.polyline(seg(d.a,d.b).map(g=>[g.lat,g.lon]),st).addTo(layer); });
   if(panel){ drawPanelLayer(); return; }
   if(stopFocus&&sel&&stopFocus.k===ui.tab&&drawStopLayer()) return;
   if(focusR){ const s=seg(focusR.a,focusR.b); if(s.length>1){L.polyline(s.map(g=>[g.lat,g.lon]),{color:"#B26A00",weight:7}).addTo(layer); map.fitBounds(L.latLngBounds(s.map(g=>[g.lat,g.lon])),{padding:[30,30]});} }
   const range=sel?[sel.a,sel.b]:[0,plan.total], inR=x=>x.km!=null&&x.km>=range[0]-1&&x.km<=range[1]+1;
   townPoints().forEach(p=>{ const km=plan.ptKm.get(p); if(sel&&!(km!=null&&km>=sel.a-0.5&&km<=sel.b+0.5)) return;
-    const night=trip.days.some((d,k)=>d.to===p&&k<nDays()-1);
-    const key=sel?true:(p===trip.start||night||p===endPt());
-    const m=L.marker([p.lat,p.lon],{icon:p.auto?L.divIcon({className:"",html:`<div class="mapemo dashed">⛽</div>`,iconSize:[22,22],iconAnchor:[11,11]}):dotIcon(night?"#2F5BA8":stopFuel(p)?"#0B6E4F":"#18201C",night||key?16:12,stopFuel(p))}).bindTooltip(p.auto?"Suggested: "+p.name:p.name,key?{permanent:true,direction:"right",offset:[10,0],className:"maplbl"}:{}).addTo(layer);
+    const nk=trip.days.findIndex((d,k)=>d.to===p&&k<nDays()-1), night=nk>=0, isStart=p===trip.start, isEnd=p===endPt()&&!isStart, round=isStart&&trip.round;
+    const dk=plan.days.findIndex(d=>d&&d.pts.slice(1,-1).includes(p));
+    const badge=!sel&&dk>=0?`<i class="pinday" style="background:${DAYCOL[dk%DAYCOL.length]}">${dk+1}</i>`:"";
+    let html, size=[22,22], label;
+    if(isStart){ html=`<div class="pin pstart">${round?"⟲":"▶"}</div>`; size=[28,28]; label=round?`Start · finish: ${p.name}`:`Start: ${p.name}`; }
+    else if(isEnd){ html=`<div class="pin pend">🏁</div>`; size=[28,28]; label=`Finish: ${p.name}`; }
+    else if(night){ html=`<div class="pin pnight" style="border-color:${DAYCOL[nk%DAYCOL.length]}">🛏<b>${nk+1}</b></div>`; size=[38,28]; label=`Night ${nk+1}: ${p.name}`; }
+    else if(p.auto){ html=`<div class="mapemo dashed">⛽${badge}</div>`; label="Suggested: "+p.name; }
+    else { html=`<div class="pin pstop">${stopFuel(p)?"⛽":"•"}${badge}</div>`; label=p.name; }
+    const key=sel?true:(isStart||night||isEnd);
+    const m=L.marker([p.lat,p.lon],{icon:L.divIcon({className:"",html,iconSize:size,iconAnchor:[size[0]/2,size[1]/2]}),zIndexOffset:night||isStart||isEnd?1000:0}).bindTooltip(label,key?{permanent:true,direction:"right",offset:[size[0]/2,0],className:"maplbl"+(night?" mlnight":"")}:{}).addTo(layer);
     m.on("click",()=>{ const k=trip.days.findIndex((d,i)=>plan.days[i]&&plan.days[i].pts.includes(p)&&(sel?i===ui.tab:true)); if(k<0) return; const j=plan.days[k].pts.indexOf(p); ui.tab=k; stopFocus={k,j}; saveUi(); renderAll(); });
   });
   if(fp&&ui.lay.fuel){
@@ -886,7 +898,7 @@ $("welcome").addEventListener("close",()=>{
 $("howItWorks").addEventListener("click",openWelcome);
 try{ if(!localStorage.getItem("rr-welcome")) setTimeout(openWelcome,300); }catch(e){}
 const STYLE_TEXT={rough:"<b>Road less travelled</b>: gravel and back roads first",mixed:"<b>Mixed</b>: gravel where it saves time, tar where it doesn't",tar:"<b>Tar</b>: main roads and highways"};
-function showStyle(){ $("styleBanner").innerHTML=`${settings.vehicle==="car"?"🚙 Car or 4x4":"🏍 Motorbike"} · ${STYLE_TEXT[settings.style]||STYLE_TEXT.rough}. Change any stretch with its way icons. <button type="button" class="linkbtn" id="bannerEdit">Change</button>`; }
+function showStyle(){ $("styleBanner").innerHTML=`${VEHICLES[settings.vehicle]||VEHICLES.bike} · ${STYLE_TEXT[settings.style]||STYLE_TEXT.rough}. Change any stretch with its way icons. <button type="button" class="linkbtn" id="bannerEdit">Change</button>`; }
 document.addEventListener("click",e=>{ if(e.target.id==="bannerEdit") openWelcome(); });
 function render(){ renderAll(); }
 function renderAll(){

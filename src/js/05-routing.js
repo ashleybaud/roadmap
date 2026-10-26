@@ -7,12 +7,12 @@ async function routeLeg(a,b,lg){
   if(lg&&lg.track){const geom=lg.track.map(([la,lo])=>({lat:la,lon:lo}));const km=lineKm(geom);return [{km,min:km/TRACK_KMH*60,geom}];}
   const style=lg&&lg.fast?"tar":settings.style;
   const alts=!!(lg&&lg.alts);
-  const car=settings.vehicle==="car";
-  const key=(car?"car|":"")+style+(alts?"|alts":"")+"|"+[a,b].map(p=>p.lon.toFixed(5)+","+p.lat.toFixed(5)).join(";");
+  const veh=settings.vehicle||"bike", car=veh!=="bike";
+  const key=(car?veh+"|":"")+style+(alts?"|alts":"")+"|"+[a,b].map(p=>p.lon.toFixed(5)+","+p.lat.toFixed(5)).join(";");
   if(cache.has(key)) return cache.get(key);
   let out;
   try{
-    const body={locations:[a,b].map(p=>({lat:p.lat,lon:p.lon,type:"break"})),costing:car?"auto":"motorcycle",costing_options:car?{auto:STYLE_CAR[style]||STYLE_CAR.rough}:{motorcycle:STYLE[style]||STYLE.rough},...(alts?{alternates:2}:{}),units:"kilometers",directions_type:"none"};
+    const body={locations:[a,b].map(p=>({lat:p.lat,lon:p.lon,type:"break"})),costing:car?"auto":"motorcycle",costing_options:car?{auto:(veh==="jeep"?STYLE_CAR:STYLE_SEDAN)[style]||STYLE_CAR.rough}:{motorcycle:STYLE[style]||STYLE.rough},...(alts?{alternates:2}:{}),units:"kilometers",directions_type:"none"};
     const ctl=new AbortController(), tm=setTimeout(()=>ctl.abort(),alts?15000:10000);
     const r=await fetch(ROUTER,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body),signal:ctl.signal}); clearTimeout(tm);
     const j=await r.json(); if(!j.trip) throw new Error(j.error||"no route");
