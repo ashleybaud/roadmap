@@ -577,7 +577,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
 </dialog>
 <dialog id="welcome" class="welcome" aria-labelledby="wTitle">
   <form method="dialog" style="display:flex;flex-direction:column;gap:12px">
-    <h2 id="wTitle">Plan a trip, day by day</h2>
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><h2 id="wTitle" style="margin:0">Plan a trip, day by day</h2><button class="icon" value="cancel" formnovalidate title="Close without changes" aria-label="Close">✕</button></div>
     <p class="note" style="margin:0">Pick where you start, your dates and where you sleep each night. The app works out the route, fuel stops, sunset, weather and what to watch for, for every day.</p>
     <div class="row2">
       <div class="field"><label class="lbl" for="wVehicle">Travelling by</label><select id="wVehicle"><option value="bike">Motorbike</option><option value="jeep">Jeep / 4x4</option><option value="car">Car</option></select></div>
@@ -595,7 +595,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
     </ol>
     <p class="note" style="margin:0"><b>Built by riders:</b> open riders' routes under <b>Find a route</b>, and tap <b>+ Add yours</b> to share a road you love or mark a place worth stopping.</p>
     <p class="note" style="margin:0">Have a route already? Use <b>Plan from a GPX file</b> and it's split into days for you. Trips are saved on this device only. You can change all of this later in Settings.</p>
-    <div class="btns" style="justify-content:flex-end"><button class="btn" value="ok">Start planning</button></div>
+    <div class="btns" style="justify-content:flex-end"><button class="btn ghost" value="cancel" formnovalidate>Cancel</button><button class="btn" value="ok" id="wOk">Start planning</button></div>
   </form>
 </dialog>
 <dialog id="acctDlg" class="welcome" aria-labelledby="aTitle">
@@ -1984,8 +1984,9 @@ $("settings").addEventListener("close",()=>{
   showStyle(); reroute?recalc():renderAll();
 });
 /* ---------- first visit: what this is and how to start (shown once; "How it works" brings it back) ---------- */
-function openWelcome(){ $("wVehicle").value=settings.vehicle; $("wStyle").value=settings.style; $("wHours").value=settings.maxHours; $("wRange").value=settings.range; $("welcome").showModal(); }
+function openWelcome(){ $("welcome").returnValue=""; $("wOk").textContent=trip.start&&trip.start.lat!=null?"Save changes":"Start planning"; $("wVehicle").value=settings.vehicle; $("wStyle").value=settings.style; $("wHours").value=settings.maxHours; $("wRange").value=settings.range; $("welcome").showModal(); }
 $("welcome").addEventListener("close",()=>{
+  if($("welcome").returnValue!=="ok"){ try{localStorage.setItem("rr-welcome","1");}catch(e){} return; } // ✕, Cancel or Esc: nothing changes
   const was=[settings.vehicle,settings.style].join();
   settings.vehicle=$("wVehicle").value; settings.style=$("wStyle").value; settings.maxHours=$("wHours").value; settings.range=$("wRange").value;
   store.set("rr2-settings",settings); SET_FIELDS.forEach(id=>$(id).value=settings[id]); try{localStorage.setItem("rr-welcome","1");}catch(e){}

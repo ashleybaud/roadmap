@@ -983,8 +983,9 @@ $("settings").addEventListener("close",()=>{
   showStyle(); reroute?recalc():renderAll();
 });
 /* ---------- first visit: what this is and how to start (shown once; "How it works" brings it back) ---------- */
-function openWelcome(){ $("wVehicle").value=settings.vehicle; $("wStyle").value=settings.style; $("wHours").value=settings.maxHours; $("wRange").value=settings.range; $("welcome").showModal(); }
+function openWelcome(){ $("welcome").returnValue=""; $("wOk").textContent=trip.start&&trip.start.lat!=null?"Save changes":"Start planning"; $("wVehicle").value=settings.vehicle; $("wStyle").value=settings.style; $("wHours").value=settings.maxHours; $("wRange").value=settings.range; $("welcome").showModal(); }
 $("welcome").addEventListener("close",()=>{
+  if($("welcome").returnValue!=="ok"){ try{localStorage.setItem("rr-welcome","1");}catch(e){} return; } // ✕, Cancel or Esc: nothing changes
   const was=[settings.vehicle,settings.style].join();
   settings.vehicle=$("wVehicle").value; settings.style=$("wStyle").value; settings.maxHours=$("wHours").value; settings.range=$("wRange").value;
   store.set("rr2-settings",settings); SET_FIELDS.forEach(id=>$(id).value=settings[id]); try{localStorage.setItem("rr-welcome","1");}catch(e){}
