@@ -43,8 +43,8 @@ assign onewaypenalty
   10000
   0.0
 assign islinktype = highway=motorway_link|trunk_link|primary_link|secondary_link|tertiary_link
-assign ispaved = surface=paved|asphalt|concrete|paving_stones|sett|chipseal|metal|concrete:plates
-assign isunpaved = surface=unpaved|gravel|fine_gravel|compacted|dirt|earth|ground|sand|pebblestone|grass|mud|rock|gravel_turf
+assign ispaved = surface=paved|asphalt|concrete|paving_stones|sett
+assign isunpaved = surface=unpaved|gravel|fine_gravel|compacted|dirt|earth|ground|sand|pebblestone|grass|mud
 assign isgravel = or isunpaved and istrack not ispaved
 assign costfactor
   add max onewaypenalty accesspenalty
