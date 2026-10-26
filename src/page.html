@@ -181,10 +181,14 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 [hidden]{display:none!important}
 .maplbl{background:#fff;color:#18201C;border:1px solid #18201C;border-radius:3px;padding:1px 5px;font-size:.75rem;font-weight:600;box-shadow:none}
 .maplbl::before{display:none}
-.toast{font-size:.85rem;background:var(--ink);color:var(--bg);padding:4px 10px;border-radius:5px}
+.msgdock{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:3000;display:flex;flex-direction:column;align-items:center;gap:6px;pointer-events:none;max-width:min(92vw,560px)}
+.msgdock>*{pointer-events:auto}
+.msgdock .status{background:var(--panel);color:var(--ink);border:2px solid var(--accent);border-radius:8px;padding:8px 14px;box-shadow:0 4px 14px rgba(0,0,0,.18);font-size:.9rem;min-height:0}
+.msgdock .status:empty,.msgdock .status.gone{display:none}
+.toast{font-size:.9rem;background:var(--ink);color:var(--bg);padding:8px 14px;border-radius:8px;box-shadow:0 4px 14px rgba(0,0,0,.25)}
 .linkbtn{background:none;border:0;color:inherit;text-decoration:underline;cursor:pointer;font:inherit;font-weight:700}
 header h1{font-size:2.7rem;font-weight:700;letter-spacing:-.005em;text-transform:uppercase}
-@media (max-width:640px){header h1{font-size:2rem}}
+@media (max-width:640px){header h1{font-size:1.7rem}header{gap:6px;padding-bottom:6px}header .note{display:none}.motto{font-size:.95rem;margin:0}header .btns .btn{padding:4px 10px;font-size:.85rem}#hdrSummary{display:none}.guide .gh{font-size:1.1rem}.guide>summary{padding:6px 0}}
 .motto{font-family:var(--f-display);font-weight:700;font-size:1.2rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:2px 0}
 .testtag{font-family:var(--f-mono);font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;background:var(--warn);color:var(--onfill);padding:2px 6px;border-radius:4px;vertical-align:middle}
 a.btn{text-decoration:none;display:inline-flex;align-items:center}
@@ -335,10 +339,13 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .mapemo.dashed{border-style:dashed;border-color:#0B6E4F}
 .days .ovday{padding:6px 0;border-top:0}
 .wherebox{display:inline-block;min-width:220px;vertical-align:middle}
-.tripbar{grid-template-columns:minmax(0,2fr) minmax(0,1fr) minmax(0,1fr)!important;border-bottom:0}
-.tripbar>.field:nth-child(3){order:-1}
-.tripbar>.field:nth-child(4){display:none}
-@media (max-width:560px){.tripbar{grid-template-columns:1fr 1fr!important}.tripbar>.field:nth-child(3){grid-column:1/-1}}
+.tripbar{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;border-bottom:0}
+.tripbar>.field:nth-child(3){order:-2}.tripbar>.field:nth-child(4){order:-1}
+@media (max-width:420px){.tripbar{grid-template-columns:1fr!important}}
+.tripbar input[type=date]{font-variant-numeric:tabular-nums;padding-inline:8px}
+.ep.need{color:var(--warn);font-style:italic}
+.gpxbar{margin:2px 0 8px}
+.gpxbtn{cursor:pointer}
 .clearrow{justify-content:flex-end}
 .iconbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px;border:2px solid var(--ink);border-radius:10px;padding:6px 10px;margin:10px 0 12px;background:var(--panel)}
 .ibhead{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-right:4px;flex-basis:100%}
@@ -432,7 +439,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
   <div class="work">
     <div class="mapcol">
       <div class="mapbar">
-        <span class="status" id="status" role="status"></span><span class="toast" id="toast" role="status" hidden></span>
+
       </div>
       <div id="map"></div>
     </div>
@@ -447,12 +454,13 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 <aside id="panel" class="sheet" hidden aria-label="Stop details"><div class="dlghead"><div><h2 id="pTitle"></h2><div class="note" id="pSub"></div></div><button class="icon" type="button" id="pClose" aria-label="Close">✕</button></div><div class="ptabs" id="pTabs"></div><div id="pBody" class="dlgbody"></div></aside>
 <div id="peek" class="peek" hidden></div>
 <div id="print" class="print"></div>
+<div class="msgdock"><span class="status" id="status" role="status" aria-live="polite"></span><span class="toast" id="toast" role="status" hidden></span></div>
 <div hidden id="tbHold">
   <section class="tripbar" aria-label="Trip">
     <div class="field"><label class="lbl" for="startDate">Leave</label><input id="startDate" type="date"></div>
     <div class="field"><label class="lbl" for="endDate">Back</label><input id="endDate" type="date"></div>
     <div class="field ac"><label class="lbl" for="startPlace">From</label><div class="inbtn"><input id="startPlace" type="text" autocomplete="off" placeholder="My location or a town"><button class="icon" id="clearStart" type="button" title="Clear" aria-label="Clear" hidden>✕</button><button class="icon" id="useLoc" type="button" title="Use my location" aria-label="Use my location">⌖</button></div><div class="sugg" hidden></div></div>
-    <div class="field ac"><label class="lbl" for="endPlace">Finish</label><div class="inbtn"><input id="endPlace" type="text" autocomplete="off" placeholder="Same as start"><button class="icon" id="sameStart" type="button" title="Finish where I started" aria-label="Finish where I started" hidden>✕</button></div><div class="sugg" hidden></div></div>
+    <div class="field ac"><label class="lbl" for="endPlace">Finish</label><div class="inbtn"><input id="endPlace" type="text" autocomplete="off" placeholder="Back where I started"><button class="icon" id="sameStart" type="button" title="Finish where I started" aria-label="Finish where I started" hidden>✕</button></div><div class="sugg" hidden></div></div>
   </section>
 </div>
 

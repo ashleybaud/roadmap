@@ -113,10 +113,10 @@ function daySuggest(k,ignoreAuto){
       return late.slice().sort((x,y)=>((x.off>2)-(y.off>2))||((!x.food)-(!y.food))||(y.km-x.km))[0]; };
     let pick=null, pi=-1; const mo=trip.gpx?5:40; // a followed GPX only takes towns on its line
     const fuelL=cands.filter(t=>t.fuel&&t.off<=mo&&inWin(t,win));
-    if(fuelL.length){ pick=choose(fuelL); pi=0; } else { const anyL=cands.filter(t=>t.off<=mo&&inWin(t,win)); if(anyL.length){ pick=choose(anyL); pi=2; } }
+    if(fuelL.length){ pick=choose(fuelL); pi=0; } else { const anyL=cands.filter(t=>t.off<=Math.min(mo,7.5)&&inWin(t,win)); /* a town without fuel is only worth a short detour */ if(anyL.length){ pick=choose(anyL); pi=2; } }
     if(pick&&pi>=2){ const nf=cands.filter(t=>t.fuel&&t.off<=40&&t.km>win&&t.km<pd.b)[0]; probs.push({from:pos,to:nf?nf.km:pd.b,fromName:posName,toName:nf?nf.name:pd.pts[pd.pts.length-1].name}); }
     if(pick){ sugg.push(pick); pos=pick.km; posName=pick.name; continue; }
-    const next=cands.filter(t=>t.km>win&&t.km<pd.b).sort((x,y)=>(x.off<=5?0:1)-(y.off<=5?0:1)||x.km-y.km)[0];
+    const next=cands.filter(t=>t.km>win&&t.km<pd.b&&(t.fuel?t.off<=40:t.off<=7.5)).sort((x,y)=>(x.off<=5?0:1)-(y.off<=5?0:1)||x.km-y.km)[0];
     probs.push({from:pos,to:next?next.km:pd.b,fromName:posName,toName:next?next.name:pd.pts[pd.pts.length-1].name});
     if(!next) break; sugg.push(next); pos=next.km; posName=next.name;
   }
@@ -182,6 +182,7 @@ wireSearch($("endPlace"),$("endPlace").parentElement.nextElementSibling,p=>{trip
 $("endPlace").addEventListener("change",e=>{ if(!e.target.value.trim()&&!trip.round){trip.round=true;changed();} });
 $("sameStart").addEventListener("click",()=>{trip.round=true;changed();});
 let toastT;
+{ const st=$("status"); let t0; new MutationObserver(()=>{ st.classList.remove("gone"); clearTimeout(t0); if(!/…$/.test(st.textContent)) t0=setTimeout(()=>st.classList.add("gone"),6000); }).observe(st,{childList:true,characterData:true,subtree:true}); }
 function setFinish(p){
   const prev={round:trip.round,end:trip.end}; trip.end=p; trip.round=false; changed();
   const t=$("toast"); t.innerHTML=`Finish changed to ${esc(p.name)}. <button type="button" class="linkbtn">Undo</button>`; t.hidden=false;
@@ -520,10 +521,10 @@ function dayWay(k){
   const t=all?"Quick way all day":none?`${styleName()} all day`:`${styleName()}, with ${fast} stretch${fast>1?"es":""} the quick way`;
   return `<span class="dway" title="${esc(t)}. Change it per stretch on the day's stops.">${none?STYLE_ICON.default:all?STYLE_ICON.fast:STYLE_ICON.default+STYLE_ICON.fast}</span>`;
 }
-function fromCell(k){ const from=dayFrom(k); if(!from) return `<span class="ep">?</span>`; return `<span class="ep">${k===0?"▶":"🛏"} ${esc(from.name)}</span>`; }
+function fromCell(k){ const from=dayFrom(k); if(!from||from.lat==null) return `<span class="ep need">${k===0?"Set your start":"Pick the night before"}</span>`; return `<span class="ep">${k===0?"▶":"🛏"} ${esc(from.name)}</span>`; }
 function sumBox(k,big){
   const pd=!planStale&&plan&&plan.days[k], d=trip.days[k], r=pd?dayRisk(k):null, from=dayFrom(k), last=k===nDays()-1;
-  const msg=!trip.start||trip.start.lat==null?(k===0?"Set your start above to see the route":""):!from?"Pick the night stop before this day":!dayTo(k)?(last?"Pick where you finish":"Pick where you sleep"):!dayPts(k)?"Add a stop or a finish":"Working out the route…";
+  const msg=!trip.start||trip.start.lat==null?(k===0?"Set your start above to see the route":""):!from?"Pick the night stop before this day":!dayTo(k)?"":!dayPts(k)?"Add a stop or a finish":"Working out the route…";
   const chain=stopsChain(k), arr=` <span class="arr">→</span> `, toSym=last?(trip.round?"⟲":"🏁"):"🛏";
   const date=`<span class="sdate">${esc(big?dayLong(k):dayName(k))}</span>`;
   const line=nDays()===1&&trip.round&&!trip.days[0].vias.length
@@ -531,7 +532,7 @@ function sumBox(k,big){
     :`<span class="schain">${fromCell(k)}${arr}${chain?chain+arr:""}<span class="ep to ${last?"":"night"}" ${last?"":`title="Night ${k+1}: where you sleep"`}>${toSym} ${toCell(k)}</span></span>${dayWay(k)}`;
   return `<div class="sumbox ${big?"big":""}">
     <div class="sumline">${date}<div class="sumrow">${line}</div></div>
-    ${pd?`<div class="sicons"><span class="sl">${timePill(k,pd.km,dayMinutes(k),`data-focusday="${k}"`)+fuelBtn(k)}</span><span class="sr">${sunSpan(k)+wxLink(k)}<span class="flags">${flagIcons(r,k)}</span></span></div>${riskHtml(r,k)}${big?fuelList(k):""}${!big&&nDays()>1?gtkLine(k):""}`:`<div class="note">${msg}</div>`}
+    ${!pd&&!msg?"":pd?`<div class="sicons"><span class="sl">${timePill(k,pd.km,dayMinutes(k),`data-focusday="${k}"`)+fuelBtn(k)}</span><span class="sr">${sunSpan(k)+wxLink(k)}<span class="flags">${flagIcons(r,k)}</span></span></div>${riskHtml(r,k)}${big?fuelList(k):""}${!big&&nDays()>1?gtkLine(k):""}`:`<div class="note">${msg}</div>`}
   </div>`;
 }
 function dayHead(k){ return sumBox(k,true)+(!planStale&&plan&&plan.days[k]?gtkHtml(k):"")+`<h3 class="detailh">Stops</h3>`; }
@@ -603,7 +604,7 @@ function stopDetail(k,j,cat){
 function stopList(k){
   const d=trip.days[k], pd=!planStale&&plan&&plan.days[k], last=k===nDays()-1;
   let h="";
-  if(!pd) return h+`<div class="rname"><span class="lbl" style="white-space:nowrap">Add a stop</span>${searchBox("addvia-"+k,"","Town, pass or place on this day",true)}</div>`;
+  if(!pd) return nDays()===1&&trip.round&&!d.vias.length?h:h+`<div class="rname"><span class="lbl" style="white-space:nowrap">Add a stop</span>${searchBox("addvia-"+k,"","Town, pass or place on this day",true)}</div>`;
   h+=`<ol class="stops">`;
   pd.pts.forEach((p,j)=>{
     if(j===0) return;
@@ -802,10 +803,29 @@ function townLabels(){ if(!map||!lblLayer||!townList) return; lblLayer.clearLaye
   const own=plan?townPoints():[];
   const used=own.map(p=>map.latLngToContainerPoint([p.lat,p.lon])); list.forEach(t=>{ const pnt=map.latLngToContainerPoint([t.lat,t.lon]); if(used.some(u=>Math.abs(u.x-pnt.x)<90&&Math.abs(u.y-pnt.y)<22)) return; used.push(pnt);
     L.marker([t.lat,t.lon],{interactive:false,keyboard:false,icon:L.divIcon({className:"townlbl"+(t.place==="city"?" city":""),html:`<span>${esc(t.name)}</span>`,iconSize:[0,0]})}).addTo(lblLayer); }); }
-function ensureMap(){ if(!map){map=L.map("map",{scrollWheelZoom:true});L.tileLayer(TILES.url,{maxZoom:TILES.maxZoom,attribution:TILES.attribution}).addTo(map);map.setView([-31,20],5); lblLayer=L.layerGroup().addTo(map); map.on("moveend",townLabels); if(window.ResizeObserver) new ResizeObserver(()=>map.invalidateSize()).observe($("map"));} map.invalidateSize(); if(layer) layer.remove(); layer=L.layerGroup().addTo(map); }
+function ensureMap(){ if(!map){map=L.map("map",{scrollWheelZoom:true});L.tileLayer(TILES.url,{maxZoom:TILES.maxZoom,attribution:TILES.attribution}).addTo(map);map.setView(...homeView()); lblLayer=L.layerGroup().addTo(map); map.on("moveend",townLabels); if(window.ResizeObserver) new ResizeObserver(()=>map.invalidateSize()).observe($("map"));} map.invalidateSize(); if(layer) layer.remove(); layer=L.layerGroup().addTo(map); }
 const seg=(a,b)=>plan.geom.filter((g,i)=>plan.cum[i]>=a-0.01&&plan.cum[i]<=b+0.01);
+// where the map opens before there's a trip: the region of the device's time zone, no location prompt
+function homeView(){
+  let tz=""; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone||""; }catch(e){}
+  if(/^Africa\/(Johannesburg|Windhoek|Gaborone|Maputo|Harare|Maseru|Mbabane|Lusaka)/.test(tz)) return [[-29,24],5];
+  if(/^Europe\/(London|Dublin)|^Atlantic\/(Reykjavik|Faroe)/.test(tz)) return [[54,-3],6];
+  if(/^America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage|Detroit|Boise|Indiana|Kentucky|North_Dakota)|^US\//.test(tz)) return [[39,-97],4];
+  if(/^America\/(Toronto|Vancouver|Edmonton|Winnipeg|Halifax|Regina|St_Johns)/.test(tz)) return [[54,-100],4];
+  if(/^Australia\//.test(tz)) return [[-27,134],4];
+  if(/^Pacific\/Auckland/.test(tz)) return [[-41,173],5];
+  if(/^Europe\//.test(tz)) return [[50,10],4];
+  if(/^Africa\//.test(tz)) return [[2,20],3];
+  if(/^America\//.test(tz)) return [[-15,-60],3];
+  if(/^Asia\//.test(tz)) return [[30,90],3];
+  return [[20,0],2];
+}
+let startSeen="";
 function drawMap(){
-  if(!window.L) return; ensureMap(); if(!plan) return; townLabels();
+  if(!window.L) return; ensureMap();
+  if(!plan){ const s0=trip.start; if(s0&&s0.lat!=null){ L.marker([s0.lat,s0.lon],{icon:L.divIcon({className:"",html:`<div class="pin pstart">▶</div>`,iconSize:[28,28],iconAnchor:[14,14]})}).bindTooltip("Start: "+s0.name,{permanent:true,direction:"right",offset:[14,0],className:"maplbl"}).addTo(layer);
+      const key=s0.lat+","+s0.lon; if(startSeen!==key){ startSeen=key; map.setView([s0.lat,s0.lon],9,{animate:false}); } } return; }
+  townLabels();
   const sel=ui.tab==="ov"?null:plan.days[ui.tab];
   const hl=sel?null:ovHi;
   plan.days.forEach((d,k)=>{ if(!d) return; const on=sel?k===ui.tab:(hl==null||hl===k), col=DAYCOL[k%DAYCOL.length];
@@ -841,7 +861,7 @@ function drawMap(){
   if(ui.lay.med&&meds) meds.filter(m=>m.off<=25&&inR(m)).forEach(m=>L.marker([m.lat,m.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:#B3261E">🏥</div>`,iconSize:[22,22],iconAnchor:[11,11]})}).bindTooltip(`${m.name||(m.type==="hospital"?"Hospital":"Clinic")}${m.phone?" · "+m.phone:""}`).addTo(layer));
   pois.filter(p=>ui.types[p.kind]&&inR(p)).sort((a,b)=>a.off-b.off).slice(0,+ui.max).forEach(p=>{const t=TYPES.find(x=>x.id===p.kind); L.marker([p.lat,p.lon],{icon:dotIcon(t.c,10)}).bindTooltip(`${p.name} · ${t.n}`).addTo(layer);});
   if(ui.lay.stay) stays.forEach(s=>{ if(!trip.days.some((d,k)=>d.to===s.night&&k<nDays()-1)) return; s.places.forEach(p=>L.marker([p.lat,p.lon],{icon:dotIcon("#2F5BA8",9)}).bindTooltip(p.name).addTo(layer)); });
-  if(!focusR){ const g=sel?seg(sel.a,sel.b):plan.geom; if(g.length>1&&(window._refit||sel||lastSel!==ui.tab)){map.fitBounds(L.latLngBounds(g.map(x=>[x.lat,x.lon])),{padding:[24,24]});} window._refit=false; lastSel=ui.tab; }
+  if(!focusR){ const g=sel?seg(sel.a,sel.b):plan.geom; if(g.length>1&&(window._refit||sel||lastSel!==ui.tab)){map.fitBounds(L.latLngBounds(g.map(x=>[x.lat,x.lon])),{padding:[24,24]});} if(!planStale) window._refit=false; lastSel=ui.tab; }
 }
 function drawPanelLayer(){
   const {k,j,tab}=panel, sc=scope(k,j); if(!sc) return;
