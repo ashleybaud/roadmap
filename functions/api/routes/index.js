@@ -16,9 +16,10 @@ export function routeCols(b) {
     region: clean(b.region, 10) || null,
     start_lat: Number.isFinite(+trip.start.lat) ? +trip.start.lat : null,
     start_lon: Number.isFinite(+trip.start.lon) ? +trip.start.lon : null,
+    grade_json: b.grade && Array.isArray(b.grade.km) ? JSON.stringify({ km: b.grade.km.slice(0, 6).map(x => Math.max(0, Math.round(+x || 0))), top: Math.max(0, Math.min(5, +b.grade.top || 0)) }) : null,
   };
 }
-export const LIST_COLS = `id, title, summary, km, days, vehicle, style, visibility, pick, created, updated`;
+export const LIST_COLS = `id, title, summary, km, days, vehicle, style, visibility, pick, grade_json, created, updated`;
 
 export const onRequestGet = handle(async ({ request, env }) => {
   const u = await requireUser(env, request);
@@ -30,7 +31,7 @@ export const onRequestPost = handle(async ({ request, env }) => {
   const n = await D.prepare(`SELECT COUNT(*) AS n FROM routes WHERE user_id = ?`).bind(u.id).first();
   if (n && n.n >= 500) throw new HttpError(400, "You've reached 500 saved routes. Delete some first.");
   const id = newId(8);
-  await D.prepare(`INSERT INTO routes (id, user_id, title, summary, data, km, days, vehicle, style, region, start_lat, start_lon, created, updated) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
-    .bind(id, u.id, c.title, c.summary, c.data, c.km, c.days, c.vehicle, c.style, c.region, c.start_lat, c.start_lon, t, t).run();
+  await D.prepare(`INSERT INTO routes (id, user_id, title, summary, data, km, days, vehicle, style, region, start_lat, start_lon, grade_json, created, updated) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`)
+    .bind(id, u.id, c.title, c.summary, c.data, c.km, c.days, c.vehicle, c.style, c.region, c.start_lat, c.start_lon, c.grade_json, t, t).run();
   return json({ id, title: c.title });
 });

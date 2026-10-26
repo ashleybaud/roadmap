@@ -49,6 +49,7 @@ assign isgravel = or isunpaved and istrack not ispaved
 assign costfactor
   add max onewaypenalty accesspenalty
   add switch islinktype 0.05 0
+  add switch 4wd_only=yes {P4} 0
   switch and highway= not route=ferry 10000
   switch route=ferry 5.67
   switch isgravel ( switch istrack ( switch tracktype=grade4|grade5 50 20 ) 5 )
@@ -65,6 +66,9 @@ assign costfactor
 assign priorityclassifier = 0
 assign classifiermask = 0
 assign dummyUsage = smoothness=
+assign dummyUsage2 = 4wd_only=
+assign dummyUsage3 = ford=
+assign dummyUsage4 = sac_scale=
 
 ---context:node
 assign motorvehicleaccess

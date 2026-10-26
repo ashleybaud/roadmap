@@ -21,8 +21,8 @@ export const onRequestPut = handle(async ({ request, env, params }) => {
   const vis = VIS.includes(b.visibility) ? b.visibility : r.visibility;
   if (b.trip) {
     const c = routeCols({ ...b, title: b.title || r.title });
-    await D.prepare(`UPDATE routes SET title=?, summary=?, data=?, km=?, days=?, vehicle=?, style=?, region=?, start_lat=?, start_lon=?, visibility=?, updated=? WHERE id=?`)
-      .bind(c.title, c.summary, c.data, c.km, c.days, c.vehicle, c.style, c.region, c.start_lat, c.start_lon, vis, now(), r.id).run();
+    await D.prepare(`UPDATE routes SET title=?, summary=?, data=?, km=?, days=?, vehicle=?, style=?, region=?, start_lat=?, start_lon=?, grade_json=?, visibility=?, updated=? WHERE id=?`)
+      .bind(c.title, c.summary, c.data, c.km, c.days, c.vehicle, c.style, c.region, c.start_lat, c.start_lon, c.grade_json, vis, now(), r.id).run();
   } else {
     await D.prepare(`UPDATE routes SET title=?, visibility=?, updated=? WHERE id=?`).bind(clean(b.title, 120) || r.title, vis, now(), r.id).run();
   }

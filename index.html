@@ -388,6 +388,13 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .gpxbtn{cursor:pointer}
 .gpxnote{font-weight:700;border:1px solid var(--line);border-radius:4px;padding:1px 5px}
 .welcome{max-width:560px}
+.gradebar{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--muted)}
+.gstrip{flex:1;display:flex;height:8px;border-radius:4px;overflow:hidden;min-width:80px;background:var(--line)}
+.gstrip i{display:block;height:100%}
+.gradebar.big .gstrip{height:11px}
+.gpc{white-space:nowrap;font-family:var(--f-mono);font-size:.72rem}
+.gbadge{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:20px;padding:0 5px;border-radius:4px;font:700 .72rem/1 var(--f-mono);color:#fff;background:#C9CEC5;flex:none}
+.gbadge.g0{color:#18201C}.gbadge.g1{background:#7A847D}.gbadge.g2{background:#D9A441;color:#18201C}.gbadge.g3{background:#D9702B}.gbadge.g4{background:#B3261E}.gbadge.g5{background:#2A0F0D}
 .dlgwrap{display:flex;flex-direction:column;gap:12px}
 .dlghead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 #fText{width:100%;font:inherit;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);resize:vertical}
@@ -433,6 +440,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
     <div class="ggrid">
       <section><h3>1. Plan a trip</h3><p>Set where you start and your dates. Each day gets its own tab. Pick where you sleep each night, and add stops in between for a pass, a farm stall or a mate you want to see. The route is worked out for you.</p></section>
       <section><h3>2. Pick your roads</h3><p><b>Road less travelled</b> takes gravel and back roads wherever they go. <b>Mixed</b> rides plenty of gravel and uses tar to link it up. <b>Tar</b> keeps you on sealed roads. Set it once, then change any stretch with its way icon: brown for your style, blue for the quick way.</p></section>
+      <section><h3>Route grades</h3><p><b>G1</b> tar · <b>G2</b> good gravel, any car · <b>G3</b> rough gravel, corrugations and loose stones · <b>G4</b> 4x4 or adventure bike: rocks, sand, steep · <b>G5</b> expert: technical, river crossings. Each day shows a bar of how much is at each grade and a badge for the hardest bit. Tap 🛣 on the map to colour the route by grade.</p></section>
       <section><h3>3. Fuel</h3><p>Tell it how far you go between fills ("Stop at least every"). Towns with fuel are suggested at about that spacing. "Fuel not confirmed" means there's none on our map. Know better? Open the stop and tick "Fuel here".</p></section>
       <section><h3>4. Night stops</h3><p>🛏 marks where you sleep, on the map and in the list. Open a night stop for places to stay, with numbers and websites. Move a night stop and the days around it are worked out again.</p></section>
       <section><h3>5. Before you go</h3><p>Every day shows distance, riding time, sunset and weather. Orange means have a look: a long day, arriving near dark, rain or heat. "Good to know" lists what to sort out first, like public holidays, border posts, and long stretches without fuel or a hospital.</p></section>
@@ -488,7 +496,8 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
     <div><span class="flag finfo">◷</span> The clocks change during the day.</div>
     <div><span class="sty">STYLE_FAST</span> Get me there quickly. <span class="sty">STYLE_ROUGH</span> Road less travelled, or the style set in Settings.</div>
     <div><span class="tdot" style="background:var(--warn)"></span> A dot on a day tab: something on that day needs a look.</div>
-    <div><b>On the map</b> (green = shown): ⛽ fuel stations on the route · 🛏 places to stay at night stops · 🍴 food · ★ sights, viewpoints and passes · 🏥 hospitals and clinics · 🛣 road type, tar to single track (coming soon)</div>
+    <div><b>On the map</b> (green = shown): ⛽ fuel stations on the route · 🛏 places to stay at night stops · 🍴 food · ★ sights, viewpoints and passes · 🏥 hospitals and clinics · 🛣 the route coloured by grade</div>
+    <h3 style="margin-top:6px">Route grades</h3><div id="gradeKey" class="keylist" style="gap:6px"></div><p class="note">Graded from what OpenStreetMap says about each road. Roads change after rain and grading, so check locally. Riders' reports will sharpen this.</p>
     <p class="note">We show where fuel is; we don't track your tank. Suggested stops use your "Stop at least every" setting. Fuel, places and hospitals come from OpenStreetMap and can be wrong. Phone ahead on remote legs.</p>
     <div class="btns"><button class="btn" value="close">Close</button></div>
   </form>
@@ -653,8 +662,9 @@ async function brouterLeg(a,b,veh,style,alts){
     let t=await r.text(); if(!t.startsWith("{")&&/profile/i.test(t)){ pid=await brProfile(name,true); return get(idx); }
     if(!t.startsWith("{")) throw new Error(t.slice(0,80));
     const f=JSON.parse(t).features[0], msgs=f.properties.messages||[], hd=msgs[0]||[], iD=hd.indexOf("Distance"), iW=hd.indexOf("WayTags");
-    let min=0, grav=0; msgs.slice(1).forEach(m=>{ const d=(+m[iD]||0)/1000, w=m[iW]||""; min+=d/brSpeed(w,veh)*60; if(/surface=(unpaved|gravel|fine_gravel|compacted|dirt|earth|ground|sand)|highway=track/.test(w)&&!/surface=(paved|asphalt|concrete)/.test(w)) grav+=d; });
-    return {km:(+f.properties["track-length"]||0)/1000,min,gravelKm:grav,geom:f.geometry.coordinates.map(([lo,la])=>({lat:la,lon:lo}))}; };
+    let min=0, grav=0, at=0; const grades=[]; msgs.slice(1).forEach(m=>{ const d=(+m[iD]||0)/1000, w=m[iW]||""; min+=d/brSpeed(w,veh)*60; if(/surface=(unpaved|gravel|fine_gravel|compacted|dirt|earth|ground|sand)|highway=track/.test(w)&&!/surface=(paved|asphalt|concrete)/.test(w)) grav+=d;
+      const g=wayGrade(w), last=grades[grades.length-1]; if(last&&last[2]===g) last[1]=at+d; else grades.push([at,at+d,g]); at+=d; });
+    return {km:(+f.properties["track-length"]||0)/1000,min,gravelKm:grav,grades,geom:f.geometry.coordinates.map(([lo,la])=>({lat:la,lon:lo}))}; };
   const out=[await get(0)];
   if(alts) for(const i of [1,2]){ try{ const x=await get(i); if(Math.abs(x.km-out[0].km)>1) out.push(x); }catch(e){} }
   return out;
@@ -910,7 +920,7 @@ async function recalc(){
     res.forEach((r,k)=>{
       if(!r){days.push(null);return;}
       const d=trip.days[k];
-      const legs=r.opts.map((o,j)=>{const ch=o[Math.min((d.legs[j]&&d.legs[j].alt)||0,o.length-1)];return {km:ch.km,min:ch.min,geom:ch.geom,gravelKm:ch.gravelKm,n:o.length,alts:o.map(x=>x.km),gpx:!(d.legs[j]&&d.legs[j].track)&&!!gtr(k,j)};});
+      const legs=r.opts.map((o,j)=>{const ch=o[Math.min((d.legs[j]&&d.legs[j].alt)||0,o.length-1)];return {km:ch.km,min:ch.min,geom:ch.geom,gravelKm:ch.gravelKm,grades:ch.grades||[[0,ch.km,0]],n:o.length,alts:o.map(x=>x.km),gpx:!(d.legs[j]&&d.legs[j].track)&&!!gtr(k,j)};});
       if(!ptKm.has(r.pts[0])) ptKm.set(r.pts[0],acc);
       legs.forEach((L,j)=>{L.a=acc; L.geom.forEach((g,i)=>{if(geom.length&&i>0)acc+=hav(geom[geom.length-1],g); geom.push(g);cum.push(acc);}); L.b=acc; ptKm.set(r.pts[j+1],acc);});
       days.push({pts:r.pts,legs,km:legs.reduce((t,x)=>t+x.km,0),min:legs.reduce((t,x)=>t+x.min,0),a:legs[0].a,b:legs[legs.length-1].b});
@@ -1288,7 +1298,7 @@ function tripTotals(){
   if(!plan) return "";
   const n=nDays(), tot=plan.days.reduce((t,d)=>t+(d?d.km:0),0), ride=plan.days.reduce((t,d,k)=>t+(d?dayMinutes(k):0),0);
   const fin=trip.round||!trip.end?(trip.start?trip.start.name:"?"):trip.end.name;
-  return `<div class="totals"><span>Back at <b>${esc(fin)}</b></span><span>${n} day${n>1?"s":""} · ${Math.round(tot).toLocaleString()} km · about ${fmtDur(ride)} ${VEH().ing}</span></div>`;
+  return `<div class="totals"><span>Back at <b>${esc(fin)}</b></span><span>${n} day${n>1?"s":""} · ${Math.round(tot).toLocaleString()} km · about ${fmtDur(ride)} ${VEH().ing}</span></div>${gradeBar(tripGrade(),true)}`;
 }
 function stayRows(k){
   const last=k===nDays()-1, to=dayTo(k); if(!to||(last&&trip.round)) return "";
@@ -1380,7 +1390,7 @@ function sumBox(k,big){
     :`<span class="schain">${fromCell(k)}${arr}${chain?chain+arr:""}<span class="ep to ${last?"":"night"}" ${last?"":`title="Night ${k+1}: where you sleep"`}>${toSym} ${toCell(k)}</span></span>${dayWay(k)}`;
   return `<div class="sumbox ${big?"big":""}">
     <div class="sumline">${date}<div class="sumrow">${line}</div></div>
-    ${!pd&&!msg?"":pd?`<div class="sicons"><span class="sl">${timePill(k,pd.km,dayMinutes(k),`data-focusday="${k}"`)+fuelBtn(k)}</span><span class="sr">${sunSpan(k)+wxLink(k)}<span class="flags">${flagIcons(r,k)}</span></span></div>${riskHtml(r,k)}${big?fuelList(k):""}${!big&&nDays()>1?gtkLine(k):""}`:`<div class="note">${msg}</div>`}
+    ${!pd&&!msg?"":pd?`<div class="sicons"><span class="sl">${timePill(k,pd.km,dayMinutes(k),`data-focusday="${k}"`)+fuelBtn(k)}</span><span class="sr">${sunSpan(k)+wxLink(k)}<span class="flags">${flagIcons(r,k)}</span></span></div>${gradeBar(dayGrade(k),big)}${riskHtml(r,k)}${big?fuelList(k):""}${!big&&nDays()>1?gtkLine(k):""}`:`<div class="note">${msg}</div>`}
   </div>`;
 }
 function dayHead(k){ return sumBox(k,true)+(!planStale&&plan&&plan.days[k]?gtkHtml(k):"")+`<h3 class="detailh">Stops</h3>`; }
@@ -1679,6 +1689,7 @@ function drawMap(){
   plan.days.forEach((d,k)=>{ if(!d) return; const on=sel?k===ui.tab:(hl==null||hl===k), col=DAYCOL[k%DAYCOL.length];
     const st=sel?{color:on?col:"#5C6660",weight:on?5:3,opacity:on?.9:.3}:{color:on?col:"#5C6660",weight:on?(k===0?7:5):3,opacity:on?.95:.25,dashArray:k>0?"10 8":null,lineCap:"butt"};
     L.polyline(seg(d.a,d.b).map(g=>[g.lat,g.lon]),st).addTo(layer); });
+  if(ui.lay.road) drawGradeLayer(sel);
   if(panel){ drawPanelLayer(); return; }
   if(stopFocus&&sel&&stopFocus.k===ui.tab&&drawStopLayer()) return;
   if(focusR){ const s=seg(focusR.a,focusR.b); if(s.length>1){L.polyline(s.map(g=>[g.lat,g.lon]),{color:"#B26A00",weight:7}).addTo(layer); map.fitBounds(L.latLngBounds(s.map(g=>[g.lat,g.lon])),{padding:[30,30]});} }
@@ -1723,11 +1734,11 @@ function drawPanelLayer(){
 }
 
 /* ---------- icon bar: what to show on the map ---------- */
-const LAY=[["fuel","⛽","Fuel","Fuel stations on the route"],["stay","🛏","Stay","Places to stay at night stops"],["food","🍴","Food","Places to eat"],["sights","★","Sights","Sights, viewpoints and passes"],["med","🏥","Medical","Hospitals and clinics"],["road","🛣","Road type","Tar to single track, coming next"]];
+const LAY=[["fuel","⛽","Fuel","Fuel stations on the route"],["stay","🛏","Stay","Places to stay at night stops"],["food","🍴","Food","Places to eat"],["sights","★","Sights","Sights, viewpoints and passes"],["med","🏥","Medical","Hospitals and clinics"],["road","🛣","Road grade","The route coloured by grade, G1 tar to G5 expert"]];
 ui.lay=Object.assign({fuel:true,stay:!!ui.sleep,food:!!ui.types.food,sights:true,med:false},ui.lay||{});
 function renderLayers(){
-  $("iconbar").innerHTML=`<span class="ibhead">On the map</span>`+LAY.map(([id,ic,w,t])=>{ const on=!!ui.lay[id]&&id!=="road";
-    return `<button type="button" class="ib ${on?"on":""}" data-lay="${id}" title="${esc(w)}: ${esc(t)}" aria-label="${esc(w)}" aria-pressed="${on}" ${id==="road"?"disabled":""}>${ic}</button>`; }).join("")
+  $("iconbar").innerHTML=`<span class="ibhead">On the map</span>`+LAY.map(([id,ic,w,t])=>{ const on=!!ui.lay[id];
+    return `<button type="button" class="ib ${on?"on":""}" data-lay="${id}" title="${esc(w)}: ${esc(t)}" aria-label="${esc(w)}" aria-pressed="${on}">${ic}</button>`; }).join("")
     +(ui.lay.sights?`<label class="ibmax" title="How many sights to show">★ <select data-max aria-label="How many sights">${[["10","10"],["25","25"],["50","50"],["1000","All"]].map(([v,l])=>`<option value="${v}" ${ui.max===v?"selected":""}>${l}</option>`).join("")}</select></label>`:"")+`<button type="button" class="ibkey" data-key title="What the icons and colours mean">?</button>`;
 }
 $("iconbar").addEventListener("click",e=>{ if(e.target.closest("select")) return; if(e.target.closest("[data-key]")){ $("keyDlg").showModal(); return; } const b=e.target.closest("[data-lay]"); if(!b||b.disabled) return; const id=b.dataset.lay; ui.lay[id]=!ui.lay[id];
@@ -2080,7 +2091,7 @@ function renderAcct(msg){
 }
 async function loadRoutes(){ try{ acct.routes=(await api("/api/routes")).routes; }catch(e){ acct.routes=[]; renderAcct({err:1,text:e.message}); return; } if(acctMode==="routes") renderAcct(); }
 async function saveRoute(update){
-  const body={title:($("sTitle")&&$("sTitle").value.trim())||defaultTitle(),trip:JSON.parse(JSON.stringify(trip)),settings,km:tripKm(),summary:tripSummary(),region:trip.start&&trip.start.lat<-16&&trip.start.lat>-35?"za":""};
+  const body={title:($("sTitle")&&$("sTitle").value.trim())||defaultTitle(),trip:JSON.parse(JSON.stringify(trip)),settings,km:tripKm(),summary:tripSummary(),region:trip.start&&trip.start.lat<-16&&trip.start.lat>-35?"za":"",grade:(()=>{ const G=tripGrade(); return G?{km:G.km.map(x=>Math.round(x)),top:G.top}:null; })()};
   delete body.trip.savedId; delete body.trip.savedTitle;
   try{
     if(update) await api("/api/routes/"+trip.savedId,{method:"PUT",body});
@@ -2148,5 +2159,53 @@ $("fbForm").addEventListener("submit",async e=>{
 });
 document.addEventListener("click",e=>{ const f=e.target.closest&&e.target.closest("[data-fixat]"); if(!f) return; const [lat,lon,...n]=f.dataset.fixat.split(","); openFeedback("fix",{lat:+lat,lon:+lon,name:n.join(",")}); });
 loadMe();
+
+/* ---------- route grading ----------
+   Grade of each stretch of road, from the OpenStreetMap tags BRouter reports for it.
+   G1 tar · G2 good gravel, any car · G3 rough gravel · G4 4x4 / adventure bike · G5 expert. 0 = surface not on the map.
+   A day's grade = the km at each grade (the bar) and its hardest grade with at least 1 km of it (the badge). */
+const GRADES=[
+  {g:0,short:"?",name:"Surface unknown",text:"The map doesn't say what this road is. Often gravel in the countryside.",col:"#C9CEC5"},
+  {g:1,short:"G1",name:"Tar",text:"Sealed road.",col:"#7A847D"},
+  {g:2,short:"G2",name:"Good gravel",text:"Graded gravel. Fine in any car, easy on any bike.",col:"#D9A441"},
+  {g:3,short:"G3",name:"Rough gravel",text:"Corrugations, loose stones, ruts. Take it slower; road tyres struggle.",col:"#D9702B"},
+  {g:4,short:"G4",name:"4x4 / adventure",text:"Rocks, sand, steep climbs. High clearance or an adventure bike and some skill.",col:"#B3261E"},
+  {g:5,short:"G5",name:"Expert",text:"Technical: big rocks, deep sand, river crossings. Experienced riders and proper 4x4s only.",col:"#2A0F0D"},
+];
+function wayGrade(w){
+  const tag=k=>{ const m=w.match(new RegExp("(?:^|\\s)"+k+"=([^\\s]+)")); return m?m[1]:""; };
+  const h=tag("highway"), s=tag("surface"), tt=(tag("tracktype").match(/\d/)||[])[0], sm=tag("smoothness");
+  if(tag("sac_scale")||h==="path"||h==="bridleway"||tag("ford")==="yes"||tt==="5"||/very_horrible|impassable/.test(sm)) return 5;
+  if(tt==="4"||tag("4wd_only")==="yes"||/^(very_bad|horrible)$/.test(sm)||/^(sand|mud|rock)$/.test(s)) return 4;
+  if(/^(paved|asphalt|concrete|paving_stones|sett|chipseal|metal)/.test(s)) return /^(bad)$/.test(sm)?2:1;
+  if(tt==="3"||/^(dirt|earth|ground|grass|pebblestone|unpaved)$/.test(s)&&h==="track"||/^(dirt|earth|ground|grass)$/.test(s)||sm==="bad") return 3;
+  if(/^(gravel|fine_gravel|compacted|unpaved|pebblestone)$/.test(s)||tt==="1"||tt==="2") return 2;
+  if(h==="track") return 3;
+  if(/^(motorway|trunk|primary|secondary)(_link)?$/.test(h)) return 1; // big roads without a surface tag are almost always sealed
+  if(/^(residential|living_street|service|tertiary)(_link)?$/.test(h)) return 1;
+  return 0; // e.g. an unclassified country road with no surface on the map
+}
+// km at each grade for some legs, plus the hardest grade with at least 1 km
+function gradeKm(legs){
+  const km=[0,0,0,0,0,0]; (legs||[]).forEach(L=>(L.grades||[[0,L.km,0]]).forEach(([a,b,g])=>km[g]+=Math.max(0,b-a)));
+  const tot=km.reduce((t,x)=>t+x,0); let top=0; for(let g=5;g>=1;g--) if(km[g]>=1){ top=g; break; }
+  return {km,tot,top};
+}
+function gradeTitle(G){ return GRADES.filter(x=>G.km[x.g]>=0.5).map(x=>`${x.short==="?"?"Unknown":x.short} ${x.name}: ${Math.round(G.km[x.g])} km`).join("\n"); }
+function gradeBar(G,big){
+  if(!G||!G.tot) return "";
+  const segs=[1,2,3,4,5,0].filter(g=>G.km[g]>0).map(g=>`<i style="flex:${G.km[g].toFixed(2)};background:${GRADES[g].col}"></i>`).join("");
+  const unp=G.km[2]+G.km[3]+G.km[4]+G.km[5], pc=Math.round(unp/G.tot*100);
+  return `<span class="gradebar ${big?"big":""}" title="${esc(gradeTitle(G))}"><span class="gbadge g${G.top}" title="Hardest: ${esc(GRADES[G.top].name)}">${G.top?GRADES[G.top].short:"G?"}</span><span class="gstrip">${segs}</span><span class="gpc">${pc}% gravel${G.km[0]>=1?` · ${Math.round(G.km[0])} km unknown`:""}</span></span>`;
+}
+const dayGrade=k=>plan&&plan.days[k]?gradeKm(plan.days[k].legs):null;
+const tripGrade=()=>plan?gradeKm(plan.days.filter(Boolean).flatMap(d=>d.legs)):null;
+// map layer: the route coloured by grade
+function drawGradeLayer(sel){
+  plan.days.forEach((d,k)=>{ if(!d||(sel&&sel!==d)) return;
+    d.legs.forEach(lg=>(lg.grades||[]).forEach(([a,b,g])=>{ const s=seg(lg.a+a,lg.a+b); if(s.length>1) L.polyline(s.map(p=>[p.lat,p.lon]),{color:GRADES[g].col,weight:6,opacity:.95,lineCap:"butt"}).bindTooltip(`${GRADES[g].short==="?"?"":GRADES[g].short+" "}${GRADES[g].name}`,{sticky:true}).addTo(layer); })); });
+}
+function gradeKeyHtml(){ return GRADES.slice(1).concat(GRADES[0]).map(x=>`<div><span class="gbadge g${x.g}">${x.short==="?"?"?":x.short}</span> <b>${x.name}.</b> ${x.text}</div>`).join(""); }
+$("gradeKey").innerHTML=gradeKeyHtml();
 
 </script></body></html>

@@ -52,7 +52,7 @@ function renderAcct(msg){
 }
 async function loadRoutes(){ try{ acct.routes=(await api("/api/routes")).routes; }catch(e){ acct.routes=[]; renderAcct({err:1,text:e.message}); return; } if(acctMode==="routes") renderAcct(); }
 async function saveRoute(update){
-  const body={title:($("sTitle")&&$("sTitle").value.trim())||defaultTitle(),trip:JSON.parse(JSON.stringify(trip)),settings,km:tripKm(),summary:tripSummary(),region:trip.start&&trip.start.lat<-16&&trip.start.lat>-35?"za":""};
+  const body={title:($("sTitle")&&$("sTitle").value.trim())||defaultTitle(),trip:JSON.parse(JSON.stringify(trip)),settings,km:tripKm(),summary:tripSummary(),region:trip.start&&trip.start.lat<-16&&trip.start.lat>-35?"za":"",grade:(()=>{ const G=tripGrade(); return G?{km:G.km.map(x=>Math.round(x)),top:G.top}:null; })()};
   delete body.trip.savedId; delete body.trip.savedTitle;
   try{
     if(update) await api("/api/routes/"+trip.savedId,{method:"PUT",body});

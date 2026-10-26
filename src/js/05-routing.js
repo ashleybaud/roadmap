@@ -27,8 +27,9 @@ async function brouterLeg(a,b,veh,style,alts){
     let t=await r.text(); if(!t.startsWith("{")&&/profile/i.test(t)){ pid=await brProfile(name,true); return get(idx); }
     if(!t.startsWith("{")) throw new Error(t.slice(0,80));
     const f=JSON.parse(t).features[0], msgs=f.properties.messages||[], hd=msgs[0]||[], iD=hd.indexOf("Distance"), iW=hd.indexOf("WayTags");
-    let min=0, grav=0; msgs.slice(1).forEach(m=>{ const d=(+m[iD]||0)/1000, w=m[iW]||""; min+=d/brSpeed(w,veh)*60; if(/surface=(unpaved|gravel|fine_gravel|compacted|dirt|earth|ground|sand)|highway=track/.test(w)&&!/surface=(paved|asphalt|concrete)/.test(w)) grav+=d; });
-    return {km:(+f.properties["track-length"]||0)/1000,min,gravelKm:grav,geom:f.geometry.coordinates.map(([lo,la])=>({lat:la,lon:lo}))}; };
+    let min=0, grav=0, at=0; const grades=[]; msgs.slice(1).forEach(m=>{ const d=(+m[iD]||0)/1000, w=m[iW]||""; min+=d/brSpeed(w,veh)*60; if(/surface=(unpaved|gravel|fine_gravel|compacted|dirt|earth|ground|sand)|highway=track/.test(w)&&!/surface=(paved|asphalt|concrete)/.test(w)) grav+=d;
+      const g=wayGrade(w), last=grades[grades.length-1]; if(last&&last[2]===g) last[1]=at+d; else grades.push([at,at+d,g]); at+=d; });
+    return {km:(+f.properties["track-length"]||0)/1000,min,gravelKm:grav,grades,geom:f.geometry.coordinates.map(([lo,la])=>({lat:la,lon:lo}))}; };
   const out=[await get(0)];
   if(alts) for(const i of [1,2]){ try{ const x=await get(i); if(Math.abs(x.km-out[0].km)>1) out.push(x); }catch(e){} }
   return out;

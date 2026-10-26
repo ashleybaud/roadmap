@@ -388,6 +388,13 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .gpxbtn{cursor:pointer}
 .gpxnote{font-weight:700;border:1px solid var(--line);border-radius:4px;padding:1px 5px}
 .welcome{max-width:560px}
+.gradebar{display:flex;align-items:center;gap:8px;font-size:.78rem;color:var(--muted)}
+.gstrip{flex:1;display:flex;height:8px;border-radius:4px;overflow:hidden;min-width:80px;background:var(--line)}
+.gstrip i{display:block;height:100%}
+.gradebar.big .gstrip{height:11px}
+.gpc{white-space:nowrap;font-family:var(--f-mono);font-size:.72rem}
+.gbadge{display:inline-flex;align-items:center;justify-content:center;min-width:28px;height:20px;padding:0 5px;border-radius:4px;font:700 .72rem/1 var(--f-mono);color:#fff;background:#C9CEC5;flex:none}
+.gbadge.g0{color:#18201C}.gbadge.g1{background:#7A847D}.gbadge.g2{background:#D9A441;color:#18201C}.gbadge.g3{background:#D9702B}.gbadge.g4{background:#B3261E}.gbadge.g5{background:#2A0F0D}
 .dlgwrap{display:flex;flex-direction:column;gap:12px}
 .dlghead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 #fText{width:100%;font:inherit;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);resize:vertical}
@@ -433,6 +440,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
     <div class="ggrid">
       <section><h3>1. Plan a trip</h3><p>Set where you start and your dates. Each day gets its own tab. Pick where you sleep each night, and add stops in between for a pass, a farm stall or a mate you want to see. The route is worked out for you.</p></section>
       <section><h3>2. Pick your roads</h3><p><b>Road less travelled</b> takes gravel and back roads wherever they go. <b>Mixed</b> rides plenty of gravel and uses tar to link it up. <b>Tar</b> keeps you on sealed roads. Set it once, then change any stretch with its way icon: brown for your style, blue for the quick way.</p></section>
+      <section><h3>Route grades</h3><p><b>G1</b> tar · <b>G2</b> good gravel, any car · <b>G3</b> rough gravel, corrugations and loose stones · <b>G4</b> 4x4 or adventure bike: rocks, sand, steep · <b>G5</b> expert: technical, river crossings. Each day shows a bar of how much is at each grade and a badge for the hardest bit. Tap 🛣 on the map to colour the route by grade.</p></section>
       <section><h3>3. Fuel</h3><p>Tell it how far you go between fills ("Stop at least every"). Towns with fuel are suggested at about that spacing. "Fuel not confirmed" means there's none on our map. Know better? Open the stop and tick "Fuel here".</p></section>
       <section><h3>4. Night stops</h3><p>🛏 marks where you sleep, on the map and in the list. Open a night stop for places to stay, with numbers and websites. Move a night stop and the days around it are worked out again.</p></section>
       <section><h3>5. Before you go</h3><p>Every day shows distance, riding time, sunset and weather. Orange means have a look: a long day, arriving near dark, rain or heat. "Good to know" lists what to sort out first, like public holidays, border posts, and long stretches without fuel or a hospital.</p></section>
@@ -488,7 +496,8 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
     <div><span class="flag finfo">◷</span> The clocks change during the day.</div>
     <div><span class="sty">STYLE_FAST</span> Get me there quickly. <span class="sty">STYLE_ROUGH</span> Road less travelled, or the style set in Settings.</div>
     <div><span class="tdot" style="background:var(--warn)"></span> A dot on a day tab: something on that day needs a look.</div>
-    <div><b>On the map</b> (green = shown): ⛽ fuel stations on the route · 🛏 places to stay at night stops · 🍴 food · ★ sights, viewpoints and passes · 🏥 hospitals and clinics · 🛣 road type, tar to single track (coming soon)</div>
+    <div><b>On the map</b> (green = shown): ⛽ fuel stations on the route · 🛏 places to stay at night stops · 🍴 food · ★ sights, viewpoints and passes · 🏥 hospitals and clinics · 🛣 the route coloured by grade</div>
+    <h3 style="margin-top:6px">Route grades</h3><div id="gradeKey" class="keylist" style="gap:6px"></div><p class="note">Graded from what OpenStreetMap says about each road. Roads change after rain and grading, so check locally. Riders' reports will sharpen this.</p>
     <p class="note">We show where fuel is; we don't track your tank. Suggested stops use your "Stop at least every" setting. Fuel, places and hospitals come from OpenStreetMap and can be wrong. Phone ahead on remote legs.</p>
     <div class="btns"><button class="btn" value="close">Close</button></div>
   </form>

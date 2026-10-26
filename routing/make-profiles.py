@@ -51,6 +51,7 @@ assign isgravel = or isunpaved and istrack not ispaved
 assign costfactor
   add max onewaypenalty accesspenalty
   add switch islinktype 0.05 0
+  add switch 4wd_only=yes {P4} 0
   switch and highway= not route=ferry 10000
   switch route=ferry 5.67
   switch isgravel ( switch istrack ( switch tracktype=grade4|grade5 {TRK45} {TRKC} ) {GRAV} )
@@ -67,6 +68,9 @@ assign costfactor
 assign priorityclassifier = 0
 assign classifiermask = 0
 assign dummyUsage = smoothness=
+assign dummyUsage2 = 4wd_only=
+assign dummyUsage3 = ford=
+assign dummyUsage4 = sac_scale=
 
 ---context:node
 assign motorvehicleaccess
@@ -84,11 +88,11 @@ VB='switch motorcycle= motorvehicleaccess motorcycle=yes|permissive|designated|d
 VC='switch motorcar= motorvehicleaccess motorcar=yes|permissive|designated|destination'
 P={
  # name: (vehicle access expr, motorway access, track access, costs)
- 'bike-rough':(VB,1,1,dict(GRAV=1.0,TRKC=1.3,TRK45=3.0,CMW=8,CT=2.5,CP=2.0,CS=1.7,CTE=1.45,CU=1.35)),
- 'bike-mixed':(VB,1,1,dict(GRAV=1.1,TRKC=1.8,TRK45=5,CMW=2.2,CT=1.5,CP=1.35,CS=1.25,CTE=1.2,CU=1.2)),
+ 'bike-rough':(VB,1,1,dict(P4=0.3,GRAV=1.0,TRKC=1.3,TRK45=3.0,CMW=8,CT=2.5,CP=2.0,CS=1.7,CTE=1.45,CU=1.35)),
+ 'bike-mixed':(VB,1,1,dict(P4=0.3,GRAV=1.1,TRKC=1.8,TRK45=5,CMW=2.2,CT=1.5,CP=1.35,CS=1.25,CTE=1.2,CU=1.2)),
  'bike-tar':  (VB,1,1,dict(GRAV=4,TRKC=8,TRK45=30,CMW=1.0,CT=1.0,CP=1.05,CS=1.15,CTE=1.25,CU=1.4)),
- 'jeep-rough':(VC,1,1,dict(GRAV=1.0,TRKC=1.1,TRK45=1.6,CMW=8,CT=2.5,CP=2.0,CS=1.7,CTE=1.45,CU=1.35)),
- 'jeep-mixed':(VC,1,1,dict(GRAV=1.1,TRKC=1.4,TRK45=3,CMW=2.2,CT=1.5,CP=1.35,CS=1.25,CTE=1.2,CU=1.2)),
+ 'jeep-rough':(VC,1,1,dict(P4=0,GRAV=1.0,TRKC=1.1,TRK45=1.6,CMW=8,CT=2.5,CP=2.0,CS=1.7,CTE=1.45,CU=1.35)),
+ 'jeep-mixed':(VC,1,1,dict(P4=0,GRAV=1.1,TRKC=1.4,TRK45=3,CMW=2.2,CT=1.5,CP=1.35,CS=1.25,CTE=1.2,CU=1.2)),
  'jeep-tar':  (VC,1,1,dict(GRAV=4,TRKC=8,TRK45=30,CMW=1.0,CT=1.0,CP=1.05,CS=1.15,CTE=1.25,CU=1.4)),
  'car-rough': (VC,1,0,dict(GRAV=1.2,TRKC=4,TRK45=50,CMW=6,CT=2.2,CP=1.8,CS=1.5,CTE=1.3,CU=1.3)),
  'car-mixed': (VC,1,0,dict(GRAV=1.6,TRKC=8,TRK45=50,CMW=1.8,CT=1.3,CP=1.2,CS=1.2,CTE=1.2,CU=1.3)),

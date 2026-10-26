@@ -1,7 +1,7 @@
 var __defProp = Object.defineProperty;
 var __name = (target, value) => __defProp(target, "name", { value, configurable: true });
 
-// ../.wrangler/tmp/bundle-dFwCBh/strip-cf-connecting-ip-header.js
+// ../.wrangler/tmp/bundle-7skiLT/strip-cf-connecting-ip-header.js
 function stripCfConnectingIPHeader(input, init) {
   const request = new Request(input, init);
   request.headers.delete("CF-Connecting-IP");
@@ -251,11 +251,12 @@ function routeCols(b) {
     style: clean(s.style, 10) || null,
     region: clean(b.region, 10) || null,
     start_lat: Number.isFinite(+trip.start.lat) ? +trip.start.lat : null,
-    start_lon: Number.isFinite(+trip.start.lon) ? +trip.start.lon : null
+    start_lon: Number.isFinite(+trip.start.lon) ? +trip.start.lon : null,
+    grade_json: b.grade && Array.isArray(b.grade.km) ? JSON.stringify({ km: b.grade.km.slice(0, 6).map((x) => Math.max(0, Math.round(+x || 0))), top: Math.max(0, Math.min(5, +b.grade.top || 0)) }) : null
   };
 }
 __name(routeCols, "routeCols");
-var LIST_COLS = `id, title, summary, km, days, vehicle, style, visibility, pick, created, updated`;
+var LIST_COLS = `id, title, summary, km, days, vehicle, style, visibility, pick, grade_json, created, updated`;
 var onRequestGet3 = handle(async ({ request, env }) => {
   const u = await requireUser(env, request);
   const r = await (await db(env)).prepare(`SELECT ${LIST_COLS} FROM routes WHERE user_id = ? ORDER BY updated DESC LIMIT 200`).bind(u.id).all();
@@ -268,7 +269,7 @@ var onRequestPost3 = handle(async ({ request, env }) => {
   if (n && n.n >= 500)
     throw new HttpError(400, "You've reached 500 saved routes. Delete some first.");
   const id = newId(8);
-  await D.prepare(`INSERT INTO routes (id, user_id, title, summary, data, km, days, vehicle, style, region, start_lat, start_lon, created, updated) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(id, u.id, c.title, c.summary, c.data, c.km, c.days, c.vehicle, c.style, c.region, c.start_lat, c.start_lon, t, t).run();
+  await D.prepare(`INSERT INTO routes (id, user_id, title, summary, data, km, days, vehicle, style, region, start_lat, start_lon, grade_json, created, updated) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`).bind(id, u.id, c.title, c.summary, c.data, c.km, c.days, c.vehicle, c.style, c.region, c.start_lat, c.start_lon, c.grade_json, t, t).run();
   return json({ id, title: c.title });
 });
 
@@ -296,7 +297,7 @@ var onRequestPut = handle(async ({ request, env, params }) => {
   const vis = VIS.includes(b.visibility) ? b.visibility : r.visibility;
   if (b.trip) {
     const c = routeCols({ ...b, title: b.title || r.title });
-    await D.prepare(`UPDATE routes SET title=?, summary=?, data=?, km=?, days=?, vehicle=?, style=?, region=?, start_lat=?, start_lon=?, visibility=?, updated=? WHERE id=?`).bind(c.title, c.summary, c.data, c.km, c.days, c.vehicle, c.style, c.region, c.start_lat, c.start_lon, vis, now(), r.id).run();
+    await D.prepare(`UPDATE routes SET title=?, summary=?, data=?, km=?, days=?, vehicle=?, style=?, region=?, start_lat=?, start_lon=?, grade_json=?, visibility=?, updated=? WHERE id=?`).bind(c.title, c.summary, c.data, c.km, c.days, c.vehicle, c.style, c.region, c.start_lat, c.start_lon, c.grade_json, vis, now(), r.id).run();
   } else {
     await D.prepare(`UPDATE routes SET title=?, visibility=?, updated=? WHERE id=?`).bind(clean(b.title, 120) || r.title, vis, now(), r.id).run();
   }
@@ -1013,7 +1014,7 @@ var jsonError = /* @__PURE__ */ __name(async (request, env, _ctx, middlewareCtx)
 }, "jsonError");
 var middleware_miniflare3_json_error_default = jsonError;
 
-// ../.wrangler/tmp/bundle-dFwCBh/middleware-insertion-facade.js
+// ../.wrangler/tmp/bundle-7skiLT/middleware-insertion-facade.js
 var __INTERNAL_WRANGLER_MIDDLEWARE__ = [
   middleware_ensure_req_body_drained_default,
   middleware_miniflare3_json_error_default
@@ -1045,7 +1046,7 @@ function __facade_invoke__(request, env, ctx, dispatch, finalMiddleware) {
 }
 __name(__facade_invoke__, "__facade_invoke__");
 
-// ../.wrangler/tmp/bundle-dFwCBh/middleware-loader.entry.ts
+// ../.wrangler/tmp/bundle-7skiLT/middleware-loader.entry.ts
 var __Facade_ScheduledController__ = class {
   constructor(scheduledTime, cron, noRetry) {
     this.scheduledTime = scheduledTime;

@@ -35,6 +35,18 @@ function fakeRoute(body) {
   return { trip: { summary: { length: km, time: km / 70 * 3600 }, legs: [{ shape: enc6(pts) }] } };
 }
 
+// BRouter-style answer: a straight line in three parts, tar, gravel and a rough 4x4 track
+function fakeBrouter(u) {
+  const ll = decodeURIComponent(u.match(/lonlats=([^&]+)/)[1]).split("|").map(x => x.split(",").map(Number));
+  const [[lo1, la1], [lo2, la2]] = ll, R = 6371, rad = x => x * Math.PI / 180;
+  const km = 2 * R * Math.asin(Math.sqrt(Math.sin(rad(la2 - la1) / 2) ** 2 + Math.cos(rad(la1)) * Math.cos(rad(la2)) * Math.sin(rad(lo2 - lo1) / 2) ** 2)) * 1.2;
+  const n = Math.max(2, Math.round(km)), coords = [];
+  for (let i = 0; i <= n; i++) coords.push([lo1 + (lo2 - lo1) * i / n, la1 + (la2 - la1) * i / n]);
+  const m = km * 1000, parts = [[0.5, "highway=primary surface=asphalt"], [0.35, "highway=unclassified surface=gravel"], [0.15, "highway=track tracktype=grade4"]];
+  const messages = [["Longitude", "Latitude", "Elevation", "Distance", "CostPerKm", "ElevCost", "TurnCost", "NodeCost", "InitialCost", "WayTags", "NodeTags", "Time", "Energy"],
+    ...parts.map(([f, w]) => ["0", "0", "0", String(Math.round(m * f)), "1000", "0", "0", "0", "0", w, "", "0", "0"])];
+  return { type: "FeatureCollection", features: [{ type: "Feature", properties: { "track-length": String(Math.round(m)), messages }, geometry: { type: "LineString", coordinates: coords } }] };
+}
 const day = n => { const d = new Date(); d.setDate(d.getDate() + n); return d.toISOString().slice(0, 10); };
 const TRIP = {
   startDate: day(1), endDate: day(2), round: false, sugV: 4,
@@ -54,6 +66,8 @@ const TRIP = {
   await page.route("**/*", async route => {
     const u = route.request().url();
     if (u.startsWith(base)) return route.continue();
+    if (u.includes("brouter.de/brouter/profile")) return route.fulfill({ contentType: "application/json", body: '{"profileid":"custom_1"}' });
+    if (u.includes("brouter.de/brouter?")) return route.fulfill({ contentType: "application/json", body: JSON.stringify(fakeBrouter(u)) });
     if (u.includes("api.stadiamaps.com/route")) return route.fulfill({ contentType: "application/json", body: JSON.stringify(fakeRoute(JSON.parse(route.request().postData()))) });
     if (leafletDir && /unpkg\.com\/leaflet@[\d.]+\/dist\/(.+)$/.test(u)) { const f = path.join(leafletDir, u.match(/dist\/(.+)$/)[1]); if (fs.existsSync(f)) return route.fulfill({ path: f }); }
     if (u.includes("unpkg.com/leaflet")) return route.continue();
@@ -72,6 +86,9 @@ const TRIP = {
   ok(await page.evaluate(() => trip.days.every(d => !d.fresh)), "suggestions not settled after one pass");
   ok(await page.$$eval(".sumbox", b => b.length) >= 2, "overview day boxes missing");
   ok(await page.$$eval(".sumbox .wmin", b => b.length) === 0, "fuel warning text shown on overview");
+  const gr = await page.evaluate(() => { const G = tripGrade(); return G && { top: G.top, g1: Math.round(G.km[1]), g2: Math.round(G.km[2]), g4: Math.round(G.km[4]) }; });
+  ok(gr && gr.top === 4 && gr.g1 > gr.g2 && gr.g2 > gr.g4 && gr.g4 > 0, "route grading wrong: " + JSON.stringify(gr));
+  ok(await page.$$eval(".sumbox .gradebar", b => b.length) >= 2, "grade bar missing on the day boxes");
 
   await page.click('[data-day="0"]'); await page.waitForTimeout(500);
   ok(await page.$$eval("ol.stops li", b => b.length) >= 2, "day stop list missing");
