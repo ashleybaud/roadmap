@@ -104,6 +104,8 @@ function goodToKnow(k){
   if(w&&w.tz) add("info","route","Clocks change today: "+utc(w.tz.from)+" to "+utc(w.tz.to)+".");
 
   if(typeof reportsFor==="function") reportsFor(k).forEach(function(r){ add(r.lvl,"route",r.text); });
+  if(typeof gradeWarnFor==="function") gradeWarnFor(k).forEach(function(r){ add(r.lvl,"route",r.text); });
+  if(typeof elevFor==="function") elevFor(k).forEach(function(r){ add(r.lvl,"route",r.text); });
   var rank={bad:0,warn:1,info:2};
   return out.sort(function(a,b){return rank[a.lvl]-rank[b.lvl];});
 }

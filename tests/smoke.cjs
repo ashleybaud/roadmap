@@ -41,7 +41,7 @@ function fakeBrouter(u) {
   const [[lo1, la1], [lo2, la2]] = ll, R = 6371, rad = x => x * Math.PI / 180;
   const km = 2 * R * Math.asin(Math.sqrt(Math.sin(rad(la2 - la1) / 2) ** 2 + Math.cos(rad(la1)) * Math.cos(rad(la2)) * Math.sin(rad(lo2 - lo1) / 2) ** 2)) * 1.2;
   const n = Math.max(2, Math.round(km)), coords = [];
-  for (let i = 0; i <= n; i++) coords.push([lo1 + (lo2 - lo1) * i / n, la1 + (la2 - la1) * i / n]);
+  for (let i = 0; i <= n; i++) coords.push([lo1 + (lo2 - lo1) * i / n, la1 + (la2 - la1) * i / n, 200 + 600 * Math.sin(Math.PI * i / n)]);
   const m = km * 1000, parts = [[0.5, "highway=primary surface=asphalt"], [0.35, "highway=unclassified surface=gravel"], [0.15, "highway=track tracktype=grade4"]];
   const messages = [["Longitude", "Latitude", "Elevation", "Distance", "CostPerKm", "ElevCost", "TurnCost", "NodeCost", "InitialCost", "WayTags", "NodeTags", "Time", "Energy"],
     ...parts.map(([f, w]) => ["0", "0", "0", String(Math.round(m * f)), "1000", "0", "0", "0", "0", w, "", "0", "0"])];
@@ -89,6 +89,9 @@ const TRIP = {
   const gr = await page.evaluate(() => { const G = tripGrade(); return G && { top: G.top, g1: Math.round(G.km[1]), g2: Math.round(G.km[2]), g4: Math.round(G.km[4]) }; });
   ok(gr && gr.top === 4 && gr.g1 > gr.g2 && gr.g2 > gr.g4 && gr.g4 > 0, "route grading wrong: " + JSON.stringify(gr));
   ok(await page.$$eval(".sumbox .gradebar", b => b.length) >= 2, "grade bar missing on the day boxes");
+  const el = await page.evaluate(() => { const E = dayElev(0); return E && { up: E.up, top: E.top }; });
+  ok(el && el.top >= 700 && el.up >= 500, "elevation not worked out: " + JSON.stringify(el));
+  ok(await page.$$eval(".sumbox .elevline", b => b.length) >= 2, "climb line missing on the day boxes");
 
   await page.click('[data-day="0"]'); await page.waitForTimeout(500);
   ok(await page.$$eval("ol.stops li", b => b.length) >= 2, "day stop list missing");

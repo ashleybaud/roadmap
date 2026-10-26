@@ -16,7 +16,8 @@ async function brProfile(name,fresh){
 const SPD={bike:{motorway:110,trunk:100,primary:90,secondary:80,tertiary:70,unclassified:60,res:35,gravel:65,track:40,rough:25},
   jeep:{motorway:110,trunk:100,primary:90,secondary:80,tertiary:70,unclassified:60,res:35,gravel:60,track:40,rough:20},
   car:{motorway:120,trunk:110,primary:100,secondary:90,tertiary:80,unclassified:70,res:35,gravel:60,track:30,rough:10}};
-function brSpeed(w,veh){ const S=SPD[veh]||SPD.bike, h=(w.match(/highway=(\w+)/)||[])[1]||"", unp=/surface=(unpaved|gravel|fine_gravel|compacted|dirt|earth|ground|sand|pebblestone|grass|mud)/.test(w);
+function brSpeed(w,veh){ const gs=gradeSpeed(wayGrade(w),veh); if(gs) return gs; // off tar: by terrain grade and vehicle
+  const S=SPD[veh]||SPD.bike, h=(w.match(/highway=(\w+)/)||[])[1]||"", unp=/surface=(unpaved|gravel|fine_gravel|compacted|dirt|earth|ground|sand|pebblestone|grass|mud)/.test(w);
   if(h==="track") return /tracktype=grade(4|5)/.test(w)?S.rough:S.track;
   if(unp) return S.gravel;
   const base=h.replace("_link",""); return S[base]||(/residential|living_street|service/.test(h)?S.res:50); }
@@ -29,7 +30,7 @@ async function brouterLeg(a,b,veh,style,alts){
     const f=JSON.parse(t).features[0], msgs=f.properties.messages||[], hd=msgs[0]||[], iD=hd.indexOf("Distance"), iW=hd.indexOf("WayTags");
     let min=0, grav=0, at=0; const grades=[]; msgs.slice(1).forEach(m=>{ const d=(+m[iD]||0)/1000, w=m[iW]||""; min+=d/brSpeed(w,veh)*60; if(/surface=(unpaved|gravel|fine_gravel|compacted|dirt|earth|ground|sand)|highway=track/.test(w)&&!/surface=(paved|asphalt|concrete)/.test(w)) grav+=d;
       const g=wayGrade(w), last=grades[grades.length-1]; if(last&&last[2]===g) last[1]=at+d; else grades.push([at,at+d,g]); at+=d; });
-    return {km:(+f.properties["track-length"]||0)/1000,min,gravelKm:grav,grades,geom:f.geometry.coordinates.map(([lo,la])=>({lat:la,lon:lo}))}; };
+    return {km:(+f.properties["track-length"]||0)/1000,min,gravelKm:grav,grades,geom:f.geometry.coordinates.map(([lo,la,el])=>el!=null?{lat:la,lon:lo,ele:el}:{lat:la,lon:lo})}; };
   const out=[await get(0)];
   if(alts) for(const i of [1,2]){ try{ const x=await get(i); if(Math.abs(x.km-out[0].km)>1) out.push(x); }catch(e){} }
   return out;

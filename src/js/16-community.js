@@ -57,7 +57,7 @@ async function loadRating(){ const k=rateKey(); if(!acct.ready||!k||k===rating.k
   try{ rating.data=await api("/api/ratings?route="+encodeURIComponent(k)); renderDetails(); }catch(e){} }
 function rateLine(){
   if(!acct.ready||!rateKey()) return ""; const d=rating.key===rateKey()?rating.data:null;
-  const sum=d&&d.n?`<span>★ ${d.stars} from ${d.n} rider${d.n>1?"s":""}${d.grade?` · riders say G${Math.round(d.grade)}`:""}</span>`:`<span class="note">No ratings yet.</span>`;
+  const sum=d&&d.n?`<span>★ ${d.stars} from ${d.n} rider${d.n>1?"s":""}${d.grade?` · riders say ${GRADES[Math.round(d.grade)].name}`:""}</span>`:`<span class="note">No ratings yet.</span>`;
   return `<div class="rateline">${sum}<button class="linkbtn" type="button" data-rate>${d&&d.mine?"Change your rating":"Rode it? Rate it"}</button></div>`;
 }
 let rtStars=0;
@@ -65,7 +65,7 @@ function openRate(){
   if(!acct.user){ acct.why="Sign in to rate this route. Ratings only come from riders who've ridden it."; openAcct("signin"); return; }
   const m=rating.data&&rating.data.mine; rtStars=m?m.stars:0; $("rtMsg").textContent="";
   $("rtStars").innerHTML=[1,2,3,4,5].map(i=>`<button type="button" data-st="${i}" class="${i<=rtStars?"on":""}" aria-label="${i} star${i>1?"s":""}">★</button>`).join("");
-  $("rtGrade").innerHTML=GRADES.slice(1).map(x=>`<option value="${x.g}">${x.short} ${x.name}</option>`).join("");
+  $("rtGrade").innerHTML=GRADES.slice(1).map(x=>`<option value="${x.g}">${x.name} (${vehNote(x.g)})</option>`).join("");
   const G=tripGrade(); $("rtGrade").value=m?m.grade:(G&&G.top||2); $("rtDate").value=m?m.rode_on:""; $("rtDate").max=ymd(new Date()); $("rtVeh").value=m&&m.vehicle||settings.vehicle||"bike";
   $("rateDlg").showModal();
 }
