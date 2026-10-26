@@ -4,8 +4,8 @@ const TABS={fuel:"Fuel",stay:"Stay",food:"Food",sight:"Sights"};
 const DAYCOL=["#0B6E4F","#2F5BA8","#9A6A33","#6B4E9B","#B3261E","#00838F","#5D4037"];
 function ymd(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 function addDays(s,n){const d=new Date(s+"T12:00:00");d.setDate(d.getDate()+n);return ymd(d);}
-const dayName=k=>dayDate(k).toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"});
-const dayLong=k=>dayDate(k).toLocaleDateString(undefined,{weekday:"long",day:"numeric",month:"long"});
+const dayName=k=>dayDate(k).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"});
+const dayLong=k=>dayDate(k).toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
 const fmtDate=d=>d.toLocaleDateString(undefined,{weekday:"short",day:"numeric",month:"short"});
 const tomorrow=ymd(new Date(Date.now()+86400000));
 const pt=(name,lat,lon,extra)=>Object.assign({name,lat,lon},extra||{});
@@ -508,14 +508,29 @@ function gradesTxt(t){ const e=(t&&t.extra)||""; const g=[]; if(/\b93\b/.test(e)
 /* ---------- summary box: one line per day, used on the Overview and the day view ---------- */
 function stopsChain(k){
   const d=trip.days[k], v=d.vias.filter(x=>x.lat!=null);
-  return v.map((x,i)=>x.auto?`<i class="autoname" data-gostop="${k}:${i+1}">${esc(x.name)}${x.fuelHere?" ⛽":" (fuel?)"}${x.detour?` (+${x.detour} km)`:""}</i>`:`<b>${esc(x.name)}</b>`).join(", ");
+  return v.map((x,i)=>x.auto?`<i class="autoname" data-gostop="${k}:${i+1}">${esc(x.name)}${x.fuelHere?" ⛽":" (fuel?)"}${x.detour?` (+${x.detour} km)`:""}</i>`:`<span class="stopname">${esc(x.name)}</span>`).join(`<span class="arr">→</span>`);
 }
+// the way this day is ridden: one icon on the right of every day line, matching the icons on each stretch
+function dayWay(k){
+  const d=trip.days[k], pts=dayPts(k), pd=!planStale&&plan&&plan.days[k]; if(!pts) return "";
+  const n=pts.length-1; let fast=0, gpx=0;
+  for(let j=0;j<n;j++){ if(pd&&pd.legs[j]&&pd.legs[j].gpx) gpx++; else if(legFast(d,j)) fast++; }
+  if(gpx===n) return `<span class="dway" title="Follows your GPX file"><span class="note gpxnote">GPX</span></span>`;
+  const rest=n-gpx, all=fast===rest, none=fast===0;
+  const t=all?"Quick way all day":none?`${styleName()} all day`:`${styleName()}, with ${fast} stretch${fast>1?"es":""} the quick way`;
+  return `<span class="dway" title="${esc(t)}. Change it per stretch on the day's stops.">${none?STYLE_ICON.default:all?STYLE_ICON.fast:STYLE_ICON.default+STYLE_ICON.fast}</span>`;
+}
+function fromCell(k){ const from=dayFrom(k); if(!from) return `<span class="ep">?</span>`; return `<span class="ep">${k===0?"▶":"🛏"} ${esc(from.name)}</span>`; }
 function sumBox(k,big){
-  const pd=!planStale&&plan&&plan.days[k], d=trip.days[k], r=pd?dayRisk(k):null, from=dayFrom(k);
-  const msg=!trip.start||trip.start.lat==null?(k===0?"Set From above to see the route":""):!from?"Pick the night stop before this day":!dayTo(k)?"Pick where you sleep":!dayPts(k)?"Add a stop or a finish":"Working out the route…";
-  const chain=stopsChain(k), ds=fp&&fp.days&&fp.days[k];
+  const pd=!planStale&&plan&&plan.days[k], d=trip.days[k], r=pd?dayRisk(k):null, from=dayFrom(k), last=k===nDays()-1;
+  const msg=!trip.start||trip.start.lat==null?(k===0?"Set your start above to see the route":""):!from?"Pick the night stop before this day":!dayTo(k)?(last?"Pick where you finish":"Pick where you sleep"):!dayPts(k)?"Add a stop or a finish":"Working out the route…";
+  const chain=stopsChain(k), arr=` <span class="arr">→</span> `, toSym=last?(trip.round?"⟲":"🏁"):"🛏";
+  const date=`<span class="sdate">${esc(big?dayLong(k):dayName(k))}</span>`;
+  const line=nDays()===1&&trip.round&&!trip.days[0].vias.length
+    ?`<span class="schain">${fromCell(k)}${arr}<span class="wherebox">${searchBox("whereto-0","","Where to?",true)}</span>${arr}<span class="ep">⟲ back home</span></span>`
+    :`<span class="schain">${fromCell(k)}${arr}${chain?chain+arr:""}<span class="ep to">${toSym} ${toCell(k)}</span></span>${dayWay(k)}`;
   return `<div class="sumbox ${big?"big":""}">
-    ${nDays()===1&&trip.round&&!trip.days[0].vias.length?`<div class="sumline"><span class="sdate">${esc(big?dayLong(k):dayName(k))}:</span> ${esc(from?from.name:"?")} <span class="arr">→</span> <span class="wherebox">${searchBox("whereto-0","","Where to?",true)}</span> <span class="arr">→</span> back home</div>`:`<div class="sumline"><span class="sdate">${esc(big?dayLong(k):dayName(k))}:</span> ${esc(from?from.name:"?")} <span class="arr">→</span> ${chain?chain+` <span class="arr">→</span> `:""}${toCell(k)}${dayPts(k)&&dayPts(k).slice(1).some((_,j)=>legFast(d,j))?` <span class="sty" title="Quick way on some or all of this day">${STYLE_ICON.fast}</span>`:""}</div>`}
+    <div class="sumline">${date}<div class="sumrow">${line}</div></div>
     ${pd?`<div class="sicons"><span class="sl">${timePill(k,pd.km,dayMinutes(k),`data-focusday="${k}"`)+fuelBtn(k)}</span><span class="sr">${sunSpan(k)+wxLink(k)}<span class="flags">${flagIcons(r,k)}</span></span></div>${riskHtml(r,k)}${big?fuelList(k):""}${!big&&nDays()>1?gtkLine(k):""}`:`<div class="note">${msg}</div>`}
   </div>`;
 }
@@ -594,7 +609,7 @@ function stopList(k){
     if(j===0) return;
     const isFrom=j===0, isTo=j===pd.pts.length-1, vi=j-1, L=j>0?pd.legs[j-1]:null, lg=j>0?(d.legs[j-1]||{}):{};
     const open=stopFocus&&stopFocus.k===k&&stopFocus.j===j, km=j>0?Math.round(pd.legs[j-1].b-pd.a):0;
-    const lab=isFrom?"From":isTo?(last?"Finish":"Night stop"):`Stop ${j}`;
+    const lab=isFrom?"From":isTo?(last?(trip.round?"⟲ Home":"🏁 Finish"):"🛏 Night stop"):`Stop ${j}`;
     const av=placesOk?stopAvail(p):null;
     const icons=av?AV.filter(a=>av[a[0]].length).map(a=>`<button type="button" class="avi ${open&&stopFocus.cat===a[0]?"on":""}" data-av="${k}:${j}:${a[0]}" title="${esc(a[2])}: ${av[a[0]].length}">${a[1]}</button>`).join(""):"";
     const fq=legFast(d,j-1), way=lg.track||(L&&L.gpx)?(L&&L.gpx?`<span class="note gpxnote" title="This stretch follows your GPX file">GPX</span>`:""):`<span class="seg2 legway" role="group" aria-label="Way to this stop"><button type="button" data-legsty="${j-1}:0" class="${fq?"":"on"}" title="${esc(styleName())} to here">${STYLE_ICON.default}</button><button type="button" data-legsty="${j-1}:1" class="${fq?"on":""}" title="Get me here quickly">${STYLE_ICON.fast}</button></span>`;
