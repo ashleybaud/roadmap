@@ -1,0 +1,79 @@
+---context:global
+assign downhillcost 0
+assign downhillcutoff 0
+assign uphillcost 0
+assign uphillcutoff 0
+assign validForBikes 1
+assign validForCars 1
+assign turnInstructionMode = 0
+
+---context:way
+assign turncost = if junction=roundabout then 0 else 20
+assign initialclassifier = if route=ferry then 1 else 0
+assign initialcost switch route=ferry 20000 0
+assign isresidentialorliving = or highway=residential|living_street living_street=yes
+assign istrack = highway=track
+assign motorvehicleaccess
+  switch motor_vehicle=
+    switch vehicle=
+      switch access=
+        switch highway=motorway|motorway_link 1
+        switch highway=trunk|trunk_link 1
+        switch highway=primary|primary_link 1
+        switch highway=secondary|secondary_link 1
+        switch highway=tertiary|tertiary_link 1
+        switch highway=unclassified 1
+        switch route=ferry 1
+        switch isresidentialorliving 1
+        switch highway=service 1
+        switch highway=track 1
+        0
+        access=yes|permissive|designated|destination
+      vehicle=yes|permissive|designated|destination
+    motor_vehicle=yes|permissive|designated|destination
+assign vehicleaccess
+  switch motorcycle= motorvehicleaccess motorcycle=yes|permissive|designated|destination
+assign accesspenalty switch vehicleaccess 0 10000
+assign onewaypenalty
+  switch switch reversedirection=yes
+         switch oneway=
+                junction=roundabout
+                oneway=yes|true|1
+         oneway=-1
+  10000
+  0.0
+assign islinktype = highway=motorway_link|trunk_link|primary_link|secondary_link|tertiary_link
+assign ispaved = surface=paved|asphalt|concrete|paving_stones|sett|chipseal|metal|concrete:plates
+assign isunpaved = surface=unpaved|gravel|fine_gravel|compacted|dirt|earth|ground|sand|pebblestone|grass|mud|rock|gravel_turf
+assign isgravel = or isunpaved and istrack not ispaved
+assign costfactor
+  add max onewaypenalty accesspenalty
+  add switch islinktype 0.05 0
+  switch and highway= not route=ferry 10000
+  switch route=ferry 5.67
+  switch isgravel ( switch istrack ( switch tracktype=grade4|grade5 30 8 ) 4 )
+  switch highway=motorway|motorway_link 1.0
+  switch highway=trunk|trunk_link 1.0
+  switch highway=primary|primary_link 1.05
+  switch highway=secondary|secondary_link 1.15
+  switch highway=tertiary|tertiary_link 1.25
+  switch highway=unclassified 1.4
+  switch isresidentialorliving 2
+  switch highway=service 2
+  switch istrack 8
+  10000
+assign priorityclassifier = 0
+assign classifiermask = 0
+assign dummyUsage = smoothness=
+
+---context:node
+assign motorvehicleaccess
+  switch motor_vehicle=
+    switch vehicle=
+      switch access=
+        switch barrier=bollard|cycle_barrier 0
+        1
+        access=yes|permissive|designated|destination
+      vehicle=yes|permissive|designated|destination
+    motor_vehicle=yes|permissive|designated|destination
+assign initialcost switch motorvehicleaccess 0 1000000
