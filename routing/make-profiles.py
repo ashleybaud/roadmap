@@ -97,6 +97,10 @@ P={
  'car-rough': (VC,1,0,dict(P4=10000,GRAV=1.2,TRKC=4,TRK45=50,CMW=6,CT=2.2,CP=1.8,CS=1.5,CTE=1.3,CU=1.3)),
  'car-mixed': (VC,1,0,dict(P4=10000,GRAV=1.6,TRKC=8,TRK45=50,CMW=1.8,CT=1.3,CP=1.2,CS=1.2,CTE=1.2,CU=1.3)),
  'car-tar':   (VC,1,0,dict(P4=10000,GRAV=5,TRKC=20,TRK45=50,CMW=1.0,CT=1.0,CP=1.05,CS=1.15,CTE=1.25,CU=1.4)),
+ # fastest for the vehicle: cost ~ time, gravel weighed by how fast it's really ridden or driven (the blue "quick way")
+ 'bike-fast': (VB,1,1,dict(P4=0.3,GRAV=1.7,TRKC=2.2,TRK45=3.5,CMW=1.0,CT=1.1,CP=1.22,CS=1.37,CTE=1.57,CU=1.83)),
+ 'jeep-fast': (VC,1,1,dict(P4=0,GRAV=1.83,TRKC=3.1,TRK45=7.3,CMW=1.0,CT=1.1,CP=1.22,CS=1.37,CTE=1.57,CU=1.83)),
+ 'car-fast':  (VC,1,0,dict(P4=10000,GRAV=1.9,TRKC=3.7,TRK45=50,CMW=1.0,CT=1.1,CP=1.22,CS=1.37,CTE=1.57,CU=1.83)),
 }
 out={}
 for k,(va,mw,trk,c) in P.items():
@@ -104,4 +108,5 @@ for k,(va,mw,trk,c) in P.items():
     for kk,v in c.items(): s=s.replace('{'+kk+'}',str(v))
     out[k]=s
 json.dump(out,open('profiles.json','w'))
+for k,v in out.items(): open(k+'.brf','w').write(v)
 print(len(out), len(out['bike-rough']))
