@@ -254,7 +254,7 @@ function dayWx(k){
   const hits=rows.map(x=>{const i=x.daily.time.indexOf(date); return i<0?null:{role:x.role,code:x.daily.weather_code[i],tmax:x.daily.temperature_2m_max[i],tmin:x.daily.temperature_2m_min[i],rain:x.daily.precipitation_sum[i],prob:x.daily.precipitation_probability_max[i],gust:x.daily.wind_gusts_10m_max[i],sunset:x.daily.sunset[i]};}).filter(Boolean);
   const from=rows.find(x=>x.role==="from"), to=rows.find(x=>x.role==="to");
   const tz=from&&to&&from.tz!=null&&to.tz!=null&&from.tz!==to.tz?{from:from.tz,to:to.tz}:null;
-  if(!hits.length) return {none:true,opens:addDays(date,-15),tz};
+  if(!hits.length) return date<ymd(new Date())?{none:true,past:true,tz}:{none:true,opens:addDays(date,-15),tz};
   const mx=f=>Math.max(...hits.map(h=>h[f]??-99)), mn=f=>Math.min(...hits.map(h=>h[f]??99));
   const toH=hits.find(h=>h.role==="to");
   return {code:mx("code"),tmax:mx("tmax"),tmin:mn("tmin"),rain:mx("rain"),prob:mx("prob"),gust:mx("gust"),sunset:toH&&toH.sunset,tz};
@@ -321,6 +321,7 @@ function wxLink(k){
   const w=dayWx(k), to=dayTo(k); if(!to) return "";
   const href=`https://www.windy.com/?${to.lat.toFixed(2)},${to.lon.toFixed(2)},9`;
   if(!w) return `<a class="wxlink" href="${href}" target="_blank" rel="noopener" title="Forecast for the area">☁ …</a>`;
+  if(w.past) return "";
   if(w.none) return `<a class="wxlink" href="${href}" target="_blank" rel="noopener" title="Forecast for the area">☁ from ${esc(fmtDate(new Date(w.opens+"T12:00:00")))}</a>`;
   return `<a class="wxlink" href="${href}" target="_blank" rel="noopener" title="${esc(wxText(w))}. Opens the forecast for the area.">${WXI(w.code)} ${Math.round(w.tmin)}–${Math.round(w.tmax)}°C</a>`;
 }
@@ -932,7 +933,7 @@ function drawMap(){
     else if(p.auto){ html=`<div class="mapemo dashed">⛽${badge}</div>`; label="Suggested: "+p.name; }
     else { html=`<div class="pin pstop">${stopFuel(p)?"⛽":"•"}${badge}</div>`; label=p.name; }
     const key=sel?true:(isStart||night||isEnd);
-    const m=L.marker([p.lat,p.lon],{icon:L.divIcon({className:"",html,iconSize:size,iconAnchor:[size[0]/2,size[1]/2]}),zIndexOffset:night||isStart||isEnd?1000:0}).bindTooltip(label,key?{permanent:true,direction:"right",offset:[size[0]/2,0],className:"maplbl"+(night?" mlnight":"")}:{}).addTo(layer);
+    const m=L.marker([p.lat,p.lon],{icon:L.divIcon({className:"",html,iconSize:size,iconAnchor:[size[0]/2,size[1]/2]}),zIndexOffset:night||isStart||isEnd?1000:0}).bindTooltip(label,key?{permanent:true,direction:night&&nk%2===1?"left":"right",offset:[night&&nk%2===1?-size[0]/2:size[0]/2,0],className:"maplbl"+(night?" mlnight":"")}:{}).addTo(layer);
     m.on("click",()=>{ const k=trip.days.findIndex((d,i)=>plan.days[i]&&plan.days[i].pts.includes(p)&&(sel?i===ui.tab:true)); if(k<0) return; const j=plan.days[k].pts.indexOf(p); ui.tab=k; stopFocus={k,j}; saveUi(); renderAll(); });
   });
   if(fp&&ui.lay.fuel){

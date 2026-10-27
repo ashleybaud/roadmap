@@ -35,8 +35,8 @@ a{color:var(--accent)}.wrap{max-width:820px;margin:0 auto;padding:0 16px}
 header{border-bottom:2px solid var(--ink);padding:14px 0 12px}
 .logo{display:inline-block;font:700 2.7rem/1 "Barlow Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:-.005em;color:var(--ink);text-decoration:none}
 .motto{font:700 1.2rem "Barlow Condensed","Arial Narrow",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:2px 0 0}
-.hdrlinks{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}.hdrlinks a{font:700 1.05rem "Barlow Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.05em;text-decoration:none;color:#fff;background:#0B6E4F;padding:5px 14px;border-radius:5px;border:2px solid #0B6E4F}.hdrlinks a:hover{filter:brightness(1.12)}.hdrlinks a.on{background:transparent;color:var(--accent);border-color:var(--accent)}
-@media (max-width:640px){.logo{font-size:1.9rem}.motto{font-size:.95rem}.hdrlinks a{font-size:.95rem;padding:4px 10px}}
+.hdrlinks{display:grid;grid-template-columns:repeat(4,auto);justify-content:start;gap:0;margin:10px 0 0;background:var(--ink);border-radius:6px;overflow:hidden;width:100%}.hdrlinks a{font:700 1.15rem "Barlow Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.06em;text-decoration:none;color:var(--bg);padding:9px 20px;border:0;border-bottom:4px solid transparent;background:none;border-radius:0;white-space:nowrap}.hdrlinks a:hover{background:color-mix(in srgb,var(--bg) 12%,transparent)}.hdrlinks a.on{border-bottom-color:#D9A441}@media (max-width:640px){.hdrlinks{grid-template-columns:repeat(2,minmax(0,1fr))}.hdrlinks a{font-size:.95rem;padding:8px 4px;text-align:center;letter-spacing:.03em}}
+@media (max-width:640px){.logo{font-size:1.9rem}.motto{font-size:.95rem}}
 h1,h2{font-family:"Barlow Condensed","Arial Narrow",sans-serif;line-height:1.1;text-transform:uppercase;letter-spacing:.01em}
 h1{font-size:2.4rem;margin:28px 0 6px}h2{font-size:1.5rem;margin:30px 0 8px}
 .meta{color:var(--muted);font-size:.95rem}.fdr{color:var(--accent);font-weight:600;margin:6px 0 0}
@@ -46,7 +46,8 @@ ol.days{padding-left:0;list-style:none}ol.days li{background:var(--panel);border
 blockquote{margin:14px 0;padding:4px 16px;border-left:3px solid var(--accent);background:var(--chip)}
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin:14px 0}.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px 14px;text-decoration:none;color:var(--ink)}.card b{display:block;color:var(--accent)}.card span{font-size:.85rem;color:var(--muted)}
 footer{border-top:1px solid var(--line);margin:40px 0 0;padding:16px 0 30px;color:var(--muted);font-size:.9rem}
-.note{font-size:.9rem;color:var(--muted)}`;
+.note{font-size:.9rem;color:var(--muted)}
+.photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin:18px 0}.photos img{width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:6px}`;
 
 function page({ url, title, desc, body, ld, image, active }) {
   return `<!doctype html>
@@ -101,9 +102,10 @@ ${f ? `<p class="fdr">Ridden by the founder${f.year ? " in " + f.year : ""} · $
 ${statBox}${S ? `<p class="note">Distances and grades from the planner's route on OpenStreetMap roads. Your plan may differ.</p>` : ""}
 ${S && S.grade ? `<p>Hardest stretch: <b>${GR[S.grade]}</b>, ${GRTXT[S.grade] || ""}. The grade reads differently by vehicle: what's fun on an adventure bike can be slow and hard in a car.</p>` : ""}
 <h2>Day by day</h2>${dayList}
+${f && f.photos && f.photos.length ? `<div class="photos">${f.photos.map((u, i) => `<img src="${esc(u)}" alt="${esc(r.title)}, ${f.year || ""} photo ${i + 1}" loading="lazy">`).join("")}</div>` : ""}
 ${f ? `<h2>The story</h2><blockquote><p>${esc(f.story)}</p></blockquote>
 ${f.tips && f.tips.length ? `<h2>Good to know</h2><ul>${f.tips.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
-<h2>Read the misadventures</h2><ul>${f.posts.map(p => `<li><a href="${esc(p.u)}">${esc(p.t)}</a></li>`).join("")}</ul>` : ""}
+${f.posts.length ? `<h2>Read the misadventures</h2><ul>${f.posts.map(p => `<li><a href="${esc(p.u)}">${esc(p.t)}</a></li>`).join("")}</ul>` : `<p><a href="${BLOG}">More misadventures on onetrackmind.co.za</a></p>`}` : ""}
 <p class="note">Roads change. Check conditions before you go, and report what you find in the planner so the next rider knows.</p>
 </main>`;
   const ld = [{

@@ -43,7 +43,8 @@
      "Epupa: don't swim in the river. Crocodiles.",
      "Fill up at Torra Bay junction; fuel is far apart on the coast.",
      "Two nights at Epupa. The planner shows it as one stop; add a rest day yourself."
-    ]
+    ],
+    "photos": []
    },
    "trip": {
     "start": {
@@ -227,6 +228,149 @@
    }
   },
   {
+   "id": "namibia-2004-orange-river-mouth",
+   "title": "Namaqualand, the Orange River mouth and |Ai-|Ais",
+   "region": "Northern Cape · Southern Namibia",
+   "style": "tar",
+   "vehicles": [
+    "bike",
+    "jeep",
+    "car"
+   ],
+   "blurb": "Up the N7 to Noordoewer, across to the coast at Port Nolloth and Alexander Bay, into Namibia at Oranjemund, up the Orange River through Sendelingsdrif to Rosh Pinah, then into the Fish River Canyon at |Ai-|Ais and home down the N7.",
+   "founder": {
+    "year": 2004,
+    "ride": "KTM 950 Adventure",
+    "story": "October 2004, on a KTM 950 Adventure, with a paper map and a guess at the fuel. Namaqualand, the diamond coast where the Orange River meets the Atlantic, the river road through Sendelingsdrif and a night in the bottom of the Fish River Canyon at |Ai-|Ais. Twenty-two years later I put the same trip into the planner, and it found the long fuel gap before I'd even packed.",
+    "posts": [],
+    "tips": [
+     "Long gap without fuel on the coast and river leg: fill up in Port Nolloth, Alexander Bay and Oranjemund.",
+     "Sendelingsdrif is a pont: 08:00 to 16:30, and it only runs when the river allows. Have a plan B via Noordoewer.",
+     "Two border crossings: passport, bike papers, and a letter of authority if the bike isn't in your name.",
+     "|Ai-|Ais sits in the bottom of the canyon: hot in summer, cold at night in winter."
+    ],
+    "photos": []
+   },
+   "trip": {
+    "start": {
+     "name": "Cape Town",
+     "lat": -33.92,
+     "lon": 18.418
+    },
+    "end": {
+     "name": "Cape Town",
+     "lat": -33.92,
+     "lon": 18.418
+    },
+    "round": false,
+    "days": [
+     {
+      "to": {
+       "name": "Noordoewer",
+       "lat": -28.72197,
+       "lon": 17.61798
+      },
+      "vias": [
+       {
+        "name": "Piketberg",
+        "lat": -32.9035,
+        "lon": 18.7563,
+        "fast": true
+       },
+       {
+        "name": "Vanrhynsdorp",
+        "lat": -31.6089,
+        "lon": 18.7389,
+        "fast": true
+       },
+       {
+        "name": "Kamieskroon",
+        "lat": -30.2058,
+        "lon": 17.9325,
+        "fast": true
+       }
+      ],
+      "style": "default",
+      "legs": [],
+      "toFast": true
+     },
+     {
+      "to": {
+       "name": "Rosh Pinah",
+       "lat": -27.96424,
+       "lon": 16.76108
+      },
+      "vias": [
+       {
+        "name": "Port Nolloth",
+        "lat": -29.2525,
+        "lon": 16.8686
+       },
+       {
+        "name": "Alexander Bay",
+        "lat": -28.6085,
+        "lon": 16.487
+       },
+       {
+        "name": "Oranjemund",
+        "lat": -28.5509,
+        "lon": 16.4285
+       },
+       {
+        "name": "Sendelingsdrif",
+        "lat": -28.123,
+        "lon": 16.889
+       }
+      ],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": {
+       "name": "|Ai-|Ais",
+       "lat": -27.92,
+       "lon": 17.492
+      },
+      "vias": [],
+      "style": "default",
+      "legs": []
+     },
+     {
+      "to": null,
+      "vias": [
+       {
+        "name": "Steinkopf",
+        "lat": -29.2625,
+        "lon": 17.73333,
+        "fast": true
+       },
+       {
+        "name": "Garies",
+        "lat": -30.5617,
+        "lon": 17.9881,
+        "fast": true
+       },
+       {
+        "name": "Klawer",
+        "lat": -31.775,
+        "lon": 18.62556,
+        "fast": true
+       },
+       {
+        "name": "Piketberg",
+        "lat": -32.9035,
+        "lon": 18.7563,
+        "fast": true
+       }
+      ],
+      "style": "default",
+      "legs": [],
+      "toFast": true
+     }
+    ]
+   }
+  },
+  {
    "id": "namibia-2020-orange-river",
    "title": "Fish River Canyon and the Orange River",
    "region": "Northern Cape · Southern Namibia",
@@ -263,7 +407,8 @@
      "Day 1 is 850 km. Split it at Springbok if you want to enjoy it.",
      "Fill up at every town on the way home: Steinkopf, Springbok, Vanrhynsdorp, Klawer.",
      "Tyre choice matters on the river road; knobblies win."
-    ]
+    ],
+    "photos": []
    },
    "trip": {
     "start": {
@@ -456,7 +601,8 @@
      "Carry a satellite phone. Cell signal is good in towns, nothing in between.",
      "Grootberg Lodge: 4x4 or motorbike for the driveway.",
      "Heed the oil light. Nothing good comes from pushing on."
-    ]
+    ],
+    "photos": []
    },
    "trip": {
     "start": {
@@ -638,7 +784,8 @@
      "Livestock and taxis on every road in the old Transkei. Ride slower than you think.",
      "Fuel range lulls you. Fill up before hunting for the Kei mouth pont.",
      "Day 1 from Durban isn't in the blog; the story starts at Port St Johns."
-    ]
+    ],
+    "photos": []
    },
    "trip": {
     "start": {
@@ -812,7 +959,8 @@
      "Prince Alfred's Pass is narrow with blind corners. Expect someone in your lane.",
      "Angie's G Spot at De Vlugt for lunch.",
      "Cell signal is patchy on the passes; know who to call."
-    ]
+    ],
+    "photos": []
    },
    "trip": {
     "start": {
@@ -906,7 +1054,8 @@
      "We did 1,250 km in one day. Don't. Sleep in Upington.",
      "Take firewood from Upington. There's none on the pan.",
      "Book or bring a tent. Speedweek fills up."
-    ]
+    ],
+    "photos": []
    },
    "trip": {
     "start": {
@@ -1050,7 +1199,8 @@
      "The Channel: we took the Eurotunnel out and an overnight ferry from Portsmouth back. The planner routes the ferry.",
      "Bike theft is real in the UK. Lock it to something.",
      "Nights in England are approximate where the blog doesn't say."
-    ]
+    ],
+    "photos": []
    },
    "trip": {
     "start": {
@@ -1419,7 +1569,8 @@
      "Book the Eisriesenwelt and don't believe 'short walk'. It's a climb.",
      "Local SIM in Italy: cheap data for the whole of Europe.",
      "Panniers make a race weekend easy: lock the helmet away and walk."
-    ]
+    ],
+    "photos": []
    },
    "trip": {
     "start": {
@@ -1570,7 +1721,8 @@
      "Venice parking fills up. Park at Mestre and take the train in.",
      "Ask nicely at the factories. It works more often than you'd think.",
      "Check museum opening hours; some only open in the afternoon."
-    ]
+    ],
+    "photos": []
    },
    "trip": {
     "start": {
@@ -1715,7 +1867,8 @@
       "u": "https://onetrackmind.co.za/2020/02/22/2020-cdba-day-3/"
      }
     ],
-    "tips": []
+    "tips": [],
+    "photos": []
    },
    "trip": {
     "start": {
@@ -1789,7 +1942,8 @@
       "u": "https://onetrackmind.co.za/2026/03/29/progress-accidentally/"
      }
     ],
-    "tips": []
+    "tips": [],
+    "photos": []
    },
    "trip": {
     "start": {
@@ -1874,7 +2028,8 @@
       "u": "https://onetrackmind.co.za/2024/06/07/langberg-montagu/"
      }
     ],
-    "tips": []
+    "tips": [],
+    "photos": []
    },
    "trip": {
     "start": {
@@ -1939,7 +2094,8 @@
       "u": "https://onetrackmind.co.za/2016/12/17/roof-of-africa-2016-the-mountain-kingdom-of-lesotho/"
      }
     ],
-    "tips": []
+    "tips": [],
+    "photos": []
    },
    "trip": {
     "start": {

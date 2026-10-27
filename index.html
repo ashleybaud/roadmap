@@ -454,10 +454,11 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .acctline{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding-top:10px}
 .pkb{font-size:.86rem;margin-top:4px}
 .homelink{color:inherit;text-decoration:none}
-.hdrlinks{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.hdrlinks a{font:700 1.05rem var(--f-display);text-transform:uppercase;letter-spacing:.05em;text-decoration:none;color:#fff;background:#0B6E4F;padding:5px 14px;border-radius:5px}
-.hdrlinks a:hover{filter:brightness(1.12)}
-.hdrlinks a{border:2px solid #0B6E4F}.hdrlinks a.on{background:transparent;color:var(--accent);border-color:var(--accent)}
+.hdrlinks{display:grid;grid-template-columns:repeat(4,auto);justify-content:start;gap:0;margin:10px 0 0;background:var(--ink);border-radius:6px;overflow:hidden;width:100%}
+.hdrlinks a{font:700 1.15rem var(--f-display);text-transform:uppercase;letter-spacing:.06em;text-decoration:none;color:var(--bg);padding:9px 20px;border:0;border-bottom:4px solid transparent;background:none;border-radius:0;white-space:nowrap}
+.hdrlinks a:hover{background:color-mix(in srgb,var(--bg) 12%,transparent)}
+.hdrlinks a.on{border-bottom-color:#D9A441}
+@media (max-width:640px){.hdrlinks{grid-template-columns:repeat(2,minmax(0,1fr))}.hdrlinks a{font-size:.95rem;padding:8px 4px;text-align:center;letter-spacing:.03em}}
 .fdr{font-size:.8rem;color:var(--accent);font-weight:600;margin-top:2px}
 .drafttag{font:600 .7rem var(--f-mono);background:var(--warn);color:var(--onfill);padding:1px 6px;border-radius:3px;vertical-align:middle}
 .fdrbox{border-left:3px solid var(--accent);background:var(--chip);padding:8px 10px;margin:10px 0;font-size:.88rem}
@@ -524,8 +525,9 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
 <body>
 <div class="wrap">
   <header>
-    <div><h1><a class="homelink" href="/" title="Home">OneTrackMind</a> <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><div class="note">Every great route, graded for your skill, planned day by day. <b>Built by riders:</b> add your favourite routes, mark the places worth stopping.</div><nav class="hdrlinks" aria-label="Site"><a href="/" class="on" aria-current="page">Plan a trip</a><a href="/routes/">Routes</a><a href="/about/">About the founder</a><a href="https://onetrackmind.co.za" target="_blank" rel="noopener">Misadventures ↗</a></nav></div>
+    <div><h1><a class="homelink" href="/" title="Home">OneTrackMind</a> <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><div class="note">Every great route, graded for your skill, planned day by day. <b>Built by riders:</b> add your favourite routes, mark the places worth stopping.</div></div>
     <div class="btns"><span class="lbl mono" id="hdrSummary"></span><button class="btn ghost" id="feedback" type="button">Send feedback</button><button class="btn" id="addBtn" type="button" hidden>+ Add yours</button><button class="btn ghost" id="reviewBtn" type="button" hidden>Review</button><button class="btn ghost" id="acctBtn" type="button" hidden>Sign in</button><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
+    <nav class="hdrlinks" style="order:9" aria-label="Site"><a href="/" class="on" aria-current="page">Plan a trip</a><a href="/routes/">Routes</a><a href="/about/">About the founder</a><a href="https://onetrackmind.co.za" target="_blank" rel="noopener">Misadventures ↗</a></nav>
   </header>
 
   <details class="guide" id="guide">
@@ -1283,7 +1285,7 @@ function dayWx(k){
   const hits=rows.map(x=>{const i=x.daily.time.indexOf(date); return i<0?null:{role:x.role,code:x.daily.weather_code[i],tmax:x.daily.temperature_2m_max[i],tmin:x.daily.temperature_2m_min[i],rain:x.daily.precipitation_sum[i],prob:x.daily.precipitation_probability_max[i],gust:x.daily.wind_gusts_10m_max[i],sunset:x.daily.sunset[i]};}).filter(Boolean);
   const from=rows.find(x=>x.role==="from"), to=rows.find(x=>x.role==="to");
   const tz=from&&to&&from.tz!=null&&to.tz!=null&&from.tz!==to.tz?{from:from.tz,to:to.tz}:null;
-  if(!hits.length) return {none:true,opens:addDays(date,-15),tz};
+  if(!hits.length) return date<ymd(new Date())?{none:true,past:true,tz}:{none:true,opens:addDays(date,-15),tz};
   const mx=f=>Math.max(...hits.map(h=>h[f]??-99)), mn=f=>Math.min(...hits.map(h=>h[f]??99));
   const toH=hits.find(h=>h.role==="to");
   return {code:mx("code"),tmax:mx("tmax"),tmin:mn("tmin"),rain:mx("rain"),prob:mx("prob"),gust:mx("gust"),sunset:toH&&toH.sunset,tz};
@@ -1350,6 +1352,7 @@ function wxLink(k){
   const w=dayWx(k), to=dayTo(k); if(!to) return "";
   const href=`https://www.windy.com/?${to.lat.toFixed(2)},${to.lon.toFixed(2)},9`;
   if(!w) return `<a class="wxlink" href="${href}" target="_blank" rel="noopener" title="Forecast for the area">☁ …</a>`;
+  if(w.past) return "";
   if(w.none) return `<a class="wxlink" href="${href}" target="_blank" rel="noopener" title="Forecast for the area">☁ from ${esc(fmtDate(new Date(w.opens+"T12:00:00")))}</a>`;
   return `<a class="wxlink" href="${href}" target="_blank" rel="noopener" title="${esc(wxText(w))}. Opens the forecast for the area.">${WXI(w.code)} ${Math.round(w.tmin)}–${Math.round(w.tmax)}°C</a>`;
 }
@@ -1961,7 +1964,7 @@ function drawMap(){
     else if(p.auto){ html=`<div class="mapemo dashed">⛽${badge}</div>`; label="Suggested: "+p.name; }
     else { html=`<div class="pin pstop">${stopFuel(p)?"⛽":"•"}${badge}</div>`; label=p.name; }
     const key=sel?true:(isStart||night||isEnd);
-    const m=L.marker([p.lat,p.lon],{icon:L.divIcon({className:"",html,iconSize:size,iconAnchor:[size[0]/2,size[1]/2]}),zIndexOffset:night||isStart||isEnd?1000:0}).bindTooltip(label,key?{permanent:true,direction:"right",offset:[size[0]/2,0],className:"maplbl"+(night?" mlnight":"")}:{}).addTo(layer);
+    const m=L.marker([p.lat,p.lon],{icon:L.divIcon({className:"",html,iconSize:size,iconAnchor:[size[0]/2,size[1]/2]}),zIndexOffset:night||isStart||isEnd?1000:0}).bindTooltip(label,key?{permanent:true,direction:night&&nk%2===1?"left":"right",offset:[night&&nk%2===1?-size[0]/2:size[0]/2,0],className:"maplbl"+(night?" mlnight":"")}:{}).addTo(layer);
     m.on("click",()=>{ const k=trip.days.findIndex((d,i)=>plan.days[i]&&plan.days[i].pts.includes(p)&&(sel?i===ui.tab:true)); if(k<0) return; const j=plan.days[k].pts.indexOf(p); ui.tab=k; stopFocus={k,j}; saveUi(); renderAll(); });
   });
   if(fp&&ui.lay.fuel){
@@ -2178,7 +2181,7 @@ function goodToKnow(k){
     if(w.tmax>=42) add("bad","route","Extreme heat: "+Math.round(w.tmax)+"°C. Leave early, carry lots of water."); else if(w.tmax>=37) add("warn","route","Hot: "+Math.round(w.tmax)+"°C. Carry extra water.");
     if(w.rain>=25) add("bad","route","Heavy rain: "+Math.round(w.rain)+" mm. Gravel and river crossings may be impassable."); else if(w.rain>=8&&w.prob>=50) add("warn","route","Rain likely: "+Math.round(w.rain)+" mm. Gravel gets slippery.");
     if(w.tmin<=2) add("warn","route","Near freezing in the morning: "+Math.round(w.tmin)+"°C. Watch for ice early.");
-  } else if(w&&w.none) add("info","route","Weather forecast available from "+fmtDate(new Date(w.opens+"T12:00:00"))+".");
+  } else if(w&&w.none&&!w.past) add("info","route","Weather forecast available from "+fmtDate(new Date(w.opens+"T12:00:00"))+".");
   var gk=pd.legs.reduce(function(t,l){return t+(l.gravelKm||0);},0), known=pd.legs.every(function(l){return l.gravelKm!=null;});
   if(known&&pd.km>0) add("info","route","Surface: about "+Math.round(gk)+" km gravel or dirt ("+Math.round(100*gk/pd.km)+"%), "+Math.round(pd.km-gk)+" km tar.");
   var fdn=dayFords(k); if(fdn) add(w&&!w.none&&w.rain>=5?"warn":"info","route",fdn+" river crossing"+(fdn>1?"s":"")+" on the route"+(w&&!w.none&&w.rain>=5?", with rain forecast. Check levels before crossing.":"."));
@@ -2594,7 +2597,7 @@ $("picksDlg").addEventListener("click",e=>{
 });
 function openPick(r){
   const t=JSON.parse(JSON.stringify(r.trip)); t.sugV=5; t.days.forEach(d=>{ d.fresh=true; d.legs=d.legs||[]; d.vias=d.vias||[]; d.style=d.style||"default"; });
-  t.pick=r.id; if(r.founder) t.founder={year:r.founder.year,ride:r.founder.ride,url:(r.founder.posts[0]||{}).u||"",page:r.draft?"":"/routes/"+r.id+"/",tips:r.founder.tips||[]};
+  t.pick=r.id; if(r.founder) t.founder={year:r.founder.year,ride:r.founder.ride,url:(r.founder.posts[0]||{}).u||"https://onetrackmind.co.za",page:r.draft?"":"/routes/"+r.id+"/",tips:r.founder.tips||[]};
   applyTrip(t,{style:r.style},r.title);
 }
 // the founder's note on a trip opened from his picks

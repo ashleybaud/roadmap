@@ -454,10 +454,11 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .acctline{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;justify-content:space-between;border-top:1px solid var(--line);padding-top:10px}
 .pkb{font-size:.86rem;margin-top:4px}
 .homelink{color:inherit;text-decoration:none}
-.hdrlinks{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
-.hdrlinks a{font:700 1.05rem var(--f-display);text-transform:uppercase;letter-spacing:.05em;text-decoration:none;color:#fff;background:#0B6E4F;padding:5px 14px;border-radius:5px}
-.hdrlinks a:hover{filter:brightness(1.12)}
-.hdrlinks a{border:2px solid #0B6E4F}.hdrlinks a.on{background:transparent;color:var(--accent);border-color:var(--accent)}
+.hdrlinks{display:grid;grid-template-columns:repeat(4,auto);justify-content:start;gap:0;margin:10px 0 0;background:var(--ink);border-radius:6px;overflow:hidden;width:100%}
+.hdrlinks a{font:700 1.15rem var(--f-display);text-transform:uppercase;letter-spacing:.06em;text-decoration:none;color:var(--bg);padding:9px 20px;border:0;border-bottom:4px solid transparent;background:none;border-radius:0;white-space:nowrap}
+.hdrlinks a:hover{background:color-mix(in srgb,var(--bg) 12%,transparent)}
+.hdrlinks a.on{border-bottom-color:#D9A441}
+@media (max-width:640px){.hdrlinks{grid-template-columns:repeat(2,minmax(0,1fr))}.hdrlinks a{font-size:.95rem;padding:8px 4px;text-align:center;letter-spacing:.03em}}
 .fdr{font-size:.8rem;color:var(--accent);font-weight:600;margin-top:2px}
 .drafttag{font:600 .7rem var(--f-mono);background:var(--warn);color:var(--onfill);padding:1px 6px;border-radius:3px;vertical-align:middle}
 .fdrbox{border-left:3px solid var(--accent);background:var(--chip);padding:8px 10px;margin:10px 0;font-size:.88rem}
@@ -524,8 +525,9 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
 <body>
 <div class="wrap">
   <header>
-    <div><h1><a class="homelink" href="/" title="Home">OneTrackMind</a> <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><div class="note">Every great route, graded for your skill, planned day by day. <b>Built by riders:</b> add your favourite routes, mark the places worth stopping.</div><nav class="hdrlinks" aria-label="Site"><a href="/" class="on" aria-current="page">Plan a trip</a><a href="/routes/">Routes</a><a href="/about/">About the founder</a><a href="https://onetrackmind.co.za" target="_blank" rel="noopener">Misadventures ↗</a></nav></div>
+    <div><h1><a class="homelink" href="/" title="Home">OneTrackMind</a> <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><div class="note">Every great route, graded for your skill, planned day by day. <b>Built by riders:</b> add your favourite routes, mark the places worth stopping.</div></div>
     <div class="btns"><span class="lbl mono" id="hdrSummary"></span><button class="btn ghost" id="feedback" type="button">Send feedback</button><button class="btn" id="addBtn" type="button" hidden>+ Add yours</button><button class="btn ghost" id="reviewBtn" type="button" hidden>Review</button><button class="btn ghost" id="acctBtn" type="button" hidden>Sign in</button><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
+    <nav class="hdrlinks" style="order:9" aria-label="Site"><a href="/" class="on" aria-current="page">Plan a trip</a><a href="/routes/">Routes</a><a href="/about/">About the founder</a><a href="https://onetrackmind.co.za" target="_blank" rel="noopener">Misadventures ↗</a></nav>
   </header>
 
   <details class="guide" id="guide">

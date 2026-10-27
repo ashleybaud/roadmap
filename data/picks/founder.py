@@ -35,6 +35,19 @@ TRIPS = [
    day(P("Windhoek Game Camp", -22.41504, 17.05086)),
   ])),
 
+ dict(id="namibia-2004-orange-river-mouth", title="Namaqualand, the Orange River mouth and |Ai-|Ais",
+  region="Northern Cape · Southern Namibia", style="tar", vehicles=["bike", "jeep", "car"],
+  blurb="Up the N7 to Noordoewer, across to the coast at Port Nolloth and Alexander Bay, into Namibia at Oranjemund, up the Orange River through Sendelingsdrif to Rosh Pinah, then into the Fish River Canyon at |Ai-|Ais and home down the N7.",
+  founder=dict(year=2004, ride="KTM 950 Adventure",
+   story="October 2004, on a KTM 950 Adventure, with a paper map and a guess at the fuel. Namaqualand, the diamond coast where the Orange River meets the Atlantic, the river road through Sendelingsdrif and a night in the bottom of the Fish River Canyon at |Ai-|Ais. Twenty-two years later I put the same trip into the planner, and it found the long fuel gap before I'd even packed.",
+   posts=[], tips=["Long gap without fuel on the coast and river leg: fill up in Port Nolloth, Alexander Bay and Oranjemund.", "Sendelingsdrif is a pont: 08:00 to 16:30, and it only runs when the river allows. Have a plan B via Noordoewer.", "Two border crossings: passport, bike papers, and a letter of authority if the bike isn't in your name.", "|Ai-|Ais sits in the bottom of the canyon: hot in summer, cold at night in winter."]),
+  trip=dict(start=P("Cape Town", -33.92, 18.418), end=P("Cape Town", -33.92, 18.418), round=False, days=[
+   day(P("Noordoewer", -28.72197, 17.61798), [P("Piketberg", -32.9035, 18.7563, fast=True), P("Vanrhynsdorp", -31.6089, 18.7389, fast=True), P("Kamieskroon", -30.2058, 17.9325, fast=True)], toFast=True),
+   day(P("Rosh Pinah", -27.96424, 16.76108), [P("Port Nolloth", -29.2525, 16.8686), P("Alexander Bay", -28.6085, 16.487), P("Oranjemund", -28.5509, 16.4285), P("Sendelingsdrif", -28.123, 16.889)]),
+   day(P("|Ai-|Ais", -27.92, 17.492)),
+   day(None, [P("Steinkopf", -29.2625, 17.73333, fast=True), P("Garies", -30.5617, 17.9881, fast=True), P("Klawer", -31.775, 18.62556, fast=True), P("Piketberg", -32.9035, 18.7563, fast=True)], toFast=True),
+  ])),
+
  dict(id="namibia-2020-orange-river", title="Fish River Canyon and the Orange River",
   region="Northern Cape · Southern Namibia", style="rough", vehicles=["bike", "jeep", "car"],
   blurb="Cape Town to Canyon Village in one 850 km day, the Fish River Canyon, the hot tar to Aus, then the Orange River road from Rosh Pinah to Noordoewer. Back over Piekenierskloof.",
@@ -216,6 +229,8 @@ def main():
     for t in TRIPS:
         t = json.loads(json.dumps(t))
         fd = t["founder"]; fd["posts"] = [{"t": a, "u": BLOG + b} for a, b in fd["posts"]]
+        ph = HERE.parent.parent / "img" / "trips" / t["id"]  # photos: img/trips/<id>/*.jpg, shown on the route page
+        fd["photos"] = sorted("/img/trips/%s/%s" % (t["id"], f.name) for f in ph.glob("*.jpg")) if ph.is_dir() else []
         if old.get(t["id"], {}).get("stats"): t["stats"] = old[t["id"]]["stats"]
         out.append(t)
     d["routes"] = out + keep

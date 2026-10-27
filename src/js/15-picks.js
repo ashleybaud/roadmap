@@ -28,7 +28,7 @@ $("picksDlg").addEventListener("click",e=>{
 });
 function openPick(r){
   const t=JSON.parse(JSON.stringify(r.trip)); t.sugV=5; t.days.forEach(d=>{ d.fresh=true; d.legs=d.legs||[]; d.vias=d.vias||[]; d.style=d.style||"default"; });
-  t.pick=r.id; if(r.founder) t.founder={year:r.founder.year,ride:r.founder.ride,url:(r.founder.posts[0]||{}).u||"",page:r.draft?"":"/routes/"+r.id+"/",tips:r.founder.tips||[]};
+  t.pick=r.id; if(r.founder) t.founder={year:r.founder.year,ride:r.founder.ride,url:(r.founder.posts[0]||{}).u||"https://onetrackmind.co.za",page:r.draft?"":"/routes/"+r.id+"/",tips:r.founder.tips||[]};
   applyTrip(t,{style:r.style},r.title);
 }
 // the founder's note on a trip opened from his picks
