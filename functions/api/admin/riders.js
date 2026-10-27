@@ -16,10 +16,13 @@ export const onRequestGet = handle(async ({ request, env }) => {
       "Content-Disposition": `attachment; filename="onetrackmind-mailing-list-${day(now())}.csv"` } });
   }
   const week = now() - 7 * 864e5;
-  const [c, latest] = await D.batch([
+  const since = new Date(now() - 30 * 864e5).toISOString().slice(0, 10), since7 = new Date(now() - 7 * 864e5).toISOString().slice(0, 10);
+  const [c, latest, ev] = await D.batch([
     D.prepare(`SELECT COUNT(*) AS total, SUM(news) AS news, SUM(contributor) AS contributors, SUM(CASE WHEN created > ? THEN 1 ELSE 0 END) AS week FROM users`).bind(week),
     D.prepare(`SELECT email, name, created, last_seen, news, contributor FROM users ORDER BY created DESC LIMIT 50`),
+    D.prepare(`SELECT name, SUM(n) AS d30, SUM(CASE WHEN day >= ? THEN n ELSE 0 END) AS d7 FROM events WHERE day >= ? GROUP BY name`).bind(since7, since),
   ]);
+  const events = {}; ev.results.forEach(r => { events[r.name] = { d30: r.d30, d7: r.d7 }; });
   const k = c.results[0] || {};
-  return json({ total: k.total || 0, news: k.news || 0, contributors: k.contributors || 0, week: k.week || 0, riders: latest.results });
+  return json({ total: k.total || 0, news: k.news || 0, contributors: k.contributors || 0, week: k.week || 0, riders: latest.results, events });
 });

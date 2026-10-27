@@ -135,6 +135,11 @@ const TRIP = {
   if (!nav.g.length || !nav.g[0].url.startsWith("https://www.google.com/maps/dir/?api=1&origin=") || !nav.btn || !nav.w.length || !nav.w[0].url.includes("waze.com/ul?ll=")) throw new Error("phone nav links: " + JSON.stringify(nav).slice(0, 400));
   if (nav.g.some(p => (p.url.match(/%7C/g) || []).length > 8)) throw new Error("too many Google waypoints");
   console.log("phone nav:", nav.g.length, "google part(s),", nav.w.length, "waze stops; first:", nav.g[0].url.slice(0, 160));
+  await page.evaluate(() => tryRoute());
+  await page.waitForFunction(() => trip.pick === "swartberg-loop", null, { timeout: 8000 }).catch(() => {});
+  const tr = await page.evaluate(() => ({ pick: trip.pick, hero: !!document.querySelector(".hero [data-tryroute]"), welcome: !!document.querySelector("#welcome [data-tryroute]") }));
+  ok(tr.pick === "swartberg-loop" && tr.hero && tr.welcome, "Try a route: " + JSON.stringify(tr));
+  console.log("try a route:", JSON.stringify(tr));
   await browser.close(); srv.close();
   if (fails.length) { console.error("SMOKE TEST FAILED:\n - " + fails.join("\n - ")); process.exit(1); }
   console.log(`smoke test passed (fuel pill: "${title}")`);

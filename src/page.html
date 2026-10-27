@@ -221,6 +221,10 @@ header h1{font-size:2.7rem;font-weight:700;letter-spacing:-.005em;text-transform
 .herosteps span{font-size:.92rem;line-height:1.35;color:#fff;opacity:.85}
 @media (max-width:900px){.herosteps{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:640px){body.hastrip .herosteps,body.hastrip .herosub{display:none}.hero{padding:12px}.herohead{font-size:1.75rem}.herosub{font-size:.95rem;margin:6px 0 10px}.herosteps{gap:6px}.herosteps li{padding:8px}.herosteps b{font-size:1rem}.herosteps span{font-size:.82rem}}
+.herocta{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-top:12px}.herocta span{color:#fff;opacity:.8;font-size:.92rem}
+.herobtn{background:#3FB48A!important;border-color:#3FB48A!important;color:#0d1410!important;font-weight:700}
+@media (max-width:640px){body.hastrip .herocta{display:none}.herocta span{font-size:.82rem}}
+.evt{border-collapse:collapse;margin:4px 0;font-size:.9rem}.evt td,.evt th{padding:2px 10px 2px 0;text-align:left}.evt td+td,.evt th+th{text-align:right}
 .testtag{font-family:var(--f-mono);font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;background:var(--warn);color:var(--onfill);padding:2px 6px;border-radius:4px;vertical-align:middle}
 a.btn{text-decoration:none;display:inline-flex;align-items:center}
 .print{display:none}
@@ -568,6 +572,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
         <li><b>Load your GPS</b><span>One tap: the right GPX for Garmin, BMW, KTM, Ducati or Harley.</span></li>
         <li><b>Or just ride with your phone</b><span>Each day opens in Google Maps or Waze. No GPS? No problem.</span></li>
       </ol>
+      <div class="herocta"><button class="btn herobtn" type="button" data-tryroute>Try a route: Swartberg Pass in 2 days ›</button><span>Opens a finished trip. Change anything, or tap New to plan your own.</span></div>
     </section>
   </header>
 
@@ -691,6 +696,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
 <dialog id="welcome" class="welcome" aria-labelledby="wTitle">
   <form method="dialog" style="display:flex;flex-direction:column;gap:12px">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><h2 id="wTitle" style="margin:0">Plan a trip, day by day</h2><button class="icon" value="cancel" formnovalidate title="Close without changes" aria-label="Close">✕</button></div>
+    <button class="btn ghost" type="button" data-tryroute style="align-self:flex-start">Not sure yet? Try a finished route first ›</button>
     <p class="note" style="margin:0">Pick where you start, your dates and where you sleep each night. The app works out the route, fuel stops, sunset, weather and what to watch for, for every day.</p>
     <div class="row2">
       <div class="field"><label class="lbl" for="wVehicle">Travelling by</label><select id="wVehicle"><option value="bike">Motorbike</option><option value="jeep">Jeep / 4x4</option><option value="car">Car</option></select></div>

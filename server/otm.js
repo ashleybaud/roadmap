@@ -23,6 +23,8 @@ const SCHEMA = [
   // places riders mark (viewpoints, farm stalls, bike-friendly stays...); shown to others once approved
   `CREATE TABLE IF NOT EXISTS spots (id TEXT PRIMARY KEY, user_id TEXT NOT NULL, kind TEXT NOT NULL, name TEXT NOT NULL, note TEXT, lat REAL NOT NULL, lon REAL NOT NULL, status TEXT NOT NULL DEFAULT 'pending', created INTEGER NOT NULL, reviewed INTEGER)`,
   `CREATE INDEX IF NOT EXISTS spots_pos ON spots(status, lat, lon)`,
+  // anonymous daily counts of what riders do (planned a trip, downloaded a GPX...): no user, no IP
+  `CREATE TABLE IF NOT EXISTS events (day TEXT NOT NULL, name TEXT NOT NULL, n INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (day, name))`,
   `CREATE TABLE IF NOT EXISTS spot_votes (spot_id TEXT NOT NULL, user_id TEXT NOT NULL, created INTEGER NOT NULL, PRIMARY KEY (spot_id, user_id))`,
 ];
 // columns added after tables already existed (each runs once; "duplicate column" errors are expected afterwards)
