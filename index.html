@@ -8,12 +8,12 @@
 </script>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>OneTrackMind · Recce. Ride. Report.</title>
-<meta name="description" content="Free planner for multi-day motorbike, 4x4 and self-drive trips. Day by day on real roads: fuel gaps, night stops, camping and places to stay, sunset, weather and a grade for every road, read for your vehicle.">
+<meta name="description" content="Free planner for multi-day motorbike, 4x4 and self-drive trips. Day by day on real roads: fuel gaps, night stops, camping and places to stay, sunset, weather and a grade for every road, read for your vehicle. Then ride it: GPX for your Garmin or bike app, or Google Maps and Waze on your phone.">
 <link rel="canonical" href="https://onetrackmind.online/">
 <link rel="icon" href="/img/icon.svg" type="image/svg+xml">
 <meta property="og:type" content="website"><meta property="og:site_name" content="OneTrackMind">
 <meta property="og:title" content="OneTrackMind · Plan multi-day rides and drives">
-<meta property="og:description" content="Plan multi-day rides and drives on real roads. Fuel, night stops, and every road graded for your bike, 4x4 or car. Free.">
+<meta property="og:description" content="Plan multi-day rides and drives on real roads. Fuel, night stops, and every road graded for your bike, 4x4 or car. Straight to your GPS, bike app or Google Maps. Free.">
 <meta property="og:url" content="https://onetrackmind.online/"><meta property="og:image" content="https://onetrackmind.online/img/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","@id":"https://onetrackmind.online/#app","name":"OneTrackMind","url":"https://onetrackmind.online/","applicationCategory":"TravelApplication","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"ZAR"},"description":"Free planner for multi-day motorbike, 4x4 and self-drive trips: fuel stops and gaps, night stops and places to stay, sunset, weather, height profile and a road grade for every stretch, read for your vehicle.","publisher":{"@id":"https://onetrackmind.online/#org"}},{"@type":"Organization","@id":"https://onetrackmind.online/#org","name":"OneTrackMind","url":"https://onetrackmind.online/","logo":"https://onetrackmind.online/img/icon.svg","sameAs":["https://onetrackmind.co.za"],"founder":{"@type":"Person","name":"Ashley","url":"https://onetrackmind.online/about/"}}]}</script>
@@ -131,6 +131,9 @@ input[type=text],input[type=email],input[type=number],input[type=time],input[typ
 .sugrow{display:flex;gap:8px;align-items:center;font-size:.8rem;color:var(--muted);margin-left:32px;padding:2px 0}
 .sugrow svg{width:13px;height:13px;color:var(--accent)}
 .legopts{position:relative}
+.wazebox{position:relative;display:inline-block}.wazebox summary{list-style:none;cursor:pointer}.wazebox summary::-webkit-details-marker{display:none}
+.wazelist{position:absolute;z-index:30;top:calc(100% + 4px);left:0;min-width:220px;max-width:300px;background:var(--card,#fff);border:1px solid var(--line,#ccc);border-radius:10px;padding:8px;display:flex;flex-direction:column;gap:6px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+.wazelist a{font-weight:600}.phonenav{align-items:center}.navday{margin:10px 0}.navday .btns{margin-top:4px}
 .legopts summary{list-style:none;width:28px;height:28px;font-weight:700}
 .legopts summary::-webkit-details-marker{display:none}
 .legmenu{position:absolute;z-index:1200;right:0;top:calc(100% + 4px);background:var(--panel);border:1px solid var(--line);border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.18);padding:10px;display:flex;flex-direction:column;gap:8px;min-width:250px}
@@ -537,7 +540,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
 <body>
 <div class="wrap">
   <header>
-    <div><h1><a class="homelink" href="/" title="Home">OneTrackMind</a> <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><div class="note">Every great route, graded for your skill, planned day by day. <b>Built by riders:</b> add your favourite routes, mark the places worth stopping.</div></div>
+    <div><h1><a class="homelink" href="/" title="Home">OneTrackMind</a> <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><div class="note">Every great route, graded for your skill, planned day by day. <b>Then ride it:</b> one tap sends it to your Garmin, your bike's app (BMW, KTM, Ducati, Harley) or your phone in Google Maps and Waze. No GPS? No problem. <b>Built by riders:</b> add your favourite routes, mark the places worth stopping.</div></div>
     <div class="btns"><span class="lbl mono" id="hdrSummary"></span><button class="btn ghost" id="feedback" type="button">Send feedback</button><button class="btn" id="addBtn" type="button" hidden>+ Add yours</button><button class="btn ghost" id="reviewBtn" type="button" hidden>Review</button><button class="btn ghost" id="acctBtn" type="button" hidden>Sign in</button><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
     <nav class="hdrlinks" style="order:9" aria-label="Site"><a href="/" class="on" aria-current="page">Plan a trip</a><a href="/routes/">Routes</a><a href="/about/">About the founder</a><a href="https://onetrackmind.co.za" target="_blank" rel="noopener">Misadventures ↗</a></nav>
   </header>
@@ -569,7 +572,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
       <section><h3>7. Before and on the road</h3><ul>
         <li>Each day shows km, riding time, sunset, weather and climb. Orange means look again.</li>
         <li><b>Good to know</b> lists what to sort first: borders, holidays, long gaps without fuel or a hospital.</li>
-        <li>Set <b>My bike or GPS</b> in Settings and the <b>GPX</b> file is made for it (each day, or the whole trip). Leading a group? <b>Group ride pack</b> zips every format with a read-me. Or <b>Save as PDF</b>. Sign in to save routes and open them on your phone.</li></ul></section>
+        <li>Set <b>My bike or GPS</b> in Settings and the <b>GPX</b> file is made for it (each day, or the whole trip). No GPS? <b>Google Maps / Waze</b> opens each day on your phone, and <b>Send to my phone or the group</b> shares the links. Leading a group? <b>Group ride pack</b> zips every format, phone links included, with a read-me. Or <b>Save as PDF</b>. Sign in to save routes and open them on your phone.</li></ul></section>
       <section><h3>8. Built by riders</h3><ul>
         <li><b>+ Add yours</b> shares a road or marks a place. <b>📍</b> on the map marks it in two taps on the road.</li>
         <li>Report the road, rate a route you rode. We check everything before other riders see it.</li></ul></section>
@@ -639,6 +642,12 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
     <div class="btns"><button class="btn" value="close">Close</button></div>
   </form>
 </dialog>
+<dialog id="navDlg" class="welcome" aria-labelledby="navTitle"><div class="dlgwrap">
+  <div class="dlghead"><h2 id="navTitle">Navigate on your phone</h2><button class="icon" type="button" data-navclose aria-label="Close">✕</button></div>
+  <p class="note" style="margin:0">Google Maps opens each day with its stops. Waze goes one stop at a time. Both pick their own roads between points: for gravel and back roads, the GPX in your GPS or in OsmAnd, Calimoto or Kurviger follows the line exactly.</p>
+  <div id="navBody"></div>
+  <div class="btns" style="justify-content:flex-end"><button class="btn small ghost" type="button" data-navfile>Save as a file</button><button class="btn small" type="button" data-navshare>Send to my phone or the group</button></div>
+</div></dialog>
 <dialog id="pinfoDlg" class="pinfo" aria-label="Place details"><div id="piBody"></div></dialog>
 <dialog id="gpsDlg" class="welcome" aria-labelledby="gpsTitle"><form method="dialog" style="display:flex;flex-direction:column;gap:10px">
   <h2 id="gpsTitle" style="margin:0">What will you load this into?</h2>
@@ -669,7 +678,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
       <li><b>From and dates:</b> where you start, when you leave and when you're back.</li>
       <li><b>Night stops:</b> where you sleep each night. Add stops along the way if you like.</li>
       <li><b>Each day:</b> open its tab for fuel stops, what's open when you arrive, and anything to watch for.</li>
-      <li><b>Take it with you:</b> a GPX file for your GPS or phone, and a PDF to print.</li>
+      <li><b>Ride it:</b> straight onto your Garmin or bike app as GPX, or open it on your phone in Google Maps or Waze. Plus a PDF to print.</li>
     </ol>
     <p class="note" style="margin:0"><b>Built by riders:</b> open riders' routes under <b>Find a route</b>, and tap <b>+ Add yours</b> to share a road you love or mark a place worth stopping.</p>
     <p class="note" style="margin:0">Have a route already? Use <b>Plan from a GPX file</b> and it's split into days for you. Trips are saved on this device only. You can change all of this later in Settings.</p>
@@ -1822,7 +1831,7 @@ function dayBody(k){
   if(m) h+=`<details class="medbox"><summary><span class="lbl">Medical</span> ${m.near.length} hospital${m.near.length===1?"":"s"} and clinics near the route · furthest point ${fmtFar(m.far)} km from a hospital</summary>
     ${m.near.map(x=>`<div class="item"><div class="meta"><b>${esc(x.name||(x.type==="hospital"?"Hospital":"Clinic"))}</b><span class="note">${x.type==="hospital"?"Hospital":"Clinic"} · km ${Math.round(x.km-pd.a)} · ${x.off<0.5?"on the route":x.off.toFixed(1)+" km off"}${x.phone?` · <a href="tel:${esc(x.phone.replace(/[^\d+]/g,""))}">${esc(x.phone)}</a>`:""}</span></div></div>`).join("")||`<div class="note">None listed within 25 km of the route.</div>`}
     <div class="note">Emergency from a mobile: 112. Check the local numbers before you go.</div></details>`;
-  h+=`<div class="btns"><button class="btn small" type="button" data-gpx="${k}">GPX file</button>${nDays()===1?`<button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}`:""}<span class="note">Download, then share it to your bike's app.</span></div>`;
+  h+=`<div class="btns"><button class="btn small" type="button" data-gpx="${k}">GPX file</button>${nDays()===1?`<button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}`:""}<span class="note">GPX for your bike's GPS or a phone app.</span></div><div class="btns phonenav"><span class="lbl">On your phone</span>${navButtons(k)}</div>`;
   return h;
 }
 function drawStopLayer(){
@@ -1847,7 +1856,7 @@ function overviewHtml(){
   h+=tripTotals();
   h+=sleepList();
   if(plan&&!planStale&&settings.vehicle!=="bike"&&trip.start) h+=`<div class="btns partnerrow"><a class="btn small ghost" href="${esc(carHireUrl(trip.start.name))}" target="_blank" rel="sponsored noopener">Hire a ${settings.vehicle==="jeep"?"4x4":"car"} ↗</a><span class="note">Self-drive? Compare hire companies.</span></div>`;
-  if(plan&&!planStale) h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px">${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">${esc(dayName(k))} GPX</button>`:"").join("")}<button class="btn small" type="button" data-gpx="all">Whole trip GPX</button><button class="btn small ghost" type="button" data-grouppack title="Every GPX format in one zip, with a read-me, for a group ride">Group ride pack ↓</button><button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}</div></div>`;
+  if(plan&&!planStale) h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px">${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">${esc(dayName(k))} GPX</button>`:"").join("")}<button class="btn small" type="button" data-gpx="all">Whole trip GPX</button><button class="btn small" type="button" data-navlinks title="Open each day in Google Maps or Waze on your phone">Google Maps / Waze</button><button class="btn small ghost" type="button" data-grouppack title="Every GPX format in one zip, with a read-me, for a group ride">Group ride pack ↓</button><button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}</div></div>`;
   return h+clearLink()+footNote();
 }
 function footNote(){ return `<div class="note">${placesOk&&dataDate?`Map data from OpenStreetMap, as of ${esc(dataDate)}. Weather from Open-Meteo. Phone ahead on remote legs. `:""}Plan with it, check before you go: you ride at your own risk. <a href="/terms.html">Terms and disclaimer</a> · <a href="/privacy.html">Privacy</a></div>`; }
@@ -3173,6 +3182,7 @@ function groupPack(){
   const SETS=[["1-Garmin-and-BMW-Navigator","garmin"],["2-BMW-Motorrad-Connected-app","bmw"],["3-Everything-else","any"]];
   const files=[];
   SETS.forEach(([dir,dev])=>{ files.push({name:`${dir}/Whole-trip-${base}.gpx`,text:gpxText(days,dev)}); days.forEach(d=>files.push({name:`${dir}/${fname(d)}`,text:gpxText([d],dev)})); });
+  files.push({name:"4-Phone-Google-Maps-and-Waze.html",text:navHtml()});
   files.push({name:"READ-ME-FIRST.txt",text:`${trip.start.name}, ${trip.startDate} to ${trip.endDate}. ${days.length} day${days.length>1?"s":""}.
 Planned with OneTrackMind: https://onetrackmind.online
 
@@ -3187,6 +3197,11 @@ Pick the folder for your bike or GPS. Each folder has the whole trip in one file
    OsmAnd, Organic Maps, Calimoto, Kurviger, Scenic. The exact track plus stops.
    Triumph, Honda, Yamaha: their apps don't import GPX. Use one of the phone apps above.
 
+4-Phone-Google-Maps-and-Waze.html
+   No GPS? Open this on your phone. One tap opens each day in Google Maps with
+   its stops; Waze goes stop by stop. They choose their own roads between points,
+   so for gravel and back roads the GPX files above follow the line exactly.
+
 Waypoints in every file: stops, night stops (Lodging) and fuel towns (Gas Station).
 Roads change. Check conditions before you go.
 `});
@@ -3195,5 +3210,65 @@ Roads change. Check conditions before you go.
   $("status").textContent=`Saved Group-ride-${base}.zip: every GPX format, with a read-me. Share it with the group.`;
 }
 document.addEventListener("click",e=>{ if(e.target.closest&&e.target.closest("[data-grouppack]")) groupPack(); });
+
+/* ---------- phone navigation: Google Maps (whole day, with shaping points) and Waze (stop by stop) ---------- */
+/* Google Maps app takes origin + 9 waypoints + destination per link. Longer days split into parts.
+   Shaping points between the stops keep Google on our roads; it still picks the road between points. */
+const GM_MAX=11;
+const ll=p=>`${p.lat.toFixed(5)},${p.lon.toFixed(5)}`;
+function gmParts(k){
+  const gd=gpxDay(k); if(!gd) return [];
+  const pts=gd.rte, stops=pts.map((p,i)=>p.n?i:-1).filter(i=>i>=0), parts=[];
+  let s=0; // index into stops
+  while(s<stops.length-1){
+    const e=Math.min(stops.length-1,s+GM_MAX-1), a=stops[s], b=stops[e];
+    const fixed=stops.slice(s,e+1), shape=[]; for(let i=a+1;i<b;i++) if(!pts[i].n) shape.push(i);
+    const room=GM_MAX-fixed.length, pick=[];
+    for(let j=1;j<=room&&shape.length;j++){ const i=shape[Math.round(j*(shape.length+1)/(room+1))-1]; if(i!=null&&!pick.includes(i)) pick.push(i); }
+    const idx=[...fixed,...pick].sort((x,y)=>x-y), mid=idx.slice(1,-1).map(i=>ll(pts[i]));
+    parts.push({from:pts[a].n,to:pts[b].n,url:`https://www.google.com/maps/dir/?api=1&origin=${ll(pts[a])}&destination=${ll(pts[b])}${mid.length?"&waypoints="+mid.join("%7C"):""}&travelmode=driving`});
+    s=e;
+  }
+  return parts;
+}
+function wazeStops(k){
+  const gd=gpxDay(k); if(!gd) return [];
+  const kmOf=p=>{ let best=null,bd=1e9; gd.rte.forEach(r=>{ const d=hav(r,p); if(d<bd){bd=d;best=r.km;} }); return best||0; };
+  return gd.w.map(p=>({...p,km:kmOf(p)})).sort((a,b)=>a.km-b.km)
+    .map(p=>({name:p.n,fuel:p.s==="Gas Station",url:`https://waze.com/ul?ll=${ll(p)}&navigate=yes`}));
+}
+function navButtons(k){
+  const g=gmParts(k), w=wazeStops(k); if(!g.length) return "";
+  return `${g.map((p,i)=>`<a class="btn small" href="${esc(p.url)}" target="_blank" rel="noopener" title="${esc(p.from)} to ${esc(p.to)}">Google Maps${g.length>1?` ${i+1}/${g.length}`:""}</a>`).join("")}`
+    +`<details class="wazebox"><summary class="btn small ghost">Waze ▾</summary><div class="wazelist">${w.map(s=>`<a href="${esc(s.url)}" target="_blank" rel="noopener">${s.fuel?"⛽ ":""}${esc(s.name)}</a>`).join("")}<span class="note">Waze takes one stop at a time. Tap the next one when you get there.</span></div></details>`;
+}
+function navText(){
+  if(!plan) return "";
+  return plan.days.map((d,k)=>{ if(!d) return ""; const g=gmParts(k), w=wazeStops(k);
+    return `${dayName(k)}\nGoogle Maps:\n${g.map((p,i)=>`  ${g.length>1?`Part ${i+1}: `:""}${p.from} to ${p.to}\n  ${p.url}`).join("\n")}\nWaze, stop by stop:\n${w.map(s=>`  ${s.name}: ${s.url}`).join("\n")}\n`; }).filter(Boolean).join("\n");
+}
+function navHtml(){
+  const days=plan.days.map((d,k)=>{ if(!d) return ""; const g=gmParts(k), w=wazeStops(k);
+    return `<h2>${esc(dayName(k))}</h2><p>${g.map((p,i)=>`<a class="gm" href="${esc(p.url)}">Google Maps${g.length>1?` part ${i+1}`:""}: ${esc(p.from)} to ${esc(p.to)}</a>`).join("")}</p><p class="w">Waze, one stop at a time:</p><ul>${w.map(s=>`<li><a href="${esc(s.url)}">${s.fuel?"⛽ ":""}${esc(s.name)}</a></li>`).join("")}</ul>`; }).join("");
+  return `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${esc(trip.start.name)} trip: phone navigation</title>
+<style>body{font:17px/1.45 system-ui,sans-serif;margin:0 auto;max-width:640px;padding:16px;background:#fff;color:#111}h1{font-size:1.4rem}h2{font-size:1.15rem;margin:22px 0 6px}a.gm{display:block;padding:12px 14px;margin:6px 0;border-radius:10px;background:#1a73e8;color:#fff;text-decoration:none;font-weight:600}.w{margin:10px 0 2px;color:#555}li{margin:6px 0}small{color:#666}</style></head>
+<body><h1>${esc(trip.start.name)}, ${esc(trip.startDate)}: phone navigation</h1><p><small>Open this on your phone. Google Maps opens each day with its stops, Waze one stop at a time. They pick their own roads between points; for the exact line, load the GPX into your GPS or OsmAnd, Calimoto or Kurviger.</small></p>${days}<p><small>Planned with OneTrackMind: https://onetrackmind.online. Roads change. Check conditions before you go.</small></p></body></html>`;
+}
+function openNavDlg(){
+  if(!plan||planStale){ $("status").textContent="Plan the trip first."; return; }
+  $("navBody").innerHTML=plan.days.map((d,k)=>d?`<div class="navday"><span class="lbl">${esc(dayName(k))}</span><div class="btns">${navButtons(k)}</div></div>`:"").join("");
+  $("navDlg").showModal();
+}
+document.addEventListener("click",e=>{ document.querySelectorAll(".wazebox[open]").forEach(x=>{ if(!x.contains(e.target)) x.open=false; }); });
+document.addEventListener("click",e=>{
+  const t=e.target.closest&&e.target; if(!t) return;
+  if(t.closest("[data-navlinks]")){ openNavDlg(); return; }
+  if(t.closest("[data-navclose]")){ $("navDlg").close(); return; }
+  if(t.closest("[data-navshare]")){ const txt=navText();
+    if(navigator.share) navigator.share({title:"Trip navigation",text:txt}).catch(()=>{});
+    else (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>{ $("status").textContent="Links copied. Paste them into WhatsApp or a note."; },()=>{});
+    return; }
+  if(t.closest("[data-navfile]")){ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([navHtml()],{type:"text/html"})); a.download=`Phone-navigation-${trip.start.name}-${trip.startDate}`.replace(/[^\w]+/g,"-")+".html"; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000); return; }
+});
 
 </script></body></html>

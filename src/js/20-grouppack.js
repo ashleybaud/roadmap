@@ -21,6 +21,7 @@ function groupPack(){
   const SETS=[["1-Garmin-and-BMW-Navigator","garmin"],["2-BMW-Motorrad-Connected-app","bmw"],["3-Everything-else","any"]];
   const files=[];
   SETS.forEach(([dir,dev])=>{ files.push({name:`${dir}/Whole-trip-${base}.gpx`,text:gpxText(days,dev)}); days.forEach(d=>files.push({name:`${dir}/${fname(d)}`,text:gpxText([d],dev)})); });
+  files.push({name:"4-Phone-Google-Maps-and-Waze.html",text:navHtml()});
   files.push({name:"READ-ME-FIRST.txt",text:`${trip.start.name}, ${trip.startDate} to ${trip.endDate}. ${days.length} day${days.length>1?"s":""}.
 Planned with OneTrackMind: https://onetrackmind.online
 
@@ -34,6 +35,11 @@ Pick the folder for your bike or GPS. Each folder has the whole trip in one file
    Ducati Link, KTM / Husqvarna / GasGas, Harley Boom! Box (USB), and phone apps:
    OsmAnd, Organic Maps, Calimoto, Kurviger, Scenic. The exact track plus stops.
    Triumph, Honda, Yamaha: their apps don't import GPX. Use one of the phone apps above.
+
+4-Phone-Google-Maps-and-Waze.html
+   No GPS? Open this on your phone. One tap opens each day in Google Maps with
+   its stops; Waze goes stop by stop. They choose their own roads between points,
+   so for gravel and back roads the GPX files above follow the line exactly.
 
 Waypoints in every file: stops, night stops (Lodging) and fuel towns (Gas Station).
 Roads change. Check conditions before you go.
