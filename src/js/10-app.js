@@ -132,7 +132,7 @@ function rangeFuel(a,b){
   if(!fp||!fp.days) return null;
   const k=plan.days.findIndex(d=>d&&Math.abs(d.a-a)<0.5&&Math.abs(d.b-b)<0.5); if(k<0) return null;
   const pr=fp.days[k]&&fp.days[k].probs[0]; if(!pr) return null; const len=Math.round(pr.to-pr.from);
-  return {level:"warn",len,k,to:pr.to,short:`No fuel for ${len} km`,text:`No fuel on our map for ${len} km, ${pr.fromName} to ${pr.toName}`};
+  return {level:"warn",len,k,from:pr.from,to:pr.to,short:`No fuel for ${len} km`,text:`No fuel on our map for ${len} km, ${pr.fromName} to ${pr.toName}`};
 }
 // climb and descent over one stretch (same smoothing as the day's figures)
 function legElev(a,b){ const pts=[]; plan.geom.forEach((g,i)=>{ if(plan.cum[i]>=a-0.01&&plan.cum[i]<=b+0.01&&g.ele!=null) pts.push(g.ele); }); if(pts.length<5) return null;
@@ -140,12 +140,13 @@ function legElev(a,b){ const pts=[]; plan.geom.forEach((g,i)=>{ if(plan.cum[i]>=
 function legElevTxt(a,b){ const e=legElev(a,b); return e?` · ↑${fmtM(e.up)} ↓${fmtM(e.dn)} m`:""; }
 // the fuel gap button opens the stretch where the gap ends, and keeps it in view
 function goGap(k){ const f=rangeFuel(plan.days[k].a,plan.days[k].b); if(!f) return false; const pd=plan.days[k];
-  let j=pd.legs.findIndex(L=>L.b>=f.to-0.5); if(j<0) j=pd.legs.length-1; ui.tab=k; saveUi(); stopFocus={k,j:j+1}; renderAll();
-  setTimeout(()=>{ const b=document.querySelector(`#details [data-stop="${k}:${j+1}"]`); if(b) b.closest(".stop").scrollIntoView({behavior:"smooth",block:"start"}); },60);
-  $("status").textContent=f.text+"."; return true; }
+  let j=pd.legs.findIndex(L=>L.b>=f.to-0.5); if(j<0) j=pd.legs.length-1; ui.tab=k; saveUi(); stopFocus=null; renderAll();
+  focusR={a:f.from,b:f.to}; drawMap(); // the gap on the map; the stop stays closed: the rider opens it if they want
+  setTimeout(()=>{ const b=document.querySelector(`#details [data-stop="${k}:${j+1}"]`); if(b){ const st=b.closest(".stop"); st.scrollIntoView({behavior:"smooth",block:"center"}); st.classList.add("flash"); setTimeout(()=>st.classList.remove("flash"),2500); } },60);
+  $("status").textContent=`${f.text}. Your "stop at least every" setting is ${settings.range} km: change it in Settings if your tank goes further.`; return true; }
 function fuelPill(f){
   if(!f) return "";
-  return `<span class="pill fwarn" title="${esc(f.text)}. Tap to see where.">${ICON.fuel}${f.len} km gap</span>`;
+  return `<span class="pill fwarn" title="${esc(f.text)}. Tap to see where.">${ICON.fuel}Check fuel</span>`;
 }
 function dayMinutes(k){
   const d=plan&&plan.days[k]; if(!d) return 0;
