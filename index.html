@@ -348,6 +348,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .sname .note{white-space:nowrap}
 .stools{margin-left:auto}
 .chgstop{margin:6px 0 2px}
+.partnerrow{margin:8px 0 2px}
 .tooltb{grid-column:1/-1;order:-3;display:flex;gap:6px;flex-wrap:wrap;margin:0 0 2px}
 .tooltb>button,.tooltb>label{display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);cursor:pointer;font:600 .82rem var(--f-body)}
 .tooltb>button:hover,.tooltb>label:hover,.tooltb>button.on{border-color:var(--accent);color:var(--accent)}
@@ -830,6 +831,22 @@ const STYLE_SEDAN={rough:{use_highways:0.2,use_tracks:0},mixed:{use_highways:0.6
 const VEHICLES={bike:"🏍 Motorbike",jeep:"🚙 Jeep / 4x4",car:"🚗 Car"};
 // words that depend on what you travel on
 const VEH=()=>settings.vehicle==="car"||settings.vehicle==="jeep"?{ing:"driving",Ing:"Driving",noun:"drive",who:"driver",thing:"car"}:{ing:"riding",Ing:"Riding",noun:"ride",who:"rider",thing:"bike"};
+
+/* ---------- referral partners: fill in an id once a partner approves you; links work (without commission) until then ----------
+   wrap: the network's deep-link template, {URL} = the partner page, URL-encoded (e.g. CJ: "https://www.anrdoezrs.net/click-PID-AID?url={URL}") */
+const PARTNERS={
+  booking:{aid:"",wrap:""},          // Booking.com: aid from Booking/Stay22, or CJ deep link in wrap
+  discovercars:{a_aid:"",wrap:""},   // car and 4x4 hire (Travelpayouts)
+  hostelworld:{wrap:""},             // backpackers (Travelpayouts)
+  getyourguide:{partner_id:"",wrap:""}
+};
+function partnerUrl(p,url){ const P=PARTNERS[p]||{}; return P.wrap?P.wrap.replace("{URL}",encodeURIComponent(url)):url; }
+function bookingUrl(q,inDate,outDate,lat,lon){ const u=new URL("https://www.booking.com/searchresults.html");
+  u.searchParams.set("ss",q); if(lat!=null){ u.searchParams.set("latitude",lat); u.searchParams.set("longitude",lon); }
+  if(inDate){ u.searchParams.set("checkin",inDate); u.searchParams.set("checkout",outDate); } u.searchParams.set("group_adults","2"); u.searchParams.set("no_rooms","1");
+  if(PARTNERS.booking.aid) u.searchParams.set("aid",PARTNERS.booking.aid); return partnerUrl("booking",u.toString()); }
+function carHireUrl(place,from,to){ const u=new URL("https://www.discovercars.com/"); if(PARTNERS.discovercars.a_aid) u.searchParams.set("a_aid",PARTNERS.discovercars.a_aid); return partnerUrl("discovercars",u.toString()); }
+function hostelUrl(town){ return partnerUrl("hostelworld","https://www.hostelworld.com/search?search_keywords="+encodeURIComponent(town)); }
 
 const ICON={
   fuel:`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 3h9a1 1 0 0 1 1 1v8h1.5A2.5 2.5 0 0 1 18 14.5V18a1 1 0 0 0 2 0V9.4l-2.7-2.7 1.4-1.4 3 3c.2.2.3.5.3.7V18a3 3 0 0 1-6 0v-3.5a.5.5 0 0 0-.5-.5H14v7h1v2H2v-2h1V4a1 1 0 0 1 1-1zm1 2v5h7V5H5z"/></svg>`,
@@ -1577,9 +1594,11 @@ function stayRows(k){
     :`<div class="note stayhint">Tonight is set to the town of ${esc(to.name)}, not a place to stay. Choose one below or tap a blue dot on the map. You can change it later.</div>`;
   h+=stayChips(k);
   h+=list.length?`<div class="stable">${list.map(p=>`<div class="srow ${mine(p)?"on":""}"><div><b>${esc(p.name)}</b><span class="note">${esc((p.tags.tourism||"").replace("_"," "))} · ${p.dist.toFixed(1)} km</span></div>
-      <div class="sact">${callLink(p.tags)}${infoBtn(Object.assign({kind:"sleep"},p),{town:town||to.name,dist:p.dist.toFixed(1)+" km from "+(town||to.name),act:last||mine(p)?"":`<button class="linkbtn" type="button" data-staynight="${k}:${esc(p.id)}">Stay here</button>`})}${last?"":mine(p)?`<span class="okt">✓ Your stay</span>`:`<button class="linkbtn" type="button" data-staynight="${k}:${esc(p.id)}">Stay here</button>`}</div></div>`).join("")}</div>`
+      <div class="sact">${callLink(p.tags)}<a href="${esc(bookingUrl(p.name+", "+(town||to.name),addDays(trip.startDate,k),addDays(trip.startDate,k+1)))}" target="_blank" rel="sponsored noopener">Book</a>${infoBtn(Object.assign({kind:"sleep"},p),{town:town||to.name,dist:p.dist.toFixed(1)+" km from "+(town||to.name),act:last||mine(p)?"":`<button class="linkbtn" type="button" data-staynight="${k}:${esc(p.id)}">Stay here</button>`})}${last?"":mine(p)?`<span class="okt">✓ Your stay</span>`:`<button class="linkbtn" type="button" data-staynight="${k}:${esc(p.id)}">Stay here</button>`}</div></div>`).join("")}</div>`
     :`<div class="note">${placesOk?(ty&&ty.rx?`No ${esc(ty.n.replace(/^\S+ /,"").toLowerCase())} listed within 15 km. Try Anything, or check booking sites.`:"Nothing listed within 15 km. Phone the town's info office or check booking sites."):"Loading…"}</div>`;
   if(all.length>10) h+=`<button class="linkbtn" type="button" data-more="${key}">${showAll.has(key)?"Show fewer":`Show all ${all.length}`}</button>`;
+  if(!last){ const tw=town||to.name, ci=addDays(trip.startDate,k), co=addDays(trip.startDate,k+1);
+    h+=`<div class="btns partnerrow"><a class="btn small ghost" href="${esc(bookingUrl(tw,ci,co,to.lat,to.lon))}" target="_blank" rel="sponsored noopener">More on Booking.com ↗</a>${stayTypeOf(k)==="back"?`<a class="btn small ghost" href="${esc(hostelUrl(tw))}" target="_blank" rel="sponsored noopener">Hostels ↗</a>`:""}</div><div class="note">Book links may earn OneTrackMind a small commission. It costs you nothing and keeps the planner free.</div>`; }
   return h+`</section>`;
 }
 
@@ -1603,7 +1622,7 @@ function sleepList(){
     if(!to.stay) return `<div class="slrow"><span class="sln">${esc(dayName(k))}</span><span><b>${esc(to.name)}</b> <span class="nbadge warn">town</span><br><button class="linkbtn" type="button" data-pickstay="${k}">Choose where you sleep</button></span></div>`;
     const town=to.town&&to.town.name;
     return `<div class="slrow"><span class="sln">${esc(dayName(k))}</span><span><b>${esc(to.name)}</b>${town?` <span class="note">${esc(town)}</span>`:""}${to.kind?` <span class="note">· ${esc(to.kind)}</span>`:""}<br><span class="sact">${stayContacts(to,town)}</span></span>
-      <button class="btn small ${to.booked?"":"ghost"}" type="button" data-booked="${k}">${to.booked?"Booked ✓":"Mark booked"}</button></div>`; }).join("");
+      <span>${to.booked?"":`<a class="linkbtn small" href="${esc(bookingUrl(to.name+(town?", "+town:""),addDays(trip.startDate,k),addDays(trip.startDate,k+1)))}" target="_blank" rel="sponsored noopener">Book</a> `}<button class="btn small ${to.booked?"":"ghost"}" type="button" data-booked="${k}">${to.booked?"Booked ✓":"Mark booked"}</button></span></div>`; }).join("");
   const nb=trip.days.slice(0,n-1).filter(d=>d.to&&d.to.stay&&d.to.booked).length;
   return `<section class="sleeplist"><h3>Where you sleep <span class="note">${nb} of ${n-1} booked</span></h3>${rows}<button class="linkbtn small" type="button" data-copysleep>Copy the list</button></section>`;
 }
@@ -1827,6 +1846,7 @@ function overviewHtml(){
   h+=`</div>`;
   h+=tripTotals();
   h+=sleepList();
+  if(plan&&!planStale&&settings.vehicle!=="bike"&&trip.start) h+=`<div class="btns partnerrow"><a class="btn small ghost" href="${esc(carHireUrl(trip.start.name))}" target="_blank" rel="sponsored noopener">Hire a ${settings.vehicle==="jeep"?"4x4":"car"} ↗</a><span class="note">Self-drive? Compare hire companies.</span></div>`;
   if(plan&&!planStale) h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px">${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">${esc(dayName(k))} GPX</button>`:"").join("")}<button class="btn small" type="button" data-gpx="all">Whole trip GPX</button><button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}</div></div>`;
   return h+clearLink()+footNote();
 }

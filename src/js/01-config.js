@@ -27,3 +27,19 @@ const STYLE_SEDAN={rough:{use_highways:0.2,use_tracks:0},mixed:{use_highways:0.6
 const VEHICLES={bike:"🏍 Motorbike",jeep:"🚙 Jeep / 4x4",car:"🚗 Car"};
 // words that depend on what you travel on
 const VEH=()=>settings.vehicle==="car"||settings.vehicle==="jeep"?{ing:"driving",Ing:"Driving",noun:"drive",who:"driver",thing:"car"}:{ing:"riding",Ing:"Riding",noun:"ride",who:"rider",thing:"bike"};
+
+/* ---------- referral partners: fill in an id once a partner approves you; links work (without commission) until then ----------
+   wrap: the network's deep-link template, {URL} = the partner page, URL-encoded (e.g. CJ: "https://www.anrdoezrs.net/click-PID-AID?url={URL}") */
+const PARTNERS={
+  booking:{aid:"",wrap:""},          // Booking.com: aid from Booking/Stay22, or CJ deep link in wrap
+  discovercars:{a_aid:"",wrap:""},   // car and 4x4 hire (Travelpayouts)
+  hostelworld:{wrap:""},             // backpackers (Travelpayouts)
+  getyourguide:{partner_id:"",wrap:""}
+};
+function partnerUrl(p,url){ const P=PARTNERS[p]||{}; return P.wrap?P.wrap.replace("{URL}",encodeURIComponent(url)):url; }
+function bookingUrl(q,inDate,outDate,lat,lon){ const u=new URL("https://www.booking.com/searchresults.html");
+  u.searchParams.set("ss",q); if(lat!=null){ u.searchParams.set("latitude",lat); u.searchParams.set("longitude",lon); }
+  if(inDate){ u.searchParams.set("checkin",inDate); u.searchParams.set("checkout",outDate); } u.searchParams.set("group_adults","2"); u.searchParams.set("no_rooms","1");
+  if(PARTNERS.booking.aid) u.searchParams.set("aid",PARTNERS.booking.aid); return partnerUrl("booking",u.toString()); }
+function carHireUrl(place,from,to){ const u=new URL("https://www.discovercars.com/"); if(PARTNERS.discovercars.a_aid) u.searchParams.set("a_aid",PARTNERS.discovercars.a_aid); return partnerUrl("discovercars",u.toString()); }
+function hostelUrl(town){ return partnerUrl("hostelworld","https://www.hostelworld.com/search?search_keywords="+encodeURIComponent(town)); }

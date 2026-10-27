@@ -478,9 +478,11 @@ function stayRows(k){
     :`<div class="note stayhint">Tonight is set to the town of ${esc(to.name)}, not a place to stay. Choose one below or tap a blue dot on the map. You can change it later.</div>`;
   h+=stayChips(k);
   h+=list.length?`<div class="stable">${list.map(p=>`<div class="srow ${mine(p)?"on":""}"><div><b>${esc(p.name)}</b><span class="note">${esc((p.tags.tourism||"").replace("_"," "))} · ${p.dist.toFixed(1)} km</span></div>
-      <div class="sact">${callLink(p.tags)}${infoBtn(Object.assign({kind:"sleep"},p),{town:town||to.name,dist:p.dist.toFixed(1)+" km from "+(town||to.name),act:last||mine(p)?"":`<button class="linkbtn" type="button" data-staynight="${k}:${esc(p.id)}">Stay here</button>`})}${last?"":mine(p)?`<span class="okt">✓ Your stay</span>`:`<button class="linkbtn" type="button" data-staynight="${k}:${esc(p.id)}">Stay here</button>`}</div></div>`).join("")}</div>`
+      <div class="sact">${callLink(p.tags)}<a href="${esc(bookingUrl(p.name+", "+(town||to.name),addDays(trip.startDate,k),addDays(trip.startDate,k+1)))}" target="_blank" rel="sponsored noopener">Book</a>${infoBtn(Object.assign({kind:"sleep"},p),{town:town||to.name,dist:p.dist.toFixed(1)+" km from "+(town||to.name),act:last||mine(p)?"":`<button class="linkbtn" type="button" data-staynight="${k}:${esc(p.id)}">Stay here</button>`})}${last?"":mine(p)?`<span class="okt">✓ Your stay</span>`:`<button class="linkbtn" type="button" data-staynight="${k}:${esc(p.id)}">Stay here</button>`}</div></div>`).join("")}</div>`
     :`<div class="note">${placesOk?(ty&&ty.rx?`No ${esc(ty.n.replace(/^\S+ /,"").toLowerCase())} listed within 15 km. Try Anything, or check booking sites.`:"Nothing listed within 15 km. Phone the town's info office or check booking sites."):"Loading…"}</div>`;
   if(all.length>10) h+=`<button class="linkbtn" type="button" data-more="${key}">${showAll.has(key)?"Show fewer":`Show all ${all.length}`}</button>`;
+  if(!last){ const tw=town||to.name, ci=addDays(trip.startDate,k), co=addDays(trip.startDate,k+1);
+    h+=`<div class="btns partnerrow"><a class="btn small ghost" href="${esc(bookingUrl(tw,ci,co,to.lat,to.lon))}" target="_blank" rel="sponsored noopener">More on Booking.com ↗</a>${stayTypeOf(k)==="back"?`<a class="btn small ghost" href="${esc(hostelUrl(tw))}" target="_blank" rel="sponsored noopener">Hostels ↗</a>`:""}</div><div class="note">Book links may earn OneTrackMind a small commission. It costs you nothing and keeps the planner free.</div>`; }
   return h+`</section>`;
 }
 
@@ -504,7 +506,7 @@ function sleepList(){
     if(!to.stay) return `<div class="slrow"><span class="sln">${esc(dayName(k))}</span><span><b>${esc(to.name)}</b> <span class="nbadge warn">town</span><br><button class="linkbtn" type="button" data-pickstay="${k}">Choose where you sleep</button></span></div>`;
     const town=to.town&&to.town.name;
     return `<div class="slrow"><span class="sln">${esc(dayName(k))}</span><span><b>${esc(to.name)}</b>${town?` <span class="note">${esc(town)}</span>`:""}${to.kind?` <span class="note">· ${esc(to.kind)}</span>`:""}<br><span class="sact">${stayContacts(to,town)}</span></span>
-      <button class="btn small ${to.booked?"":"ghost"}" type="button" data-booked="${k}">${to.booked?"Booked ✓":"Mark booked"}</button></div>`; }).join("");
+      <span>${to.booked?"":`<a class="linkbtn small" href="${esc(bookingUrl(to.name+(town?", "+town:""),addDays(trip.startDate,k),addDays(trip.startDate,k+1)))}" target="_blank" rel="sponsored noopener">Book</a> `}<button class="btn small ${to.booked?"":"ghost"}" type="button" data-booked="${k}">${to.booked?"Booked ✓":"Mark booked"}</button></span></div>`; }).join("");
   const nb=trip.days.slice(0,n-1).filter(d=>d.to&&d.to.stay&&d.to.booked).length;
   return `<section class="sleeplist"><h3>Where you sleep <span class="note">${nb} of ${n-1} booked</span></h3>${rows}<button class="linkbtn small" type="button" data-copysleep>Copy the list</button></section>`;
 }
@@ -728,6 +730,7 @@ function overviewHtml(){
   h+=`</div>`;
   h+=tripTotals();
   h+=sleepList();
+  if(plan&&!planStale&&settings.vehicle!=="bike"&&trip.start) h+=`<div class="btns partnerrow"><a class="btn small ghost" href="${esc(carHireUrl(trip.start.name))}" target="_blank" rel="sponsored noopener">Hire a ${settings.vehicle==="jeep"?"4x4":"car"} ↗</a><span class="note">Self-drive? Compare hire companies.</span></div>`;
   if(plan&&!planStale) h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px">${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">${esc(dayName(k))} GPX</button>`:"").join("")}<button class="btn small" type="button" data-gpx="all">Whole trip GPX</button><button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}</div></div>`;
   return h+clearLink()+footNote();
 }
