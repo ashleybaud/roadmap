@@ -3,9 +3,10 @@ const callLink=t=>t&&t.phone?`<a href="tel:${esc(String(t.phone).replace(/[^\d+]
 const PINFO={}; let pinfoN=0;
 function infoBtn(x,ctx){ const key="p"+(++pinfoN); PINFO[key]={x,ctx}; if(pinfoN>4000){ for(const k in PINFO) if(+k.slice(1)<pinfoN-2000) delete PINFO[k]; } return `<button class="linkbtn" type="button" data-pinfo="${key}">Info</button>`; }
 const KIND_NAME={fuel:"Fuel station",food:"Food",shop:"Shop",toilets:"Toilets",cash:"Cash machine",repair:"Tyres and repair",sight:"Sight",view:"Viewpoint",pass:"Pass",camp:"Camping",sleep:"Place to stay"};
-let pinfoMap=null, pinfoMk=null;
+let pinfoMap=null, pinfoMk=null, pinfoCur=null;
+function openInfoFor(x,ctx){ const key="p"+(++pinfoN); PINFO[key]={x,ctx}; openInfo(key); }
 function openInfo(key){
-  const it=PINFO[key]; if(!it) return; const {x,ctx}=it, t=x.tags||{};
+  const it=PINFO[key]; if(!it) return; pinfoCur=it; const {x,ctx}=it, t=x.tags||{};
   const kind=(t.tourism&&x.kind==="sleep")?t.tourism.replace(/_/g," "):(KIND_NAME[x.kind]||"Place");
   const web=t.website?(/^https?:/.test(t.website)?t.website:"https://"+t.website):"", g=x.kind==="fuel"?gradesTxt(t):"";
   const rows=[t.phone?["Phone",`<a href="tel:${esc(String(t.phone).replace(/[^\d+]/g,""))}">${esc(t.phone)}</a>`]:null, web?["Website",`<a href="${esc(web)}" target="_blank" rel="noopener">${esc(web.replace(/^https?:\/\/(www\.)?/,"").replace(/\/$/,""))}</a>`]:null,
@@ -14,7 +15,7 @@ function openInfo(key){
   $("piBody").innerHTML=`<h2 style="margin:0">${esc(x.name||kind)}</h2><div class="note">${esc(kind)}${ctx.dist?" · "+esc(ctx.dist):""}</div>
     ${rows.length?`<table class="pitable">${rows.map(([a,b])=>`<tr><th>${a}</th><td>${b}</td></tr>`).join("")}</table>`:`<p class="note">The map has no phone, website or hours for this place. Ask locally, or check its sign when you get there.</p>`}
     <div id="pinfoMap" class="pimap"></div>
-    <div class="btns">${am?`<button class="btn small" type="button" data-proxy="${am[1]}" data-pv="${esc(am[2])}">${esc(lab||"Add")}</button>`:""}<button class="btn small ghost" type="button" data-pclose>Close</button></div>
+    <div class="btns">${(ctx.actions||[]).map((x,i)=>`<button class="btn small ${i?"ghost":""}" type="button" data-pfn="${i}">${esc(x.label)}</button>`).join("")}${am?`<button class="btn small" type="button" data-proxy="${am[1]}" data-pv="${esc(am[2])}">${esc(lab||"Add")}</button>`:""}<button class="btn small ghost" type="button" data-pclose>Close</button></div>
     ${rows.length?"":`<p class="note" style="margin:0"><a href="https://www.google.com/search?q=${encodeURIComponent((x.name||"")+" "+(ctx.town||""))}" target="_blank" rel="noopener">Search the web for it</a></p>`}`;
   $("pinfoDlg").showModal();
   if(pinfoMap){ pinfoMap.remove(); pinfoMap=null; } if(typeof L==="undefined"){ $("pinfoMap").hidden=true; return; }
@@ -25,6 +26,7 @@ function openInfo(key){
 document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-pinfo]"); if(b){ e.preventDefault(); openInfo(b.dataset.pinfo); } });
 $("pinfoDlg").addEventListener("click",e=>{
   if(e.target===$("pinfoDlg")||e.target.closest("[data-pclose]")){ $("pinfoDlg").close(); return; }
+  const pf=e.target.closest("[data-pfn]"); if(pf&&pinfoCur){ const x=pinfoCur.ctx.actions[+pf.dataset.pfn]; $("pinfoDlg").close(); if(x) x.fn(); return; }
   const pr=e.target.closest("[data-proxy]"); if(pr){ $("pinfoDlg").close(); const b=document.querySelector(`#details [${pr.dataset.proxy}="${CSS.escape(pr.dataset.pv)}"]`); if(b) b.click(); }
 });
 

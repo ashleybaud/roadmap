@@ -348,15 +348,14 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .sname .note{white-space:nowrap}
 .stools{margin-left:auto}
 .chgstop{margin:6px 0 2px}
-.tooltb{display:flex;gap:6px;margin:10px 0 6px;flex-wrap:wrap}
-.tooltb>button,.tooltb>label{display:flex;flex-direction:column;align-items:center;gap:3px;min-width:84px;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);cursor:pointer;font:600 .8rem var(--f-body)}
-.tooltb>button:hover,.tooltb>label:hover{border-color:var(--accent);color:var(--accent)}
-@media (max-width:640px){.tooltb{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}.tooltb>button,.tooltb>label{min-width:0;padding:6px 2px;font-size:.72rem}}
+.tooltb{grid-column:1/-1;order:-3;display:flex;gap:6px;flex-wrap:wrap;margin:0 0 2px}
+.tooltb>button,.tooltb>label{display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);cursor:pointer;font:600 .82rem var(--f-body)}
+.tooltb>button:hover,.tooltb>label:hover,.tooltb>button.on{border-color:var(--accent);color:var(--accent)}
+@media (max-width:640px){.tooltb{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}.tooltb>button,.tooltb>label{justify-content:center;padding:0 4px;font-size:.74rem;gap:3px}}
+.nearstrip{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;border:2px solid var(--accent);border-radius:8px;padding:6px 10px;margin:6px 0}
+.nearstrip .icon{margin-left:auto}
+.nearme{width:16px;height:16px;border-radius:50%;background:#2F7DF6;border:3px solid #fff;box-shadow:0 0 0 2px #2F7DF6}
 .nearban{border:2px solid var(--accent);border-radius:8px;padding:8px 12px;margin:0 0 8px;display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between}
-.neardlg{max-width:560px;width:calc(100% - 24px)}
-.ndhead{display:flex;justify-content:space-between;align-items:center}
-.ndctl{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;margin:8px 0}
-#nearBody h3{margin:14px 0 4px}
 .sdtot{font-family:var(--f-mono);font-weight:500;font-size:.85em;cursor:pointer;white-space:nowrap}
 .sdtot .overt{color:var(--warn);font-weight:700}
 .pinfo{max-width:440px;width:calc(100% - 32px)}
@@ -395,7 +394,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .days .ovday{padding:6px 0;border-top:0}
 .wherebox{display:inline-block;min-width:220px;vertical-align:middle}
 .tripbar{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;border-bottom:0}
-.tripbar>.field:nth-child(3){order:-2}.tripbar>.field:nth-child(4){order:-1}
+.tripbar>.field:nth-child(4){order:-2}.tripbar>.field:nth-child(5){order:-1}
 @media (max-width:420px){.tripbar{grid-template-columns:1fr!important}}
 .tripbar input[type=date]{font-variant-numeric:tabular-nums;padding-inline:8px}
 .ep.need{color:var(--warn);font-style:italic}
@@ -539,13 +538,6 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
     <nav class="hdrlinks" style="order:9" aria-label="Site"><a href="/" class="on" aria-current="page">Plan a trip</a><a href="/routes/">Routes</a><a href="/about/">About the founder</a><a href="https://onetrackmind.co.za" target="_blank" rel="noopener">Misadventures ↗</a></nav>
   </header>
 
-<nav class="tooltb" aria-label="Trip">
-    <button type="button" id="tbNew" title="Start a fresh trip (you can undo)"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5h8.5l4.5 4.5v14.5H6z"/><path d="M14.5 2.5V7H19"/><path d="M12.5 11.5v6M9.5 14.5h6"/></svg><span>New trip</span></button>
-    <button type="button" data-picks title="OneTrackMind picks, riders' routes and your saved routes"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6.5h6l2 2h10v11H3z"/><path d="M3 10.5h18"/></svg><span>Open route</span></button>
-    <label title="Any route from a friend or your GPS: split into days with night stops and fuel"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5h8.5l4.5 4.5v14.5H6z"/><path d="M14.5 2.5V7H19"/><path d="M12.5 18v-7M9.5 14l3-3 3 3"/></svg><span>Import GPX</span><input type="file" accept=".gpx,application/gpx+xml" id="tbGpx" data-tripgpx hidden></label>
-    <button type="button" id="tbNear" title="Routes, passes and places around you"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg><span>Near me</span></button>
-  </nav>
-  <div id="nearBanner" class="nearban" hidden></div>
   <details class="guide" id="guide">
     <summary><span class="gh">How it works</span><span class="gchev" aria-hidden="true">▾</span></summary>
     <div class="ggrid">
@@ -572,6 +564,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
 
       </div>
       <div id="map"></div>
+      <div id="nearStrip" class="nearstrip" hidden><b>🧭 Near <span id="nsWhere"></span></b><label class="chk">within <select id="nearRad"><option>25</option><option>50</option><option selected>100</option><option>200</option></select> km</label><span class="note" id="nsCount"></span><button class="btn small" type="button" id="nsDay">Plan a day ride from here</button><button class="linkbtn small" type="button" id="nsLoc">Use my location</button><button class="icon" type="button" id="nsClose" title="Back to my trip" aria-label="Close">✕</button></div>
       <button type="button" class="markfab" id="markFab" hidden aria-label="Mark a place or report the road" title="Mark a place or report the road">📍</button>
     </div>
     <div class="panel" style="padding-top:8px">
@@ -588,6 +581,12 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
 <div class="msgdock"><span class="status" id="status" role="status" aria-live="polite"></span><span class="toast" id="toast" role="status" hidden></span></div>
 <div hidden id="tbHold">
   <section class="tripbar" aria-label="Trip">
+    <nav class="tooltb" aria-label="Trip">
+    <button type="button" id="tbNew" title="Start a fresh trip (you can undo)"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5h8.5l4.5 4.5v14.5H6z"/><path d="M14.5 2.5V7H19"/><path d="M12.5 11.5v6M9.5 14.5h6"/></svg><span>New</span></button>
+    <button type="button" data-picks title="OneTrackMind picks, riders' routes and your saved routes"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6.5h6l2 2h10v11H3z"/><path d="M3 10.5h18"/></svg><span>Open</span></button>
+    <label title="Any route from a friend or your GPS: split into days with night stops and fuel"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5h8.5l4.5 4.5v14.5H6z"/><path d="M14.5 2.5V7H19"/><path d="M12.5 18v-7M9.5 14l3-3 3 3"/></svg><span>GPX</span><input type="file" accept=".gpx,application/gpx+xml" id="tbGpx" data-tripgpx hidden></label>
+    <button type="button" id="tbNear" title="Routes, passes and places around you"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg><span>Near me</span></button>
+  </nav>
     <div class="field"><label class="lbl" for="startDate">Leave</label><input id="startDate" type="date"></div>
     <div class="field"><label class="lbl" for="endDate">Back</label><input id="endDate" type="date"></div>
     <div class="field ac"><label class="lbl" for="startPlace">From</label><div class="inbtn"><input id="startPlace" type="text" autocomplete="off" placeholder="My location or a town"><button class="icon" id="clearStart" type="button" title="Clear" aria-label="Clear" hidden>✕</button><button class="icon" id="useLoc" type="button" title="Use my location" aria-label="Use my location">⌖</button></div><div class="sugg" hidden></div></div>
@@ -618,9 +617,6 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
   </form>
 </dialog>
 <dialog id="pinfoDlg" class="pinfo" aria-label="Place details"><div id="piBody"></div></dialog>
-<dialog id="nearDlg" class="neardlg" aria-labelledby="nearTitle"><div class="ndhead"><h2 id="nearTitle" style="margin:0">Near me</h2><button class="icon" type="button" data-nclose aria-label="Close">✕</button></div>
-  <div class="ndctl"><span id="nearWhere" class="note"></span><label class="chk">Within <select id="nearRad"><option>25</option><option>50</option><option selected>100</option><option>200</option></select> km</label><button class="linkbtn small" type="button" id="nearLoc">Use my location</button></div>
-  <div id="nearBody"></div></dialog>
 <dialog id="welcome" class="welcome" aria-labelledby="wTitle">
   <form method="dialog" style="display:flex;flex-direction:column;gap:12px">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><h2 id="wTitle" style="margin:0">Plan a trip, day by day</h2><button class="icon" value="cancel" formnovalidate title="Close without changes" aria-label="Close">✕</button></div>
