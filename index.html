@@ -374,10 +374,12 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .stop.auto .sname b{font-weight:500;color:var(--muted)}
 .stop.auto .autotag{background:none;padding:0;font-family:var(--f-mono);font-weight:700;color:var(--ink);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;align-self:center}
 .stop.auto .avail{opacity:.8}
-.skm{font-size:1rem;font-weight:600;color:var(--ink);white-space:nowrap;margin-left:8px;align-self:center}
+.stop.auto{border-left:5px solid transparent;margin:4px 0;padding:0 8px}
+.stop.auto .sl2l{gap:10px}
+.skm{font-size:1rem;font-weight:600;color:var(--ink);white-space:nowrap;margin-left:8px;align-self:center;min-width:4.6em;text-align:right}
 .stop.mine .skm{font-size:1.12rem}
 .stop.flash{outline:3px solid var(--warn);outline-offset:2px;transition:outline-color .4s}
-.sl1 .avail{margin-left:auto}
+.sl1 .sright{margin-left:auto;display:flex;align-items:center;flex:none}
 .selev{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.05em;color:var(--muted);white-space:nowrap}
 .autotag{font-size:.74rem;font-weight:700;color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);border-radius:4px;padding:2px 6px}
 .mapemo.dashed{border-style:dashed;border-color:#0B6E4F;opacity:.6;transform:scale(.8)}
@@ -409,7 +411,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .townlbl.city span{font-size:15px;font-weight:700}
 .shead{flex-direction:column;align-items:stretch;gap:4px}
 .sl1,.sl2{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.sl1 .sname{min-width:0;flex-wrap:wrap;row-gap:2px}
+.sl1 .sname{min-width:fit-content;flex:1 1 auto;flex-wrap:wrap;row-gap:2px}
 .sl1 .avail{flex:none}
 .sl2l{display:inline-flex;align-items:center}
 .dtab{min-width:0;max-width:118px;flex:0 1 auto}
@@ -1703,7 +1705,7 @@ function stopList(k){
     const icons=av?AV.filter(a=>av[a[0]].length).map(a=>`<button type="button" class="avi ${open&&stopFocus.cat===a[0]?"on":""}" data-av="${k}:${j}:${a[0]}" title="${esc(a[2])}: ${av[a[0]].length}">${a[1]}</button>`).join(""):"";
     const fq=legFast(d,j-1), way=lg.track||(L&&L.gpx)?(L&&L.gpx?`<span class="note gpxnote" title="This stretch follows your GPX file">GPX</span>`:""):`<span class="seg2 legway" role="group" aria-label="Way to this stop"><button type="button" data-legsty="${j-1}:0" class="${fq?"":"on"}" title="${esc(styleName())} to here">${STYLE_ICON.default}</button><button type="button" data-legsty="${j-1}:1" class="${fq?"on":""}" title="Get me here quickly">${STYLE_ICON.fast}</button></span>`;
     const tools="";
-    const isVia2=!isFrom&&!isTo, mtool=`${isVia2?`<button class="btn small ghost" type="button" data-vup="${vi}" ${vi===0?"disabled":""}>↑ Move up</button><button class="btn small ghost" type="button" data-vdel="${vi}">✕ Remove this stop</button>`:""}`;
+    const isVia2=!isFrom&&!isTo, mtool=`${isVia2?`${p.auto?"":`<button class="btn small ghost" type="button" data-vren="${vi}">✎ Rename</button>`}<button class="btn small ghost" type="button" data-vup="${vi}" ${vi===0?"disabled":""}>↑ Move up</button><button class="btn small ghost" type="button" data-vdel="${vi}">✕ Remove this stop</button>`:""}`;
     const rtool=`${acct.ready?`<button class="linkbtn small" type="button" data-repat="${p.lat},${p.lon},${esc(p.name)}">Report the road here</button><button class="linkbtn small" type="button" data-spotat="${p.lat},${p.lon},${esc(p.name)}">Mark a place here</button>`:""}<button class="linkbtn small" type="button" data-fixat="${p.lat},${p.lon},${esc(p.name)}">Report a map mistake</button>`;
     const opts=L?`<details class="legopts"><summary class="icon" title="More">⋯</summary><div class="legmenu">${mtool}
         ${L.n>1&&!lg.track?`<label class="chk">Way <select data-alt="${j-1}">${L.alts.map((km2,x)=>`<option value="${x}" ${(lg.alt||0)===x?"selected":""}>Way ${x+1} · ${Math.round(km2)} km</option>`).join("")}</select></label>`:lg.track?"":lg.wantAlts?`<span class="note">No other ways found for this stretch.</span>`:`<button class="btn small ghost" type="button" data-wantalts="${j-1}">Find other ways</button>`}
@@ -1713,8 +1715,8 @@ function stopList(k){
       </div></details>`:"";
     const autoTag=p.auto?(p.fuelHere?`<span class="autotag" title="Fuel and food here. You asked to stop at least every ${esc(String(settings.range))} km.">Suggested stop${p.detour?` · +${p.detour} km`:""}</span>`
       :`<span class="autotag nofuel" title="No fuel on our map here, and none closer. Ask locally or carry extra.">Suggested stop · fuel not confirmed${p.detour?` · +${p.detour} km`:""}</span>`):"";
-    h+=`<li class="stop ${open?"open":""} ${p.auto?"auto":isTo||isFrom?"":"mine"} ${isTo&&!last?"night":""}" data-sname="${esc(p.name)}"><div class="shead"><div class="sl1"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab ${isTo&&!last?"nightlab":""}">${lab}</span><b>${esc(p.name)}</b>${p.auto?`<span class="autotag ${p.fuelHere?"":"nofuel"}" title="${p.fuelHere?"Suggested fuel stop":"Suggested stop: no fuel on our map here"}">Suggested${p.fuelHere?"":" · fuel?"}${p.detour?` · +${p.detour} km`:""}</span>`:""}</button><span class="avail">${icons}</span>${isFrom?"":`<span class="skm">km ${km}</span>`}</div>
-      <div class="sl2"><span class="sl2l"><span class="selev">${L?legElevTxt(L.a,L.b).replace(/^ · /,""):""}</span></span><span class="stools">${way}${tools}${opts}</span></div></div>${open&&plan?stopDetail(k,j,stopFocus.cat):""}</li>`;
+    h+=`<li class="stop ${open?"open":""} ${p.auto?"auto":isTo||isFrom?"":"mine"} ${isTo&&!last?"night":""}" data-sname="${esc(p.name)}"><div class="shead"><div class="sl1"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab ${isTo&&!last?"nightlab":""}">${lab}</span><b>${esc(p.name)}</b></button><span class="sright"><span class="avail">${icons}</span>${isFrom?"":`<span class="skm">km ${km}</span>`}</span></div>
+      <div class="sl2"><span class="sl2l">${p.auto?`<span class="autotag ${p.fuelHere?"":"nofuel"}" title="${p.fuelHere?"Suggested fuel stop":"Suggested stop: no fuel on our map here"}">Suggested${p.fuelHere?"":" · fuel?"}${p.detour?` · +${p.detour} km`:""}</span>`:""}<span class="selev">${L?legElevTxt(L.a,L.b).replace(/^ · /,""):""}</span></span><span class="stools">${way}${tools}${opts}</span></div></div>${open&&plan?stopDetail(k,j,stopFocus.cat):""}</li>`;
   });
   h+=`</ol><div class="rname"><span class="lbl" style="white-space:nowrap">Add a stop</span>${searchBox("addvia-"+k,"","Town, pass or place on this day",true)}</div>`;
   return h;
@@ -1828,6 +1830,7 @@ $("details").addEventListener("click",e=>{
   const fd=t.closest("[data-focusday]"); if(fd&&plan){const pd=plan.days[+fd.dataset.focusday]; focusRange(pd.a,pd.b); return;}
   const stb=t.closest("[data-staytype]"); if(stb){ const [k2,id]=stb.dataset.staytype.split(":"), d2=trip.days[+k2]; if(id===(trip.stayType||"any")) delete d2.stayType; else d2.stayType=id; showAll.delete("stay-"+k2); save(); renderDetails(); drawMap(); return; }
   const kp=t.closest("[data-keep]"); if(kp&&k!=null){ const v=trip.days[k].vias[+kp.dataset.keep]; if(v&&v.auto){ delete v.auto; v.kept=true; save(); renderDetails(); drawMap(); $("status").textContent=`${v.name} is now one of your stops.`; } return; }
+  const rn=t.closest("[data-vren]"); if(rn&&k!=null){ const v=trip.days[k].vias[+rn.dataset.vren]; if(!v) return; const nm=(window.prompt("Name for this stop",v.name)||"").trim(); if(nm&&nm!==v.name){ v.name=nm.slice(0,60); save(); renderAll(); $("status").textContent=`Renamed to ${v.name}.`; } return; }
   const up=t.closest("[data-vup]"); if(up&&k!=null){const i=+up.dataset.vup,v=trip.days[k].vias; if(i>0){[v[i-1],v[i]]=[v[i],v[i-1]];trip.days[k].legs=[];changed();} return;}
   const del=t.closest("[data-vdel]"); if(del&&k!=null){ const d=trip.days[k], v=d.vias[+del.dataset.vdel]; if(v&&v.auto){ d.noAuto=[...(d.noAuto||[]),v.name]; d.noMore=true; } d.vias.splice(+del.dataset.vdel,1); d.legs=[]; changed(); return; }
   const wa=t.closest("[data-wantalts]"); if(wa&&k!=null){ const j2=+wa.dataset.wantalts; trip.days[k].legs[j2]=Object.assign({},trip.days[k].legs[j2],{wantAlts:true}); $("status").textContent="Looking for other ways…"; save(); recalc(); return; }
