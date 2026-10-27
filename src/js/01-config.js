@@ -2,7 +2,9 @@ const OSRM="https://router.project-osrm.org/route/v1/driving/";
 const PHOTON="https://photon.komoot.io/api/";
 /* routing and map tiles: Stadia Maps (paid, authorised by domain); free servers only as a fallback */
 const ROUTER="https://api.stadiamaps.com/route/v1";
-const TILES={url:"https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png",attribution:'© <a href="https://stadiamaps.com/">Stadia Maps</a> © <a href="https://openmaptiles.org/">OpenMapTiles</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',maxZoom:18};
+/* sharp (@2x) tiles only when the connection can take them; data saver or 2G/3G gets standard tiles (4x smaller) */
+const SLOWNET=(()=>{ try{ const c=navigator.connection; return !!c&&(c.saveData||/(^|-)2g|3g/.test(c.effectiveType||"")); }catch(e){ return false; } })();
+const TILES={url:"https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}"+(SLOWNET?"":"{r}")+".png",attribution:'© <a href="https://stadiamaps.com/">Stadia Maps</a> © <a href="https://openmaptiles.org/">OpenMapTiles</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',maxZoom:18};
 const OVERPASS="/api/places";
 const TYPES=[
   {id:"view",n:"Viewpoints",c:"#2F5BA8",on:true},

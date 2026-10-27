@@ -17,6 +17,11 @@
 <meta property="og:url" content="https://onetrackmind.online/"><meta property="og:image" content="https://onetrackmind.online/img/og.png">
 <meta name="twitter:card" content="summary_large_image">
 <script type="application/ld+json">{"@context":"https://schema.org","@graph":[{"@type":"WebApplication","@id":"https://onetrackmind.online/#app","name":"OneTrackMind","url":"https://onetrackmind.online/","applicationCategory":"TravelApplication","operatingSystem":"Any (web browser)","offers":{"@type":"Offer","price":"0","priceCurrency":"ZAR"},"description":"Free planner for multi-day motorbike, 4x4 and self-drive trips: fuel stops and gaps, night stops and places to stay, sunset, weather, height profile and a road grade for every stretch, read for your vehicle.","publisher":{"@id":"https://onetrackmind.online/#org"}},{"@type":"Organization","@id":"https://onetrackmind.online/#org","name":"OneTrackMind","url":"https://onetrackmind.online/","logo":"https://onetrackmind.online/img/icon.svg","sameAs":["https://onetrackmind.co.za"],"founder":{"@type":"Person","name":"Ashley","url":"https://onetrackmind.online/about/"}}]}</script>
+<link rel="preconnect" href="https://tiles.stadiamaps.com" crossorigin>
+<link rel="preconnect" href="https://api.stadiamaps.com" crossorigin>
+<link rel="preconnect" href="https://unpkg.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
 <style>
@@ -836,7 +841,9 @@ const OSRM="https://router.project-osrm.org/route/v1/driving/";
 const PHOTON="https://photon.komoot.io/api/";
 /* routing and map tiles: Stadia Maps (paid, authorised by domain); free servers only as a fallback */
 const ROUTER="https://api.stadiamaps.com/route/v1";
-const TILES={url:"https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png",attribution:'© <a href="https://stadiamaps.com/">Stadia Maps</a> © <a href="https://openmaptiles.org/">OpenMapTiles</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',maxZoom:18};
+/* sharp (@2x) tiles only when the connection can take them; data saver or 2G/3G gets standard tiles (4x smaller) */
+const SLOWNET=(()=>{ try{ const c=navigator.connection; return !!c&&(c.saveData||/(^|-)2g|3g/.test(c.effectiveType||"")); }catch(e){ return false; } })();
+const TILES={url:"https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}"+(SLOWNET?"":"{r}")+".png",attribution:'© <a href="https://stadiamaps.com/">Stadia Maps</a> © <a href="https://openmaptiles.org/">OpenMapTiles</a> © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',maxZoom:18};
 const OVERPASS="/api/places";
 const TYPES=[
   {id:"view",n:"Viewpoints",c:"#2F5BA8",on:true},
@@ -2191,7 +2198,7 @@ $("welcome").addEventListener("close",()=>{
   if(!trip.start||trip.start.lat==null) $("startPlace").focus();
 });
 $("howItWorks").addEventListener("click",openWelcome);
-try{ if(!localStorage.getItem("rr-welcome")) setTimeout(openWelcome,300); }catch(e){}
+try{ if(!localStorage.getItem("rr-welcome")) setTimeout(()=>((document.fonts&&document.fonts.ready)||Promise.resolve()).then(openWelcome),300); }catch(e){} // wait for fonts so the box doesn't jump
 const STYLE_TEXT={rough:"<b>Road less travelled</b>: gravel and back roads wherever they go",mixed:"<b>Mixed</b>: plenty of gravel, tar to link it up",tar:"<b>Tar</b>: sealed roads, gravel avoided"};
 function showStyle(){ $("styleBanner").innerHTML=`${VEHICLES[settings.vehicle]||VEHICLES.bike} · ${STYLE_TEXT[settings.style]||STYLE_TEXT.rough}. Change any stretch with its way icons. <button type="button" class="linkbtn" id="bannerEdit">Change</button>`; }
 document.addEventListener("click",e=>{ if(e.target.id==="bannerEdit") openWelcome(); });

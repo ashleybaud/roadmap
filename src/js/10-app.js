@@ -1045,7 +1045,7 @@ $("welcome").addEventListener("close",()=>{
   if(!trip.start||trip.start.lat==null) $("startPlace").focus();
 });
 $("howItWorks").addEventListener("click",openWelcome);
-try{ if(!localStorage.getItem("rr-welcome")) setTimeout(openWelcome,300); }catch(e){}
+try{ if(!localStorage.getItem("rr-welcome")) setTimeout(()=>((document.fonts&&document.fonts.ready)||Promise.resolve()).then(openWelcome),300); }catch(e){} // wait for fonts so the box doesn't jump
 const STYLE_TEXT={rough:"<b>Road less travelled</b>: gravel and back roads wherever they go",mixed:"<b>Mixed</b>: plenty of gravel, tar to link it up",tar:"<b>Tar</b>: sealed roads, gravel avoided"};
 function showStyle(){ $("styleBanner").innerHTML=`${VEHICLES[settings.vehicle]||VEHICLES.bike} · ${STYLE_TEXT[settings.style]||STYLE_TEXT.rough}. Change any stretch with its way icons. <button type="button" class="linkbtn" id="bannerEdit">Change</button>`; }
 document.addEventListener("click",e=>{ if(e.target.id==="bannerEdit") openWelcome(); });
