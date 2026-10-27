@@ -516,6 +516,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
 .ggrid h3{font-size:1.05rem;margin-bottom:2px}
 .ggrid p{margin:0;font-size:.88rem;color:var(--ink)}
 .guide .btns{padding-bottom:12px}
+.guide ul{margin:4px 0 0;padding-left:18px}.guide li{margin:4px 0;line-height:1.45}
 .wsteps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:.92rem}
 #styleBanner .linkbtn{margin-left:6px}
 .pin{display:flex;align-items:center;justify-content:center;gap:2px;width:100%;height:100%;border-radius:50%;background:#fff;border:2.5px solid #18201C;font-size:13px;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.35);position:relative;color:#18201C}
@@ -541,17 +542,36 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
   <details class="guide" id="guide">
     <summary><span class="gh">How it works</span><span class="gchev" aria-hidden="true">▾</span></summary>
     <div class="ggrid">
-      <section><h3>1. Plan a trip</h3><p>Set where you start and your dates. Each day gets its own tab. Pick where you sleep each night, and add stops in between for a pass, a farm stall or a mate you want to see. The route is worked out for you.</p></section>
-      <section><h3>2. Pick your roads</h3><p><b>Road less travelled</b> takes gravel and back roads wherever they go. <b>Mixed</b> rides plenty of gravel and uses tar to link it up. <b>Tar</b> keeps you on sealed roads. Set it once, then change any stretch with its way icon: brown for your style, blue for the quick way.</p><p><b>Quick way is not the same as Tar.</b> The blue icon takes the fastest way for your vehicle, gravel included, ridden at its real speed: Ceres to Tankwa Padstal goes straight up the R355 gravel, 84 km. <b>Tar</b> avoids gravel even when it's longer: the same trip goes round over Op die Berg, 100 km. Road less travelled looks for the most gravel, not the most scenic pass: to ride a pass, add it, or tap <b>Ride it</b> under Passes nearby.</p></section>
-      <section><h3>Terrain grades</h3><p><b>Race</b> tar · <b>Pre-jeep</b> graded gravel · <b>Jeep</b> rough tracks, corrugations, loose stones · <b>Pre-single</b> rocks, steep, sand, river crossings · <b>Single</b> bike-only single track or serious 4x4. What each means depends on what you're driving or riding: Jeep is fun on a bike and slow in a car. Each day shows the mix, the hardest bit, the climb and the highest point. Tap 🛣 on the map to colour the route by grade.</p></section>
-      <section><h3>3. Fuel</h3><p>Tell it how far you go between fills ("Stop at least every"). Towns with fuel are suggested at about that spacing. "Fuel not confirmed" means there's none on our map. Know better? Open the stop and tick "Fuel here".</p></section>
-      <section><h3>4. Night stops</h3><p>🛏 marks where you sleep, on the map and in the list. Open a night stop for places to stay, with numbers and websites. Move a night stop and the days around it are worked out again.</p></section>
-      <section><h3>5. Before you go</h3><p>Every day shows distance, riding time, sunset and weather. Orange means have a look: a long day, arriving near dark, rain or heat. "Good to know" lists what to sort out first, like public holidays, border posts, and long stretches without fuel or a hospital.</p></section>
-      <section><h3>6. Got a route already?</h3><p>Use "Plan from a GPX file" with a route from a friend or your Garmin. It's followed exactly, split into days, and night stops and fuel are added.</p></section>
-      <section><h3>7. Take it with you</h3><p>Each day downloads as a GPX file for your GPS or phone. "Save as PDF" prints the whole trip with the warnings up front.</p></section>
-      <section><h3>Built by riders</h3><p>Tap <b>+ Add yours</b> to share a road you love or mark a place worth stopping. We check everything before other riders see it. Find riders' routes under "Find a route".</p></section>
-      <section><h3>Recce. Ride. Report.</h3><p>Sign in to save routes and open them on any device. On the road, open a stop and tap "Report the road here": washaways, no fuel, roadworks, a good stay. Riders planning that road see it on the map 📣 and under "Good to know". Rode a route? Rate it and say how hard you found it.</p></section>
-      <section><h3>Worth knowing</h3><p>Trips are saved on this device only, for now. Fuel, places and road surfaces come from OpenStreetMap and can be wrong, especially out in the sticks. Phone ahead on remote stretches, and tell us what's wrong with "Send feedback".</p></section>
+      <section><h3>1. Start</h3><ul>
+        <li><b>New</b> starts a fresh trip (with Undo). <b>Open</b> loads a pick, a rider's route or one you saved. <b>GPX</b> plans from a file. <b>🧭 Near me</b> shows what's around you.</li>
+        <li>Set <b>From</b>, <b>Finish</b>, your dates and what you like to <b>Stay in</b>. Each day gets a tab.</li></ul></section>
+      <section><h3>2. Stops</h3><ul>
+        <li><b>Your stops</b> have a green bar. <b>SUGGESTED</b> stops are fuel the app adds; ✕ removes one for good.</li>
+        <li><b>🛏 Night</b> stops are boxed. "town" means you haven't picked a place to sleep yet.</li>
+        <li>Tap a stop to see it on the map and what's there. <b>⋯</b> renames, moves or removes it.</li>
+        <li>Press and hold the map (click on a computer) to add a stop, swap one, or sleep there.</li></ul></section>
+      <section><h3>3. Roads</h3><ul>
+        <li>Each stretch has two icons: <b>brown</b> is your road choice from Settings, <b>blue</b> is the quickest way, gravel included.</li>
+        <li><b>Tar</b> (in Settings) avoids gravel even when it's longer. Road less travelled finds gravel, not passes: tap <b>Ride it</b> under Passes nearby.</li>
+        <li>Grades, easy to hard: <b>Race</b> · <b>Pre-jeep</b> · <b>Jeep</b> · <b>Pre-single</b> · <b>Single</b>. Read for what you ride: Jeep is fun on a bike, slow in a car.</li></ul></section>
+      <section><h3>4. Fuel</h3><ul>
+        <li>Set how far you go between fills ("Stop at least every"). Fuel towns are suggested at about that spacing.</li>
+        <li><b>Check fuel</b> means a stretch longer than that with no fuel on our map. Tap it to see where. Tank goes further? Change the setting.</li></ul></section>
+      <section><h3>5. Where you sleep</h3><ul>
+        <li>Each night lists places to stay, filtered by what you chose (camping, guesthouse…). Tap <b>Info</b> for details, <b>Stay here</b> to choose.</li>
+        <li><b>Mark booked</b> when it's done. The Overview lists every night with contacts and how many are booked.</li></ul></section>
+      <section><h3>6. Near me</h3><ul>
+        <li>Tap <b>🧭</b> to see routes, passes, fuel, food and stays around you. What shows follows the <b>On the map</b> buttons; zoom in for more.</li>
+        <li>Tap anything: <b>Go here</b>, <b>Add as a stop</b> or <b>There and back</b>. Tap 🧭 again to go back to your trip.</li></ul></section>
+      <section><h3>7. Before and on the road</h3><ul>
+        <li>Each day shows km, riding time, sunset, weather and climb. Orange means look again.</li>
+        <li><b>Good to know</b> lists what to sort first: borders, holidays, long gaps without fuel or a hospital.</li>
+        <li>Download each day as <b>GPX</b>, or <b>Save as PDF</b>. Sign in to save routes and open them on your phone.</li></ul></section>
+      <section><h3>8. Built by riders</h3><ul>
+        <li><b>+ Add yours</b> shares a road or marks a place. <b>📍</b> on the map marks it in two taps on the road.</li>
+        <li>Report the road, rate a route you rode. We check everything before other riders see it.</li></ul></section>
+      <section><h3>Worth knowing</h3><ul>
+        <li>Map data can be wrong out in the sticks. Phone ahead on remote stretches, and tell us with <b>Send feedback</b>. <a href="/terms.html">Terms</a></li></ul></section>
     </div>
     <div class="btns"><button type="button" class="btn small ghost" id="howItWorks">Change my bike, roads and distances</button></div>
   </details>
