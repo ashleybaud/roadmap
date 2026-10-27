@@ -371,10 +371,12 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 /* your stops pop, suggestions blend */
 .stop.mine{border-left:5px solid var(--accent);background:color-mix(in srgb,var(--accent) 9%,transparent);border-radius:4px;margin:4px 0;padding:0 8px}
 .stop.mine .sname b{font-size:1.12rem}
-.stop.auto{opacity:.72}
 .stop.auto .sname b{font-weight:500;color:var(--muted)}
-.stop.auto .autotag{background:none;padding:0;font-weight:500;color:var(--muted);font-size:.78rem}
+.stop.auto .autotag{background:none;padding:0;font-family:var(--f-mono);font-weight:700;color:var(--ink);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;align-self:center}
 .stop.auto .avail{opacity:.8}
+.skm{font-family:var(--f-mono);font-size:.72rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);white-space:nowrap;margin-left:8px;align-self:center}
+.sl1 .avail{margin-left:auto}
+.selev{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.05em;color:var(--muted);white-space:nowrap}
 .autotag{font-size:.74rem;font-weight:700;color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);border-radius:4px;padding:2px 6px}
 .mapemo.dashed{border-style:dashed;border-color:#0B6E4F;opacity:.6;transform:scale(.8)}
 .days .ovday{padding:6px 0;border-top:0}
@@ -1708,8 +1710,8 @@ function stopList(k){
       </div></details>`:"";
     const autoTag=p.auto?(p.fuelHere?`<span class="autotag" title="Fuel and food here. You asked to stop at least every ${esc(String(settings.range))} km.">Suggested stop${p.detour?` · +${p.detour} km`:""}</span>`
       :`<span class="autotag nofuel" title="No fuel on our map here, and none closer. Ask locally or carry extra.">Suggested stop · fuel not confirmed${p.detour?` · +${p.detour} km`:""}</span>`):"";
-    h+=`<li class="stop ${open?"open":""} ${p.auto?"auto":isTo||isFrom?"":"mine"} ${isTo&&!last?"night":""}" data-sname="${esc(p.name)}"><div class="shead"><div class="sl1"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab ${isTo&&!last?"nightlab":""}">${lab}</span><b>${esc(p.name)}</b><span class="note">${isFrom?"":`km ${km}`}${L?legElevTxt(L.a,L.b):""}</span>${p.auto?`<span class="autotag ${p.fuelHere?"":"nofuel"}" title="${p.fuelHere?"Suggested fuel stop":"Suggested stop: no fuel on our map here"}">suggested${p.fuelHere?"":" · fuel?"}${p.detour?` · +${p.detour} km`:""}</span>`:""}</button><span class="avail">${icons}</span></div>
-      <div class="sl2"><span class="sl2l">${p.auto?"":autoTag}</span><span class="stools">${way}${tools}${opts}</span></div></div>${open&&plan?stopDetail(k,j,stopFocus.cat):""}</li>`;
+    h+=`<li class="stop ${open?"open":""} ${p.auto?"auto":isTo||isFrom?"":"mine"} ${isTo&&!last?"night":""}" data-sname="${esc(p.name)}"><div class="shead"><div class="sl1"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab ${isTo&&!last?"nightlab":""}">${lab}</span><b>${esc(p.name)}</b>${p.auto?`<span class="autotag ${p.fuelHere?"":"nofuel"}" title="${p.fuelHere?"Suggested fuel stop":"Suggested stop: no fuel on our map here"}">Suggested${p.fuelHere?"":" · fuel?"}${p.detour?` · +${p.detour} km`:""}</span>`:""}</button><span class="avail">${icons}</span>${isFrom?"":`<span class="skm">km ${km}</span>`}</div>
+      <div class="sl2"><span class="sl2l"><span class="selev">${L?legElevTxt(L.a,L.b).replace(/^ · /,""):""}</span></span><span class="stools">${way}${tools}${opts}</span></div></div>${open&&plan?stopDetail(k,j,stopFocus.cat):""}</li>`;
   });
   h+=`</ol><div class="rname"><span class="lbl" style="white-space:nowrap">Add a stop</span>${searchBox("addvia-"+k,"","Town, pass or place on this day",true)}</div>`;
   return h;
