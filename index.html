@@ -2884,7 +2884,7 @@ function openInfo(key){
     t.email?["Email",`<a href="mailto:${esc(t.email)}">${esc(t.email)}</a>`]:null, t.hours?["Hours",esc(t.hours)]:null, g?["Fuel",esc(g)]:null].filter(Boolean);
   const am=ctx.act&&ctx.act.match(/(data-[a-z0-9]+)="([^"]*)"/), lab=ctx.act&&(ctx.act.match(/>([^<]+)<\/button>/)||[])[1];
   $("piBody").innerHTML=`<h2 style="margin:0">${esc(x.name||kind)}</h2><div class="note">${esc(kind)}${ctx.dist?" · "+esc(ctx.dist):""}</div>
-    ${rows.length?`<table class="pitable">${rows.map(([a,b])=>`<tr><th>${a}</th><td>${b}</td></tr>`).join("")}</table>`:`<p class="note">The map has no phone, website or hours for this place. Ask locally, or check its sign when you get there.</p>`}
+    ${rows.length?`<table class="pitable">${rows.map(([a,b])=>`<tr><th>${a}</th><td>${b}</td></tr>`).join("")}</table>`:["pass","view","sight","route"].includes(x.kind)?"":`<p class="note">The map has no phone, website or hours for this place. Ask locally, or check its sign when you get there.</p>`}
     <div id="pinfoMap" class="pimap"></div>
     <div class="btns">${(ctx.actions||[]).map((x,i)=>`<button class="btn small ${i?"ghost":""}" type="button" data-pfn="${i}">${esc(x.label)}</button>`).join("")}${am?`<button class="btn small" type="button" data-proxy="${am[1]}" data-pv="${esc(am[2])}">${esc(lab||"Add")}</button>`:""}<button class="btn small ghost" type="button" data-pclose>Close</button></div>
     ${rows.length?"":`<p class="note" style="margin:0"><a href="https://www.google.com/search?q=${encodeURIComponent((x.name||"")+" "+(ctx.town||""))}" target="_blank" rel="noopener">Search the web for it</a></p>`}`;
