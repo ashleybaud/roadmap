@@ -1,9 +1,10 @@
-// POST {name, contributor}: change your display name; contributor:true agrees to the contributor rules. DELETE: remove your account, your saved routes, ratings, reports and sessions.
+// POST {name, contributor, news}: news true/false = opt in or out of the monthly email (date kept as the consent record). change your display name; contributor:true agrees to the contributor rules. DELETE: remove your account, your saved routes, ratings, reports and sessions.
 import { handle, json, body, db, requireUser, sameOrigin, clean, endSession } from "../../../server/otm.js";
 export const onRequestPost = handle(async ({ request, env }) => {
   sameOrigin(request); const u = await requireUser(env, request), b = await body(request, 2000);
   const D = await db(env);
   if (b.name !== undefined) await D.prepare(`UPDATE users SET name = ? WHERE id = ?`).bind(clean(b.name, 40) || null, u.id).run();
+  if (typeof b.news === "boolean") await D.prepare(`UPDATE users SET news = ?, news_at = ? WHERE id = ?`).bind(b.news ? 1 : 0, Date.now(), u.id).run();
   if (b.contributor === true) await D.prepare(`UPDATE users SET contributor = 1 WHERE id = ?`).bind(u.id).run();
   return json({ ok: true });
 });

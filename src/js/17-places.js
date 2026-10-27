@@ -55,12 +55,19 @@ async function voteSpot(id,undo){ if(!acct.user){ acct.why="Sign in to say you'v
 let revQ=null;
 async function refreshReview(){ const b=$("reviewBtn"); if(!acct.admin){ b.hidden=true; return; }
   try{ revQ=await api("/api/admin/queue"); const n=revQ.routes.length+revQ.spots.length+revQ.reports.length+revQ.feedback.length; b.hidden=false; b.textContent=n?`Review (${n})`:"Review"; }catch(e){ b.hidden=true; } }
-$("reviewBtn").addEventListener("click",async()=>{ await refreshReview(); renderReview(); $("revDlg").showModal(); });
+let riders=null;
+async function loadRiders(){ try{ riders=await api("/api/admin/riders"); }catch(e){ riders={err:e.message}; } if($("revDlg").open) renderReview(); }
+$("reviewBtn").addEventListener("click",async()=>{ await refreshReview(); riders=null; renderReview(); $("revDlg").showModal(); loadRiders(); });
 function renderReview(){
   const q=revQ||{routes:[],spots:[],reports:[],feedback:[]}, when=t=>new Date(t).toLocaleDateString("en-GB",{day:"numeric",month:"short"});
   const who=x=>`${esc(x.who||"no name")} (${esc(x.email)}) <button class="linkbtn small" type="button" data-rvuser="${x.uid}:trust">Trust</button> <button class="linkbtn small" type="button" data-rvuser="${x.uid}:block">Block</button>`;
   const act=(type,id)=>`<div class="ract"><button class="btn small" type="button" data-rv="${type}:${id}:approve">${type==="feedback"?"Done":"Approve"}</button>${type==="feedback"?"":`<button class="btn small ghost" type="button" data-rv="${type}:${id}:reject">Reject</button>`}</div>`;
   let h="";
+  const R=riders;
+  h+=`<div class="rvh">Riders signed up</div>`+(!R?`<div class="note">Loading…</div>`:R.err?`<div class="note">${esc(R.err)}</div>`:
+    `<div class="note"><b>${R.total}</b> signed up · <b>${R.week}</b> this week · <b>${R.news}</b> want the monthly email · <b>${R.contributors}</b> contributors</div>
+    <div class="btns" style="margin:6px 0"><a class="btn small" href="/api/admin/riders?csv=1" download>Download mailing list (CSV)</a></div>
+    <details><summary class="note">Latest ${R.riders.length}</summary>${R.riders.map(x=>`<div class="note">${esc(x.email)}${x.name?" · "+esc(x.name):""} · joined ${when(x.created)}${x.news?" · ✉ yes":""}${x.contributor?" · contributor":""}</div>`).join("")}</details>`);
   h+=`<div class="rvh">Routes to share (${q.routes.length})</div>`+q.routes.map(r=>`<div class="rrow"><div><div class="rt">${esc(r.title)}</div><div class="note">${who(r)} · ${r.km||"?"} km · ${r.days} day${r.days>1?"s":""} · ${when(r.updated)}</div>${r.summary?`<div class="pkb">${esc(r.summary)}</div>`:""}<button class="linkbtn small" type="button" data-rvopen="${r.id}">Open it in the planner</button></div>${act("route",r.id)}</div>`).join("");
   h+=`<div class="rvh">Places (${q.spots.length})</div>`+q.spots.map(p=>`<div class="rrow"><div><div class="rt">${SPOT_ICON[p.kind]||""} ${esc(p.name)}</div><div class="note">${esc(p.label)} · ${who(p)} · ${when(p.created)}</div>${p.note?`<div class="pkb">${esc(p.note)}</div>`:""}<button class="linkbtn small" type="button" data-rvmap="${p.lat},${p.lon}">Show on the map</button></div>${act("spot",p.id)}</div>`).join("");
   h+=`<div class="rvh">Road reports (${q.reports.length})</div>`+q.reports.map(r=>`<div class="rrow"><div><div class="rt">${esc(r.label)}</div><div class="note">${who(r)} · seen ${esc(r.seen_on)}</div>${r.text?`<div class="pkb">${esc(r.text)}</div>`:""}<button class="linkbtn small" type="button" data-rvmap="${r.lat},${r.lon}">Show on the map</button></div>${act("report",r.id)}</div>`).join("");

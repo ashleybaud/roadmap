@@ -37,6 +37,9 @@ const MIGRATIONS = [
   `ALTER TABLE login_tokens ADD COLUMN approved_user TEXT`,
   `ALTER TABLE login_tokens ADD COLUMN poll_used INTEGER NOT NULL DEFAULT 0`,
   `ALTER TABLE login_tokens ADD COLUMN attempts INTEGER NOT NULL DEFAULT 0`,
+  // "send me new routes and trip ideas": off unless the rider ticks it; news_at = when they last said yes or no (consent record)
+  `ALTER TABLE users ADD COLUMN news INTEGER NOT NULL DEFAULT 0`,
+  `ALTER TABLE users ADD COLUMN news_at INTEGER`,
 ];
 let schemaReady = null;
 export async function db(env) {
@@ -90,9 +93,9 @@ function cookieVal(request, name) {
 export async function currentUser(env, request) {
   const raw = cookieVal(request, COOKIE); if (!raw || !env.DB) return null;
   const D = await db(env), sid = await sha256(raw);
-  const row = await D.prepare(`SELECT u.id, u.email, u.name, u.contributor, u.blocked, u.trusted, s.expires FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.id = ?`).bind(sid).first();
+  const row = await D.prepare(`SELECT u.id, u.email, u.name, u.contributor, u.blocked, u.trusted, u.news, s.expires FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.id = ?`).bind(sid).first();
   if (!row || row.expires < now()) return null;
-  return { id: row.id, email: row.email, name: row.name, contributor: !!row.contributor, blocked: !!row.blocked, trusted: !!row.trusted };
+  return { id: row.id, email: row.email, name: row.name, contributor: !!row.contributor, blocked: !!row.blocked, trusted: !!row.trusted, news: !!row.news };
 }
 export async function requireUser(env, request) {
   const u = await currentUser(env, request);

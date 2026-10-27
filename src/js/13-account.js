@@ -8,10 +8,13 @@ async function api(path,opt){
   if(!r.ok) throw new Error((j&&j.error)||"Couldn't reach OneTrackMind. Check your connection.");
   return j||{};
 }
+/* ticked "send me new routes" when signing in: record the yes once signed in (on whichever device finishes the sign-in) */
+async function flushNews(){ try{ if(acct.user&&!acct.user.news&&localStorage.getItem("otm-wantnews")==="1"){ await api("/api/account",{method:"POST",body:{news:true}}); acct.user.news=true; localStorage.removeItem("otm-wantnews"); } }catch(e){} }
 async function loadMe(){
   try{ const j=await api("/api/auth/me"); acct.ready=!!(j&&j.ready); acct.user=j&&j.user||null; acct.admin=!!(j&&j.admin); acct.contributor=!!(j&&j.contributor); }catch(e){ acct.ready=false; acct.user=null; }
   // ticked "Become a contributor" when signing in: record it now
   try{ if(acct.user&&!acct.contributor&&localStorage.getItem("otm-wantcontrib")==="1"){ await api("/api/account",{method:"POST",body:{contributor:true}}); acct.contributor=true; localStorage.removeItem("otm-wantcontrib"); } }catch(e){}
+  await flushNews();
   const b=$("acctBtn"); b.hidden=!acct.ready; b.textContent=acct.user?"My routes":"Sign in"; $("addBtn").hidden=!acct.ready;
   if(typeof refreshReview==="function") refreshReview();
   renderAll();
@@ -32,10 +35,11 @@ function renderAcct(msg){
     B.innerHTML=`${m}<p class="note" style="margin:0">${esc(acct.why||"Save your routes and open them on any device.")} We'll email you a link to sign in. No password.</p>
       <form id="aForm" class="dlgwrap"><div class="field"><label class="lbl" for="aEmail">Your email</label><input id="aEmail" type="email" autocomplete="email" required></div>
       <label class="chk"><input type="checkbox" id="aContrib" ${acct.wantContrib?"checked":""}> Become a contributor: I'll add routes, places and road reports, and I agree to the <a href="/rules.html" target="_blank">contributor rules</a></label>
+      <label class="chk"><input type="checkbox" id="aNews" ${acct.wantNews?"checked":""}> Send me new routes and trip ideas, about once a month. Unsubscribe any time.</label>
       <div class="btns" style="justify-content:flex-end"><button class="btn" type="submit">Email me a link</button></div></form>
       <p class="note" style="margin:0">We keep your email and the routes you save, nothing else. See <a href="/privacy.html" target="_blank">privacy</a> and <a href="/terms.html" target="_blank">terms</a>.</p>`;
     $("aForm").onsubmit=async e=>{ e.preventDefault(); const email=$("aEmail").value.trim(), btn=e.target.querySelector("button[type=submit]")||e.target.querySelector(".btns button"); btn.disabled=true; btn.textContent="Sending…";
-      try{ if($("aContrib").checked) localStorage.setItem("otm-wantcontrib","1"); else localStorage.removeItem("otm-wantcontrib"); }catch(err){}
+      try{ if($("aContrib").checked) localStorage.setItem("otm-wantcontrib","1"); else localStorage.removeItem("otm-wantcontrib"); }catch(err){} acct.wantNews=$("aNews").checked; try{ if(acct.wantNews) localStorage.setItem("otm-wantnews","1"); else localStorage.removeItem("otm-wantnews"); }catch(err){}
       try{ const j=await api("/api/auth/start",{method:"POST",body:{email,back:"/"}}); acctMode="sent"; acct.sentTo=email; startWaiting(j.poll); renderAcct(); }
       catch(err){ btn.disabled=false; btn.textContent="Email me a link"; renderAcct({err:1,text:err.message}); $("aEmail").value=email; } };
     setTimeout(()=>$("aEmail")&&$("aEmail").focus(),50);
@@ -60,6 +64,7 @@ function renderAcct(msg){
       <div class="rlist">${R==null?`<div class="note">Loading…</div>`:R.length?R.map(r=>`<div class="rrow"><div><div class="rt">${esc(r.title)}</div><div class="note">${r.km?r.km.toLocaleString()+" km · ":""}${r.days} day${r.days>1?"s":""}${r.vehicle?" · "+esc((VEHICLES[r.vehicle]||"").replace(/^\S+\s/,"")):""} · ${esc(new Date(r.updated).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}))}</div></div>
         <div class="ract">${acct.admin?`<button class="btn small ghost" type="button" data-rpick="${r.id}:${r.pick?0:1}">${r.pick?"Unpick":"Make pick"}</button>`:r.visibility==="public"?`<span class="note">Public</span>`:r.visibility==="review"?`<span class="note" title="We check every shared route before other riders see it">Waiting for approval</span>`:`<button class="btn small ghost" type="button" data-rpub="${r.id}" title="Let other riders find and rate it">Share publicly</button>`}<button class="btn small" type="button" data-ropen="${r.id}">Open</button><button class="icon" type="button" title="Delete" data-rdel="${r.id}">✕</button></div></div>`).join(""):`<div class="note">Nothing saved yet. Plan a trip, then tap Save route.</div>`}</div>
       ${typeof marksHtml==="function"?marksHtml():""}
+      <label class="chk"><input type="checkbox" data-news ${acct.user.news?"checked":""}> Email me new routes and trip ideas, about once a month</label>
       <div class="acctline"><span class="note">Signed in as <b>${esc(acct.user.email)}</b></span><span class="btns"><button class="linkbtn" type="button" data-signout>Sign out</button><button class="linkbtn" type="button" data-delacct>${acct.delArm?"Tap again to delete your account and routes":"Delete account"}</button></span></div>`;
   }
 }
@@ -127,7 +132,7 @@ try{ const w=JSON.parse(sessionStorage.getItem("otm-poll")||"null"); if(w&&Date.
 if(/[?&]signedin=1/.test(location.search)){ history.replaceState(null,"",location.pathname); setTimeout(()=>{ if(acct.user){ const tt=$("toast"); tt.innerHTML=`You're signed in as <b>${esc(acct.user.email)}</b>. If OneTrackMind is open in another tab, you can close that one.`; tt.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>tt.hidden=true,12000); } },1500); }
 // signed in from the email in another tab? notice it when this tab is looked at again
 { let lastCheck=0; const recheck=()=>{ if(document.visibilityState!=="visible"||acct.user||!acct.ready||Date.now()-lastCheck<3000) return; lastCheck=Date.now();
-    api("/api/auth/me").then(j=>{ if(j&&j.user){ acct.user=j.user; acct.admin=!!j.admin; acct.contributor=!!j.contributor; $("acctBtn").textContent="My routes"; if(typeof flushOutbox==="function") flushOutbox(); if(typeof refreshReview==="function") refreshReview(); if($("acctDlg").open&&acctMode==="sent"){ $("acctDlg").close(); } renderAll(); $("status").textContent=`Signed in as ${j.user.email}.`; } }).catch(()=>{}); };
+    api("/api/auth/me").then(j=>{ if(j&&j.user){ acct.user=j.user; acct.admin=!!j.admin; acct.contributor=!!j.contributor; flushNews(); $("acctBtn").textContent="My routes"; if(typeof flushOutbox==="function") flushOutbox(); if(typeof refreshReview==="function") refreshReview(); if($("acctDlg").open&&acctMode==="sent"){ $("acctDlg").close(); } renderAll(); $("status").textContent=`Signed in as ${j.user.email}.`; } }).catch(()=>{}); };
   document.addEventListener("visibilitychange",recheck); window.addEventListener("focus",recheck); }
 
 /* ---------- feedback and suggested changes: stored and emailed to us; plain email if the server can't take it ---------- */
@@ -157,3 +162,7 @@ $("fbForm").addEventListener("submit",async e=>{
 });
 document.addEventListener("click",e=>{ const f=e.target.closest&&e.target.closest("[data-fixat]"); if(!f) return; const [lat,lon,...n]=f.dataset.fixat.split(","); openFeedback("fix",{lat:+lat,lon:+lon,name:n.join(",")}); });
 loadMe();
+
+document.addEventListener("change",async e=>{ const c=e.target.closest&&e.target.closest("[data-news]"); if(!c) return; const on=c.checked;
+  try{ await api("/api/account",{method:"POST",body:{news:on}}); acct.user.news=on; $("status").textContent=on?"You're on the list: about one email a month.":"Done. No more emails from us, except sign-in links."; }
+  catch(err){ c.checked=!on; $("status").textContent=err.message; } });
