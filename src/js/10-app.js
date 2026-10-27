@@ -634,7 +634,7 @@ function stopDetail(k,j,cat){
   let h=`<div class="sdetail">`;
   if(cat){ const a=AV.find(x=>x[0]===cat); return h+listBlock(a[2]+" at the stop",a[1],av[cat],`${cat}-${k}-${j}`,x=>placeRow(x,k,j))+`</div>`; }
   if(j>0){ const f=rangeFuel(pd.legs[j-1].a,pd.legs[j-1].b); if(f&&f.level) h+=`<div class="verdict ${f.level==="bad"?"v-bad":"v-warn"}">${esc(f.text)}</div>`; }
-  if(isVia){ const vi=j-1, v=trip.days[k].vias[vi]; h+=`<div class="rname chgstop"><span class="lbl" style="white-space:nowrap">${v&&v.auto?"Stop somewhere else":"Change this stop"}</span>${searchBox(`via-${k}-${vi}`,"","Another town or place",true)}</div><div class="note">Or tap the map where you'd rather stop.</div>`; }
+  if(isVia){ const vi=j-1, v=trip.days[k].vias[vi]; h+=`<div class="rname chgstop"><span class="lbl" style="white-space:nowrap">${v&&v.auto?"Stop somewhere else":"Change this stop"}</span>${searchBox(`via-${k}-${vi}`,"","Another town or place",true)}</div><div class="note">Or ${canHover?"click":"press and hold"} the map where you'd rather stop.</div>`; }
   const any=AV.some(a=>av[a[0]].length);
   h+=`<h4 class="sub">At the stop</h4>`;
   h+=any?AV.filter(a=>av[a[0]].length).map(a=>listBlock(a[2],a[1],av[a[0]],`${a[0]}-${k}-${j}`,x=>placeRow(x,k,j))).join(""):`<div class="note">Nothing known within 1 km. Small places are often missing from the map, so ask locally.</div>`;
@@ -675,7 +675,7 @@ function stopList(k){
       </div></details>`:"";
     const autoTag=p.auto?(p.fuelHere?`<span class="autotag" title="Fuel and food here. You asked to stop at least every ${esc(String(settings.range))} km.">Suggested stop${p.detour?` · +${p.detour} km`:""}</span>`
       :`<span class="autotag nofuel" title="No fuel on our map here, and none closer. Ask locally or carry extra.">Suggested stop · fuel not confirmed${p.detour?` · +${p.detour} km`:""}</span>`):"";
-    h+=`<li class="stop ${open?"open":""} ${p.auto?"auto":""} ${isTo&&!last?"night":""}"><div class="shead"><div class="sl1"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab ${isTo&&!last?"nightlab":""}">${lab}</span><b>${esc(p.name)}</b><span class="note">${isFrom?"":`km ${km}`}</span></button><span class="avail">${icons}</span></div>
+    h+=`<li class="stop ${open?"open":""} ${p.auto?"auto":isTo||isFrom?"":"mine"} ${isTo&&!last?"night":""}" data-sname="${esc(p.name)}"><div class="shead"><div class="sl1"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab ${isTo&&!last?"nightlab":""}">${lab}</span><b>${esc(p.name)}</b><span class="note">${isFrom?"":`km ${km}`}</span></button><span class="avail">${icons}</span></div>
       <div class="sl2"><span class="sl2l">${autoTag}</span><span class="stools">${way}${tools}${opts}</span></div></div>${open&&plan?stopDetail(k,j,stopFocus.cat):""}</li>`;
   });
   h+=`</ol><div class="rname"><span class="lbl" style="white-space:nowrap">Add a stop</span>${searchBox("addvia-"+k,"","Town, pass or place on this day",true)}</div>`;
@@ -1036,7 +1036,7 @@ function renderHist(){
   $("histList").innerHTML=h.length?h.map((x,i)=>`<div class="srow"><div><b>${esc(x.label)}</b><span class="note">saved ${esc(new Date(x.at).toLocaleString(undefined,{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}))}</span></div><button class="btn small ghost" type="button" data-restore="${i}">Restore</button></div>`).join(""):`<div class="note">Nothing saved yet.</div>`;
 }
 $("histList").addEventListener("click",e=>{ const b=e.target.closest("[data-restore]"); if(!b) return; const h=store.get("rr4-hist")||[], x=h[+b.dataset.restore]; if(!x) return; snapTrip(true); const t=JSON.parse(x.key); Object.keys(trip).forEach(k=>delete trip[k]); Object.assign(trip,t); ui.tab="ov"; $("settings").close(); changed(); });
-const daySig=k=>[dayFrom(k),dayTo(k)].map(p=>p&&p.lat!=null?p.lat.toFixed(3)+","+p.lon.toFixed(3):"-").join("|");
+const daySig=k=>[dayFrom(k),...(trip.days[k]?trip.days[k].vias.filter(v=>!v.auto):[]),dayTo(k)].map(p=>p&&p.lat!=null?p.lat.toFixed(3)+","+p.lon.toFixed(3):"-").join("|");
 function changed(){ window._refit=true; focusR=null; stopFocus=null; autoRounds=0;
   syncDays(); trip.days.forEach((d,k)=>{ const s=daySig(k); if(d.sig&&d.sig!==s){ d.fresh=true; delete d.noMore; const n=d.vias.length; d.vias=d.vias.filter(v=>!v.auto); if(d.vias.length!==n) d.legs=[]; } d.sig=s; });
   snapTrip(); recalc(); }

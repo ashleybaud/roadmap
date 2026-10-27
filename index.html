@@ -344,7 +344,8 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .slrow{display:grid;grid-template-columns:5.5em 1fr auto;gap:8px;align-items:start;padding:6px 0;border-bottom:1px solid var(--line);font-size:.9rem}
 .slrow .sact{font-size:.82rem}.sln{font-weight:600}
 .stop.night{border:2px solid var(--ink);border-radius:8px;margin:6px 0;padding:0 8px;background:color-mix(in srgb,var(--ink) 7%,transparent)}
-.rlab.nightlab{background:var(--ink);color:var(--bg);border-radius:4px;padding:1px 6px;white-space:nowrap;align-self:center}
+.rlab.nightlab{background:var(--ink);color:var(--bg);border-radius:4px;padding:1px 6px;white-space:nowrap;align-self:center;flex:none;min-width:0}
+.sname .note{white-space:nowrap}
 .stools{margin-left:auto}
 .chgstop{margin:6px 0 2px}
 .pinfo{max-width:440px;width:calc(100% - 32px)}
@@ -365,9 +366,15 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .autoname{color:var(--accent);cursor:pointer;font-weight:600}
 .wmin{font-size:.86rem;font-weight:600;color:var(--warn)}
 .detailh{margin:14px 0 0;font-size:.78rem;font-family:var(--f-mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border-bottom:1px solid var(--line);padding-bottom:4px}
-.stop.auto{border:1.5px dashed var(--accent);border-radius:6px;margin:4px 0;padding:0 6px}
+/* your stops pop, suggestions blend */
+.stop.mine{border-left:5px solid var(--accent);background:color-mix(in srgb,var(--accent) 9%,transparent);border-radius:4px;margin:4px 0;padding:0 8px}
+.stop.mine .sname b{font-size:1.12rem}
+.stop.auto{opacity:.72}
+.stop.auto .sname b{font-weight:500;color:var(--muted)}
+.stop.auto:not(.open) .stools,.stop.auto:not(.open) .avail{display:none}
+.stop.auto .autotag{background:none;padding:0;font-weight:500;color:var(--muted)}
 .autotag{font-size:.74rem;font-weight:700;color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);border-radius:4px;padding:2px 6px}
-.mapemo.dashed{border-style:dashed;border-color:#0B6E4F}
+.mapemo.dashed{border-style:dashed;border-color:#0B6E4F;opacity:.6;transform:scale(.8)}
 .days .ovday{padding:6px 0;border-top:0}
 .wherebox{display:inline-block;min-width:220px;vertical-align:middle}
 .tripbar{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;border-bottom:0}
@@ -396,7 +403,8 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .townlbl.city span{font-size:15px;font-weight:700}
 .shead{flex-direction:column;align-items:stretch;gap:4px}
 .sl1,.sl2{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.sl1 .sname{min-width:0}
+.sl1 .sname{min-width:0;flex-wrap:wrap;row-gap:2px}
+.sl1 .avail{flex:none}
 .sl2l{display:inline-flex;align-items:center}
 .dtab{min-width:0;max-width:118px;flex:0 1 auto}
 .dtab .tto{display:block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -498,7 +506,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
 .pin.pend{background:#fff;font-size:15px}
 .pin.pnight{border-radius:14px;border-width:3px;font-size:14px;padding:0 4px}
 .pin.pnight b{font-size:12px}
-.pin.pstop{width:20px;height:20px;font-size:11px}
+.pin.pstop{width:24px;height:24px;font-size:12px;background:#0B6E4F;color:#fff;border:2px solid #fff;box-shadow:0 0 0 2px #0B6E4F}
 .pinday{position:absolute;top:-7px;right:-8px;min-width:14px;height:14px;border-radius:7px;color:#fff;font:700 9px/14px system-ui,sans-serif;text-align:center;font-style:normal;padding:0 2px}
 .mapemo{position:relative}
 .maplbl.mlnight{font-weight:800;border-width:2px;background:#18201C;color:#fff;border-color:#18201C}
@@ -1647,7 +1655,7 @@ function stopDetail(k,j,cat){
   let h=`<div class="sdetail">`;
   if(cat){ const a=AV.find(x=>x[0]===cat); return h+listBlock(a[2]+" at the stop",a[1],av[cat],`${cat}-${k}-${j}`,x=>placeRow(x,k,j))+`</div>`; }
   if(j>0){ const f=rangeFuel(pd.legs[j-1].a,pd.legs[j-1].b); if(f&&f.level) h+=`<div class="verdict ${f.level==="bad"?"v-bad":"v-warn"}">${esc(f.text)}</div>`; }
-  if(isVia){ const vi=j-1, v=trip.days[k].vias[vi]; h+=`<div class="rname chgstop"><span class="lbl" style="white-space:nowrap">${v&&v.auto?"Stop somewhere else":"Change this stop"}</span>${searchBox(`via-${k}-${vi}`,"","Another town or place",true)}</div><div class="note">Or tap the map where you'd rather stop.</div>`; }
+  if(isVia){ const vi=j-1, v=trip.days[k].vias[vi]; h+=`<div class="rname chgstop"><span class="lbl" style="white-space:nowrap">${v&&v.auto?"Stop somewhere else":"Change this stop"}</span>${searchBox(`via-${k}-${vi}`,"","Another town or place",true)}</div><div class="note">Or ${canHover?"click":"press and hold"} the map where you'd rather stop.</div>`; }
   const any=AV.some(a=>av[a[0]].length);
   h+=`<h4 class="sub">At the stop</h4>`;
   h+=any?AV.filter(a=>av[a[0]].length).map(a=>listBlock(a[2],a[1],av[a[0]],`${a[0]}-${k}-${j}`,x=>placeRow(x,k,j))).join(""):`<div class="note">Nothing known within 1 km. Small places are often missing from the map, so ask locally.</div>`;
@@ -1688,7 +1696,7 @@ function stopList(k){
       </div></details>`:"";
     const autoTag=p.auto?(p.fuelHere?`<span class="autotag" title="Fuel and food here. You asked to stop at least every ${esc(String(settings.range))} km.">Suggested stop${p.detour?` · +${p.detour} km`:""}</span>`
       :`<span class="autotag nofuel" title="No fuel on our map here, and none closer. Ask locally or carry extra.">Suggested stop · fuel not confirmed${p.detour?` · +${p.detour} km`:""}</span>`):"";
-    h+=`<li class="stop ${open?"open":""} ${p.auto?"auto":""} ${isTo&&!last?"night":""}"><div class="shead"><div class="sl1"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab ${isTo&&!last?"nightlab":""}">${lab}</span><b>${esc(p.name)}</b><span class="note">${isFrom?"":`km ${km}`}</span></button><span class="avail">${icons}</span></div>
+    h+=`<li class="stop ${open?"open":""} ${p.auto?"auto":isTo||isFrom?"":"mine"} ${isTo&&!last?"night":""}" data-sname="${esc(p.name)}"><div class="shead"><div class="sl1"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab ${isTo&&!last?"nightlab":""}">${lab}</span><b>${esc(p.name)}</b><span class="note">${isFrom?"":`km ${km}`}</span></button><span class="avail">${icons}</span></div>
       <div class="sl2"><span class="sl2l">${autoTag}</span><span class="stools">${way}${tools}${opts}</span></div></div>${open&&plan?stopDetail(k,j,stopFocus.cat):""}</li>`;
   });
   h+=`</ol><div class="rname"><span class="lbl" style="white-space:nowrap">Add a stop</span>${searchBox("addvia-"+k,"","Town, pass or place on this day",true)}</div>`;
@@ -2049,7 +2057,7 @@ function renderHist(){
   $("histList").innerHTML=h.length?h.map((x,i)=>`<div class="srow"><div><b>${esc(x.label)}</b><span class="note">saved ${esc(new Date(x.at).toLocaleString(undefined,{weekday:"short",day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}))}</span></div><button class="btn small ghost" type="button" data-restore="${i}">Restore</button></div>`).join(""):`<div class="note">Nothing saved yet.</div>`;
 }
 $("histList").addEventListener("click",e=>{ const b=e.target.closest("[data-restore]"); if(!b) return; const h=store.get("rr4-hist")||[], x=h[+b.dataset.restore]; if(!x) return; snapTrip(true); const t=JSON.parse(x.key); Object.keys(trip).forEach(k=>delete trip[k]); Object.assign(trip,t); ui.tab="ov"; $("settings").close(); changed(); });
-const daySig=k=>[dayFrom(k),dayTo(k)].map(p=>p&&p.lat!=null?p.lat.toFixed(3)+","+p.lon.toFixed(3):"-").join("|");
+const daySig=k=>[dayFrom(k),...(trip.days[k]?trip.days[k].vias.filter(v=>!v.auto):[]),dayTo(k)].map(p=>p&&p.lat!=null?p.lat.toFixed(3)+","+p.lon.toFixed(3):"-").join("|");
 function changed(){ window._refit=true; focusR=null; stopFocus=null; autoRounds=0;
   syncDays(); trip.days.forEach((d,k)=>{ const s=daySig(k); if(d.sig&&d.sig!==s){ d.fresh=true; delete d.noMore; const n=d.vias.length; d.vias=d.vias.filter(v=>!v.auto); if(d.vias.length!==n) d.legs=[]; } d.sig=s; });
   snapTrip(); recalc(); }
@@ -2893,7 +2901,17 @@ $("map").addEventListener("click",e=>{ const b=e.target.closest&&e.target.closes
   else if(a==="sleep"){ trip.days[k].to=p; $("status").textContent=`Night ${k+1}: ${p.name}.`; changed(); }
   else if(a.startsWith("swap:")) replaceVia(k,+a.slice(5),p);
 });
-let tapOn=false; const tapHook=()=>{ if(map&&!tapOn){ map.on("click",onMapTap); tapOn=true; } };
+let tapOn=false; const touchy=!window.matchMedia("(hover: hover) and (pointer: fine)").matches;
+const tapHook=()=>{ if(map&&!tapOn){ map.on("contextmenu",e=>{ if(e.originalEvent&&e.originalEvent.preventDefault) e.originalEvent.preventDefault(); onMapTap(e); }); if(!touchy) map.on("click",onMapTap); tapOn=true; } };
 { const _em=ensureMap; ensureMap=function(){ _em(); tapHook(); }; } tapHook();
+
+// 4. keep your place: after a change, the stop you were working on stays where it was on screen
+let keepAt=null;
+document.addEventListener("click",e=>{ const st=e.target.closest&&e.target.closest("#details .stop"); if(!st||e.target.closest("[data-stop],[data-av]")) return;
+  const del=e.target.closest("[data-vdel]"), ref=del?(st.previousElementSibling&&st.previousElementSibling.classList.contains("stop")?st.previousElementSibling:st.nextElementSibling):st;
+  if(ref&&ref.dataset.sname) keepAt={name:ref.dataset.sname,top:ref.getBoundingClientRect().top,until:Date.now()+8000}; },true);
+function keepPlace(){ if(!keepAt||Date.now()>keepAt.until) return; const el=[...document.querySelectorAll("#details .stop")].find(x=>x.dataset.sname===keepAt.name); if(!el) return;
+  const dy=el.getBoundingClientRect().top-keepAt.top; if(Math.abs(dy)>2) window.scrollBy(0,dy); }
+{ const _rd=renderDetails; renderDetails=function(){ _rd.apply(this,arguments); keepPlace(); }; }
 
 </script></body></html>
