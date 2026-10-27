@@ -368,6 +368,38 @@
       "toFast": true
      }
     ]
+   },
+   "stats": {
+    "km": 2052,
+    "gravelPct": 12,
+    "grade": 4,
+    "highM": 996,
+    "days": [
+     {
+      "km": 689,
+      "gravelPct": 0,
+      "grade": 1,
+      "highM": null
+     },
+     {
+      "km": 396,
+      "gravelPct": 7,
+      "grade": 3,
+      "highM": null
+     },
+     {
+      "km": 155,
+      "gravelPct": 93,
+      "grade": 4,
+      "highM": 608
+     },
+     {
+      "km": 811,
+      "gravelPct": 8,
+      "grade": 2,
+      "highM": 996
+     }
+    ]
    }
   },
   {
