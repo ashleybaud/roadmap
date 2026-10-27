@@ -74,7 +74,7 @@ const tapHook=()=>{ if(map&&!tapOn){ map.on("contextmenu",e=>{ if(e.originalEven
 
 // 4. keep your place: after a change, the stop you were working on stays where it was on screen
 let keepAt=null;
-document.addEventListener("click",e=>{ const st=e.target.closest&&e.target.closest("#details .stop"); if(!st||e.target.closest("[data-stop],[data-av]")) return;
+document.addEventListener("click",e=>{ const st=e.target.closest&&e.target.closest("#details .stop"); if(!st) return;
   const del=e.target.closest("[data-vdel]"), ref=del?(st.previousElementSibling&&st.previousElementSibling.classList.contains("stop")?st.previousElementSibling:st.nextElementSibling):st;
   if(ref&&ref.dataset.sname) keepAt={name:ref.dataset.sname,top:ref.getBoundingClientRect().top,until:Date.now()+8000}; },true);
 function keepPlace(){ if(!keepAt||Date.now()>keepAt.until) return; const el=[...document.querySelectorAll("#details .stop")].find(x=>x.dataset.sname===keepAt.name); if(!el) return;
