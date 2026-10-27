@@ -68,6 +68,9 @@ async function loadLocal(my){
   for(const k of ["view","pass","sight","food","camp"]){ const rows=await localKind(k,ccs); if(rows){ all.push(...nearRoute(rows,k,corridor)); if(k==="food") foodRowsAll=rows.map(r=>({lat:r[0],lon:r[1]})); } }
   if(plan) plan._cands=null;
   pois=all.filter(p=>p.off<=corridor+0.5);
+  { const pr=await localKind("pass",ccs); const best={}; // known passes up to 30 km off the route, one per name
+    (pr?nearRoute(pr,"pass",30):[]).filter(p=>p.off<=30&&p.name).forEach(p=>{ if(!best[p.name]||p.off<best[p.name].off) best[p.name]=p; });
+    passNear=Object.values(best).filter(p=>p.off>1.5); } // a pass with any point on the route is already ridden
   const stopPts=townPoints(); amen=[];
   for(const k of ["shop","toilets","cash","repair"]){ const rows=await localKind(k,ccs); if(!rows) continue;
     rows.forEach((r,i)=>{ const [lat,lon,name,type,phone,web,email,hours,extra]=r; const q={lat,lon}; if(!stopPts.some(s=>hav(s,q)<=1.2)) return;

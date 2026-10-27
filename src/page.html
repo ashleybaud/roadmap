@@ -343,7 +343,15 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .sleeplist{margin:12px 0}.sleeplist h3{margin:0 0 6px}
 .slrow{display:grid;grid-template-columns:5.5em 1fr auto;gap:8px;align-items:start;padding:6px 0;border-bottom:1px solid var(--line);font-size:.9rem}
 .slrow .sact{font-size:.82rem}.sln{font-weight:600}
-.stop.night>.shead{background:color-mix(in srgb,var(--ink) 8%,transparent);border-left:4px solid var(--ink);padding-left:6px;border-radius:4px}
+.stop.night{border:2px solid var(--ink);border-radius:8px;margin:6px 0;padding:0 8px;background:color-mix(in srgb,var(--ink) 7%,transparent)}
+.rlab.nightlab{background:var(--ink);color:var(--bg);border-radius:4px;padding:1px 6px;white-space:nowrap;align-self:center}
+.stools{margin-left:auto}
+.chgstop{margin:6px 0 2px}
+.pinfo{max-width:440px;width:calc(100% - 32px)}
+#piBody{display:flex;flex-direction:column;gap:10px}
+.pitable{border-collapse:collapse;font-size:.92rem}.pitable th{text-align:left;color:var(--muted);font-weight:500;padding:3px 12px 3px 0;vertical-align:top}.pitable td{padding:3px 0;word-break:break-word}.pitable a{color:var(--accent)}
+.pimap{height:200px;border:1px solid var(--line);border-radius:6px}
+.tapbox{display:flex;flex-direction:column;gap:6px;min-width:190px}.tapbox .btn{text-align:left}
 .schain .ep.to .tolink{font-weight:700}
 .stopname{color:var(--muted)}
 .dway{margin-left:auto;flex:none;display:inline-flex;gap:3px;line-height:0;padding-top:3px}
@@ -575,6 +583,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
     <div class="btns"><button class="btn" value="close">Close</button></div>
   </form>
 </dialog>
+<dialog id="pinfoDlg" class="pinfo" aria-label="Place details"><div id="piBody"></div></dialog>
 <dialog id="welcome" class="welcome" aria-labelledby="wTitle">
   <form method="dialog" style="display:flex;flex-direction:column;gap:12px">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><h2 id="wTitle" style="margin:0">Plan a trip, day by day</h2><button class="icon" value="cancel" formnovalidate title="Close without changes" aria-label="Close">✕</button></div>

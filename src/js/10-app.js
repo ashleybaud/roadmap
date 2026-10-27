@@ -28,6 +28,7 @@ const SET_FIELDS=["vehicle","range","leave","pace","corridor","style","maxHours"
 const settings=Object.assign({range:200,reserve:30,leave:"08:00",pace:0,corridor:5,style:"rough",vehicle:"bike",fuelMode:"suggest",maxHours:8,breakMin:20},store.get("rr2-settings")||{});
 const ui=Object.assign({types:Object.fromEntries(TYPES.map(t=>[t.id,t.on])),max:"10",sleep:false},store.get("rr4-ui")||{});
 ui.tab=ui.tab??"ov"; delete ui._lastSel;
+let passNear=[];
 let plan=null, pois=[], fuelStations=[], fuelAll=[], stays=[], placesOk=false, dataDate="", seq=0, panel=null, fp=null;
 fetch("/data/updated.json").then(r=>r.ok?r.json():null).then(j=>{if(j&&j.updated)dataDate=new Date(j.updated).toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"});}).catch(()=>{});
 
@@ -466,7 +467,7 @@ function stayRows(k){
     :`<div class="note stayhint">Tonight is set to the town of ${esc(to.name)}, not a place to stay. Choose one below or tap a blue dot on the map. You can change it later.</div>`;
   h+=stayChips(k);
   h+=list.length?`<div class="stable">${list.map(p=>`<div class="srow ${mine(p)?"on":""}"><div><b>${esc(p.name)}</b><span class="note">${esc((p.tags.tourism||"").replace("_"," "))} · ${p.dist.toFixed(1)} km</span></div>
-      <div class="sact">${linksHtml(p.tags,p.name,town||to.name)}${last?"":mine(p)?`<span class="okt">✓ Your stay</span>`:`<button class="linkbtn" type="button" data-staynight="${k}:${esc(p.id)}">Stay here</button>`}</div></div>`).join("")}</div>`
+      <div class="sact">${callLink(p.tags)}${infoBtn(Object.assign({kind:"sleep"},p),{town:town||to.name,dist:p.dist.toFixed(1)+" km from "+(town||to.name),act:last||mine(p)?"":`<button class="linkbtn" type="button" data-staynight="${k}:${esc(p.id)}">Stay here</button>`})}${last?"":mine(p)?`<span class="okt">✓ Your stay</span>`:`<button class="linkbtn" type="button" data-staynight="${k}:${esc(p.id)}">Stay here</button>`}</div></div>`).join("")}</div>`
     :`<div class="note">${placesOk?(ty&&ty.rx?`No ${esc(ty.n.replace(/^\S+ /,"").toLowerCase())} listed within 15 km. Try Anything, or check booking sites.`:"Nothing listed within 15 km. Phone the town's info office or check booking sites."):"Loading…"}</div>`;
   if(all.length>10) h+=`<button class="linkbtn" type="button" data-more="${key}">${showAll.has(key)?"Show fewer":`Show all ${all.length}`}</button>`;
   return h+`</section>`;
@@ -619,7 +620,7 @@ function placeRow(x,k,j,extraAct){
   const dist=x.dstop!=null?`${x.dstop<0.1?"at the stop":x.dstop.toFixed(1)+" km from the stop"}`:(x.off!=null?(x.off<0.3?"on the route":`${x.off.toFixed(1)} km off the route`):"");
   const g=x.kind==="fuel"?gradesTxt(t):"";
   const hrs=["fuel","food","shop","cash","repair"].includes(x.kind)?hoursHtml(t,k,j):"";
-  return `<div class="srow" data-ploc="${x.lat},${x.lon}"><div><b>${esc(nm)}</b><span class="note">${esc(dist)}${g?" · "+esc(g):""}</span>${hrs}</div><div class="sact">${linksHtml(t,x.name&&x.name!=="Fuel"?x.name:"",town)}${extraAct||""}</div></div>`;
+  return `<div class="srow" data-ploc="${x.lat},${x.lon}"><div><b>${esc(nm)}</b><span class="note">${esc(dist)}${g?" · "+esc(g):""}</span>${hrs}</div><div class="sact">${callLink(t)}${infoBtn(Object.assign({},x,{name:nm}),{town,dist,act:extraAct})}${extraAct||""}</div></div>`;
 }
 function listBlock(title,icon,list,key,rowFn){
   const shown=showAll.has(key)?list:list.slice(0,8);
@@ -633,12 +634,13 @@ function stopDetail(k,j,cat){
   let h=`<div class="sdetail">`;
   if(cat){ const a=AV.find(x=>x[0]===cat); return h+listBlock(a[2]+" at the stop",a[1],av[cat],`${cat}-${k}-${j}`,x=>placeRow(x,k,j))+`</div>`; }
   if(j>0){ const f=rangeFuel(pd.legs[j-1].a,pd.legs[j-1].b); if(f&&f.level) h+=`<div class="verdict ${f.level==="bad"?"v-bad":"v-warn"}">${esc(f.text)}</div>`; }
+  if(isVia){ const vi=j-1, v=trip.days[k].vias[vi]; h+=`<div class="rname chgstop"><span class="lbl" style="white-space:nowrap">${v&&v.auto?"Stop somewhere else":"Change this stop"}</span>${searchBox(`via-${k}-${vi}`,"","Another town or place",true)}</div><div class="note">Or tap the map where you'd rather stop.</div>`; }
   const any=AV.some(a=>av[a[0]].length);
   h+=`<h4 class="sub">At the stop</h4>`;
   h+=any?AV.filter(a=>av[a[0]].length).map(a=>listBlock(a[2],a[1],av[a[0]],`${a[0]}-${k}-${j}`,x=>placeRow(x,k,j))).join(""):`<div class="note">Nothing known within 1 km. Small places are often missing from the map, so ask locally.</div>`;
   { const auto=fuelAll.some(f=>hav(f,p)<=1);
     h+=`<div class="sopts">${auto?`<span class="note">Fuel here, on our map.</span>`:`<label class="chk"><input type="checkbox" data-fuelpt="${k}:${j}" ${p.fuelHere||p.type==="fuel"?"checked":""}> Fuel here (not on our map)</label>`}
-      ${isVia?`<label class="chk">Break <input type="number" min="0" max="600" step="5" value="${breakOf(p)}" data-breakmin="${k}:${j-1}" style="width:5em"> min</label>`:""}${acct.ready?`<button class="linkbtn small" type="button" data-repat="${p.lat},${p.lon},${esc(p.name)}">Report the road here</button><button class="linkbtn small" type="button" data-spotat="${p.lat},${p.lon},${esc(p.name)}">Mark a place here</button>`:""}<button class="linkbtn small" type="button" data-fixat="${p.lat},${p.lon},${esc(p.name)}">Something wrong on our map? Suggest a change</button></div>`;
+      ${isVia?`<label class="chk">Break <input type="number" min="0" max="600" step="5" value="${breakOf(p)}" data-breakmin="${k}:${j-1}" style="width:5em"> min</label>`:""}</div>`;
   }
   if(j>0){
     const sc=scope(k,j), way=fuelAll.filter(f=>f.km!=null&&f.km>=sc.a-0.5&&f.km<=sc.b+0.5&&hav(f,p)>1).sort((a,b)=>a.km-b.km);
@@ -662,15 +664,18 @@ function stopList(k){
     const av=placesOk?stopAvail(p):null;
     const icons=av?AV.filter(a=>av[a[0]].length).map(a=>`<button type="button" class="avi ${open&&stopFocus.cat===a[0]?"on":""}" data-av="${k}:${j}:${a[0]}" title="${esc(a[2])}: ${av[a[0]].length}">${a[1]}</button>`).join(""):"";
     const fq=legFast(d,j-1), way=lg.track||(L&&L.gpx)?(L&&L.gpx?`<span class="note gpxnote" title="This stretch follows your GPX file">GPX</span>`:""):`<span class="seg2 legway" role="group" aria-label="Way to this stop"><button type="button" data-legsty="${j-1}:0" class="${fq?"":"on"}" title="${esc(styleName())} to here">${STYLE_ICON.default}</button><button type="button" data-legsty="${j-1}:1" class="${fq?"on":""}" title="Get me here quickly">${STYLE_ICON.fast}</button></span>`;
-    const tools=!isFrom&&!isTo?`<button class="icon" type="button" title="Move up" data-vup="${vi}">↑</button><button class="icon" type="button" title="Remove" data-vdel="${vi}">✕</button>`:"";
-    const opts=L?`<details class="legopts"><summary class="icon" title="Options for the way in">⋯</summary><div class="legmenu">
+    const tools="";
+    const isVia2=!isFrom&&!isTo, mtool=`${isVia2?`<button class="btn small ghost" type="button" data-vup="${vi}" ${vi===0?"disabled":""}>↑ Move up</button><button class="btn small ghost" type="button" data-vdel="${vi}">✕ Remove this stop</button>`:""}`;
+    const rtool=`${acct.ready?`<button class="linkbtn small" type="button" data-repat="${p.lat},${p.lon},${esc(p.name)}">Report the road here</button><button class="linkbtn small" type="button" data-spotat="${p.lat},${p.lon},${esc(p.name)}">Mark a place here</button>`:""}<button class="linkbtn small" type="button" data-fixat="${p.lat},${p.lon},${esc(p.name)}">Report a map mistake</button>`;
+    const opts=L?`<details class="legopts"><summary class="icon" title="More">⋯</summary><div class="legmenu">${mtool}
         ${L.n>1&&!lg.track?`<label class="chk">Way <select data-alt="${j-1}">${L.alts.map((km2,x)=>`<option value="${x}" ${(lg.alt||0)===x?"selected":""}>Way ${x+1} · ${Math.round(km2)} km</option>`).join("")}</select></label>`:lg.track?"":lg.wantAlts?`<span class="note">No other ways found for this stretch.</span>`:`<button class="btn small ghost" type="button" data-wantalts="${j-1}">Find other ways</button>`}
         ${lg.track?`<span class="note">Own track: ${esc(lg.trackName||"GPX")}</span><button class="btn small ghost" type="button" data-untrack="${j-1}">Remove track</button>`
           :`<label class="btn small ghost" style="cursor:pointer;align-self:flex-start">Use my GPX for this stretch<input type="file" accept=".gpx,application/gpx+xml" data-track="${j-1}" hidden></label>`}
+        ${rtool}
       </div></details>`:"";
     const autoTag=p.auto?(p.fuelHere?`<span class="autotag" title="Fuel and food here. You asked to stop at least every ${esc(String(settings.range))} km.">Suggested stop${p.detour?` · +${p.detour} km`:""}</span>`
-      :`<span class="autotag nofuel" title="No fuel on our map here, and none closer. Ask locally or carry extra.">Suggested stop · fuel not confirmed${p.detour?` · +${p.detour} km`:""}</span>`)+` <button class="linkbtn small" type="button" data-keep="${j-1}" title="Make it your own stop: it stays even if the route changes">Keep this stop</button>`:"";
-    h+=`<li class="stop ${open?"open":""} ${p.auto?"auto":""} ${isTo&&!last?"night":""}"><div class="shead"><div class="sl1"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab">${lab}</span><b>${esc(p.name)}</b><span class="note">${isFrom?"":`km ${km}`}</span></button><span class="avail">${icons}</span></div>
+      :`<span class="autotag nofuel" title="No fuel on our map here, and none closer. Ask locally or carry extra.">Suggested stop · fuel not confirmed${p.detour?` · +${p.detour} km`:""}</span>`):"";
+    h+=`<li class="stop ${open?"open":""} ${p.auto?"auto":""} ${isTo&&!last?"night":""}"><div class="shead"><div class="sl1"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab ${isTo&&!last?"nightlab":""}">${lab}</span><b>${esc(p.name)}</b><span class="note">${isFrom?"":`km ${km}`}</span></button><span class="avail">${icons}</span></div>
       <div class="sl2"><span class="sl2l">${autoTag}</span><span class="stools">${way}${tools}${opts}</span></div></div>${open&&plan?stopDetail(k,j,stopFocus.cat):""}</li>`;
   });
   h+=`</ol><div class="rname"><span class="lbl" style="white-space:nowrap">Add a stop</span>${searchBox("addvia-"+k,"","Town, pass or place on this day",true)}</div>`;
@@ -682,6 +687,7 @@ function dayBody(k){
   if(!pd) return h;
   if(!placesOk) h+=`<div class="verdict v-warn">Fuel stations didn't load, so long stretches without fuel can't be checked. Check your connection and reload.</div>`;
   const m=dayMed(k);
+  h+=passRows(k);
   if(k<nDays()-1) h+=stayRows(k);
   if(m) h+=`<details class="medbox"><summary><span class="lbl">Medical</span> ${m.near.length} hospital${m.near.length===1?"":"s"} and clinics near the route · furthest point ${fmtFar(m.far)} km from a hospital</summary>
     ${m.near.map(x=>`<div class="item"><div class="meta"><b>${esc(x.name||(x.type==="hospital"?"Hospital":"Clinic"))}</b><span class="note">${x.type==="hospital"?"Hospital":"Clinic"} · km ${Math.round(x.km-pd.a)} · ${x.off<0.5?"on the route":x.off.toFixed(1)+" km off"}${x.phone?` · <a href="tel:${esc(x.phone.replace(/[^\d+]/g,""))}">${esc(x.phone)}</a>`:""}</span></div></div>`).join("")||`<div class="note">None listed within 25 km of the route.</div>`}
@@ -697,7 +703,8 @@ function drawStopLayer(){
   const av=stopAvail(sc.p), col={fuel:"#0B6E4F",food:"#B3261E",shop:"#6B4E9B",toilets:"#00838F",cash:"#2F5BA8",repair:"#5D4037"};
   const shown=[]; AV.forEach(([c,ic])=>{ if(cat&&c!==cat) return; av[c].forEach(p=>{ shown.push(p); L.marker([p.lat,p.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:${col[c]}">${ic}</div>`,iconSize:[22,22],iconAnchor:[11,11]})}).bindTooltip(p.name||AV.find(a=>a[0]===c)[2],cat?{permanent:true,direction:"right",offset:[12,0],className:"maplbl"}:{}).addTo(layer); }); });
   const pts=[...s,...shown,sc.p].map(p=>[p.lat,p.lon]);
-  if(pts.length<2) map.setView([sc.p.lat,sc.p.lon],cat?15:12); else map.fitBounds(L.latLngBounds(pts),{padding:[30,30],maxZoom:cat?16:13});
+  if(!cat) map.setView([sc.p.lat,sc.p.lon],14); // the stop and what's around it
+  else if(pts.length<2) map.setView([sc.p.lat,sc.p.lon],15); else map.fitBounds(L.latLngBounds(pts),{padding:[30,30],maxZoom:16});
   return true;
 }
 function clearLink(){ return `<div class="btns clearrow">${clearArm?`<span class="note">Clear this trip?</span><button class="btn small" type="button" data-newtrip>Clear</button><button class="btn small ghost" type="button" data-nocancel>Cancel</button>`:`<button class="linkbtn small" type="button" data-newtrip>Clear trip</button>`}</div>`; }
@@ -720,9 +727,16 @@ function wireDetails(){
   hook("finish-"+(nDays()-1),p=>{editTo.delete(nDays()-1);setFinish(p);});
   editTo.forEach(k=>{ const el=document.getElementById((k===nDays()-1?"finish-":"night-")+k); if(el&&document.activeElement!==el){ el.focus(); el.select(); el.addEventListener("blur",()=>setTimeout(()=>{ if(editTo.has(k)&&el.value.trim()===el.defaultValue.trim()){ editTo.delete(k); renderDetails(); } },400)); } });
   { const k=curDay(); if(k==null) return; const d=trip.days[k];
-    d.vias.forEach((v,i)=>hook(`via-${k}-${i}`,p=>{d.vias[i]=Object.assign(p,{type:v.type||"pass"});d.legs=[];changed();}));
+    d.vias.forEach((v,i)=>hook(`via-${k}-${i}`,p=>replaceVia(k,i,p)));
     hook("addvia-"+k,p=>{if(insertVia(k,p)!==false) changed(); else renderDetails();});
   }
+}
+// swap a stop for another place (from search or the map); a swapped-out suggestion isn't suggested again
+function replaceVia(k,i,p){
+  const d=trip.days[k], old=d.vias[i]; if(!old) return;
+  if(old.auto){ d.noAuto=[...(d.noAuto||[]),old.name]; }
+  d.vias[i]=pt(p.name,p.lat,p.lon,p.type?{type:p.type}:{}); d.legs=[]; stopFocus=null;
+  $("status").textContent=`${old.name} changed to ${p.name}.`; changed();
 }
 function insertVia(k,p){
   if(trip.days[k].vias.some(v=>hav(v,p)<0.2)||(dayTo(k)&&hav(dayTo(k),p)<0.2)){ $("status").textContent=`${p.name} is already on this day.`; return false; }
@@ -739,7 +753,7 @@ $("details").addEventListener("click",e=>{
     const tt=$("toast"); tt.innerHTML=`Trip cleared. <button type="button" class="linkbtn">Undo</button>`; tt.hidden=false; tt.querySelector("button").onclick=()=>{Object.keys(trip).forEach(x=>delete trip[x]);Object.assign(trip,prev);tt.hidden=true;changed();}; clearTimeout(toastT); toastT=setTimeout(()=>tt.hidden=true,8000); return; }
   const avb=t.closest("[data-av]"); if(avb){ const [k2,j2,c]=avb.dataset.av.split(":"); const same=stopFocus&&stopFocus.k===+k2&&stopFocus.j===+j2&&stopFocus.cat===c; stopFocus=same?null:{k:+k2,j:+j2,cat:c}; if(!stopFocus) window._refit=true; renderDetails(); drawMap(); return; }
   const pl=t.closest("[data-ploc]"); if(pl&&!t.closest("a,button")&&map){ const [la,lo]=pl.dataset.ploc.split(",").map(Number); map.setView([la,lo],16); if(window.innerWidth<=1000) $("map").scrollIntoView({behavior:"smooth",block:"start"}); return; }
-  const so=t.closest("[data-stop]"); if(so){ const [k2,j2]=so.dataset.stop.split(":").map(Number); stopFocus=stopFocus&&stopFocus.k===k2&&stopFocus.j===j2&&!stopFocus.cat?null:{k:k2,j:j2}; if(!stopFocus) window._refit=true; renderDetails(); drawMap(); return; }
+  const so=t.closest("[data-stop]"); if(so){ const [k2,j2]=so.dataset.stop.split(":").map(Number); stopFocus=stopFocus&&stopFocus.k===k2&&stopFocus.j===j2&&!stopFocus.cat?null:{k:k2,j:j2}; if(!stopFocus) window._refit=true; renderDetails(); drawMap(); if(stopFocus&&window.innerWidth<=1000) $("map").scrollIntoView({behavior:"smooth",block:"start"}); return; }
   const sf=t.closest("[data-sfuel]"); if(sf){ const [k2,j2,id]=sf.dataset.sfuel.split(":"); const x=fuelAll.find(q=>q.id===id); if(x){ if(!addStop(+k2,+j2-1,pt(x.name&&x.name!=="Fuel"?x.name:"Fuel stop",x.lat,x.lon,{fuelHere:true}))) return; stopFocus=null; $("status").textContent="Fuel stop added."; changed(); } return; }
   const sa=t.closest("[data-sadd]"); if(sa){ const [k2,j2,id]=sa.dataset.sadd.split(":"); const x=pois.find(q=>q.id===id); if(x){ if(!addStop(+k2,+j2-1,pt(x.name,x.lat,x.lon,{stay:x.kind==="sleep"||x.kind==="camp"}))) return; stopFocus=null; $("status").textContent=`Added ${x.name}.`; changed(); } return; }
   const s2=t.closest("[data-sadd2]"); if(s2){ const [k2,...nm]=s2.dataset.sadd2.split(":"); const name=nm.join(":"), tw=(fp.days[+k2]?.sugg||[]).find(x=>x.name===name); if(tw&&insertVia(+k2,pt(tw.name,tw.lat,tw.lon,{fuelHere:true}))!==false){ $("status").textContent=`Added ${tw.name}.`; changed(); } return; }
