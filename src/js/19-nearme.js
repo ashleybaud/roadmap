@@ -61,3 +61,9 @@ $("nsDay").addEventListener("click",async()=>{ if(!near) return; const d=await l
 // On the map buttons change what Near me shows
 $("iconbar").addEventListener("click",()=>setTimeout(()=>{ if(near) drawNear(); },0));
 
+
+// first GPX download: ask once what it's for, if nobody's said
+{ const _dg=downloadGpx; downloadGpx=function(k){ let asked=false; try{ asked=!!localStorage.getItem("otm-gpsasked"); }catch(e){}
+  if((settings.gps||"any")==="any"&&!asked){ try{ localStorage.setItem("otm-gpsasked","1"); }catch(e){} $("gpsAsk").value="any"; const d=$("gpsDlg");
+    d.onclose=()=>{ settings.gps=$("gpsAsk").value; store.set("rr2-settings",settings); $("gps").value=settings.gps; _dg(k); }; d.showModal(); return; }
+  _dg(k); }; }

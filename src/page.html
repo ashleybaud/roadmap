@@ -487,6 +487,8 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 dialog.wide{max-width:760px;width:calc(100vw - 32px)}
 @media (max-width:1000px){.mapcol{position:relative}}
 .markfab{position:absolute;right:14px;bottom:28px;z-index:900;width:58px;height:58px;border-radius:50%;border:3px solid #fff;background:var(--ink);color:#fff;font-size:26px;box-shadow:0 3px 10px rgba(0,0,0,.35);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.markfab{touch-action:none}
+.dragpin{position:fixed;z-index:3000;font-size:34px;pointer-events:none;transform:translate(-50%,-100%);filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
 .markfab .qn{position:absolute;top:-4px;right:-4px;background:var(--warn);color:#fff;border-radius:10px;font:700 11px/18px system-ui;min-width:18px;height:18px;padding:0 4px}
 .markedit{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.markedit input{flex:1;min-width:140px}
 .qkgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
@@ -566,7 +568,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
       <section><h3>7. Before and on the road</h3><ul>
         <li>Each day shows km, riding time, sunset, weather and climb. Orange means look again.</li>
         <li><b>Good to know</b> lists what to sort first: borders, holidays, long gaps without fuel or a hospital.</li>
-        <li>Download each day as <b>GPX</b>, or <b>Save as PDF</b>. Sign in to save routes and open them on your phone.</li></ul></section>
+        <li>Set <b>My bike or GPS</b> in Settings and the <b>GPX</b> file is made for it (each day, or the whole trip). Or <b>Save as PDF</b>. Sign in to save routes and open them on your phone.</li></ul></section>
       <section><h3>8. Built by riders</h3><ul>
         <li><b>+ Add yours</b> shares a road or marks a place. <b>📍</b> on the map marks it in two taps on the road.</li>
         <li>Report the road, rate a route you rode. We check everything before other riders see it.</li></ul></section>
@@ -637,6 +639,19 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
   </form>
 </dialog>
 <dialog id="pinfoDlg" class="pinfo" aria-label="Place details"><div id="piBody"></div></dialog>
+<dialog id="gpsDlg" class="welcome" aria-labelledby="gpsTitle"><form method="dialog" style="display:flex;flex-direction:column;gap:10px">
+  <h2 id="gpsTitle" style="margin:0">What will you load this into?</h2>
+  <p class="note" style="margin:0">Each bike app and GPS wants the file a little differently. We'll remember your choice (change it any time in Settings).</p>
+  <select id="gpsAsk">
+      <option value="any">Any GPS or phone app</option>
+      <option value="garmin">Garmin (Zumo, Montana, XT) or BMW Navigator</option>
+      <option value="bmw">BMW Motorrad Connected app</option>
+      <option value="ducati">Ducati Link app</option>
+      <option value="ktm">KTM / Husqvarna / GasGas app</option>
+      <option value="harley">Harley-Davidson (Boom! Box, USB)</option>
+      <option value="closed">Triumph, Honda or Yamaha app</option>
+      <option value="phone">Phone app (OsmAnd, Organic Maps, Calimoto, Kurviger, Scenic)</option></select>
+  <div class="btns" style="justify-content:flex-end"><button class="btn" value="ok">Make my file</button></div></form></dialog>
 <dialog id="welcome" class="welcome" aria-labelledby="wTitle">
   <form method="dialog" style="display:flex;flex-direction:column;gap:12px">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><h2 id="wTitle" style="margin:0">Plan a trip, day by day</h2><button class="icon" value="cancel" formnovalidate title="Close without changes" aria-label="Close">✕</button></div>
@@ -658,6 +673,15 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
     <p class="note" style="margin:0"><b>Built by riders:</b> open riders' routes under <b>Find a route</b>, and tap <b>+ Add yours</b> to share a road you love or mark a place worth stopping.</p>
     <p class="note" style="margin:0">Have a route already? Use <b>Plan from a GPX file</b> and it's split into days for you. Trips are saved on this device only. You can change all of this later in Settings.</p>
     <div class="btns" style="justify-content:flex-end"><button class="btn ghost" value="cancel" formnovalidate>Cancel</button><button class="btn" value="ok" id="wOk">Start planning</button></div>
+    <div class="field"><label class="lbl" for="wGps">My bike or GPS (for GPX files)</label><select id="wGps">
+      <option value="any">Any GPS or phone app</option>
+      <option value="garmin">Garmin (Zumo, Montana, XT) or BMW Navigator</option>
+      <option value="bmw">BMW Motorrad Connected app</option>
+      <option value="ducati">Ducati Link app</option>
+      <option value="ktm">KTM / Husqvarna / GasGas app</option>
+      <option value="harley">Harley-Davidson (Boom! Box, USB)</option>
+      <option value="closed">Triumph, Honda or Yamaha app</option>
+      <option value="phone">Phone app (OsmAnd, Organic Maps, Calimoto, Kurviger, Scenic)</option></select></div>
   </form>
 </dialog>
 <dialog id="acctDlg" class="welcome" aria-labelledby="aTitle">

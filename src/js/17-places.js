@@ -85,7 +85,7 @@ const OBX="otm-outbox";
 const outbox=()=>{ try{ return JSON.parse(localStorage.getItem(OBX))||[]; }catch(e){ return []; } };
 const setOutbox=a=>{ try{ localStorage.setItem(OBX,JSON.stringify(a)); }catch(e){} fabBadge(); };
 function fabBadge(){ const f=$("markFab"); f.hidden=!acct.ready; const n=outbox().length; f.innerHTML=`📍${n?`<span class="qn" title="${n} waiting to send">${n}</span>`:""}`; }
-$("markFab").addEventListener("click",()=>{
+$("markFab").addEventListener("click",()=>{ if(fabDragged){ fabDragged=false; return; } clearPin();
   $("qkSpots").innerHTML=QK_SPOTS.map(k=>`<button type="button" data-qk="spot:${k}"><span>${SPOT_ICON[k]}</span>${esc(QK_SPOT_N[k])}</button>`).join("");
   $("qkReps").innerHTML=QK_REPS.map(k=>`<button type="button" data-qk="report:${k}"><span>${REP_ICON[k]||"•"}</span>${esc(QK_REP_N[k])}</button>`).join("");
   $("qkWhere").textContent="Pull over first. One tap saves it at your position."; $("quickDlg").showModal(); getPos(true);
@@ -97,6 +97,7 @@ $("quickDlg").addEventListener("click",async e=>{
   if(e.target===$("quickDlg")||e.target.closest("[data-qkclose]")){ $("quickDlg").close(); return; }
   if(e.target.closest("[data-qkmap]")){ $("quickDlg").close(); startPicking(); return; }
   const b=e.target.closest("[data-qk]"); if(!b) return; const [t,kind]=b.dataset.qk.split(":");
+  if(dropPin){ $("quickDlg").close(); pinChose(t,kind); return; }
   b.disabled=true; $("qkWhere").textContent="Getting your position…";
   const p=await getPos(); b.disabled=false;
   if(!p){ $("qkWhere").textContent="Couldn't get your position. Allow location for this site, or tap the map instead."; return; }
@@ -159,3 +160,33 @@ $("acctDlg").addEventListener("click",async e=>{
   const mp=t.closest("[data-rvmap2]"); if(mp){ const [la,lo]=mp.dataset.rvmap2.split(",").map(Number); $("acctDlg").close(); map.setView([la,lo],14); return; }
 });
 // the full form (from a stop, or "tap the map") also asks for the agreement when needed
+
+/* drag 📍 onto the map: drop it, pick what it is, fine-tune by dragging, then Save */
+let fabDragged=false, dropPin=null, dropWhat=null, dragEl=null, dragStart=null;
+const QK_NAME=(t,k)=>t==="spot"?QK_SPOT_N[k]:QK_REP_N[k], QK_ICO=(t,k)=>t==="spot"?SPOT_ICON[k]:(REP_ICON[k]||"•");
+function clearPin(){ if(dropPin){ dropPin.remove(); dropPin=null; } dropWhat=null; }
+function openQuickSheet(){ $("qkSpots").innerHTML=QK_SPOTS.map(k=>`<button type="button" data-qk="spot:${k}"><span>${SPOT_ICON[k]}</span>${esc(QK_SPOT_N[k])}</button>`).join("");
+  $("qkReps").innerHTML=QK_REPS.map(k=>`<button type="button" data-qk="report:${k}"><span>${REP_ICON[k]||"•"}</span>${esc(QK_REP_N[k])}</button>`).join(""); }
+function pinPopup(){ if(!dropPin) return; const w=dropWhat;
+  dropPin.bindPopup(`<div class="tapbox"><b>${w?esc(QK_ICO(w.t,w.kind)+" "+QK_NAME(w.t,w.kind)):"What's here?"}</b><div class="note">Drag the pin to fine-tune.</div>${w?`<button class="btn small" type="button" data-pinsave>Save</button>`:`<button class="btn small" type="button" data-pintype>Choose what it is</button>`}${w?`<button class="btn small ghost" type="button" data-pintype>Change type</button>`:""}<button class="linkbtn small" type="button" data-pinx>Cancel</button></div>`,{closeButton:false,autoClose:false,closeOnClick:false}).openPopup(); }
+function pinChose(t,kind){ dropWhat={t,kind}; pinPopup(); }
+function dropAt(ll){ clearPin();
+  dropPin=L.marker(ll,{draggable:true,autoPan:true,zIndexOffset:3000,icon:L.divIcon({className:"",html:`<div style="font-size:30px;transform:translate(-3px,-14px)">📍</div>`,iconSize:[30,34],iconAnchor:[12,30]})}).addTo(map);
+  dropPin.on("dragend",pinPopup); openQuickSheet(); $("qkWhere").textContent="What's at the pin? You can drag it to fine-tune after."; $("quickDlg").showModal(); }
+$("map").addEventListener("click",e=>{
+  if(e.target.closest("[data-pintype]")){ openQuickSheet(); $("qkWhere").textContent="What's at the pin?"; $("quickDlg").showModal(); return; }
+  if(e.target.closest("[data-pinx]")){ clearPin(); return; }
+  if(e.target.closest("[data-pinsave]")&&dropPin&&dropWhat){ const ll=dropPin.getLatLng(), w=dropWhat;
+    setOutbox([...outbox(),{t:w.t,kind:w.kind,lat:+ll.lat.toFixed(5),lon:+ll.lng.toFixed(5),at:new Date().toISOString(),day:ymd(new Date())}]); clearPin();
+    const tt=$("toast"); tt.innerHTML=`Saved: ${esc(QK_NAME(w.t,w.kind))}. ${acct.user?"We check it before other riders see it.":"Sign in once and it's sent."}`; tt.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>tt.hidden=true,6000); flushOutbox(); }
+});
+$("quickDlg").addEventListener("close",()=>{ if(dropPin&&!dropWhat) pinPopup(); });
+$("markFab").addEventListener("pointerdown",e=>{ dragStart={x:e.clientX,y:e.clientY,id:e.pointerId}; fabDragged=false; });
+window.addEventListener("pointermove",e=>{ if(!dragStart||e.pointerId!==dragStart.id) return;
+  if(!fabDragged&&Math.hypot(e.clientX-dragStart.x,e.clientY-dragStart.y)<10) return;
+  if(!fabDragged){ fabDragged=true; dragEl=document.createElement("div"); dragEl.className="dragpin"; dragEl.textContent="📍"; document.body.appendChild(dragEl); }
+  const lift=e.pointerType==="touch"?50:0; dragEl.style.left=e.clientX+"px"; dragEl.style.top=(e.clientY-lift)+"px"; e.preventDefault(); },{passive:false});
+window.addEventListener("pointerup",e=>{ if(!dragStart||e.pointerId!==dragStart.id) return; dragStart=null; if(!fabDragged) return;
+  const lift=e.pointerType==="touch"?50:0, x=e.clientX, y=e.clientY-lift; if(dragEl){ dragEl.remove(); dragEl=null; }
+  const r=$("map").getBoundingClientRect(); if(!map||x<r.left||x>r.right||y<r.top||y>r.bottom){ setTimeout(()=>fabDragged=false,0); return; }
+  dropAt(map.containerPointToLatLng([x-r.left,y-r.top])); setTimeout(()=>fabDragged=false,50); });

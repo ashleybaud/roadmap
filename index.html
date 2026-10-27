@@ -487,6 +487,8 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 dialog.wide{max-width:760px;width:calc(100vw - 32px)}
 @media (max-width:1000px){.mapcol{position:relative}}
 .markfab{position:absolute;right:14px;bottom:28px;z-index:900;width:58px;height:58px;border-radius:50%;border:3px solid #fff;background:var(--ink);color:#fff;font-size:26px;box-shadow:0 3px 10px rgba(0,0,0,.35);cursor:pointer;display:flex;align-items:center;justify-content:center}
+.markfab{touch-action:none}
+.dragpin{position:fixed;z-index:3000;font-size:34px;pointer-events:none;transform:translate(-50%,-100%);filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
 .markfab .qn{position:absolute;top:-4px;right:-4px;background:var(--warn);color:#fff;border-radius:10px;font:700 11px/18px system-ui;min-width:18px;height:18px;padding:0 4px}
 .markedit{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.markedit input{flex:1;min-width:140px}
 .qkgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px}
@@ -566,7 +568,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
       <section><h3>7. Before and on the road</h3><ul>
         <li>Each day shows km, riding time, sunset, weather and climb. Orange means look again.</li>
         <li><b>Good to know</b> lists what to sort first: borders, holidays, long gaps without fuel or a hospital.</li>
-        <li>Download each day as <b>GPX</b>, or <b>Save as PDF</b>. Sign in to save routes and open them on your phone.</li></ul></section>
+        <li>Set <b>My bike or GPS</b> in Settings and the <b>GPX</b> file is made for it (each day, or the whole trip). Or <b>Save as PDF</b>. Sign in to save routes and open them on your phone.</li></ul></section>
       <section><h3>8. Built by riders</h3><ul>
         <li><b>+ Add yours</b> shares a road or marks a place. <b>📍</b> on the map marks it in two taps on the road.</li>
         <li>Report the road, rate a route you rode. We check everything before other riders see it.</li></ul></section>
@@ -637,6 +639,19 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
   </form>
 </dialog>
 <dialog id="pinfoDlg" class="pinfo" aria-label="Place details"><div id="piBody"></div></dialog>
+<dialog id="gpsDlg" class="welcome" aria-labelledby="gpsTitle"><form method="dialog" style="display:flex;flex-direction:column;gap:10px">
+  <h2 id="gpsTitle" style="margin:0">What will you load this into?</h2>
+  <p class="note" style="margin:0">Each bike app and GPS wants the file a little differently. We'll remember your choice (change it any time in Settings).</p>
+  <select id="gpsAsk">
+      <option value="any">Any GPS or phone app</option>
+      <option value="garmin">Garmin (Zumo, Montana, XT) or BMW Navigator</option>
+      <option value="bmw">BMW Motorrad Connected app</option>
+      <option value="ducati">Ducati Link app</option>
+      <option value="ktm">KTM / Husqvarna / GasGas app</option>
+      <option value="harley">Harley-Davidson (Boom! Box, USB)</option>
+      <option value="closed">Triumph, Honda or Yamaha app</option>
+      <option value="phone">Phone app (OsmAnd, Organic Maps, Calimoto, Kurviger, Scenic)</option></select>
+  <div class="btns" style="justify-content:flex-end"><button class="btn" value="ok">Make my file</button></div></form></dialog>
 <dialog id="welcome" class="welcome" aria-labelledby="wTitle">
   <form method="dialog" style="display:flex;flex-direction:column;gap:12px">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><h2 id="wTitle" style="margin:0">Plan a trip, day by day</h2><button class="icon" value="cancel" formnovalidate title="Close without changes" aria-label="Close">✕</button></div>
@@ -658,6 +673,15 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
     <p class="note" style="margin:0"><b>Built by riders:</b> open riders' routes under <b>Find a route</b>, and tap <b>+ Add yours</b> to share a road you love or mark a place worth stopping.</p>
     <p class="note" style="margin:0">Have a route already? Use <b>Plan from a GPX file</b> and it's split into days for you. Trips are saved on this device only. You can change all of this later in Settings.</p>
     <div class="btns" style="justify-content:flex-end"><button class="btn ghost" value="cancel" formnovalidate>Cancel</button><button class="btn" value="ok" id="wOk">Start planning</button></div>
+    <div class="field"><label class="lbl" for="wGps">My bike or GPS (for GPX files)</label><select id="wGps">
+      <option value="any">Any GPS or phone app</option>
+      <option value="garmin">Garmin (Zumo, Montana, XT) or BMW Navigator</option>
+      <option value="bmw">BMW Motorrad Connected app</option>
+      <option value="ducati">Ducati Link app</option>
+      <option value="ktm">KTM / Husqvarna / GasGas app</option>
+      <option value="harley">Harley-Davidson (Boom! Box, USB)</option>
+      <option value="closed">Triumph, Honda or Yamaha app</option>
+      <option value="phone">Phone app (OsmAnd, Organic Maps, Calimoto, Kurviger, Scenic)</option></select></div>
   </form>
 </dialog>
 <dialog id="acctDlg" class="welcome" aria-labelledby="aTitle">
@@ -2107,11 +2131,11 @@ $("settings").addEventListener("close",()=>{
   showStyle(); reroute?recalc():renderAll();
 });
 /* ---------- first visit: what this is and how to start (shown once; "How it works" brings it back) ---------- */
-function openWelcome(){ $("welcome").returnValue=""; $("wOk").textContent=trip.start&&trip.start.lat!=null?"Save changes":"Start planning"; $("wVehicle").value=settings.vehicle; $("wStyle").value=settings.style; $("wHours").value=settings.maxHours; $("wRange").value=settings.range; $("welcome").showModal(); }
+function openWelcome(){ $("wGps").value=settings.gps||"any"; $("welcome").returnValue=""; $("wOk").textContent=trip.start&&trip.start.lat!=null?"Save changes":"Start planning"; $("wVehicle").value=settings.vehicle; $("wStyle").value=settings.style; $("wHours").value=settings.maxHours; $("wRange").value=settings.range; $("welcome").showModal(); }
 $("welcome").addEventListener("close",()=>{
   if($("welcome").returnValue!=="ok"){ try{localStorage.setItem("rr-welcome","1");}catch(e){} return; } // ✕, Cancel or Esc: nothing changes
   const was=[settings.vehicle,settings.style].join();
-  settings.vehicle=$("wVehicle").value; settings.style=$("wStyle").value; settings.maxHours=$("wHours").value; settings.range=$("wRange").value;
+  settings.vehicle=$("wVehicle").value; settings.style=$("wStyle").value; settings.gps=$("wGps").value; settings.maxHours=$("wHours").value; settings.range=$("wRange").value;
   store.set("rr2-settings",settings); SET_FIELDS.forEach(id=>$(id).value=settings[id]); try{localStorage.setItem("rr-welcome","1");}catch(e){}
   showStyle(); was!==[settings.vehicle,settings.style].join()?recalc():renderAll();
   if(!trip.start||trip.start.lat==null) $("startPlace").focus();
@@ -2845,7 +2869,7 @@ const OBX="otm-outbox";
 const outbox=()=>{ try{ return JSON.parse(localStorage.getItem(OBX))||[]; }catch(e){ return []; } };
 const setOutbox=a=>{ try{ localStorage.setItem(OBX,JSON.stringify(a)); }catch(e){} fabBadge(); };
 function fabBadge(){ const f=$("markFab"); f.hidden=!acct.ready; const n=outbox().length; f.innerHTML=`📍${n?`<span class="qn" title="${n} waiting to send">${n}</span>`:""}`; }
-$("markFab").addEventListener("click",()=>{
+$("markFab").addEventListener("click",()=>{ if(fabDragged){ fabDragged=false; return; } clearPin();
   $("qkSpots").innerHTML=QK_SPOTS.map(k=>`<button type="button" data-qk="spot:${k}"><span>${SPOT_ICON[k]}</span>${esc(QK_SPOT_N[k])}</button>`).join("");
   $("qkReps").innerHTML=QK_REPS.map(k=>`<button type="button" data-qk="report:${k}"><span>${REP_ICON[k]||"•"}</span>${esc(QK_REP_N[k])}</button>`).join("");
   $("qkWhere").textContent="Pull over first. One tap saves it at your position."; $("quickDlg").showModal(); getPos(true);
@@ -2857,6 +2881,7 @@ $("quickDlg").addEventListener("click",async e=>{
   if(e.target===$("quickDlg")||e.target.closest("[data-qkclose]")){ $("quickDlg").close(); return; }
   if(e.target.closest("[data-qkmap]")){ $("quickDlg").close(); startPicking(); return; }
   const b=e.target.closest("[data-qk]"); if(!b) return; const [t,kind]=b.dataset.qk.split(":");
+  if(dropPin){ $("quickDlg").close(); pinChose(t,kind); return; }
   b.disabled=true; $("qkWhere").textContent="Getting your position…";
   const p=await getPos(); b.disabled=false;
   if(!p){ $("qkWhere").textContent="Couldn't get your position. Allow location for this site, or tap the map instead."; return; }
@@ -2919,6 +2944,36 @@ $("acctDlg").addEventListener("click",async e=>{
   const mp=t.closest("[data-rvmap2]"); if(mp){ const [la,lo]=mp.dataset.rvmap2.split(",").map(Number); $("acctDlg").close(); map.setView([la,lo],14); return; }
 });
 // the full form (from a stop, or "tap the map") also asks for the agreement when needed
+
+/* drag 📍 onto the map: drop it, pick what it is, fine-tune by dragging, then Save */
+let fabDragged=false, dropPin=null, dropWhat=null, dragEl=null, dragStart=null;
+const QK_NAME=(t,k)=>t==="spot"?QK_SPOT_N[k]:QK_REP_N[k], QK_ICO=(t,k)=>t==="spot"?SPOT_ICON[k]:(REP_ICON[k]||"•");
+function clearPin(){ if(dropPin){ dropPin.remove(); dropPin=null; } dropWhat=null; }
+function openQuickSheet(){ $("qkSpots").innerHTML=QK_SPOTS.map(k=>`<button type="button" data-qk="spot:${k}"><span>${SPOT_ICON[k]}</span>${esc(QK_SPOT_N[k])}</button>`).join("");
+  $("qkReps").innerHTML=QK_REPS.map(k=>`<button type="button" data-qk="report:${k}"><span>${REP_ICON[k]||"•"}</span>${esc(QK_REP_N[k])}</button>`).join(""); }
+function pinPopup(){ if(!dropPin) return; const w=dropWhat;
+  dropPin.bindPopup(`<div class="tapbox"><b>${w?esc(QK_ICO(w.t,w.kind)+" "+QK_NAME(w.t,w.kind)):"What's here?"}</b><div class="note">Drag the pin to fine-tune.</div>${w?`<button class="btn small" type="button" data-pinsave>Save</button>`:`<button class="btn small" type="button" data-pintype>Choose what it is</button>`}${w?`<button class="btn small ghost" type="button" data-pintype>Change type</button>`:""}<button class="linkbtn small" type="button" data-pinx>Cancel</button></div>`,{closeButton:false,autoClose:false,closeOnClick:false}).openPopup(); }
+function pinChose(t,kind){ dropWhat={t,kind}; pinPopup(); }
+function dropAt(ll){ clearPin();
+  dropPin=L.marker(ll,{draggable:true,autoPan:true,zIndexOffset:3000,icon:L.divIcon({className:"",html:`<div style="font-size:30px;transform:translate(-3px,-14px)">📍</div>`,iconSize:[30,34],iconAnchor:[12,30]})}).addTo(map);
+  dropPin.on("dragend",pinPopup); openQuickSheet(); $("qkWhere").textContent="What's at the pin? You can drag it to fine-tune after."; $("quickDlg").showModal(); }
+$("map").addEventListener("click",e=>{
+  if(e.target.closest("[data-pintype]")){ openQuickSheet(); $("qkWhere").textContent="What's at the pin?"; $("quickDlg").showModal(); return; }
+  if(e.target.closest("[data-pinx]")){ clearPin(); return; }
+  if(e.target.closest("[data-pinsave]")&&dropPin&&dropWhat){ const ll=dropPin.getLatLng(), w=dropWhat;
+    setOutbox([...outbox(),{t:w.t,kind:w.kind,lat:+ll.lat.toFixed(5),lon:+ll.lng.toFixed(5),at:new Date().toISOString(),day:ymd(new Date())}]); clearPin();
+    const tt=$("toast"); tt.innerHTML=`Saved: ${esc(QK_NAME(w.t,w.kind))}. ${acct.user?"We check it before other riders see it.":"Sign in once and it's sent."}`; tt.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>tt.hidden=true,6000); flushOutbox(); }
+});
+$("quickDlg").addEventListener("close",()=>{ if(dropPin&&!dropWhat) pinPopup(); });
+$("markFab").addEventListener("pointerdown",e=>{ dragStart={x:e.clientX,y:e.clientY,id:e.pointerId}; fabDragged=false; });
+window.addEventListener("pointermove",e=>{ if(!dragStart||e.pointerId!==dragStart.id) return;
+  if(!fabDragged&&Math.hypot(e.clientX-dragStart.x,e.clientY-dragStart.y)<10) return;
+  if(!fabDragged){ fabDragged=true; dragEl=document.createElement("div"); dragEl.className="dragpin"; dragEl.textContent="📍"; document.body.appendChild(dragEl); }
+  const lift=e.pointerType==="touch"?50:0; dragEl.style.left=e.clientX+"px"; dragEl.style.top=(e.clientY-lift)+"px"; e.preventDefault(); },{passive:false});
+window.addEventListener("pointerup",e=>{ if(!dragStart||e.pointerId!==dragStart.id) return; dragStart=null; if(!fabDragged) return;
+  const lift=e.pointerType==="touch"?50:0, x=e.clientX, y=e.clientY-lift; if(dragEl){ dragEl.remove(); dragEl=null; }
+  const r=$("map").getBoundingClientRect(); if(!map||x<r.left||x>r.right||y<r.top||y>r.bottom){ setTimeout(()=>fabDragged=false,0); return; }
+  dropAt(map.containerPointToLatLng([x-r.left,y-r.top])); setTimeout(()=>fabDragged=false,50); });
 
 /* ---------- tap the map to add, swap or sleep; place info boxes; passes worth the detour ---------- */
 const callLink=t=>t&&t.phone?`<a href="tel:${esc(String(t.phone).replace(/[^\d+]/g,""))}" title="${esc(t.phone)}">Call</a>`:"";
@@ -3068,5 +3123,11 @@ $("nsDay").addEventListener("click",async()=>{ if(!near) return; const d=await l
 // On the map buttons change what Near me shows
 $("iconbar").addEventListener("click",()=>setTimeout(()=>{ if(near) drawNear(); },0));
 
+
+// first GPX download: ask once what it's for, if nobody's said
+{ const _dg=downloadGpx; downloadGpx=function(k){ let asked=false; try{ asked=!!localStorage.getItem("otm-gpsasked"); }catch(e){}
+  if((settings.gps||"any")==="any"&&!asked){ try{ localStorage.setItem("otm-gpsasked","1"); }catch(e){} $("gpsAsk").value="any"; const d=$("gpsDlg");
+    d.onclose=()=>{ settings.gps=$("gpsAsk").value; store.set("rr2-settings",settings); $("gps").value=settings.gps; _dg(k); }; d.showModal(); return; }
+  _dg(k); }; }
 
 </script></body></html>

@@ -73,7 +73,7 @@ const TRIP = {
     if (u.includes("unpkg.com/leaflet")) return route.continue();
     return route.abort();
   });
-  await page.addInitScript(t => { if (!sessionStorage.getItem("seeded")) { localStorage.clear(); localStorage.setItem("rr4-trip", t); localStorage.setItem("rr-welcome", "1"); sessionStorage.setItem("seeded", "1"); } }, JSON.stringify(TRIP));
+  await page.addInitScript(t => { if (!sessionStorage.getItem("seeded")) { localStorage.clear(); localStorage.setItem("rr4-trip", t); localStorage.setItem("rr-welcome", "1"); localStorage.setItem("otm-gpsasked", "1"); sessionStorage.setItem("seeded", "1"); } }, JSON.stringify(TRIP));
   await page.goto(base);
   const ok = (c, m) => { if (!c) fails.push(m); };
   await page.waitForFunction(() => typeof plan !== "undefined" && plan && !planStale && plan.days.filter(Boolean).length === 2, null, { timeout: 30000 }).catch(() => fails.push("route not worked out"));
