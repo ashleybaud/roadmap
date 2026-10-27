@@ -3017,13 +3017,5 @@ $("nsDay").addEventListener("click",async()=>{ if(!near) return; const d=await l
 // On the map buttons change what Near me shows
 $("iconbar").addEventListener("click",()=>setTimeout(()=>{ if(near) drawNear(); },0));
 
-// far from your usual start? say so (only when location is already allowed: never asks by itself)
-navigator.permissions?.query({name:"geolocation"}).then(r=>{ if(r.state!=="granted") return;
-  navigator.geolocation.getCurrentPosition(p=>{ const here={lat:p.coords.latitude,lon:p.coords.longitude}; let home=null; try{ home=JSON.parse(localStorage.getItem("otm-home")||"null"); }catch(e){}
-    if(!home){ try{ localStorage.setItem("otm-home",JSON.stringify({lat:+here.lat.toFixed(3),lon:+here.lon.toFixed(3)})); }catch(e){} return; }
-    if(hav(home,here)<200) return;
-    const tw=(townList||[]).map(t=>({t,d:hav(t,here)})).sort((a,b)=>a.d-b.d)[0], nm=tw&&tw.d<60?tw.t.name:"";
-    const b=$("toast"); b.innerHTML=`You're a long way from home${nm?`, near <b>${esc(nm)}</b>`:""}. <button type="button" class="linkbtn">🧭 Show me what's near</button>`; b.hidden=false;
-    b.querySelector("button").onclick=()=>{ b.hidden=true; nearOn({lat:+here.lat.toFixed(5),lon:+here.lon.toFixed(5),name:nm||"where you are"}); }; clearTimeout(toastT); toastT=setTimeout(()=>b.hidden=true,15000); },()=>{},{timeout:15000,maximumAge:600000}); }).catch(()=>{});
 
 </script></body></html>
