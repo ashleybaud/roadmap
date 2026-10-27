@@ -57,3 +57,5 @@ document.addEventListener("click",e=>{
     return; }
   if(t.closest("[data-navfile]")){ const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([navHtml()],{type:"text/html"})); a.download=`Phone-navigation-${trip.start.name}-${trip.startDate}`.replace(/[^\w]+/g,"-")+".html"; document.body.appendChild(a); a.click(); setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000); return; }
 });
+/* returning riders with a trip on the go: on phones the hero shrinks to its headline so the planner is in view */
+try{ if(trip&&trip.start&&trip.start.lat!=null) document.body.classList.add("hastrip"); }catch(e){}

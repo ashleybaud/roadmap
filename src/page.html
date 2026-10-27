@@ -205,6 +205,17 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 header h1{font-size:2.7rem;font-weight:700;letter-spacing:-.005em;text-transform:uppercase}
 @media (max-width:640px){header h1{font-size:1.7rem}header{gap:6px;padding-bottom:6px}header .note{display:none}.motto{font-size:.95rem;margin:0}header .btns .btn{padding:4px 10px;font-size:.85rem}#hdrSummary{display:none}.guide .gh{font-size:1.1rem}.guide>summary{padding:6px 0}}
 .motto{font-family:var(--f-display);font-weight:700;font-size:1.2rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:2px 0}
+.hero{flex-basis:100%;background:#18201C;border:1px solid var(--line);color:#fff;border-radius:12px;padding:16px 18px;margin-top:4px}
+.herohead{font-family:var(--f-display);font-weight:700;text-transform:uppercase;font-size:2.4rem;line-height:1;margin:0;letter-spacing:.01em;color:#fff}
+.herohead span{color:#3FB48A}
+.herosub{margin:8px 0 12px;font-size:1.08rem;max-width:62rem;color:#fff;opacity:.92}
+.herosteps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;counter-reset:hs}
+.herosteps li{counter-increment:hs;background:rgba(255,255,255,.08);border-left:4px solid #3FB48A;border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+.herosteps b{font-family:var(--f-display);text-transform:uppercase;font-size:1.15rem;letter-spacing:.02em;color:#fff}
+.herosteps b::before{content:counter(hs) ". ";color:#3FB48A}
+.herosteps span{font-size:.92rem;line-height:1.35;color:#fff;opacity:.85}
+@media (max-width:900px){.herosteps{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){body.hastrip .herosteps,body.hastrip .herosub{display:none}.hero{padding:12px}.herohead{font-size:1.75rem}.herosub{font-size:.95rem;margin:6px 0 10px}.herosteps{gap:6px}.herosteps li{padding:8px}.herosteps b{font-size:1rem}.herosteps span{font-size:.82rem}}
 .testtag{font-family:var(--f-mono);font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;background:var(--warn);color:var(--onfill);padding:2px 6px;border-radius:4px;vertical-align:middle}
 a.btn{text-decoration:none;display:inline-flex;align-items:center}
 .print{display:none}
@@ -540,9 +551,19 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
 <body>
 <div class="wrap">
   <header>
-    <div><h1><a class="homelink" href="/" title="Home">OneTrackMind</a> <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><div class="note">Every great route, graded for your skill, planned day by day. <b>Then ride it:</b> one tap sends it to your Garmin, your bike's app (BMW, KTM, Ducati, Harley) or your phone in Google Maps and Waze. No GPS? No problem. <b>Built by riders:</b> add your favourite routes, mark the places worth stopping.</div></div>
+    <div><h1><a class="homelink" href="/" title="Home">OneTrackMind</a> <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><div class="note"><b>Built by riders:</b> add your favourite routes, mark the places worth stopping.</div></div>
     <div class="btns"><span class="lbl mono" id="hdrSummary"></span><button class="btn ghost" id="feedback" type="button">Send feedback</button><button class="btn" id="addBtn" type="button" hidden>+ Add yours</button><button class="btn ghost" id="reviewBtn" type="button" hidden>Review</button><button class="btn ghost" id="acctBtn" type="button" hidden>Sign in</button><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
     <nav class="hdrlinks" style="order:9" aria-label="Site"><a href="/" class="on" aria-current="page">Plan a trip</a><a href="/routes/">Routes</a><a href="/about/">About the founder</a><a href="https://onetrackmind.co.za" target="_blank" rel="noopener">Misadventures ↗</a></nav>
+    <section class="hero" style="order:10" aria-label="What it does">
+      <h2 class="herohead">Plan it. Book it. <span>Ride it.</span></h2>
+      <p class="herosub">Forget BaseCamp and five different apps. Route a multi-day trip in minutes, sort your beds, then send it straight to your GPS, your bike's app or your phone.</p>
+      <ol class="herosteps">
+        <li><b>Route it in minutes</b><span>Real roads, graded for your bike, 4x4 or car. Fuel gaps, sunset and weather checked for every day.</span></li>
+        <li><b>Book your beds</b><span>Places to stay at every night stop. Pick one, book it, tick it off.</span></li>
+        <li><b>Load your GPS</b><span>One tap: the right GPX for Garmin, BMW, KTM, Ducati or Harley.</span></li>
+        <li><b>Or just ride with your phone</b><span>Each day opens in Google Maps or Waze. No GPS? No problem.</span></li>
+      </ol>
+    </section>
   </header>
 
   <details class="guide" id="guide">
