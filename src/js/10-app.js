@@ -24,8 +24,8 @@ const trip=store.get("rr4-trip")||migrate()||freshTrip();
 if(trip.sugV!==5){ (trip.days||[]).forEach(d=>{ const n=(d.vias||[]).length; d.vias=(d.vias||[]).filter(v=>!v.auto); if(d.vias.length!==n) d.legs=[]; d.fresh=true; delete d.noMore; }); trip.sugV=5; }
 if(trip.startDate<ymd(new Date())){const n=trip.days.length;trip.startDate=tomorrow;trip.endDate=addDays(tomorrow,n-1);}
 
-const SET_FIELDS=["vehicle","range","leave","pace","corridor","style","maxHours","breakMin"];
-const settings=Object.assign({range:200,reserve:30,leave:"08:00",pace:0,corridor:5,style:"rough",vehicle:"bike",fuelMode:"suggest",maxHours:8,breakMin:20},store.get("rr2-settings")||{});
+const SET_FIELDS=["vehicle","range","leave","pace","corridor","style","maxHours","breakMin","gps"];
+const settings=Object.assign({range:200,reserve:30,leave:"08:00",pace:0,corridor:5,style:"rough",vehicle:"bike",fuelMode:"suggest",maxHours:8,breakMin:20,gps:"any"},store.get("rr2-settings")||{});
 const ui=Object.assign({types:Object.fromEntries(TYPES.map(t=>[t.id,t.on])),max:"10",sleep:false},store.get("rr4-ui")||{});
 ui.tab=ui.tab??"ov"; delete ui._lastSel;
 let passNear=[];
@@ -728,7 +728,7 @@ function overviewHtml(){
   h+=`</div>`;
   h+=tripTotals();
   h+=sleepList();
-  if(plan&&!planStale) h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px">${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">${esc(dayName(k))} GPX</button>`:"").join("")}<button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}</div></div>`;
+  if(plan&&!planStale) h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px">${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">${esc(dayName(k))} GPX</button>`:"").join("")}<button class="btn small" type="button" data-gpx="all">Whole trip GPX</button><button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}</div></div>`;
   return h+clearLink()+footNote();
 }
 function footNote(){ return `<div class="note">${placesOk&&dataDate?`Map data from OpenStreetMap, as of ${esc(dataDate)}. Weather from Open-Meteo. Phone ahead on remote legs. `:""}Plan with it, check before you go: you ride at your own risk. <a href="/terms.html">Terms and disclaimer</a> · <a href="/privacy.html">Privacy</a></div>`; }
@@ -790,7 +790,7 @@ $("details").addEventListener("click",e=>{
   const gb=t.closest("[data-gtk]"); if(gb){ const k2=+gb.dataset.gtk; gtkOpen.has(k2)?gtkOpen.delete(k2):gtkOpen.add(k2); renderDetails(); return; }
   const rb=t.closest("[data-risk]"); if(rb){const k2=+rb.dataset.risk; riskOpen.has(k2)?riskOpen.delete(k2):riskOpen.add(k2); renderDetails(); return;}
   if(t.closest("[data-print]")){printTrip();return;}
-  const g=t.closest("[data-gpx]"); if(g){downloadGpx(+g.dataset.gpx);return;}
+  const g=t.closest("[data-gpx]"); if(g){downloadGpx(g.dataset.gpx==="all"?"all":+g.dataset.gpx);return;}
   const ls=t.closest("[data-legsty]"); if(ls&&k!=null){ const [j2,f2]=ls.dataset.legsty.split(":"), j=+j2, f=f2==="1", d2=trip.days[k], v=d2.vias[j];
     if(v&&v.auto){ let i=j; while(i<d2.vias.length&&d2.vias[i].auto) i++; if(i<d2.vias.length) d2.vias[i].fast=f; else d2.toFast=f; // the way belongs to the stretch, up to the next own stop
       let a=j; while(a>0&&d2.vias[a-1].auto) a--; d2.vias.splice(a,i-a); d2.legs=[]; delete d2.noMore; changed(); return; }
@@ -978,27 +978,49 @@ document.addEventListener("click",e=>{ const b=e.target.closest("[data-addtown]"
 document.addEventListener("click",e=>{ document.querySelectorAll(".legopts[open]").forEach(x=>{if(!x.contains(e.target)) x.open=false;});});
 
 /* ---------- GPX ---------- */
-function downloadGpx(k){
-  const pd=plan.days[k]; if(!pd) return; const from=pd.pts[0], to=pd.pts[pd.pts.length-1];
+/* GPX for the rider's bike or GPS: track for most, plus a short route for Garmin and BMW (they navigate a route) */
+const GPS_NAME={any:"GPS or phone app",garmin:"Garmin",bmw:"BMW Motorrad Connected app",ducati:"Ducati Link app",ktm:"KTM app",harley:"Harley Boom! Box (copy it to a USB stick)",closed:"phone app",phone:"phone app"};
+function gpxDay(k){
+  const pd=plan.days[k]; if(!pd) return null; const from=pd.pts[0], to=pd.pts[pd.pts.length-1];
   const name=`${dayName(k)} ${from.name} to ${to.name}`, g=seg(pd.a,pd.b);
   const last=k===nDays()-1, sym=(p,j)=>j===pd.pts.length-1?(last?"Flag, Red":"Lodging"):stopFuel(p)?"Gas Station":p.type==="sight"||p.type==="pass"?"Scenic Area":"Flag, Blue";
   const fuelW=fp?fuelGroups(fp.fills.filter(f=>f.km>pd.a&&f.km<=pd.b)).filter(g=>!pd.pts.some(p=>hav(p,g.st[0])<2)).map(g=>({lat:g.st[0].lat,lon:g.st[0].lon,n:"Fuel "+(g.town?g.town.name:g.st[0].name),s:"Gas Station"})):[];
   const w=[...pd.pts.slice(1).map((p,i)=>({lat:p.lat,lon:p.lon,n:p.name,s:sym(p,i+1)})),...fuelW];
-  const text=`<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="OneTrackMind" xmlns="http://www.topografix.com/GPX/1/1">
-${w.map(p=>`  <wpt lat="${p.lat.toFixed(5)}" lon="${p.lon.toFixed(5)}"><name>${esc(p.n)}</name><sym>${esc(p.s)}</sym></wpt>`).join("\n")}
-  <trk>
-    <name>${esc(name)}</name>
+  // route: the stops plus shaping points along the line, at most 50 (BMW's limit; Garmin is happy with it)
+  const stopsKm=pd.pts.map((p,j)=>j===0?pd.a:pd.legs[j-1].b), want=Math.max(0,50-pd.pts.length), step=(pd.b-pd.a)/(want+1);
+  const shape=[]; for(let i=1;i<=want;i++){ const km=pd.a+step*i; if(stopsKm.some(x=>Math.abs(x-km)<step*0.4)) continue; const gi=plan.cum.findIndex(c=>c>=km); if(gi>=0) shape.push({km,lat:plan.geom[gi].lat,lon:plan.geom[gi].lon}); }
+  const rte=[...pd.pts.map((p,j)=>({km:stopsKm[j],lat:p.lat,lon:p.lon,n:p.name})),...shape].sort((a,b)=>a.km-b.km).slice(0,50);
+  return {name,w,trk:simplify(g,20),rte};
+}
+const x5=v=>v.toFixed(5);
+function gpxText(days,dev){
+  const withRte=dev==="garmin"||dev==="bmw", withTrk=dev!=="bmw";
+  const w=days.flatMap(d=>d.w).filter((p,i,a)=>a.findIndex(q=>q.n===p.n&&Math.abs(q.lat-p.lat)<1e-4)===i);
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="OneTrackMind (onetrackmind.online)" xmlns="http://www.topografix.com/GPX/1/1">
+${w.map(p=>`  <wpt lat="${x5(p.lat)}" lon="${x5(p.lon)}"><name>${esc(p.n)}</name><sym>${esc(p.s)}</sym></wpt>`).join("\n")}
+${withRte?days.map(d=>`  <rte>
+    <name>${esc(d.name)}</name>
+${d.rte.map(p=>`    <rtept lat="${x5(p.lat)}" lon="${x5(p.lon)}">${p.n?`<name>${esc(p.n)}</name>`:""}</rtept>`).join("\n")}
+  </rte>`).join("\n"):""}
+${withTrk?days.map(d=>`  <trk>
+    <name>${esc(d.name)}</name>
     <trkseg>
-${simplify(g,20).map(x=>`      <trkpt lat="${x.lat.toFixed(5)}" lon="${x.lon.toFixed(5)}"/>`).join("\n")}
+${d.trk.map(x=>`      <trkpt lat="${x5(x.lat)}" lon="${x5(x.lon)}"/>`).join("\n")}
     </trkseg>
-  </trk>
+  </trk>`).join("\n"):""}
 </gpx>
 `;
+}
+function downloadGpx(k){
+  const dev=settings.gps||"any", ks=k==="all"?plan.days.map((d,i)=>d?i:-1).filter(i=>i>=0):[k];
+  const days=ks.map(gpxDay).filter(Boolean); if(!days.length) return;
+  const name=k==="all"?`${trip.start.name} trip ${trip.startDate}`:days[0].name;
   const file=name.replace(/[^\w]+/g,"-").replace(/-+$/,"")+".gpx";
-  const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([text],{type:"application/gpx+xml"})); a.download=file; document.body.appendChild(a); a.click();
+  const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob([gpxText(days,dev)],{type:"application/gpx+xml"})); a.download=file; document.body.appendChild(a); a.click();
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);
-  $("status").textContent=`Saved ${file}. Open it from your downloads and share it to your ${VEH().thing}'s or phone's app.`;
+  $("status").textContent=dev==="closed"?`Saved ${file}. Your bike's own app can't import GPX: open the file in Calimoto, Kurviger or OsmAnd on your phone instead.`
+    :`Saved ${file} for your ${GPS_NAME[dev]}. Open it from your downloads and share it to the app${dev==="bmw"?" (shown as a route: your stops plus shaping points, 50 at most)":""}.`;
 }
 
 /* ---------- settings + glue ---------- */

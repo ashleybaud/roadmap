@@ -761,6 +761,15 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
     </div>
     <div class="field"><label class="lbl" for="vehicle">Travelling by</label><select id="vehicle"><option value="bike">Motorbike</option><option value="jeep">Jeep / 4x4</option><option value="car">Car</option></select></div>
     <div class="field"><label class="lbl" for="style">Route style</label><select id="style"><option value="rough">Road less travelled: back roads and gravel first</option><option value="mixed">Mixed: plenty of gravel, tar to link it up</option><option value="tar">Tar: main roads and highways</option></select><span class="note">Road less travelled is often the shortest and toughest way. Check your bike, tyres and skills match it. Any day can be switched to Liaison.</span></div>
+    <div class="field"><label class="lbl" for="gps">My bike or GPS (for GPX files)</label><select id="gps">
+      <option value="any">Any GPS or phone app</option>
+      <option value="garmin">Garmin (Zumo, Montana, XT) or BMW Navigator</option>
+      <option value="bmw">BMW Motorrad Connected app</option>
+      <option value="ducati">Ducati Link app</option>
+      <option value="ktm">KTM / Husqvarna / GasGas app</option>
+      <option value="harley">Harley-Davidson (Boom! Box, USB)</option>
+      <option value="closed">Triumph, Honda or Yamaha app</option>
+      <option value="phone">Phone app (OsmAnd, Organic Maps, Calimoto, Kurviger, Scenic)</option></select><div class="note">The GPX buttons write the right file for it.</div></div>
     <div class="field"><label class="lbl" for="corridor">Show places up to (km) off the route</label><input id="corridor" type="number" min="1" max="20" step="1" value="5"></div>
     <div class="field"><span class="lbl">Earlier versions of this trip</span><div id="histList" class="stable"></div><span class="note">The last 5 versions are kept on this device.</span></div>
     <div class="btns" style="justify-content:flex-end"><button class="btn" value="ok">Done</button></div>
