@@ -17,7 +17,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: sudo apt-get install -y imagemagick >/dev/null
+      - run: which mogrify || (sudo apt-get update -qq && sudo apt-get install -y -qq imagemagick)
       - run: node scripts/fetch-blog-media.mjs
       - name: Save photos
         run: |
