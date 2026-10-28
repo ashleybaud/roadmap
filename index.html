@@ -366,6 +366,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .schain .ep.to{font-weight:700}
 .schain .ep.night{background:var(--ink);color:var(--bg);border-radius:6px;padding:0 8px;white-space:nowrap}
 .schain .ep.night .tolink{color:var(--bg);border-bottom-color:var(--bg)}
+.schain .ep.night input,.schain .ep.night input.empty{color:var(--ink)!important;background:var(--bg)!important}
 .schain .ep .sugg,.schain .ep .sugg button{color:var(--ink);white-space:normal}
 .schain .ep .sugg button .note,.schain .ep .sugg button span{color:var(--muted)}
 .nbadge{display:inline-block;font:600 .68rem var(--f-mono);padding:0 5px;border-radius:3px;vertical-align:middle;white-space:nowrap;color:var(--onfill)}
@@ -1351,7 +1352,7 @@ function dayMinutes(k){
 }
 
 /* ---------- search wiring ---------- */
-function wireSearch(input,list,onPick){
+function wireSearch(input,list,onPick,opt){
   let t,ctl,hits=null,hitsQ="",pending=null,pickWhenReady=false,done=false;
   let start0=input.value;
   // the From and Finish boxes are wired once and used again and again: each visit starts fresh
@@ -1359,7 +1360,7 @@ function wireSearch(input,list,onPick){
   const pick=h=>{ if(done) return; done=true; list.hidden=true; input.blur(); onPick(pt(h.name,h.lat,h.lon)); };
   const run=q=>{ ctl?.abort(); ctl=new AbortController(); list.innerHTML=`<div class="note" style="padding:8px">Searching…</div>`; list.hidden=false;
     const c=map?map.getCenter():{lat:-33,lng:19};
-    pending=searchPlaces(q,c,ctl.signal).then(r=>{ hits=r; hitsQ=q; pending=null;
+    pending=searchPlaces(q,c,ctl.signal).then(r=>{ if(opt&&opt.near) r=nearTrip(r); hits=r; hitsQ=q; pending=null;
       if(pickWhenReady){ pickWhenReady=false; if(r.length) pick(r[0]); else { list.hidden=true; $("status").textContent="Not changed — pick a place from the list."; } return; }
       list.innerHTML=r.map((h,k)=>`<button type="button" data-k="${k}"><b>${esc(h.name)}</b><br><span class="note">${esc(h.sub)}</span></button>`).join("")||`<div class="note" style="padding:8px">No match. Try a nearby town.</div>`;
       list.hidden=false;
@@ -1374,7 +1375,10 @@ function wireSearch(input,list,onPick){
   input.addEventListener("blur",()=>{ setTimeout(()=>{ if(!done&&!commit()) list.hidden=true; },150); });
 }
 function searchBox(id,value,placeholder,noClear){return `<div class="ac" style="flex:1;min-width:0"><div class="inbtn"><input type="text" id="${id}" class="${value?"":"empty"}" value="${esc(value||"")}" placeholder="${esc(placeholder)}" autocomplete="off">${!noClear&&value?`<button class="icon" type="button" data-clear="${id}" title="Clear" aria-label="Clear">✕</button>`:""}</div><div class="sugg" hidden></div></div>`;}
-function hook(id,onPick){const el=document.getElementById(id); if(el) wireSearch(el,el.closest(".ac").querySelector(".sugg"),onPick);}
+function hook(id,onPick){const el=document.getElementById(id); if(el) wireSearch(el,el.closest(".ac").querySelector(".sugg"),onPick,{near:/^(night|addvia)-/.test(id)});}
+// night stops and stops along the way: only places within reach of the trip (a worldwide search can return a "Colony" in India)
+function nearTrip(r){ const a=trip.start&&trip.start.lat!=null?trip.start:null, b=endPt()&&endPt().lat!=null?endPt():null; if(!a&&!b) return r;
+  const lim=Math.max(800,a&&b?hav(a,b):0)*1.2, ok=r.filter(h=>(a&&hav(a,h)<=lim)||(b&&hav(b,h)<=lim)); return ok; }
 
 /* ---------- trip bar ---------- */
 function renderTripBar(){
