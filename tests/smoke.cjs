@@ -146,6 +146,13 @@ const TRIP = {
   const nt = await page.evaluate(() => ({ night: trip.days[0].to && trip.days[0].to.name, auto: !!(trip.days[0].to && trip.days[0].to.autoNight), days: plan ? plan.days.filter(Boolean).map(d => Math.round(d.km)) : null }));
   ok(nt.night && nt.auto && nt.days && nt.days.length === 2, "auto night stop: " + JSON.stringify(nt));
   console.log("auto night:", JSON.stringify(nt));
+  // shrink to 1 day and back to 2: a night must be picked again, with no leftover stop
+  await page.evaluate(() => { trip.endDate = trip.startDate; changed(); });
+  await page.waitForTimeout(500);
+  await page.evaluate(() => { trip.endDate = addDays(trip.startDate, 1); changed(); });
+  await page.waitForFunction(() => trip.days.length === 2 && trip.days[0].to && plan && !planStale, null, { timeout: 30000 }).catch(() => {});
+  const nt2 = await page.evaluate(() => ({ night: trip.days[0].to && trip.days[0].to.name, vias: trip.days.map(d => d.vias.length) }));
+  ok(nt2.night && nt2.vias.every(v => v === 0), "night after 2>1>2 days: " + JSON.stringify(nt2));
   // From box: pick twice in a row (the box is wired once)
   for (const q of ["Clanwilliam", "Calvinia"]) {
     await page.focus("#startPlace"); await page.fill("#startPlace", q);

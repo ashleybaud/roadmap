@@ -4,17 +4,20 @@
    change any suggested one and it's yours. Suggestions are redone only when the trip itself changes. */
 function nightSig(){
   const p=x=>x&&x.lat!=null?x.lat.toFixed(3)+","+x.lon.toFixed(3):"-";
-  return [p(trip.start),trip.round?"round":p(trip.end),nDays(),settings.vehicle,settings.style,...trip.days.slice(0,-1).map(d=>d.to&&!d.to.autoNight?p(d.to):"")].join("|");
+  return ["v2",p(trip.start),trip.round?"round":p(trip.end),nDays(),settings.vehicle,settings.style,...trip.days.slice(0,-1).map(d=>d.to&&!d.to.autoNight?p(d.to):"")].join("|");
 }
 async function autoNights(){
-  const n=nDays(); if(n<2||trip.round||!trip.start||trip.start.lat==null||!trip.end||trip.end.lat==null) return false;
-  const sig=nightSig(); if(trip.nightSig===sig) return false;
-  trip.days.slice(0,-1).forEach(d=>{ if(d.to&&d.to.autoNight){ d.to=null; d.legs=[]; } });
+  const n=nDays(); if(n<2||trip.round||!trip.start||trip.start.lat==null||!trip.end||trip.end.lat==null){ delete trip.nightSig; return false; }
+  const sig=nightSig(), fresh=trip.nightSig!==sig;
+  // nothing to do unless the trip changed or a night is empty that you didn't empty yourself
+  if(!fresh&&!trip.days.slice(0,-1).some(d=>!d.to&&!d.noAutoNight)) return false;
+  if(fresh) trip.days.slice(0,-1).forEach(d=>{ delete d.noAutoNight; if(d.to&&d.to.autoNight){ d.to=null; d.legs=[]; } });
+  trip.days.forEach(d=>{ const k=d.vias.length; d.vias=d.vias.filter(v=>!v.autoNight); if(d.vias.length!==k) d.legs=[]; }); // a suggested night that slid into a day when days were removed
   const towns=(await allTowns()).filter(t=>t.place==="city"||t.place==="town"||t.place==="village");
   let changed=false, a=0;
   while(a<n-1){
-    if(trip.days[a].to){ a++; continue; }
-    let b=a; while(b<n-1&&!trip.days[b].to) b++;          // days a..b-1 have no night stop; day b ends at a known place
+    if(trip.days[a].to||trip.days[a].noAutoNight){ a++; continue; }
+    let b=a; while(b<n-1&&!trip.days[b].to&&!trip.days[b].noAutoNight) b++;          // days a..b-1 have no night stop; day b ends at a known place
     const A=dayFrom(a), B=dayTo(b); if(!A||!B||A.lat==null||B.lat==null){ a=b+1; continue; }
     const r=(await routeLeg(A,B,{fast:true}))[0], g=r.geom, cum=[0];
     for(let i=1;i<g.length;i++) cum.push(cum[i-1]+hav(g[i-1],g[i]));

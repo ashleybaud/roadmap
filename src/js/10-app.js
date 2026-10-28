@@ -38,7 +38,7 @@ function dayCountFromDates(){const a=new Date(trip.startDate+"T12:00:00"),b=new 
 function syncDays(){
   const n=dayCountFromDates();
   while(trip.days.length<n) trip.days.splice(trip.days.length-1,0,{to:null,style:"default",vias:[],legs:[]});
-  while(trip.days.length>n){const last=trip.days.pop(),prev=trip.days[trip.days.length-1]; if(prev.to) prev.vias.push(Object.assign(prev.to,{type:"pass"})); prev.to=null; prev.vias.push(...last.vias); prev.legs=[];}
+  while(trip.days.length>n){const last=trip.days.pop(),prev=trip.days[trip.days.length-1]; if(prev.to&&!prev.to.autoNight) prev.vias.push(Object.assign(prev.to,{type:"pass"})); prev.to=null; prev.vias.push(...last.vias); prev.legs=[];}
   if(ui.tab!=="ov"&&ui.tab>=trip.days.length) ui.tab="ov";
 }
 const endPt=()=>trip.round?trip.start:trip.end;
@@ -718,7 +718,7 @@ function dayBody(k){
   if(m) h+=`<details class="medbox"><summary><span class="lbl">Medical</span> ${m.near.length} hospital${m.near.length===1?"":"s"} and clinics near the route · furthest point ${fmtFar(m.far)} km from a hospital</summary>
     ${m.near.map(x=>`<div class="item"><div class="meta"><b>${esc(x.name||(x.type==="hospital"?"Hospital":"Clinic"))}</b><span class="note">${x.type==="hospital"?"Hospital":"Clinic"} · km ${Math.round(x.km-pd.a)} · ${x.off<0.5?"on the route":x.off.toFixed(1)+" km off"}${x.phone?` · <a href="tel:${esc(x.phone.replace(/[^\d+]/g,""))}">${esc(x.phone)}</a>`:""}</span></div></div>`).join("")||`<div class="note">None listed within 25 km of the route.</div>`}
     <div class="note">Emergency from a mobile: 112. Check the local numbers before you go.</div></details>`;
-  h+=`<div class="btns"><button class="btn small" type="button" data-gpx="${k}">GPX file</button>${nDays()===1?`<button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}`:""}<span class="note">GPX for your bike's GPS or a phone app.</span></div><div class="btns phonenav"><span class="lbl">On your phone</span>${navButtons(k)}<button class="btn small share" type="button" data-sharetrip>Share this trip ↗</button></div>`;
+  h+=`<div class="btns"><button class="btn small" type="button" data-gpx="${k}">GPX file</button>${nDays()===1?`<button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}`:""}<span class="note">GPX for your bike's GPS or a phone app.</span></div><div class="btns phonenav"><span class="lbl">On your phone</span>${navButtons(k)}<button class="btn small share" type="button" data-sharetrip>Share this trip ↗</button><button class="btn small wa" type="button" data-sharewa title="Send this trip on WhatsApp">WhatsApp this trip</button></div>`;
   return h;
 }
 function drawStopLayer(){
@@ -743,7 +743,7 @@ function overviewHtml(){
   h+=tripTotals();
   h+=sleepList();
   if(plan&&!planStale&&settings.vehicle!=="bike"&&trip.start) h+=`<div class="btns partnerrow"><a class="btn small ghost" href="${esc(carHireUrl(trip.start.name))}" target="_blank" rel="sponsored noopener">Hire a ${settings.vehicle==="jeep"?"4x4":"car"} ↗</a><span class="note">Self-drive? Compare hire companies.</span></div>`;
-  if(plan&&!planStale) h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px"><button class="btn small share" type="button" data-sharetrip title="A link anyone can open: the whole plan, then Google Maps / Waze or GPX">Share this trip ↗</button>${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">${esc(dayName(k))} GPX</button>`:"").join("")}<button class="btn small" type="button" data-gpx="all">Whole trip GPX</button><button class="btn small" type="button" data-navlinks title="Open each day in Google Maps or Waze on your phone">Google Maps / Waze</button><button class="btn small ghost" type="button" data-grouppack title="Every GPX format in one zip, with a read-me, for a group ride">Group ride pack ↓</button><button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}</div></div>`;
+  if(plan&&!planStale) h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px"><button class="btn small share" type="button" data-sharetrip title="A link anyone can open: the whole plan, then Google Maps / Waze or GPX">Share this trip ↗</button><button class="btn small wa" type="button" data-sharewa title="Send this trip on WhatsApp">WhatsApp this trip</button>${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">${esc(dayName(k))} GPX</button>`:"").join("")}<button class="btn small" type="button" data-gpx="all">Whole trip GPX</button><button class="btn small" type="button" data-navlinks title="Open each day in Google Maps or Waze on your phone">Google Maps / Waze</button><button class="btn small ghost" type="button" data-grouppack title="Every GPX format in one zip, with a read-me, for a group ride">Group ride pack ↓</button><button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}</div></div>`;
   return h+clearLink()+footNote();
 }
 function footNote(){ return `<div class="note">${placesOk&&dataDate?`Map data from OpenStreetMap, as of ${esc(dataDate)}. Weather from Open-Meteo. Phone ahead on remote legs. `:""}Plan with it, check before you go: you ride at your own risk. <a href="/terms.html">Terms and disclaimer</a> · <a href="/privacy.html">Privacy</a></div>`; }
@@ -787,7 +787,7 @@ $("details").addEventListener("click",e=>{
   const mv=t.closest("[data-morevias]"); if(mv){viaOpen.add(+mv.dataset.morevias);renderDetails();return;}
   const et=t.closest("[data-editto]"); if(et){editTo.add(+et.dataset.editto);renderDetails();return;}
   const cl=t.closest("[data-clear]"); if(cl){ const id=cl.dataset.clear, m=id.match(/^(night|finish|via)-(\d+)(?:-(\d+))?$/); if(!m) return;
-    if(m[1]==="night"){trip.days[+m[2]].to=null;editTo.add(+m[2]);} else if(m[1]==="finish"){trip.round=true;} else {trip.days[+m[2]].vias.splice(+m[3],1);trip.days[+m[2]].legs=[];}
+    if(m[1]==="night"){trip.days[+m[2]].to=null;trip.days[+m[2]].noAutoNight=true;editTo.add(+m[2]);} else if(m[1]==="finish"){trip.round=true;} else {trip.days[+m[2]].vias.splice(+m[3],1);trip.days[+m[2]].legs=[];}
     changed(); return; }
   const fk=t.closest("[data-fuelk]"); if(fk&&goGap(+fk.dataset.fuelk)) return; if(fk){const k2=+fk.dataset.fuelk; if(ui.tab==="ov"){ fuelOpen.add(k2); const tb=document.querySelector(`[data-day="${k2}"]`); if(tb){ tb.click(); return; } } fuelOpen.has(k2)?fuelOpen.delete(k2):fuelOpen.add(k2); renderDetails(); return;}
   const af=t.closest("[data-addfill]"); if(af){const f=fp.fills.find(x=>x.id===af.dataset.addfill); if(f){insertVia(+af.dataset.day,pt(f.name&&f.name!=="Fuel"?f.name:"Fuel stop",f.lat,f.lon,{fuelHere:true}));changed();} return;}
