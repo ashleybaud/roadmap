@@ -608,6 +608,13 @@ function dayWay(k){
   if(settings.style==="tar") return `<span class="dway" title="Main roads, like normal sat-nav">${STYLE_ICON.fast}</span>`;
   return `<span class="dway" title="${esc(t)}. Change it per stretch on the day's stops.">${none?STYLE_ICON.default:all?STYLE_ICON.fast:STYLE_ICON.default+STYLE_ICON.fast}</span>`;
 }
+// overview: the same filter icons for where the day ends; tap to open that day zoomed to it, showing just those
+function dayTrio(k){
+  const pd=!planStale&&plan&&plan.days[k]; if(!pd||!placesOk) return ""; const j=pd.pts.length-1, p=pd.pts[j], av=stopAvail(p);
+  const on=["fuel","stay","food","sights"].filter(c=>ui.lay[c]&&!(c==="stay"&&k===nDays()-1&&trip.round)); if(!on.length) return "";
+  return `<span class="trioset">${AV.filter(a=>on.includes(a[0])).map(a=>{ const n=av[a[0]].length; return `<button type="button" class="avi trio ${n?"":"none"}" ${n?`data-ovav="${k}:${j}:${a[0]}"`:"disabled"} title="${esc(a[2])} at ${esc(p.name)}: ${n||"none"}">${a[1]}</button>`; }).join("")}</span>`;
+}
+document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-ovav]"); if(!b) return; const [k,j,c]=b.dataset.ovav.split(":"); ui.tab=+k; stopFocus={k:+k,j:+j,cat:c}; saveUi(); renderAll(); });
 function fromCell(k){ const from=dayFrom(k); if(!from||from.lat==null) return `<span class="ep need">${k===0?"Set your start":"Pick the night before"}</span>`; return `<span class="ep">${k===0?"▶":"🛏"} ${esc(from.name)}</span>`; }
 function sumBox(k,big){
   const pd=!planStale&&plan&&plan.days[k], d=trip.days[k], r=pd?dayRisk(k):null, from=dayFrom(k), last=k===nDays()-1;
@@ -617,7 +624,7 @@ function sumBox(k,big){
   const date=`<span class="sdate">${esc(big?dayLong(k):dayName(k))}${pdx?`<span class="sdtot" data-focusday="${k}" title="Show the day on the map"> · ${Math.round(pdx.km)} km · <span class="${long?"overt":""}" title="${long?`Over your ${settings.maxHours}h a day`:"Riding time"}">${fmtDur(mins)}</span></span>`:""}</span>`;
   const line=nDays()===1&&trip.round&&!trip.days[0].vias.length
     ?`<span class="schain">${fromCell(k)}${arr}<span class="wherebox">${searchBox("whereto-0","","Where to?",true)}</span>${arr}<span class="ep">⟲ back home</span></span>`
-    :`<span class="schain">${fromCell(k)}${arr}${chain?chain+arr:""}<span class="ep to ${last?"":"night"}" ${last?"":`title="Night ${k+1}: where you sleep"`}>${toSym} ${toCell(k)}</span></span>${dayWay(k)}`;
+    :`<span class="schain">${fromCell(k)}${arr}${chain?chain+arr:""}<span class="ep to ${last?"":"night"}" ${last?"":`title="Night ${k+1}: where you sleep"`}>${toSym} ${toCell(k)}</span></span>${big?"":dayTrio(k)}${dayWay(k)}`;
   return `<div class="sumbox ${big?"big":""}">
     <div class="sumline">${date}<div class="sumrow">${line}</div></div>
     ${!pd&&!msg?"":pd?`<div class="sicons"><span class="sl">${fuelBtn(k)}</span><span class="sr">${sunSpan(k)+wxLink(k)}<span class="flags">${flagIcons(r,k)}</span></span></div>${gradeBar(dayGrade(k),big)}${elevLine(k)}${big||nDays()===1?elevProfile(k):""}${riskHtml(r,k)}${big?fuelList(k):""}${!big&&nDays()>1?gtkLine(k):""}`:`<div class="note">${msg}</div>`}
