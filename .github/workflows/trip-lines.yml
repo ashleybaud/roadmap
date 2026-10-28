@@ -1,0 +1,28 @@
+name: Trip lines for the blog maps
+on:
+  workflow_dispatch:
+  push:
+    branches: [stories]
+    paths:
+      - scripts/fetch-trip-lines.mjs
+      - .github/workflows/trip-lines.yml
+permissions:
+  contents: write
+jobs:
+  copy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/fetch-trip-lines.mjs
+      - name: Save photos
+        run: |
+          git config user.name "route-and-range-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add data/picks/lines.json
+          git diff --cached --quiet || git commit -m "Trip lines for the blog maps"
+          git pull --rebase
+          git push

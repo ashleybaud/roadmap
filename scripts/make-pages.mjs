@@ -11,6 +11,7 @@ const STORIES = JSON.parse(fs.readFileSync(path.join(ROOT, "data/stories/stories
 const FAV = JSON.parse(fs.readFileSync(path.join(ROOT, "data/favourites/favourites.json"), "utf8"));
 const picks = JSON.parse(fs.readFileSync(path.join(ROOT, "data/picks/picks.json"), "utf8")).routes;
 const live = picks.filter(r => !r.draft);
+const LINES = fs.existsSync(path.join(ROOT, "data/picks/lines.json")) ? JSON.parse(fs.readFileSync(path.join(ROOT, "data/picks/lines.json"), "utf8")) : {};
 const today = new Date().toISOString().slice(0, 10);
 const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const VEH = { bike: "Motorbike", jeep: "4x4", car: "Car" };
@@ -58,7 +59,7 @@ footer{border-top:1px solid var(--line);margin:40px 0 0;padding:16px 0 30px;colo
 .cover{width:100%;max-height:420px;object-fit:cover;border-radius:8px;margin:14px 0}.tocome{background:var(--chip);border-radius:6px;padding:8px 12px;font-size:.9rem;color:var(--muted)}
 .serieshead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}.snav{display:flex;justify-content:space-between;gap:10px;margin:24px 0;flex-wrap:wrap}.snav a{max-width:48%}
 .cards.trips{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}.card.trip{display:flex;flex-direction:column;gap:4px}.card.trip>img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:4px;margin:-4px 0 6px}.card.trip .routemap{width:100%;height:auto;margin:-4px 0 6px}
-.routemap{display:block;width:100%;height:auto;margin:14px 0}.cta.ghost{background:transparent;color:var(--accent);border:2px solid var(--accent);margin-left:8px}
+.routemap{display:block;width:100%;height:auto;margin:14px 0}.tripmap{height:460px;margin:14px 0;border-radius:8px;border:1px solid var(--line,#d9ddd5)}@media(max-width:640px){.tripmap{height:320px}}.tmlab{background:rgba(255,255,255,.92);border:0;box-shadow:0 1px 3px rgba(0,0,0,.25);font:600 12px IBM Plex Sans,system-ui,sans-serif;padding:2px 6px}.tmlab:before{display:none}.cta.ghost{background:transparent;color:var(--accent);border:2px solid var(--accent);margin-left:8px}
 .collage{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin:12px 0}.collage .tile{position:relative;display:block;aspect-ratio:4/3;border-radius:6px;overflow:hidden;background:var(--chip);text-decoration:none}.collage .tile img{width:100%;height:100%;object-fit:cover;margin:0;border-radius:0}.collage .tile span{position:absolute;left:0;right:0;bottom:0;padding:8px 10px;background:linear-gradient(transparent,rgba(0,0,0,.75));color:#fff;display:flex;flex-direction:column}.collage .tile small{opacity:.8}
 .card.story img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:4px;margin:-4px 0 8px}
 .photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin:18px 0}.photos img{width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:6px}`;
@@ -235,6 +236,22 @@ function routeSvg(r, w, h, big) {
 ${nights.map((p, i) => { const [x, y] = xy(p); return `<circle cx="${x}" cy="${y}" r="${big ? 6 : 4}" fill="#18201C"/>${big ? lab(p, p.name.replace(/,.*$/, "")) : ""}`; }).join("")}
 ${(() => { const [x, y] = xy(t.start); return `<circle cx="${x}" cy="${y}" r="${big ? 8 : 5}" fill="#D9A441" stroke="#18201C" stroke-width="2"/>${lab(t.start, t.start.name)}`; })()}</svg>`;
 }
+const coverOf = L => (L.find(x => x.cover) || {}).cover;
+// the trip on a real map (same map as the planner): the road line, the start and every night stop. The drawn outline only if there's no line yet
+function tripMap(r) {
+  const ln = LINES[r.id] && LINES[r.id].line; if (!ln || ln.length < 2) return routeSvg(r, 820, 460, true);
+  const t = r.trip, nights = t.days.slice(0, -1).map(d => d.to).filter(Boolean).map(p => [p.lat, p.lon, p.name.replace(/,.*$/, "")]);
+  const data = JSON.stringify({ line: ln, start: [t.start.lat, t.start.lon, t.start.name.replace(/,.*$/, "")], nights }).replace(/</g, "\\u003c");
+  return `<div id="tripmap" class="tripmap" role="img" aria-label="Route map: ${esc(r.title)}"></div>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>(function(){var d=${data};var m=L.map("tripmap",{scrollWheelZoom:false,zoomSnap:0.25});
+L.tileLayer("https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png",{maxZoom:18,attribution:'&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(m);
+L.polyline(d.line,{color:"#fff",weight:8,opacity:.9}).addTo(m);var pl=L.polyline(d.line,{color:"#0B6E4F",weight:4.5}).addTo(m);
+d.nights.forEach(function(p){L.circleMarker([p[0],p[1]],{radius:6,color:"#fff",weight:2,fillColor:"#18201C",fillOpacity:1}).bindTooltip(p[2],{permanent:true,direction:"right",className:"tmlab"}).addTo(m);});
+L.circleMarker([d.start[0],d.start[1]],{radius:8,color:"#18201C",weight:2,fillColor:"#D9A441",fillOpacity:1}).bindTooltip(d.start[2],{permanent:true,direction:"right",className:"tmlab"}).addTo(m);
+m.fitBounds(pl.getBounds(),{padding:[28,28]});})();</script>`;
+}
 function tripFacts(n, L) { const r = live.find(x => x.id === TRIP_ROUTE[n]); return { r, line: [r ? `${r.trip.days.length} days` : "", r && r.stats ? `${km(r.stats.km)} km` : "", r ? r.region : "", `${L.length} posts`].filter(Boolean).join(" · ") }; }
 function tripPage(n, L) {
   const { r, line } = tripFacts(n, L), slug = tripSlug(n, L);
@@ -242,7 +259,7 @@ function tripPage(n, L) {
 <p class="note"><a href="/blog/">Blog</a> · trip</p>
 <h1>${esc(tripName(n))}</h1>
 <div class="meta">${fmtDate(L[0].date)} – ${fmtDate(L[L.length - 1].date)} · ${esc(line)}</div>
-${r ? routeSvg(r, 820, 460, true) : (L[0].cover ? `<img class="cover" src="${esc(L[0].cover)}" alt="${esc(tripName(n))}">` : "")}
+${r ? tripMap(r) : (coverOf(L) ? `<img class="cover" src="${esc(coverOf(L))}" alt="${esc(tripName(n))}">` : "")}
 ${r ? `<p class="intro">${esc(r.blurb)}</p><a class="cta" href="/?pick=${esc(r.id)}">Open this trip in the planner</a> <a class="cta ghost" href="/routes/${esc(r.id)}/">Day by day</a>` : ""}
 <h2>The trip, day by day</h2>
 <div class="collage">${L.map((x, i) => `<a href="/blog/${esc(x.slug)}/" class="tile">${x.cover ? `<img src="${esc(x.cover)}" alt="" loading="lazy">` : ""}<span><b>${i + 1}. ${esc(x.title.replace(/^(\d{4}\s+)?/, ""))}</b><small>${fmtDate(x.date)}</small></span></a>`).join("")}</div>
@@ -273,7 +290,7 @@ function storiesIndex(M) {
   const multi = groups.filter(([, L]) => L.length > 1), single = groups.filter(([, L]) => L.length === 1).map(([, L]) => L[0]);
   const body = `<main><h1>Blog</h1>
 <p class="intro">Twenty years of road trips, festivals, factories and museums, mostly on two wheels and mostly not to plan. Trips first, newest first.</p>
-<h2>Trips</h2><div class="cards trips">${multi.map(([name, L]) => { const { r, line } = tripFacts(name, L); return `<a class="card trip" href="/blog/${tripSlug(name, L)}/">${r ? routeSvg(r, 300, 170, false) : L[0].cover ? `<img src="${esc(L[0].cover)}" alt="" loading="lazy">` : ""}<b>${esc(tripName(name))}</b><span>${fmtDate(L[0].date).replace(/^\d+ /, "")} · ${esc(line)}</span></a>`; }).join("")}</div>
+<h2>Trips</h2><div class="cards trips">${multi.map(([name, L]) => { const { r, line } = tripFacts(name, L); return `<a class="card trip" href="/blog/${tripSlug(name, L)}/">${coverOf(L) ? `<img src="${esc(coverOf(L))}" alt="" loading="lazy">` : r ? routeSvg(r, 300, 170, false) : ""}<b>${esc(tripName(name))}</b><span>${fmtDate(L[0].date).replace(/^\d+ /, "")} · ${esc(line)}</span></a>`; }).join("")}</div>
 <section><h2>More posts</h2><div class="cards">${single.map(card).join("")}</div></section>
 <a class="cta" href="/">Plan your own</a></main>`;
   const ld = { "@context": "https://schema.org", "@type": "Blog", name: "OneTrackMind blog", url: SITE + "/blog/", author: FOUNDER };
