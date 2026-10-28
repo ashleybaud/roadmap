@@ -239,7 +239,7 @@ ${(() => { const [x, y] = xy(t.start); return `<circle cx="${x}" cy="${y}" r="${
 const coverOf = L => (L.find(x => x.cover) || {}).cover;
 // the trip on a real map (same map as the planner): the road line, the start and every night stop. The drawn outline only if there's no line yet
 function tripMap(r) {
-  const ln = LINES[r.id] && LINES[r.id].line; if (!ln || ln.length < 2) return routeSvg(r, 820, 460, true);
+  const raw = LINES[r.id] && LINES[r.id].line, k = raw ? Math.ceil(raw.length / 1500) : 1, ln = raw && raw.filter((p, i) => i % k === 0 || i === raw.length - 1); if (!ln || ln.length < 2) return routeSvg(r, 820, 460, true);
   const t = r.trip, nights = t.days.slice(0, -1).map(d => d.to).filter(Boolean).map(p => [p.lat, p.lon, p.name.replace(/,.*$/, "")]);
   const data = JSON.stringify({ line: ln, start: [t.start.lat, t.start.lon, t.start.name.replace(/,.*$/, "")], nights }).replace(/</g, "\\u003c");
   return `<div id="tripmap" class="tripmap" role="img" aria-label="Route map: ${esc(r.title)}"></div>
