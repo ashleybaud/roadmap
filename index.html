@@ -1295,13 +1295,13 @@ function syncDays(){
   while(trip.days.length>n){const last=trip.days.pop(),prev=trip.days[trip.days.length-1]; if(prev.to&&!prev.to.autoNight) prev.vias.push(Object.assign(prev.to,{type:"pass"})); prev.to=null; prev.vias.push(...last.vias); prev.legs=[];}
   if(ui.tab!=="ov"&&ui.tab>=trip.days.length) ui.tab="ov";
 }
-// how many days a one-way trip needs: the riding time over your "longest day" setting. Worked out once per trip; − / + or your own night stops take over
+// how many days a one-way trip needs: the riding time (plus a break at every fuel stop) over your "longest day" setting. Worked out once per trip; − / + or your own night stops take over
 function autoDayCount(){
   if(trip.daysSet||trip.round||!plan||!trip.end||trip.gpx||trip.pick||trip.days.slice(0,-1).some(d=>d.to&&!d.to.autoNight)) return false; // your own nights: you decide the days
   const own=trip.days.flatMap(d=>d.vias.filter(v=>!v.auto&&!v.autoNight)).map(v=>v.lat.toFixed(3)+","+v.lon.toFixed(3));
   const sig=[trip.start.lat.toFixed(3),trip.start.lon.toFixed(3),trip.end.lat.toFixed(3),trip.end.lon.toFixed(3),settings.maxHours,settings.vehicle,settings.style,...own].join("|");
   if(trip.autoDaysSig===sig) return false; trip.autoDaysSig=sig;
-  const mins=plan.days.reduce((t,d,k)=>t+(d?dayMinutes(k):0),0), want=Math.max(1,Math.min(14,Math.ceil(mins/(Math.max(2,+settings.maxHours||8)*60)-0.1)));
+  const mins=plan.days.reduce((t,d,k)=>t+(d?dayMinutes(k):0),0)+Math.floor(plan.total/Math.max(50,+settings.range||200))*(+settings.breakMin||20), want=Math.max(1,Math.min(14,Math.ceil(mins/(Math.max(2,+settings.maxHours||8)*60)-0.1)));
   if(want===nDays()) { save(); return false; }
   trip.endDate=addDays(trip.startDate,want-1); syncDays(); save(); return true;
 }
