@@ -45,3 +45,6 @@ function bookingUrl(q,inDate,outDate,lat,lon){ const u=new URL("https://www.book
   if(PARTNERS.booking.aid) u.searchParams.set("aid",PARTNERS.booking.aid); return partnerUrl("booking",u.toString()); }
 function carHireUrl(place,from,to){ const u=new URL("https://www.discovercars.com/"); if(PARTNERS.discovercars.a_aid) u.searchParams.set("a_aid",PARTNERS.discovercars.a_aid); return partnerUrl("discovercars",u.toString()); }
 function hostelUrl(town){ return partnerUrl("hostelworld","https://www.hostelworld.com/search?search_keywords="+encodeURIComponent(town)); }
+
+/* where the connection is (Cloudflare, rough, nothing stored): country for the first screen, position to sanity-check browser location */
+const whereP=fetch("/api/where").then(r=>r.ok?r.json():null).catch(()=>null);

@@ -159,7 +159,9 @@ function dayMinutes(k){
 /* ---------- search wiring ---------- */
 function wireSearch(input,list,onPick){
   let t,ctl,hits=null,hitsQ="",pending=null,pickWhenReady=false,done=false;
-  const start0=input.value;
+  let start0=input.value;
+  // the From and Finish boxes are wired once and used again and again: each visit starts fresh
+  input.addEventListener("focus",()=>{ done=false; start0=input.value; hits=null; pickWhenReady=false; });
   const pick=h=>{ if(done) return; done=true; list.hidden=true; input.blur(); onPick(pt(h.name,h.lat,h.lon)); };
   const run=q=>{ ctl?.abort(); ctl=new AbortController(); list.innerHTML=`<div class="note" style="padding:8px">Searching…</div>`; list.hidden=false;
     const c=map?map.getCenter():{lat:-33,lng:19};
@@ -195,6 +197,8 @@ wireSearch($("startPlace"),$("startPlace").parentElement.nextElementSibling,p=>{
 wireSearch($("endPlace"),$("endPlace").parentElement.nextElementSibling,p=>{trip.end=p;trip.round=false;changed();});
 $("endPlace").addEventListener("change",e=>{ if(!e.target.value.trim()&&!trip.round){trip.round=true;changed();} });
 $("sameStart").addEventListener("click",()=>{trip.round=true;changed();});
+// tapping a place box means you want to change it: select what's there so typing replaces it
+document.addEventListener("focusin",e=>{ const el=e.target; if(el&&el.tagName==="INPUT"&&el.type==="text"&&el.closest(".ac")&&el.value) setTimeout(()=>{ try{ el.select(); }catch(x){} },0); });
 let toastT;
 { const st=$("status"); let t0; new MutationObserver(()=>{ st.classList.remove("gone"); clearTimeout(t0); if(!/…$/.test(st.textContent)) t0=setTimeout(()=>st.classList.add("gone"),6000); }).observe(st,{childList:true,characterData:true,subtree:true}); }
 function setFinish(p){
@@ -206,12 +210,18 @@ function setFinish(p){
 function useMyLocation(){
   if(!navigator.geolocation){$("status").textContent="This browser can't share your location. Type a town.";return;}
   $("status").textContent="Getting your location…";
-  navigator.geolocation.getCurrentPosition(p=>{trip.start=pt("My location",+p.coords.latitude.toFixed(5),+p.coords.longitude.toFixed(5));changed();},
+  navigator.geolocation.getCurrentPosition(async p=>{ const here={lat:+p.coords.latitude.toFixed(5),lon:+p.coords.longitude.toFixed(5)};
+    // computers without GPS guess from the network and can be a country out. Check it against where the connection is
+    const w=await whereP.catch(()=>null);
+    if(w&&w.lat!=null&&p.coords.accuracy>2000&&hav(here,w)>300){ trip.start=null; changed(); $("status").textContent="Your browser's location looks wrong, so it isn't used. Type your start town."; $("startPlace").focus(); return; }
+    trip.start=pt("My location",here.lat,here.lon);changed();},
     ()=>{$("status").textContent="Location not shared. Type a start town instead.";},{enableHighAccuracy:true,timeout:15000});
 }
 $("useLoc").addEventListener("click",useMyLocation);
 $("clearStart").addEventListener("click",()=>{trip.start=null;$("startPlace").value="";$("startPlace").focus();changed();});
 function locateIfAllowed(){ navigator.permissions?.query({name:"geolocation"}).then(r=>{if(r.state==="granted") useMyLocation();}).catch(()=>{}); }
+// a "My location" saved from a bad network guess (a country out): drop it
+if(trip.start&&trip.start.name==="My location"&&trip.start.lat!=null) whereP.then(w=>{ if(w&&w.lat!=null&&trip.start&&trip.start.name==="My location"&&hav(trip.start,w)>300){ trip.start=pt("My location",null,null); changed(); locateIfAllowed(); } });
 if(trip.start&&trip.start.name==="My location"&&trip.start.lat==null){
   locateIfAllowed();
 }

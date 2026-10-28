@@ -146,6 +146,15 @@ const TRIP = {
   const nt = await page.evaluate(() => ({ night: trip.days[0].to && trip.days[0].to.name, auto: !!(trip.days[0].to && trip.days[0].to.autoNight), days: plan ? plan.days.filter(Boolean).map(d => Math.round(d.km)) : null }));
   ok(nt.night && nt.auto && nt.days && nt.days.length === 2, "auto night stop: " + JSON.stringify(nt));
   console.log("auto night:", JSON.stringify(nt));
+  // From box: pick twice in a row (the box is wired once)
+  for (const q of ["Clanwilliam", "Calvinia"]) {
+    await page.focus("#startPlace"); await page.fill("#startPlace", q);
+    await page.waitForSelector("#startPlace ~ .sugg button, .ac:has(#startPlace) .sugg button", { timeout: 8000 }).catch(() => {});
+    const b = await page.$(".ac:has(#startPlace) .sugg button"); if (b) await b.dispatchEvent("mousedown");
+    await page.waitForTimeout(400);
+    const nm = await page.evaluate(() => trip.start && trip.start.name);
+    ok(nm === q, "From pick " + q + " gave " + nm);
+  }
   await page.evaluate(() => tryRoute());
   await page.waitForFunction(() => trip.pick === "swartberg-loop", null, { timeout: 8000 }).catch(() => {});
   const tr = await page.evaluate(() => ({ pick: trip.pick, hero: !!document.querySelector(".hero [data-tryroute]"), welcome: !!document.querySelector("#welcome [data-tryroute]") }));

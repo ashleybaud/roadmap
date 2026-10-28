@@ -918,6 +918,9 @@ function bookingUrl(q,inDate,outDate,lat,lon){ const u=new URL("https://www.book
 function carHireUrl(place,from,to){ const u=new URL("https://www.discovercars.com/"); if(PARTNERS.discovercars.a_aid) u.searchParams.set("a_aid",PARTNERS.discovercars.a_aid); return partnerUrl("discovercars",u.toString()); }
 function hostelUrl(town){ return partnerUrl("hostelworld","https://www.hostelworld.com/search?search_keywords="+encodeURIComponent(town)); }
 
+/* where the connection is (Cloudflare, rough, nothing stored): country for the first screen, position to sanity-check browser location */
+const whereP=fetch("/api/where").then(r=>r.ok?r.json():null).catch(()=>null);
+
 const ICON={
   fuel:`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4 3h9a1 1 0 0 1 1 1v8h1.5A2.5 2.5 0 0 1 18 14.5V18a1 1 0 0 0 2 0V9.4l-2.7-2.7 1.4-1.4 3 3c.2.2.3.5.3.7V18a3 3 0 0 1-6 0v-3.5a.5.5 0 0 0-.5-.5H14v7h1v2H2v-2h1V4a1 1 0 0 1 1-1zm1 2v5h7V5H5z"/></svg>`,
   stay:`<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M3 5h2v8h6V8h7a3 3 0 0 1 3 3v8h-2v-3H5v3H3V5zm4 3.5a2 2 0 1 1 0 4 2 2 0 0 1 0-4z"/></svg>`,
@@ -1347,7 +1350,9 @@ function dayMinutes(k){
 /* ---------- search wiring ---------- */
 function wireSearch(input,list,onPick){
   let t,ctl,hits=null,hitsQ="",pending=null,pickWhenReady=false,done=false;
-  const start0=input.value;
+  let start0=input.value;
+  // the From and Finish boxes are wired once and used again and again: each visit starts fresh
+  input.addEventListener("focus",()=>{ done=false; start0=input.value; hits=null; pickWhenReady=false; });
   const pick=h=>{ if(done) return; done=true; list.hidden=true; input.blur(); onPick(pt(h.name,h.lat,h.lon)); };
   const run=q=>{ ctl?.abort(); ctl=new AbortController(); list.innerHTML=`<div class="note" style="padding:8px">Searching…</div>`; list.hidden=false;
     const c=map?map.getCenter():{lat:-33,lng:19};
@@ -1383,6 +1388,8 @@ wireSearch($("startPlace"),$("startPlace").parentElement.nextElementSibling,p=>{
 wireSearch($("endPlace"),$("endPlace").parentElement.nextElementSibling,p=>{trip.end=p;trip.round=false;changed();});
 $("endPlace").addEventListener("change",e=>{ if(!e.target.value.trim()&&!trip.round){trip.round=true;changed();} });
 $("sameStart").addEventListener("click",()=>{trip.round=true;changed();});
+// tapping a place box means you want to change it: select what's there so typing replaces it
+document.addEventListener("focusin",e=>{ const el=e.target; if(el&&el.tagName==="INPUT"&&el.type==="text"&&el.closest(".ac")&&el.value) setTimeout(()=>{ try{ el.select(); }catch(x){} },0); });
 let toastT;
 { const st=$("status"); let t0; new MutationObserver(()=>{ st.classList.remove("gone"); clearTimeout(t0); if(!/…$/.test(st.textContent)) t0=setTimeout(()=>st.classList.add("gone"),6000); }).observe(st,{childList:true,characterData:true,subtree:true}); }
 function setFinish(p){
@@ -1394,12 +1401,18 @@ function setFinish(p){
 function useMyLocation(){
   if(!navigator.geolocation){$("status").textContent="This browser can't share your location. Type a town.";return;}
   $("status").textContent="Getting your location…";
-  navigator.geolocation.getCurrentPosition(p=>{trip.start=pt("My location",+p.coords.latitude.toFixed(5),+p.coords.longitude.toFixed(5));changed();},
+  navigator.geolocation.getCurrentPosition(async p=>{ const here={lat:+p.coords.latitude.toFixed(5),lon:+p.coords.longitude.toFixed(5)};
+    // computers without GPS guess from the network and can be a country out. Check it against where the connection is
+    const w=await whereP.catch(()=>null);
+    if(w&&w.lat!=null&&p.coords.accuracy>2000&&hav(here,w)>300){ trip.start=null; changed(); $("status").textContent="Your browser's location looks wrong, so it isn't used. Type your start town."; $("startPlace").focus(); return; }
+    trip.start=pt("My location",here.lat,here.lon);changed();},
     ()=>{$("status").textContent="Location not shared. Type a start town instead.";},{enableHighAccuracy:true,timeout:15000});
 }
 $("useLoc").addEventListener("click",useMyLocation);
 $("clearStart").addEventListener("click",()=>{trip.start=null;$("startPlace").value="";$("startPlace").focus();changed();});
 function locateIfAllowed(){ navigator.permissions?.query({name:"geolocation"}).then(r=>{if(r.state==="granted") useMyLocation();}).catch(()=>{}); }
+// a "My location" saved from a bad network guess (a country out): drop it
+if(trip.start&&trip.start.name==="My location"&&trip.start.lat!=null) whereP.then(w=>{ if(w&&w.lat!=null&&trip.start&&trip.start.name==="My location"&&hav(trip.start,w)>300){ trip.start=pt("My location",null,null); changed(); locateIfAllowed(); } });
 if(trip.start&&trip.start.name==="My location"&&trip.start.lat==null){
   locateIfAllowed();
 }
@@ -3447,7 +3460,7 @@ document.addEventListener("click",e=>{
 let TRY_PICK="swartberg-loop";
 /* the right door: visitors from Southern Africa get a trip from home; everyone else gets the planner plus the Southern Africa band */
 const LOCAL=["ZA","NA","BW","LS","SZ","ZW","MZ"];
-fetch("/api/where").then(r=>r.ok?r.json():null).then(j=>{ const c=j&&j.country; if(!c||LOCAL.includes(c)) return;
+whereP.then(j=>{ const c=j&&j.country; if(!c||LOCAL.includes(c)) return;
   TRY_PICK="namibia-2020-tortoise"; const b=$("tryBtn"); if(b) b.textContent="Try a route: Northern Namibia by 4x4, 8 days ›";
   const h=$("heroBand"); if(h) h.hidden=false; }).catch(()=>{});
 async function tryRoute(){

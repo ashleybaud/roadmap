@@ -29,7 +29,7 @@ document.addEventListener("click",e=>{
 let TRY_PICK="swartberg-loop";
 /* the right door: visitors from Southern Africa get a trip from home; everyone else gets the planner plus the Southern Africa band */
 const LOCAL=["ZA","NA","BW","LS","SZ","ZW","MZ"];
-fetch("/api/where").then(r=>r.ok?r.json():null).then(j=>{ const c=j&&j.country; if(!c||LOCAL.includes(c)) return;
+whereP.then(j=>{ const c=j&&j.country; if(!c||LOCAL.includes(c)) return;
   TRY_PICK="namibia-2020-tortoise"; const b=$("tryBtn"); if(b) b.textContent="Try a route: Northern Namibia by 4x4, 8 days ›";
   const h=$("heroBand"); if(h) h.hidden=false; }).catch(()=>{});
 async function tryRoute(){
