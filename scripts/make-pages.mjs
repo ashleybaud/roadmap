@@ -86,6 +86,8 @@ html[data-mode="motorsport"] .modesw button.on{background:#F2C500;color:#111}
 .evc{display:flex;flex-direction:column;gap:4px;padding:12px}.evd{font:700 1.2rem var(--f-display,"Barlow Condensed",sans-serif);color:var(--accent)}.unc{font:600 .75rem var(--f-body,sans-serif);font-style:normal;color:var(--warn);border:1px solid var(--warn);border-radius:3px;padding:0 4px;margin-left:6px}.evl{display:flex;gap:12px;flex-wrap:wrap;margin-top:4px}
 
 .nlbox{margin:28px 0 0;padding:14px 16px;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:6px;background:var(--panel);display:flex;flex-direction:column;gap:6px;color:var(--ink)}.nlbox span{color:var(--muted);font-size:.92rem}.nlf{display:flex;gap:8px;flex-wrap:wrap;position:relative}.nlf input[type=email]{flex:1;min-width:200px;padding:9px 10px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink);font:inherit}.nlf button{padding:9px 16px;border:0;border-radius:4px;background:var(--accent);color:var(--onfill,#fff);font-weight:700;cursor:pointer}
+
+.me{float:right;width:min(38%,260px);height:auto;margin:0 0 14px 20px;border-radius:10px;border:3px solid var(--gold)}@media(max-width:640px){.me{float:none;display:block;width:70%;max-width:260px;margin:0 0 14px}}
 `;
 
 function page({ url, title, desc, body, ld, image, active }) {
@@ -377,12 +379,13 @@ function aboutPage() {
   const fav = ["namibia-2020-orange-river", "eu-road-trip-2018", "namibia-2017-epupa", "wild-coast-2019"].map(id => live.find(r => r.id === id)).filter(Boolean);
   const body = `<main>
 <h1>About OneTrackMind</h1>
+<img class="me" src="/img/ashley.jpg" width="352" height="469" alt="Ashley in his garage, leaning on a white Alfa Romeo">
 <p class="intro">OneTrackMind plans road trips anywhere in the world, on the roads less travelled, for motorbikes, 4x4s and cars. Day by day on real roads: fuel gaps, night stops and places to stay, sunset, weather and a grade for every stretch, read for your vehicle. Then it sends the trip to your GPS, your bike's app or Google Maps and Waze on your phone.</p>
 <p>It's free for riders and drivers. <a href="/advertise/">Sponsors and advertisers</a> pay for it, and booking links pay a small commission when you book a bed or a car through them, at no cost to you.</p>
 <h2>Who's behind it</h2>
 <p>I'm Ashley. I spent 25 years selling speed: Ducati Cape Town first, then KTM Cape Town. For most of those years I was the guy organising the trips, packing too little and trusting my mates to carry the tools.</p>
 <p>I've been adventuring Namibia since 2003. The Fish River Canyon, Epupa Falls, the Skeleton Coast, and the Orange River road between Rosh Pinah and Noordoewer, which is still my favourite piece of riding anywhere. I've done Europe on a 790 Duke, the Nürburgring on a public Sunday, and a Wild Coast that tried to take me out with goats, taxis and potholes in equal measure. We ran adventure bootcamps because we'd learnt, the hard way, how quickly a small problem in the desert turns into a big one.</p>
-<p>In 2021 I sold the business. These days I live on a farm in the Swartland, build and race old Alfa Romeos at the Simola Hill Climb (class champion in 2023), and write about the wins and the <s>s</s>cars on <a href="${BLOG}">onetrackmind.co.za</a>.</p>
+<p>In 2021 I sold the business. These days I live on a farm in the Swartland, build and race old Alfa Romeos at the Simola Hill Climb (class champion in 2023), and write about the wins and the <s>s</s>cars on <a href="${BLOG}">onetrackmind.co.za</a>. It all started with a Stepnose I commissioned. Then I built a Bedford CF 4x4 myself, then the widebody.</p>
 <h2>Riding and the mind</h2>
 <p>After too many years of unregulated stress management, something had to give. I'm an overthinker, and I learnt I'd been looking after my bikes better than I looked after myself. Getting back on a motorcycle showed me how much riding does for my head: a long road, a full tank and the noise in your head goes quiet. I'm not shy about saying it, because plenty of riders feel the same and don't. Look after the machine. Look after the rider too.</p>
 <h2>Why this planner</h2>
