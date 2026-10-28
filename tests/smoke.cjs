@@ -139,6 +139,10 @@ const TRIP = {
   ok(trio.rows > 0 && trio.trio === trio.rows * ["fuel","stay","food","sights"].filter(c => trio.lay[c]).length, "fuel/food/bed icons on every stop: " + JSON.stringify(trio));
   if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT });
   await page.evaluate(() => { ui.tab = "ov"; renderAll(); });
+  const ov = await page.evaluate(() => { ui.lay.stay = true; ui.lay.fuel = true; ui.tab = "ov"; renderAll(); const b = document.querySelector("[data-ovav]"); if (!b) return { btn: false }; b.click(); return { btn: true, tab: ui.tab, list: !!document.querySelector(".ovlist"), rows: document.querySelectorAll(".ovrows li").length, pins: document.querySelectorAll(".numpin").length }; });
+  ok(!ov.btn || (ov.tab === "ov" && ov.list), "overview icon list: " + JSON.stringify(ov));
+  console.log("overview icons:", JSON.stringify(ov));
+  await page.evaluate(() => { ovFocus = null; renderAll(); });
   console.log("phone nav:", nav.g.length, "google part(s),", nav.w.length, "waze stops; first:", nav.g[0].url.slice(0, 160));
   const sh = await page.evaluate(async () => { renderDetails(); const btns = document.querySelectorAll("[data-sharetrip]").length; const f = window.fetch; let sent = null;
     window.fetch = (u, o) => { if (String(u) === "/api/share") { sent = JSON.parse(o.body); return Promise.resolve(new Response('{"id":"abc23xyz"}', { status: 200 })); } return f(u, o); };

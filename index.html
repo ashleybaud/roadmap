@@ -60,6 +60,8 @@ input[type=text],input[type=email],input[type=number],input[type=time],input[typ
 .btn.share{background:#0B6E4F;border-color:#0B6E4F;color:#fff}
 .namedlg{border:1px solid var(--ink);border-radius:8px;padding:16px;max-width:320px;width:90vw;background:var(--bg);color:var(--ink)}.namedlg input{width:100%;margin-top:6px}
 .trioset{display:inline-flex;gap:2px;margin-right:4px}.avi.trio.none{opacity:.25;cursor:default}
+.numpin{width:22px;height:22px;border-radius:50%;color:#fff;border:2px solid #fff;font:700 11px/18px system-ui,sans-serif;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.4)}
+.ovlist{border:1px solid var(--line);border-top:0;border-radius:0 0 8px 8px;padding:8px 12px;margin:-6px 0 10px;background:var(--panel,#fff)}.ovhead{display:flex;gap:8px;align-items:baseline}.ovhead .linkbtn{margin-left:auto}.ovrows{list-style:none;padding:0;margin:6px 0}.ovrows li{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px dashed var(--line)}.ovrows .num{flex:0 0 22px;height:22px;border-radius:50%;color:#fff;font:700 11px/22px system-ui,sans-serif;text-align:center}.ovrows .ovn{flex:1;min-width:0}.ovrows .sact{display:flex;gap:8px;align-items:center;white-space:nowrap}
 .staybadge{display:inline-block;white-space:nowrap;background:#2F5BA8;color:#fff;font:600 12px/1 system-ui,sans-serif;padding:5px 7px;border-radius:12px;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.35);cursor:pointer}#map.zoomin .staybadge{display:none}
 .favmk{width:26px;height:26px;border-radius:50%;background:#D9A441;color:#18201C;border:2px solid #18201C;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.35)}
 .btn.wa{background:#25D366;border-color:#25D366;color:#073B1E}
@@ -1818,9 +1820,9 @@ function dayWay(k){
 function dayTrio(k){
   const pd=!planStale&&plan&&plan.days[k]; if(!pd||!placesOk) return ""; const j=pd.pts.length-1, p=pd.pts[j], av=stopAvail(p);
   const on=["fuel","stay","food","sights"].filter(c=>ui.lay[c]&&!(c==="stay"&&k===nDays()-1&&trip.round)); if(!on.length) return "";
-  return `<span class="trioset">${AV.filter(a=>on.includes(a[0])).map(a=>{ const n=av[a[0]].length; return `<button type="button" class="avi trio ${n?"":"none"}" ${n?`data-ovav="${k}:${j}:${a[0]}"`:"disabled"} title="${esc(a[2])} at ${esc(p.name)}: ${n||"none"}">${a[1]}</button>`; }).join("")}</span>`;
+  return `<span class="trioset">${AV.filter(a=>on.includes(a[0])).map(a=>{ const n=av[a[0]].length; return `<button type="button" class="avi trio ${n?"":"none"} ${ovFocus&&ovFocus.k===k&&ovFocus.cat===a[0]?"on":""}" ${n?`data-ovav="${k}:${j}:${a[0]}"`:"disabled"} title="${esc(a[2])} at ${esc(p.name)}: ${n||"none"}">${a[1]}</button>`; }).join("")}</span>`;
 }
-document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-ovav]"); if(!b) return; const [k,j,c]=b.dataset.ovav.split(":"); ui.tab=+k; stopFocus={k:+k,j:+j,cat:c}; saveUi(); renderAll(); });
+document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-ovav]"); if(!b) return; const [k,j,c]=b.dataset.ovav.split(":"); const same=ovFocus&&ovFocus.k===+k&&ovFocus.cat===c; ovFocus=same?null:{k:+k,j:+j,cat:c}; if(!ovFocus) window._refit=true; renderAll(); if(ovFocus&&window.innerWidth<=1000) $("map").scrollIntoView({behavior:"smooth",block:"start"}); });
 function fromCell(k){ const from=dayFrom(k); if(!from||from.lat==null) return `<span class="ep need">${k===0?"Set your start":"Pick the night before"}</span>`; return `<span class="ep">${k===0?"▶":"🛏"} ${esc(from.name)}</span>`; }
 function sumBox(k,big){
   const pd=!planStale&&plan&&plan.days[k], d=trip.days[k], r=pd?dayRisk(k):null, from=dayFrom(k), last=k===nDays()-1;
@@ -1834,7 +1836,7 @@ function sumBox(k,big){
   return `<div class="sumbox ${big?"big":""}">
     <div class="sumline">${date}<div class="sumrow">${line}</div></div>
     ${!pd&&!msg?"":pd?`<div class="sicons"><span class="sl">${fuelBtn(k)}</span><span class="sr">${sunSpan(k)+wxLink(k)}<span class="flags">${flagIcons(r,k)}</span></span></div>${gradeBar(dayGrade(k),big)}${elevLine(k)}${big||nDays()===1?elevProfile(k):""}${riskHtml(r,k)}${big?fuelList(k):""}${!big&&nDays()>1?gtkLine(k):""}`:`<div class="note">${msg}</div>`}
-  </div>`;
+  </div>${big?"":ovList(k)}`;
 }
 function dayHead(k){ return sumBox(k,true)+(!planStale&&plan&&plan.days[k]?gtkHtml(k):"")+`<h3 class="detailh">Stops</h3>`; }
 function gtkLine(k){ if(planStale||!plan||!plan.days[k]) return ""; const g=goodToKnow(k), n=g.filter(x=>x.lvl!=="info").length, bad=g.some(x=>x.lvl==="bad");
@@ -1868,7 +1870,7 @@ let stopFocus=null;
 function placeRow(x,k,j,extraAct){
   const t=x.tags||{}, town=plan.days[k].pts[j]?.name||"";
   const nm=x.name&&x.name!=="Fuel"?x.name:({fuel:"Fuel station",food:"Food",shop:"Shop",toilets:"Toilets",cash:"ATM",repair:"Workshop"}[x.kind]||"Place");
-  const dist=x.dstop!=null?`${x.dstop<0.1?"at the stop":x.dstop.toFixed(1)+" km from the stop"}`:(x.off!=null?(x.off<0.3?"on the route":`${x.off.toFixed(1)} km off the route`):"");
+  const dist=x.dstop!=null?`${Math.max(0.1,x.dstop).toFixed(1)} km from ${town||"the stop"}`:(x.off!=null?(x.off<0.3?"on the route":`${x.off.toFixed(1)} km off the route`):"");
   const g=x.kind==="fuel"?gradesTxt(t):"";
   const hrs=["fuel","food","shop","cash","repair"].includes(x.kind)?hoursHtml(t,k,j):"";
   return `<div class="srow" data-ploc="${x.lat},${x.lon}"><div><b>${esc(nm)}</b><span class="note">${esc(dist)}${g?" · "+esc(g):""}</span>${hrs}</div><div class="sact">${callLink(t)}${infoBtn(Object.assign({},x,{name:nm}),{town,dist,act:extraAct})}${extraAct||""}</div></div>`;
@@ -1947,13 +1949,39 @@ function dayBody(k){
   h+=`<div class="btns"><button class="btn small" type="button" data-gpx="${k}">GPX file</button>${nDays()===1?`<button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}`:""}<span class="note">GPX for your bike's GPS or a phone app.</span></div><div class="btns phonenav"><span class="lbl">On your phone</span>${navButtons(k)}<button class="btn small share" type="button" data-sharetrip>Share this trip ↗</button><button class="btn small wa" type="button" data-sharewa title="Send this trip on WhatsApp">WhatsApp this trip</button>${nameBtn()}</div>`;
   return h;
 }
+// one category at a stop on the map: plain numbered dots matching the list; the name shows on hover or tap
+const CATCOL={fuel:"#0B6E4F",food:"#B3261E",stay:"#2F5BA8",sights:"#9A6A33",shop:"#6B4E9B",toilets:"#00838F",cash:"#2F5BA8",repair:"#5D4037"};
+function catPins(list,c,k,j){
+  const night=c==="stay"&&j===plan.days[k].pts.length-1&&k<nDays()-1;
+  list.forEach((p,i)=>{ const nm=p.name||AV.find(a=>a[0]===c)[2];
+    L.marker([p.lat,p.lon],{icon:L.divIcon({className:"",html:`<div class="numpin" style="background:${CATCOL[c]}">${i+1}</div>`,iconSize:[22,22],iconAnchor:[11,11]}),zIndexOffset:800-i})
+      .bindTooltip(`${i+1}. ${esc(nm)}`).bindPopup(`<b>${i+1}. ${esc(nm)}</b>${night?`<br><button class="btn small" type="button" data-staynight="${k}:${esc(p.id)}">Stay here</button>`:""}`).addTo(layer); });
+  return list;
+}
+// Overview: tap ⛽ 🛏 🍴 ★ on a day and the list opens under that day, the map shows just those, and you stay on the Overview
+var ovFocus=null; // var: renders can run before this line
+function drawOvLayer(){
+  const {k,j,cat}=ovFocus, pd=plan&&plan.days[k], p=pd&&pd.pts[j]; if(!p) return false;
+  L.marker([p.lat,p.lon],{icon:dotIcon("#18201C",16)}).bindTooltip(p.name,{permanent:true,direction:"right",offset:[10,0],className:"maplbl"}).addTo(layer);
+  const list=catPins(stopAvail(p)[cat],cat,k,j), pts=[...list,p].map(x=>[x.lat,x.lon]);
+  if(pts.length<2) map.setView([p.lat,p.lon],14); else map.fitBounds(L.latLngBounds(pts),{padding:[30,30],maxZoom:16});
+  return true;
+}
+function ovList(k){
+  if(!ovFocus||ovFocus.k!==k||!plan||!plan.days[k]) return ""; const {j,cat}=ovFocus, p=plan.days[k].pts[j], a=AV.find(x=>x[0]===cat), list=stopAvail(p)[cat], night=cat==="stay"&&j===plan.days[k].pts.length-1&&k<nDays()-1;
+  const key=`ov-${cat}-${k}`, shown=showAll.has(key)?list:list.slice(0,8), ci=addDays(trip.startDate,k), co=addDays(trip.startDate,k+1);
+  return `<div class="ovlist"><div class="ovhead"><b>${a[1]} ${esc(a[2])} in ${esc(p.name)}</b> <span class="note">${list.length}</span><button class="linkbtn small" type="button" data-ovclose>Close ✕</button></div>
+    <ol class="ovrows">${shown.map((x,i)=>`<li><span class="num" style="background:${CATCOL[cat]}">${i+1}</span><span class="ovn"><b>${esc(x.name||a[2])}</b>${night&&i===0?` <span class="sugtag">Suggested</span>`:""}<span class="note"> ${esc(((x.tags&&x.tags.tourism)||"").replace(/_/g," "))}${(x.tags&&x.tags.tourism)?" · ":""}${Math.max(0.1,x.dstop).toFixed(1)} km from ${esc(p.name)}</span></span><span class="sact">${night?`<a href="${esc(bookingUrl(x.name+", "+p.name,ci,co))}" target="_blank" rel="sponsored noopener">Book</a><button class="btn small ${i===0?"":"ghost"}" type="button" data-staynight="${k}:${esc(x.id)}">Stay here</button>`:`<button class="linkbtn small" type="button" data-ploc="${x.lat},${x.lon}">Show</button>`}</span></li>`).join("")}</ol>
+    ${list.length>8?`<button class="linkbtn small" type="button" data-more="${key}">${showAll.has(key)?"Show fewer":`Show all ${list.length}`}</button>`:""}</div>`;
+}
+document.addEventListener("click",e=>{ if(e.target.closest&&e.target.closest("[data-ovclose]")){ ovFocus=null; window._refit=true; renderAll(); } });
 function drawStopLayer(){
   const {k,j,cat}=stopFocus, sc=scope(k,j); if(!sc) return false;
   const s=sc.jj>0&&!cat?seg(sc.a,sc.b):[];
   if(s.length>1) L.polyline(s.map(g=>[g.lat,g.lon]),{color:"#B26A00",weight:7}).addTo(layer);
   L.marker([sc.p.lat,sc.p.lon],{icon:dotIcon("#18201C",16)}).bindTooltip(sc.p.name,{permanent:true,direction:"right",offset:[10,0],className:"maplbl"}).addTo(layer);
   const av=stopAvail(sc.p), col={fuel:"#0B6E4F",food:"#B3261E",stay:"#2F5BA8",sights:"#9A6A33",shop:"#6B4E9B",toilets:"#00838F",cash:"#2F5BA8",repair:"#5D4037"};
-  const shown=[]; AV.forEach(([c,ic])=>{ if(cat&&c!==cat) return; av[c].forEach(p=>{ shown.push(p); L.marker([p.lat,p.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:${col[c]}">${ic}</div>`,iconSize:[22,22],iconAnchor:[11,11]})}).bindTooltip(p.name||AV.find(a=>a[0]===c)[2],cat?{permanent:true,direction:"right",offset:[12,0],className:"maplbl"}:{}).addTo(layer); }); });
+  const shown=[]; AV.forEach(([c,ic])=>{ if(cat&&c!==cat) return; if(cat){ shown.push(...catPins(av[c],c,k,j)); return; } av[c].forEach(p=>{ shown.push(p); L.marker([p.lat,p.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:${col[c]}">${ic}</div>`,iconSize:[22,22],iconAnchor:[11,11]})}).bindTooltip(p.name||AV.find(a=>a[0]===c)[2]).addTo(layer); }); });
   const pts=[...s,...shown,sc.p].map(p=>[p.lat,p.lon]);
   if(!cat) map.setView([sc.p.lat,sc.p.lon],14); // the stop and what's around it
   else if(pts.length<2) map.setView([sc.p.lat,sc.p.lon],15); else map.fitBounds(L.latLngBounds(pts),{padding:[30,30],maxZoom:16});
@@ -2162,6 +2190,7 @@ function drawMap(){
   try{ if(ui.lay.fav&&typeof drawFavs==="function") drawFavs(); }catch(e){} // an extra layer must never stop the route
   if(panel){ drawPanelLayer(); return; }
   if(stopFocus&&sel&&stopFocus.k===ui.tab&&drawStopLayer()) return;
+  if(ovFocus&&!sel&&drawOvLayer()) return;
   if(focusR){ const s=seg(focusR.a,focusR.b); if(s.length>1){L.polyline(s.map(g=>[g.lat,g.lon]),{color:"#B26A00",weight:7}).addTo(layer); map.fitBounds(L.latLngBounds(s.map(g=>[g.lat,g.lon])),{padding:[30,30]});} }
   const range=sel?[sel.a,sel.b]:[0,plan.total], inR=x=>x.km!=null&&x.km>=range[0]-1&&x.km<=range[1]+1;
   townPoints().forEach(p=>{ const km=plan.ptKm.get(p); if(sel&&!(km!=null&&km>=sel.a-0.5&&km<=sel.b+0.5)) return;
@@ -2319,7 +2348,7 @@ function renderHist(){
 }
 $("histList").addEventListener("click",e=>{ const b=e.target.closest("[data-restore]"); if(!b) return; const h=store.get("rr4-hist")||[], x=h[+b.dataset.restore]; if(!x) return; snapTrip(true); const t=JSON.parse(x.key); Object.keys(trip).forEach(k=>delete trip[k]); Object.assign(trip,t); ui.tab="ov"; $("settings").close(); changed(); });
 const daySig=k=>[dayFrom(k),...(trip.days[k]?trip.days[k].vias.filter(v=>!v.auto):[]),dayTo(k)].map(p=>p&&p.lat!=null?p.lat.toFixed(3)+","+p.lon.toFixed(3):"-").join("|");
-function changed(){ window._refit=true; focusR=null; stopFocus=null; autoRounds=0;
+function changed(){ window._refit=true; focusR=null; stopFocus=null; ovFocus=null; autoRounds=0;
   syncDays(); trip.days.forEach((d,k)=>{ const s=daySig(k); if(d.sig&&d.sig!==s){ d.fresh=true; delete d.noMore; const n=d.vias.length; d.vias=d.vias.filter(v=>!v.auto); if(d.vias.length!==n) d.legs=[]; } d.sig=s; });
   snapTrip(); recalc(); }
 $("keyDlg").innerHTML=$("keyDlg").innerHTML.replace("STYLE_FAST",STYLE_ICON.fast).replace("STYLE_ROUGH",STYLE_ICON.default).replaceAll("FUEL",ICON.fuel);
