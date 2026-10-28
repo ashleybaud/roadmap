@@ -222,6 +222,8 @@ header h1{font-size:2.7rem;font-weight:700;letter-spacing:-.005em;text-transform
 @media (max-width:900px){.herosteps{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:640px){body.hastrip .herosteps,body.hastrip .herosub{display:none}.hero{padding:12px}.herohead{font-size:1.75rem}.herosub{font-size:.95rem;margin:6px 0 10px}.herosteps{gap:6px}.herosteps li{padding:8px}.herosteps b{font-size:1rem}.herosteps span{font-size:.82rem}}
 .heroband{display:block;margin-top:12px;padding:10px 14px;border-radius:8px;background:rgba(63,180,138,.16);border:1px solid #3FB48A;color:#fff;text-decoration:none}.heroband b{color:#3FB48A}.heroband span{opacity:.9}
+.sitefoot{margin:28px 0 10px;padding-top:14px;border-top:1px solid var(--line)}.sponsors{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px}
+.spons{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:8px;padding:8px 14px;text-decoration:none;color:var(--ink);background:var(--panel)}.spons b{font-family:var(--f-display);text-transform:uppercase;letter-spacing:.03em;font-size:1.1rem}.spons span{font-size:.85rem;color:var(--muted)}.spons.open{border-style:dashed}.spons.open b{color:var(--accent)}
 .herocta{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-top:12px}.herocta span{color:#fff;opacity:.8;font-size:.92rem}
 .herobtn{background:#3FB48A!important;border-color:#3FB48A!important;color:#0d1410!important;font-weight:700}
 @media (max-width:640px){body.hastrip .herocta{display:none}.herocta span{font-size:.82rem}}
@@ -637,6 +639,12 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
       <div class="details" id="details"></div>
     </div>
   </div>
+  <footer class="sitefoot">
+    <div class="sponsors"><span class="lbl">OneTrackMind is free thanks to</span>
+      <a class="spons" href="https://alterego.co.za" target="_blank" rel="noopener sponsored"><b>AlterEgo</b><span>Made-to-order wear for petrolheads</span></a>
+      <a class="spons open" href="/advertise/"><b>Your brand here</b><span>Sponsor or advertise ›</span></a></div>
+    <div class="note">OneTrackMind: plan road trips anywhere, on the roads less travelled, then ride them on your GPS or phone. · <a href="/rides/">The founder's rides</a> · <a href="/advertise/">Advertise</a> · <a href="/about/">About</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> · <a href="mailto:hello@onetrackmind.online">hello@onetrackmind.online</a></div>
+  </footer>
 </div>
 
 <aside id="panel" class="sheet" hidden aria-label="Stop details"><div class="dlghead"><div><h2 id="pTitle"></h2><div class="note" id="pSub"></div></div><button class="icon" type="button" id="pClose" aria-label="Close">✕</button></div><div class="ptabs" id="pTabs"></div><div id="pBody" class="dlgbody"></div></aside>
