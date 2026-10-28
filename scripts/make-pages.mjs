@@ -200,7 +200,7 @@ function favIndex() {
   const body = `<main><h1>Founder's fav's</h1>
 <p class="intro">The places I'd send you to. Twenty-odd years of riding and driving through Southern Africa and Europe, boiled down to the ones I still talk about. Some are roads, some are waterfalls, some are race tracks. Each one has how to get there, where to sleep, and a button that plans the trip for you.</p>
 ${GROUPS.map(([g, t]) => { const L = FAV.filter(x => x.group === g); return L.length ? `<h2 id="${g}">${t}</h2>${g === "petrol" ? `<p class="note">For people who travel for engines: race tracks, factories, museums and the roads you've seen on TV.</p>` : ""}<div class="cards">${L.map(card).join("")}</div>` : ""; }).join("\n")}
-<h2 id="stories">Stories</h2><p>The old blog, moved home: <a href="/stories/">road trips, festivals, factories and museums, grouped by trip</a>.</p>
+<h2 id="blog">Blog</h2><p>The old blog, moved home: <a href="/blog/">road trips, festivals, factories and museums, grouped by trip</a>.</p>
 <h2 id="trips">The trips behind them</h2><p class="note">Where these came from. Every trip opens in the planner, so you can take it, change it and ride it yourself.</p>
 <div class="cards rides">${fdr.map(ride).join("")}</div>
 <a class="cta" href="/">Plan your own</a></main>`;
@@ -215,30 +215,30 @@ const fmtDate = d => new Date(d + "T12:00:00").toLocaleDateString("en-GB", { day
 function storyPage(x, L) {
   const i = L.indexOf(x), prev = L[i - 1], next = L[i + 1];
   const body = `<main class="story">
-<p class="note"><a href="/stories/">Stories</a>${L.length > 1 ? ` · ${esc(x.series)} · part ${i + 1} of ${L.length}` : ""}</p>
+<p class="note"><a href="/blog/">Blog</a>${L.length > 1 ? ` · ${esc(x.series)} · part ${i + 1} of ${L.length}` : ""}</p>
 <h1>${esc(x.title)}</h1>
 <div class="meta">${fmtDate(x.date)}</div>
 ${x.cover && !x.html.includes(x.cover) ? `<img class="cover" src="${esc(x.cover)}" alt="${esc(x.title)}" loading="eager">` : ""}
 ${x.gallery ? `<p class="tocome">Photos first, story to come.</p>` : ""}
 ${x.html}
-${L.length > 1 ? `<nav class="snav">${prev ? `<a href="/stories/${esc(prev.slug)}/">‹ ${esc(prev.title)}</a>` : "<span></span>"}${next ? `<a href="/stories/${esc(next.slug)}/">${esc(next.title)} ›</a>` : ""}</nav>` : ""}
+${L.length > 1 ? `<nav class="snav">${prev ? `<a href="/blog/${esc(prev.slug)}/">‹ ${esc(prev.title)}</a>` : "<span></span>"}${next ? `<a href="/blog/${esc(next.slug)}/">${esc(next.title)} ›</a>` : ""}</nav>` : ""}
 <a class="cta" href="/">Plan a trip like this</a>
 <p class="note">First published on onetrackmind.co.za. Places change: check before you go.</p>
 </main>`;
-  const ld = { "@context": "https://schema.org", "@type": "BlogPosting", headline: x.title, datePublished: x.date, author: FOUNDER, publisher: ORG, url: `${SITE}/stories/${x.slug}/`, ...(x.cover ? { image: x.cover } : {}) };
-  return page({ active: "/favourites/", url: `/stories/${x.slug}/`, title: `${x.title} · OneTrackMind stories`, desc: (x.lead || x.title).slice(0, 155), body, ld });
+  const ld = { "@context": "https://schema.org", "@type": "BlogPosting", headline: x.title, datePublished: x.date, author: FOUNDER, publisher: ORG, url: `${SITE}/blog/${x.slug}/`, ...(x.cover ? { image: x.cover } : {}) };
+  return page({ active: "/favourites/", url: `/blog/${x.slug}/`, title: `${x.title} · OneTrackMind blog`, desc: (x.lead || x.title).slice(0, 155), body, ld });
 }
 function storiesIndex(M) {
   const groups = [...M.entries()].sort((a, b) => b[1][0].date.localeCompare(a[1][0].date));
-  const card = x => `<a class="card story" href="/stories/${esc(x.slug)}/">${x.cover ? `<img src="${esc(x.cover)}" alt="" loading="lazy">` : ""}<b>${esc(x.title)}</b><span>${fmtDate(x.date)}${x.gallery ? " · photos" : ""}</span></a>`;
+  const card = x => `<a class="card story" href="/blog/${esc(x.slug)}/">${x.cover ? `<img src="${esc(x.cover)}" alt="" loading="lazy">` : ""}<b>${esc(x.title)}</b><span>${fmtDate(x.date)}${x.gallery ? " · photos" : ""}</span></a>`;
   const multi = groups.filter(([, L]) => L.length > 1), single = groups.filter(([, L]) => L.length === 1).map(([, L]) => L[0]);
-  const body = `<main><h1>Stories</h1>
+  const body = `<main><h1>Blog</h1>
 <p class="intro">Twenty years of road trips, festivals, factories and museums, mostly on two wheels and mostly not to plan. Trips first, newest first.</p>
 ${multi.map(([name, L]) => `<section><div class="serieshead"><h2>${esc(name.replace(/^\d{4}-\d{2} /, ""))}</h2><span class="note">${fmtDate(L[0].date).replace(/^\d+ /, "")} · ${L.length} parts</span></div><div class="cards">${L.map(card).join("")}</div></section>`).join("\n")}
-<section><h2>More stories</h2><div class="cards">${single.map(card).join("")}</div></section>
+<section><h2>More posts</h2><div class="cards">${single.map(card).join("")}</div></section>
 <a class="cta" href="/">Plan your own</a></main>`;
-  const ld = { "@context": "https://schema.org", "@type": "Blog", name: "OneTrackMind stories", url: SITE + "/stories/", author: FOUNDER };
-  return page({ active: "/favourites/", url: "/stories/", title: "Stories: road trips, festivals and factories · OneTrackMind", desc: "Road trip stories from Southern Africa and Europe by the founder of OneTrackMind: Namibia, Lesotho, the Wild Coast, Motor Valley, EICMA and more.", body, ld });
+  const ld = { "@context": "https://schema.org", "@type": "Blog", name: "OneTrackMind blog", url: SITE + "/blog/", author: FOUNDER };
+  return page({ active: "/favourites/", url: "/blog/", title: "Blog: road trips, festivals and factories · OneTrackMind", desc: "Road trip stories from Southern Africa and Europe by the founder of OneTrackMind: Namibia, Lesotho, the Wild Coast, Motor Valley, EICMA and more.", body, ld });
 }
 
 function advertisePage() {
@@ -293,10 +293,10 @@ fs.rmSync(path.join(ROOT, "favourites"), { recursive: true, force: true });
 write("rides/index.html", redirectPage("/favourites/#trips"));
 write("favourites/index.html", favIndex());
 FAV.forEach(x => write(`favourites/${x.id}/index.html`, favPage(x)));
-fs.rmSync(path.join(ROOT, "stories"), { recursive: true, force: true });
-{ const M = seriesOf(); write("stories/index.html", storiesIndex(M)); M.forEach(L => L.forEach(x => write(`stories/${x.slug}/index.html`, storyPage(x, L)))); }
+fs.rmSync(path.join(ROOT, "blog"), { recursive: true, force: true });
+{ const M = seriesOf(); write("blog/index.html", storiesIndex(M)); M.forEach(L => L.forEach(x => write(`blog/${x.slug}/index.html`, storyPage(x, L)))); }
 write("advertise/index.html", advertisePage());
-const urls = ["/", "/routes/", "/favourites/", "/about/", "/advertise/", ...live.map(r => `/routes/${r.id}/`), ...FAV.map(x => `/favourites/${x.id}/`), "/stories/", ...STORIES.map(x => `/stories/${x.slug}/`), "/terms.html", "/privacy.html", "/rules.html"];
+const urls = ["/", "/routes/", "/favourites/", "/about/", "/advertise/", ...live.map(r => `/routes/${r.id}/`), ...FAV.map(x => `/favourites/${x.id}/`), "/blog/", ...STORIES.map(x => `/blog/${x.slug}/`), "/terms.html", "/privacy.html", "/rules.html"];
 write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${today}</lastmod></url>`).join("\n")}\n</urlset>\n`);
 write("robots.txt", `# Everyone welcome, search engines and AI assistants included.\nUser-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${SITE}/sitemap.xml\n`);
 write("llms.txt", `# OneTrackMind
