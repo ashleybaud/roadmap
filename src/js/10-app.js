@@ -615,10 +615,10 @@ function dayWay(k){
   return `<span class="dway" title="${esc(t)}. Change it per stretch on the day's stops.">${none?STYLE_ICON.default:all?STYLE_ICON.fast:STYLE_ICON.default+STYLE_ICON.fast}</span>`;
 }
 // overview: the same filter icons for where the day ends; tap to open that day zoomed to it, showing just those
-function dayTrio(k){
+function dayTrio(k,big){
   const pd=!planStale&&plan&&plan.days[k]; if(!pd||!placesOk) return ""; const j=pd.pts.length-1, p=pd.pts[j], av=stopAvail(p);
   const on=["fuel","stay","food","sights"].filter(c=>ui.lay[c]&&!(c==="stay"&&k===nDays()-1&&trip.round)); if(!on.length) return "";
-  return `<span class="trioset">${AV.filter(a=>on.includes(a[0])).map(a=>{ const n=av[a[0]].length; return `<button type="button" class="avi trio ${n?"":"none"} ${ovFocus&&ovFocus.k===k&&ovFocus.cat===a[0]?"on":""}" ${n?`data-ovav="${k}:${j}:${a[0]}"`:"disabled"} data-c="${a[0]}" title="${esc(a[2])} at ${esc(p.name)}: ${n||"none"}">${trioIcon(a[0])}</button>`; }).join("")}</span>`;
+  return `<span class="trioset">${AV.filter(a=>on.includes(a[0])).map(a=>{ const n=av[a[0]].length; return `<button type="button" class="avi trio ${n?"":"none"} ${(big?stopFocus&&stopFocus.k===k&&stopFocus.j===j&&stopFocus.cat===a[0]:ovFocus&&ovFocus.k===k&&ovFocus.cat===a[0])?"on":""}" ${n?(big?`data-av="${k}:${j}:${a[0]}"`:`data-ovav="${k}:${j}:${a[0]}"`):"disabled"} data-c="${a[0]}" title="${esc(a[2])} at ${esc(p.name)}: ${n||"none"}">${trioIcon(a[0])}</button>`; }).join("")}</span>`;
 }
 document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-ovav]"); if(!b) return; const [k,j,c]=b.dataset.ovav.split(":"); const same=ovFocus&&ovFocus.k===+k&&ovFocus.cat===c; ovFocus=same?null:{k:+k,j:+j,cat:c}; if(!ovFocus) window._refit=true; renderAll(); if(ovFocus&&window.innerWidth<=1000) $("map").scrollIntoView({behavior:"smooth",block:"start"}); });
 function fromCell(k){ const from=dayFrom(k); if(!from||from.lat==null) return `<span class="ep need">${k===0?"Set your start":"Pick the night before"}</span>`; return `<span class="ep">${k===0?"▶":"🛏"} ${esc(from.name)}</span>`; }
@@ -630,7 +630,7 @@ function sumBox(k,big){
   const date=`<span class="sdate">${esc(big?dayLong(k):dayName(k))}${pdx?`<span class="sdtot" data-focusday="${k}" title="Show the day on the map"> · ${Math.round(pdx.km)} km · <span class="${long?"overt":""}" title="${long?`Over your ${settings.maxHours}h a day`:"Riding time"}">${fmtDur(mins)}</span></span>`:""}</span>`;
   const line=nDays()===1&&trip.round&&!trip.days[0].vias.length
     ?`<span class="schain">${fromCell(k)}${arr}<span class="wherebox">${searchBox("whereto-0","","Where to?",true)}</span>${arr}<span class="ep">⟲ back home</span></span>`
-    :`<span class="schain">${fromCell(k)}${arr}${chain?chain+arr:""}<span class="ep to ${last?"":"night"}" ${last?"":`title="Night ${k+1}: where you sleep"`}>${toSym} ${toCell(k)}</span></span>${big?"":dayTrio(k)}${dayWay(k)}`;
+    :`<span class="schain">${fromCell(k)}${arr}${chain?chain+arr:""}<span class="ep to ${last?"":"night"}" ${last?"":`title="Night ${k+1}: where you sleep"`}>${toSym} ${toCell(k)}</span></span>${dayTrio(k,big)}${dayWay(k)}`;
   return `<div class="sumbox ${big?"big":""}">
     <div class="sumline">${date}<div class="sumrow">${line}</div></div>
     ${!pd&&!msg?"":pd?`<div class="sicons"><span class="sl">${fuelBtn(k)}</span><span class="sr">${sunSpan(k)+wxLink(k)}<span class="flags">${flagIcons(r,k)}</span></span></div>${gradeBar(dayGrade(k),big)}${elevLine(k)}${big||nDays()===1?elevProfile(k):""}${riskHtml(r,k)}${big?fuelList(k):""}${!big&&nDays()>1?gtkLine(k):""}`:`<div class="note">${msg}</div>`}
