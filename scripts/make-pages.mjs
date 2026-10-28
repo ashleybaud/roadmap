@@ -47,6 +47,7 @@ blockquote{margin:14px 0;padding:4px 16px;border-left:3px solid var(--accent);ba
 .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin:14px 0}.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px 14px;text-decoration:none;color:var(--ink)}.card b{display:block;color:var(--accent)}.card span{font-size:.85rem;color:var(--muted)}
 footer{border-top:1px solid var(--line);margin:40px 0 0;padding:16px 0 30px;color:var(--muted);font-size:.9rem}
 .note{font-size:.9rem;color:var(--muted)}
+.intro{font-size:1.1rem}.cards.rides{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}.card.ride{display:flex;flex-direction:column;gap:4px}.card.ride .yr{font:700 1.6rem "Barlow Condensed",sans-serif;color:var(--accent);line-height:1}.card.ride .lead{color:var(--ink);font-size:.95rem}.card.ride .go{color:var(--accent);font-weight:600;margin-top:auto}
 .photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin:18px 0}.photos img{width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:6px}`;
 
 function page({ url, title, desc, body, ld, image, active }) {
@@ -71,7 +72,7 @@ function page({ url, title, desc, body, ld, image, active }) {
 ${(Array.isArray(ld) ? ld : [ld]).filter(Boolean).map(x => `<script type="application/ld+json">${JSON.stringify(x)}</script>`).join("\n")}
 </head>
 <body><div class="wrap">
-<header><a class="logo" href="/">OneTrackMind</a><div class="motto">Recce. Ride. Report.</div><nav class="hdrlinks" aria-label="Site">${[["/","Plan a trip"],["/routes/","Routes"],["/about/","About the founder"]].map(([h,t])=>`<a href="${h}"${active===h?' class="on" aria-current="page"':""}>${t}</a>`).join("")}<a href="${BLOG}" target="_blank" rel="noopener">Misadventures ↗</a></nav></header>
+<header><a class="logo" href="/">OneTrackMind</a><div class="motto">Recce. Ride. Report.</div><nav class="hdrlinks" aria-label="Site">${[["/","Plan a trip"],["/routes/","Routes"],["/rides/","The founder's rides"],["/about/","About"]].map(([h,t])=>`<a href="${h}"${active===h?' class="on" aria-current="page"':""}>${t}</a>`).join("")}</nav></header>
 ${body}
 <footer>OneTrackMind is a free trip planner for multi-day rides and drives: motorbikes, 4x4s and cars. Built by riders. Stories and misadventures on <a href="${BLOG}">onetrackmind.co.za</a>. · <a href="/terms.html">Terms and disclaimer</a> · <a href="/privacy.html">Privacy</a> · <a href="/rules.html">Rules</a></footer>
 </div></body></html>
@@ -128,6 +129,25 @@ function routesIndex() {
   return page({ active: "/routes/", url: "/routes/", title: "Routes: multi-day motorbike, 4x4 and self-drive trips · OneTrackMind", desc: "Multi-day motorbike, 4x4 and self-drive routes in South Africa, Namibia, Lesotho and Europe, with fuel, night stops and road grades. Free to plan.", body, ld });
 }
 
+/* the founder's rides: his trips as memories, where it all started; each opens its route in the planner */
+const SA = ["South Africa", "Namibia", "Lesotho", "Northern Cape", "Western Cape", "Eastern Cape", "Kalahari", "Garden Route", "Karoo", "Cederberg", "Swartberg", "Tankwa"];
+const isAfrica = r => SA.some(w => (r.region || "").includes(w)) || /namibia|lesotho|cape|karoo|kalahari/i.test(r.id);
+function ridesIndex() {
+  const fdr = live.filter(r => r.founder).sort((a, b) => (b.founder.year || 0) - (a.founder.year || 0));
+  const af = fdr.filter(isAfrica), eu = fdr.filter(r => !isAfrica(r));
+  const first = s => { const t = String(s || "").split(/(?<=[.!?])\s/)[0]; return t.length > 180 ? t.slice(0, 177) + "…" : t; };
+  const card = r => `<a class="card ride" href="/routes/${r.id}/"><span class="yr">${r.founder.year || ""}</span><b>${esc(r.title)}</b><span>${esc(r.region)} · ${r.trip.days.length} day${r.trip.days.length > 1 ? "s" : ""} · ${esc(r.founder.ride)}</span>${r.founder.story ? `<span class="lead">${esc(first(r.founder.story))}</span>` : ""}<span class="go">Read it, then ride it ›</span></a>`;
+  const body = `<main><h1>The founder's rides</h1>
+<p class="intro">Where it all started. Twenty-odd years of trips through Southern Africa and Europe on bikes, in 4x4s and the odd hired Fiat: the good roads, the wrong turns and the nights we didn't plan. Every one of them opens in the planner, so you can take it, change it and ride it yourself.</p>
+<p class="note">These are memories: roads change, places close. Check conditions before you go, and send a ride report so the next rider knows.</p>
+<h2>Southern Africa</h2><div class="cards rides">${af.map(card).join("")}</div>
+${eu.length ? `<h2>Europe</h2><p class="note">Proof the planner works anywhere: plan your own trip in any country the same way.</p><div class="cards rides">${eu.map(card).join("")}</div>` : ""}
+<p>More stories on <a href="${BLOG}">the old blog</a> while they move here.</p>
+<a class="cta" href="/">Plan your own</a></main>`;
+  const ld = { "@context": "https://schema.org", "@type": "CollectionPage", name: "The founder's rides", url: SITE + "/rides/", hasPart: fdr.map(r => ({ "@type": "TouristTrip", name: r.title, url: `${SITE}/routes/${r.id}/` })) };
+  return page({ active: "/rides/", url: "/rides/", title: "The founder's rides: Southern Africa and Europe road trips · OneTrackMind", desc: "Road trips through Namibia, South Africa and Europe by the founder of OneTrackMind, told honestly. Each one opens in the planner so you can ride it yourself.", body, ld });
+}
+
 function aboutPage() {
   const fav = ["namibia-2020-orange-river", "eu-road-trip-2018", "namibia-2017-epupa", "wild-coast-2019"].map(id => live.find(r => r.id === id)).filter(Boolean);
   const body = `<main>
@@ -153,7 +173,8 @@ fs.rmSync(path.join(ROOT, "routes"), { recursive: true, force: true });
 live.forEach(r => write(`routes/${r.id}/index.html`, routePage(r)));
 write("routes/index.html", routesIndex());
 write("about/index.html", aboutPage());
-const urls = ["/", "/routes/", "/about/", ...live.map(r => `/routes/${r.id}/`), "/terms.html", "/privacy.html", "/rules.html"];
+write("rides/index.html", ridesIndex());
+const urls = ["/", "/routes/", "/rides/", "/about/", ...live.map(r => `/routes/${r.id}/`), "/terms.html", "/privacy.html", "/rules.html"];
 write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${today}</lastmod></url>`).join("\n")}\n</urlset>\n`);
 write("robots.txt", `# Everyone welcome, search engines and AI assistants included.\nUser-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${SITE}/sitemap.xml\n`);
 write("llms.txt", `# OneTrackMind
