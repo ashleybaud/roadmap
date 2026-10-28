@@ -73,10 +73,10 @@ input[type=text],input[type=email],input[type=number],input[type=time],input[typ
 .box .boxsub{font:500 .85rem "IBM Plex Mono",monospace;text-transform:none;letter-spacing:0;color:var(--muted);margin-left:6px}
 .box.planbox{border-color:#B26A00;padding:8px 10px 10px}.box.planbox .boxh{display:none}
 .planbox .tripbar{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px;padding-bottom:0}
-.planbox .tripbar>.field:nth-child(4),.planbox .tripbar>.field:nth-child(5){grid-column:1/-1}
-.planbox .tripbar>.field:nth-child(4)>.lbl,.planbox .tripbar>.field:nth-child(5)>.lbl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.planbox .tripbar>.field:nth-child(4) .inbtn::before{content:"▶";align-self:center;font-size:12px;width:16px;color:#0B6E4F}
-.planbox .tripbar>.field:nth-child(5) .inbtn::before{content:"🏁";align-self:center;font-size:12px;width:16px}
+.planbox #startField,.planbox #endField{grid-column:1/-1}
+.planbox #startField>.lbl,.planbox #endField>.lbl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.planbox #startField .inbtn::before{content:"▶";align-self:center;font-size:12px;width:16px;color:#0B6E4F}
+.planbox #endField .inbtn::before{content:"🏁";align-self:center;font-size:12px;width:16px}
 .planbox .tripbar input,.planbox .tripbar select{font-size:14px;padding:5px 8px;height:32px}
 .planbox .tripbar .lbl{font-size:.62rem}
 .planbox .tripbar .stayfield{grid-column:auto}
@@ -94,7 +94,7 @@ input[type=text],input[type=email],input[type=number],input[type=time],input[typ
 .trow .tkm{font:500 .8rem "IBM Plex Mono",monospace;color:var(--muted);white-space:nowrap}
 .trow .tctl{display:inline-flex;gap:4px;align-items:center}.tbtn{border:1px solid var(--line);background:var(--bg);border-radius:5px;width:26px;height:26px;cursor:pointer;font-size:11px;line-height:1;color:var(--ink)}.tbtn:disabled{opacity:.3;cursor:default}
 .tday{display:flex;gap:10px;align-items:baseline;padding:10px 6px 2px;font-weight:700;border-bottom:2px solid var(--ink)}
-.tadd{margin-top:8px}.rname.tadd{display:flex;gap:8px;align-items:center}
+.tadd{margin-top:8px}.roundchk,.tbwhen{grid-column:1/-1}.roundchk{display:flex;gap:6px;align-items:center;font-size:13px;margin:4px 0 2px}.tbwhen{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;width:100%}.tbwhen .field{flex:1;min-width:110px}.stepper{display:flex;align-items:center;border:1px solid var(--line,#ccd);border-radius:6px;height:36px;background:#fff}.stepper button{width:34px;height:100%;border:0;background:none;font-size:18px;cursor:pointer;color:inherit}.stepper b{flex:1;text-align:center;min-width:24px}.rname.tadd{display:flex;gap:8px;align-items:center}
 .srow2{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line)}.srow2 .sn{flex:1;min-width:0}.srow2 .sact{display:flex;gap:8px;align-items:center;white-space:nowrap}.srow2 .avi.trio{cursor:default}
 .snext{margin-top:8px}
 @media (max-width:640px){.trow{grid-template-columns:26px 1fr auto}.trow .tkm{grid-column:2;grid-row:2;margin-top:-4px}.trow .tctl{grid-row:1/3;grid-column:3}}
@@ -475,7 +475,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .days .ovday{padding:6px 0;border-top:0}
 .wherebox{display:inline-block;min-width:220px;vertical-align:middle}
 .tripbar{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;border-bottom:0}
-.tripbar>.field:nth-child(4){order:-2}.tripbar>.field:nth-child(5){order:-1}
+#startField{order:-2}#endField{order:-1}
 @media (max-width:420px){.tripbar{grid-template-columns:1fr!important}}
 .tripbar input[type=date]{font-variant-numeric:tabular-nums;padding-inline:8px}
 .ep.need{color:var(--warn);font-style:italic}
@@ -641,8 +641,8 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
     <div class="ggrid">
       <section><h3>1. Start</h3><ul>
         <li><b>New</b> starts a fresh trip (with Undo). <b>Open</b> loads a pick, a rider's route or one you saved. <b>GPX</b> plans from a file. <b>🧭 Near me</b> shows what's around you.</li>
-        <li>Set <b>From</b>, <b>Finish</b>, your dates and what you like to <b>Stay in</b>. Each day gets a tab.</li>
-        <li>More than one day? Your <b>night stops are picked for you</b>: the trip is split into even days, each night in a town on the way. Change any of them; yours are kept.</li>
+        <li>You start from <b>your location</b> (tap it to change). Type <b>Where to?</b>, then <b>+ Add a stop</b> for anything on the way. Tick <b>Round trip</b> to finish where you start. Each day gets a tab.</li>
+        <li><b>The days follow the trip.</b> A long trip is split into days by your <b>longest day</b> setting, each night in a town with beds. Tap 🛏 on a stop to sleep there (one day more), ✕ on a night to ride through (one day less), or use <b>Days − +</b>. Add a place to stay as a stop and it becomes a night. Set only when you <b>Leave</b>.</li>
         <li><b>✏ Draw</b> lets you tap the map point to point, following roads or in a straight line for tracks the map doesn't show.</li></ul></section>
       <section><h3>2. Stops</h3><ul>
         <li><b>Your stops</b> have a green bar. <b>SUGGESTED</b> stops are fuel the app adds; ✕ removes one for good.</li>
@@ -714,11 +714,12 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
     <button type="button" id="tbNear" title="Routes, passes and places around you"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg><span>Near me</span></button>
     <button type="button" id="tbDraw" title="Draw your own line: tap the map point to point"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/><circle cx="4" cy="20" r="0.6"/></svg><span>Draw</span></button>
   </nav>
-    <div class="field"><label class="lbl" for="startDate">Leave</label><input id="startDate" type="date"></div>
-    <div class="field"><label class="lbl" for="endDate">Back</label><input id="endDate" type="date"></div>
-    <div class="field ac"><label class="lbl" for="startPlace">From</label><div class="inbtn"><input id="startPlace" type="text" autocomplete="off" placeholder="My location or a town"><button class="icon" id="clearStart" type="button" title="Clear" aria-label="Clear" hidden>✕</button><button class="icon" id="useLoc" type="button" title="Use my location" aria-label="Use my location">⌖</button></div><div class="sugg" hidden></div></div>
-    <div class="field ac"><label class="lbl" for="endPlace">Finish</label><div class="inbtn"><input id="endPlace" type="text" autocomplete="off" placeholder="Back where I started"><button class="icon" id="sameStart" type="button" title="Finish where I started" aria-label="Finish where I started" hidden>✕</button></div><div class="sugg" hidden></div></div>
-      <div class="field stayfield"><label class="lbl" for="stayType">Stay in</label><select id="stayType"><option value="any">Anything</option><option value="camp">⛺ Camping</option><option value="guest">Guesthouse / B&amp;B</option><option value="hotel">Hotel / Lodge</option><option value="self">Self-catering</option><option value="back">Backpackers</option></select></div>
+    <div class="field ac" id="startField"><label class="lbl" for="startPlace">From</label><div class="inbtn"><input id="startPlace" type="text" autocomplete="off" placeholder="My location or a town"><button class="icon" id="clearStart" type="button" title="Clear" aria-label="Clear" hidden>✕</button><button class="icon" id="useLoc" type="button" title="Use my location" aria-label="Use my location">⌖</button></div><div class="sugg" hidden></div></div>
+    <div class="field ac" id="endField"><label class="lbl" for="endPlace">Where to?</label><div class="inbtn"><input id="endPlace" type="text" autocomplete="off" placeholder="Where to?"><button class="icon" id="sameStart" type="button" title="Clear" aria-label="Clear" hidden>✕</button></div><div class="sugg" hidden></div></div>
+    <label class="chk roundchk"><input type="checkbox" id="roundTrip"> Round trip: finish where I start</label>
+    <div class="tbwhen"><div class="field"><label class="lbl" for="startDate">Leave</label><input id="startDate" type="date"></div>
+    <div class="field"><span class="lbl">Days</span><div class="stepper"><button type="button" id="dMinus" aria-label="One day less">−</button><b id="dN">1</b><button type="button" id="dPlus" aria-label="One day more">+</button></div></div>
+      <div class="field stayfield"><label class="lbl" for="stayType">Stay in</label><select id="stayType"><option value="any">Anything</option><option value="camp">⛺ Camping</option><option value="guest">Guesthouse / B&amp;B</option><option value="hotel">Hotel / Lodge</option><option value="self">Self-catering</option><option value="back">Backpackers</option></select></div></div>
   </section>
 </div>
 
@@ -767,7 +768,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
   <form method="dialog" style="display:flex;flex-direction:column;gap:12px">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><h2 id="wTitle" style="margin:0">Plan a trip, day by day</h2><button class="icon" value="cancel" formnovalidate title="Close without changes" aria-label="Close">✕</button></div>
     <button class="btn ghost" type="button" data-tryroute style="align-self:flex-start">Not sure yet? Try a finished route first ›</button>
-    <p class="note" style="margin:0">Pick where you start, your dates and where you sleep each night. The app works out the route, fuel stops, sunset, weather and what to watch for, for every day.</p>
+    <p class="note" style="margin:0">Say where you're going and when you leave. The days and night stops follow. The app works out the route, fuel stops, sunset, weather and what to watch for, for every day.</p>
     <div class="row2">
       <div class="field"><label class="lbl" for="wVehicle">Travelling by</label><select id="wVehicle"><option value="bike">Motorbike</option><option value="jeep">Jeep / 4x4</option><option value="car">Car</option></select></div>
       <div class="field"><label class="lbl" for="wStyle">Roads you like</label><select id="wStyle"><option value="rough">Road less travelled: gravel and back roads</option><option value="mixed">Mixed: plenty of gravel, tar to link it up</option><option value="tar">Tar: main roads</option></select></div>
@@ -777,8 +778,8 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
       <div class="field"><label class="lbl" for="wRange">Stop at least every (km)</label><input id="wRange" type="number" min="0" max="1200" step="5"></div>
     </div>
     <ol class="wsteps">
-      <li><b>From and dates:</b> where you start, when you leave and when you're back.</li>
-      <li><b>Night stops:</b> picked for you on trips of more than one day. Change any you like, and add stops along the way.</li>
+      <li><b>Where to?</b> You start from your location. Add your destination and any stops, and when you leave.</li>
+      <li><b>Days and nights:</b> worked out from your longest day. Tap 🛏 on a stop to sleep there, or change any night.</li>
       <li><b>Each day:</b> open its tab for fuel stops, what's open when you arrive, and anything to watch for.</li>
       <li><b>Ride it:</b> straight onto your Garmin or bike app as GPX, or open it on your phone in Google Maps or Waze. Plus a PDF to print.</li>
     </ol>

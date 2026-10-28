@@ -29,12 +29,12 @@ function stopRows(kOnly){
     d.vias.forEach((v,i)=>{ if(v.lat==null) return; const j=i+1, L=pd&&pd.legs[j-1], km=L?Math.round(onDay?L.b-pd.a:L.b):null;
       const canUp=!v.auto&&(i>0||k>0), canDn=!v.auto&&(i<d.vias.length-1||k<nDays()-1);
       h+=`<li class="trow ${v.auto?"auto":""} ${isSel(k,j)?"on":""}" ${pd?`data-selstop="${k}:${j}"`:""}><span class="tmk ${v.auto?"sug":""}">${v.auto?"⛽":numOf[k+":"+i]}</span><span class="tnm"><b>${esc(v.name)}</b>${v.auto?` <span class="autotag">Suggested${v.fuelHere?" fuel":""}</span>`:""}</span><span class="tkm">${km!=null?"km "+km:""}</span>
-        <span class="tctl">${onDay&&pd?legTools(k,j):""}${v.auto?"":`<button type="button" class="tbtn" data-tmove="${k}:${i}:-1" ${canUp?"":"disabled"} title="Move up">▲</button><button type="button" class="tbtn" data-tmove="${k}:${i}:1" ${canDn?"":"disabled"} title="Move down">▼</button>`}<button type="button" class="tbtn" data-tdel="${k}:${i}" title="Remove this stop">✕</button></span></li>`; });
+        <span class="tctl">${onDay&&pd?legTools(k,j):""}${v.auto||(k===nDays()-1&&!dayTo(k))?"":`<button type="button" class="tbtn" data-tsleep="${k}:${i}" title="Sleep here: this becomes a night stop and the trip gets a day">🛏</button>`}${v.auto?"":`<button type="button" class="tbtn" data-tmove="${k}:${i}:-1" ${canUp?"":"disabled"} title="Move up">▲</button><button type="button" class="tbtn" data-tmove="${k}:${i}:1" ${canDn?"":"disabled"} title="Move down">▼</button>`}<button type="button" class="tbtn" data-tdel="${k}:${i}" title="Remove this stop">✕</button></span></li>`; });
     const to=dayTo(k);
     if(!to||to.lat==null){ h+=`<li class="trow need"><span class="tmk">${last?"🏁":"🛏"}</span><span class="tnm">${last?`<span class="note">Set a finish above, or add a stop</span>`:toCell(k)}</span></li>`; return; }
     const j=pd?pd.pts.length-1:null, km=pd?Math.round(onDay?pd.km:pd.b):null, arr=pd?fmtT(arrMin(k,j)):"";
     h+=`<li class="trow end ${last?"fin":"night"} ${pd&&isSel(k,j)?"on":""}" ${pd?`data-selstop="${k}:${j}"`:""}><span class="tmk">${last?(trip.round?"⟲":"🏁"):"🛏"}</span><span class="tnm">${last?`<b>${esc(to.name)}</b><span class="note"> ${trip.round?"back home":"finish"}</span>`:`${toCell(k)} <span class="note">night ${k+1}</span>`}</span><span class="tkm">${km!=null?"km "+km:""}${arr?` · ${arr}`:""}</span>
-      <span class="tctl">${onDay&&pd?legTools(k,j):""}${last?"":`<button type="button" class="tbtn" data-clear="night-${k}" title="Change the night stop">✕</button>`}</span></li>`;
+      <span class="tctl">${onDay&&pd?legTools(k,j):""}${last?"":`<button type="button" class="tbtn" data-dropnight="${k}" title="No night here: one day less">✕</button>`}</span></li>`;
   });
   h+=`</ol>`;
   return h;
@@ -84,6 +84,8 @@ document.addEventListener("click",e=>{
   const t=e.target; if(!t.closest) return;
   const mv=t.closest("[data-tmove]"); if(mv){ const [k,i,dir]=mv.dataset.tmove.split(":").map(Number); moveStop(k,i,dir); return; }
   const dl=t.closest("[data-tdel]"); if(dl){ const [k,i]=dl.dataset.tdel.split(":").map(Number), d=trip.days[k], v=d.vias[i]; if(v&&v.auto){ d.noAuto=[...(d.noAuto||[]),v.name]; d.noMore=true; } d.vias.splice(i,1); d.legs=[]; selStop=null; changed(); return; }
+  const sl=t.closest("[data-tsleep]"); if(sl){ const [k2,i2]=sl.dataset.tsleep.split(":").map(Number); sleepAt(k2,i2); changed(); return; }
+  const dn=t.closest("[data-dropnight]"); if(dn){ dropNight(+dn.dataset.dropnight); changed(); return; }
   if(t.closest("[data-addopen]")){ addOpen=true; renderDetails(); const el=document.getElementById("addstop"); if(el) el.focus(); return; }
   if(t.closest("[data-addclose]")){ addOpen=false; renderDetails(); return; }
   const sr=t.closest("[data-selstop]"); if(sr&&!t.closest("button,a,input,select,details,label")){ const [k,j]=sr.dataset.selstop.split(":").map(Number); selStop={k,j}; ovFocus=null;

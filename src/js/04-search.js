@@ -20,6 +20,7 @@ async function searchPlaces(q,c,signal){
   const variants=[...new Set([q,q.replace(/\d+/g,""),q.replace(/\s+/g,"")])].filter(v=>v.trim().length>=3);
   const res=await Promise.all(variants.map(v=>fetch(`${PHOTON}?q=${encodeURIComponent(v)}&limit=6&lat=${c.lat.toFixed(3)}&lon=${c.lng.toFixed(3)}&location_bias_scale=0.5`,{signal}).then(r=>r.json()).catch(()=>({features:[]}))));
   res.flatMap(j=>j.features||[]).forEach(f=>{const p=f.properties;const [lon,lat]=f.geometry.coordinates;
-    out.push({name:p.name||p.street||q,sub:[p.city||p.county,p.state,p.country].filter(x=>x&&x!==p.name).join(", "),lat,lon});});
+    const stay=p.osm_key==="tourism"&&/^(hotel|motel|guest_house|hostel|chalet|apartment|camp_site|caravan_site|alpine_hut|wilderness_hut)$/.test(p.osm_value||"");
+    out.push({name:p.name||p.street||q,sub:[stay?"🛏 place to stay":"",p.city||p.county,p.state,p.country].filter(x=>x&&x!==p.name).join(", "),lat,lon,stay});});
   const seen=new Set(); return out.filter(r=>{const k=norm(r.name)+Math.round(r.lat*20)+","+Math.round(r.lon*20);if(seen.has(k))return false;seen.add(k);return true;}).slice(0,8);
 }

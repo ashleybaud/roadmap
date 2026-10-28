@@ -164,6 +164,15 @@ const TRIP = {
   await page.waitForFunction(() => trip.days.length === 2 && trip.days[0].to && plan && !planStale, null, { timeout: 30000 }).catch(() => {});
   const nt2 = await page.evaluate(() => ({ night: trip.days[0].to && trip.days[0].to.name, vias: trip.days.map(d => d.vias.filter(v => !v.auto).length) }));
   ok(nt2.night && nt2.vias.every(v => v === 0), "night after 2>1>2 days: " + JSON.stringify(nt2));
+  // days follow the trip: a long one-way trip gets its days from the riding time; Sleep here adds a day, ✕ on a night drops one
+  await page.evaluate(() => { Object.keys(trip).forEach(x => delete trip[x]); Object.assign(trip, freshTrip(), { start: pt("Cape Town", -33.925, 18.424), end: pt("Tzaneen", -23.833, 30.163), sugV: 5 }); plan = null; changed(); });
+  await page.waitForFunction(() => trip.days.length >= 2 && trip.days[0].to && plan && !planStale, null, { timeout: 30000 }).catch(() => {});
+  const ad = await page.evaluate(() => ({ days: trip.days.length, night: trip.days[0].to && trip.days[0].to.name, field: !!document.getElementById("endDate"), dn: document.getElementById("dN").textContent }));
+  ok(ad.days >= 2 && ad.night && !ad.field && ad.dn === String(ad.days), "days from the trip: " + JSON.stringify(ad));
+  const sl = await page.evaluate(() => { const n0 = trip.days.length; trip.days[0].vias.push(pt("Laingsburg", -33.197, 20.858)); sleepAt(0, trip.days[0].vias.length - 1); const n1 = trip.days.length, night = trip.days[0].to.name; dropNight(0); return { n0, n1, night, n2: trip.days.length, kept: trip.days[0].vias.some(v => v.name === "Laingsburg"), set: !!trip.daysSet, end: trip.endDate === addDays(trip.startDate, trip.days.length - 1) }; });
+  ok(sl.n1 === sl.n0 + 1 && sl.night === "Laingsburg" && sl.n2 === sl.n0 && sl.kept && sl.set && sl.end, "sleep here / no night: " + JSON.stringify(sl));
+  console.log("days:", JSON.stringify(ad), JSON.stringify(sl));
+  await page.evaluate(() => changed());
   // From box: pick twice in a row (the box is wired once)
   for (const q of ["Clanwilliam", "Calvinia"]) {
     await page.focus("#startPlace"); await page.fill("#startPlace", q);

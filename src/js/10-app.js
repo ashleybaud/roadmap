@@ -19,7 +19,7 @@ function migrate(){
   const start=old.date||tomorrow, f=st[0], l=st[st.length-1];
   return {startDate:start,endDate:addDays(start,days.length-1),start:pt(f.name,f.lat,f.lon),end:pt(l.name,l.lat,l.lon),round:!!old.round,days};
 }
-const freshTrip=()=>({startDate:tomorrow,endDate:tomorrow,start:pt("My location",null,null),end:null,round:true,days:[{to:null,style:"default",vias:[],legs:[]}]});
+const freshTrip=()=>({startDate:tomorrow,endDate:tomorrow,start:pt("My location",null,null),end:null,round:false,days:[{to:null,style:"default",vias:[],legs:[]}]});
 const trip=store.get("rr4-trip")||migrate()||freshTrip();
 if(trip.sugV!==5){ (trip.days||[]).forEach(d=>{ const n=(d.vias||[]).length; d.vias=(d.vias||[]).filter(v=>!v.auto); if(d.vias.length!==n) d.legs=[]; d.fresh=true; delete d.noMore; }); trip.sugV=5; }
 if(trip.startDate<ymd(new Date())){const n=trip.days.length;trip.startDate=tomorrow;trip.endDate=addDays(tomorrow,n-1);}
@@ -44,6 +44,30 @@ function syncDays(){
   while(trip.days.length<n) trip.days.splice(trip.days.length-1,0,{to:null,style:"default",vias:[],legs:[]});
   while(trip.days.length>n){const last=trip.days.pop(),prev=trip.days[trip.days.length-1]; if(prev.to&&!prev.to.autoNight) prev.vias.push(Object.assign(prev.to,{type:"pass"})); prev.to=null; prev.vias.push(...last.vias); prev.legs=[];}
   if(ui.tab!=="ov"&&ui.tab>=trip.days.length) ui.tab="ov";
+}
+// how many days a one-way trip needs: the riding time over your "longest day" setting. Worked out once per trip; − / + or your own night stops take over
+function autoDayCount(){
+  if(trip.daysSet||trip.round||!plan||!trip.end||trip.gpx||trip.pick||trip.days.slice(0,-1).some(d=>d.to&&!d.to.autoNight)) return false; // your own nights: you decide the days
+  const own=trip.days.flatMap(d=>d.vias.filter(v=>!v.auto&&!v.autoNight)).map(v=>v.lat.toFixed(3)+","+v.lon.toFixed(3));
+  const sig=[trip.start.lat.toFixed(3),trip.start.lon.toFixed(3),trip.end.lat.toFixed(3),trip.end.lon.toFixed(3),settings.maxHours,settings.vehicle,settings.style,...own].join("|");
+  if(trip.autoDaysSig===sig) return false; trip.autoDaysSig=sig;
+  const mins=plan.days.reduce((t,d,k)=>t+(d?dayMinutes(k):0),0), want=Math.max(1,Math.min(14,Math.ceil(mins/(Math.max(2,+settings.maxHours||8)*60)-0.1)));
+  if(want===nDays()) { save(); return false; }
+  trip.endDate=addDays(trip.startDate,want-1); syncDays(); save(); return true;
+}
+// sleep at a stop: it becomes that day's night stop and the rest of the day moves to a new day
+function sleepAt(k,i){
+  const d=trip.days[k], v=d.vias[i]; if(!v) return;
+  const nd={to:d.to,style:d.style,vias:d.vias.slice(i+1),legs:[]};
+  d.vias=d.vias.slice(0,i); d.to=Object.assign(v,{type:undefined}); delete d.to.auto; delete d.to.autoNight; d.legs=[]; delete d.noAutoNight;
+  trip.days.splice(k+1,0,nd); trip.daysSet=true; trip.endDate=addDays(trip.startDate,nDays()-1);
+}
+// no night here: the two days become one, the night stop stays on the way (a suggested one just goes)
+function dropNight(k){
+  const d=trip.days[k], nx=trip.days[k+1]; if(!nx) return;
+  if(d.to&&!d.to.autoNight) d.vias.push(Object.assign(d.to,{type:"pass"}));
+  d.vias.push(...nx.vias); d.to=nx.to; d.legs=[]; trip.days.splice(k+1,1); trip.daysSet=true; trip.endDate=addDays(trip.startDate,nDays()-1);
+  if(ui.tab!=="ov"&&ui.tab>=nDays()) ui.tab="ov";
 }
 const endPt=()=>trip.round?trip.start:trip.end;
 const dayFrom=k=>k===0?trip.start:trip.days[k-1].to;
@@ -76,6 +100,7 @@ async function recalc(){
     });
     if(!geom.length){plan=null;fp=null;$("status").textContent="Pick where you're going to see the route.";renderAll();return;}
     plan={days,geom,cum,total:acc,ptKm}; planStale=false;
+    if(autoDayCount()){ recalc(); return; }
     $("status").textContent="Finding fuel and places…";
     renderAll();
     loadWeather(my).then(()=>{if(my===seq) renderAll();}).catch(()=>{wx=null;});
@@ -166,7 +191,7 @@ function wireSearch(input,list,onPick,opt){
   let start0=input.value;
   // the From and Finish boxes are wired once and used again and again: each visit starts fresh
   input.addEventListener("focus",()=>{ done=false; start0=input.value; hits=null; pickWhenReady=false; });
-  const pick=h=>{ if(done) return; done=true; list.hidden=true; input.blur(); onPick(pt(h.name,h.lat,h.lon)); };
+  const pick=h=>{ if(done) return; done=true; list.hidden=true; input.blur(); onPick(pt(h.name,h.lat,h.lon,h.stay?{stay:true}:null)); };
   const run=q=>{ ctl?.abort(); ctl=new AbortController(); list.innerHTML=`<div class="note" style="padding:8px">Searching…</div>`; list.hidden=false;
     const c=map?map.getCenter():{lat:-33,lng:19};
     pending=searchPlaces(q,c,ctl.signal).then(r=>{ if(opt&&opt.near) r=nearTrip(r); hits=r; hitsQ=q; pending=null;
@@ -191,19 +216,25 @@ function nearTrip(r){ const a=trip.start&&trip.start.lat!=null?trip.start:null, 
 
 /* ---------- trip bar ---------- */
 function renderTripBar(){
-  $("startDate").value=trip.startDate; $("endDate").value=trip.endDate; $("stayType").value=trip.stayType||"any"; $("endDate").min=trip.startDate;
+  $("startDate").value=trip.startDate; $("stayType").value=trip.stayType||"any"; $("dN").textContent=nDays(); $("dMinus").disabled=nDays()<2;
+  $("roundTrip").checked=!!trip.round; $("endField").hidden=!!trip.round;
   if(document.activeElement!==$("startPlace")) $("startPlace").value=trip.start&&trip.start.lat!=null?trip.start.name:"";
   const noStart=!trip.start||trip.start.lat==null; $("startPlace").classList.toggle("need",noStart); $("startPlace").placeholder=noStart?"Tap ⌖ or type a town":"My location or a town";
   if(document.activeElement!==$("endPlace")) $("endPlace").value=trip.round||!trip.end?"":trip.end.name;
+  $("endPlace").classList.toggle("need",!trip.round&&!trip.end&&!!trip.start&&trip.start.lat!=null);
   $("sameStart").hidden=!!trip.round||!trip.end; $("clearStart").hidden=!trip.start||trip.start.lat==null;
 }
 $("stayType").addEventListener("change",e=>{ trip.stayType=e.target.value; trip.days.forEach(d=>{ if(d.stayType===trip.stayType) delete d.stayType; }); save(); renderDetails(); drawMap(); });
-$("startDate").addEventListener("change",e=>{const n=nDays();trip.startDate=e.target.value||tomorrow;if(trip.endDate<trip.startDate)trip.endDate=addDays(trip.startDate,n-1);changed();});
-$("endDate").addEventListener("change",e=>{trip.endDate=e.target.value<trip.startDate?trip.startDate:e.target.value;changed();});
-wireSearch($("startPlace"),$("startPlace").parentElement.nextElementSibling,p=>{trip.start=p;changed();});
-wireSearch($("endPlace"),$("endPlace").parentElement.nextElementSibling,p=>{trip.end=p;trip.round=false;changed();});
-$("endPlace").addEventListener("change",e=>{ if(!e.target.value.trim()&&!trip.round){trip.round=true;changed();} });
-$("sameStart").addEventListener("click",()=>{trip.round=true;changed();});
+// the days follow the trip: one more for every night stop. Leave is the only date; − / + adds or drops a day
+$("startDate").addEventListener("change",e=>{const n=nDays();trip.startDate=e.target.value||tomorrow;trip.endDate=addDays(trip.startDate,n-1);changed();});
+function setDayCount(n){ n=Math.max(1,Math.min(60,n)); trip.daysSet=true; trip.endDate=addDays(trip.startDate,n-1); changed(); }
+$("dMinus").addEventListener("click",()=>setDayCount(nDays()-1));
+$("dPlus").addEventListener("click",()=>setDayCount(nDays()+1));
+$("roundTrip").addEventListener("change",e=>{ trip.round=e.target.checked; delete trip.daysSet; changed(); });
+wireSearch($("startPlace"),$("startPlace").parentElement.nextElementSibling,p=>{trip.start=p;delete trip.daysSet;changed();});
+wireSearch($("endPlace"),$("endPlace").parentElement.nextElementSibling,p=>{ if(p.stay&&trip.start&&trip.start.lat!=null){ p=Object.assign({},p); delete p.stay; } trip.end=p;trip.round=false;delete trip.daysSet;changed();});
+$("endPlace").addEventListener("change",e=>{ if(!e.target.value.trim()&&trip.end){trip.end=null;changed();} });
+$("sameStart").addEventListener("click",()=>{trip.end=null;changed();});
 // tapping a place box means you want to change it: select what's there so typing replaces it
 document.addEventListener("focusin",e=>{ const el=e.target; if(el&&el.tagName==="INPUT"&&el.type==="text"&&el.closest(".ac")&&el.value) setTimeout(()=>{ try{ el.select(); }catch(x){} },0); });
 let toastT;
@@ -815,7 +846,11 @@ function wireDetails(){
   hook("whereto-0",p=>{ trip.days[0].vias.push(p); trip.days[0].legs=[]; changed(); });
   hook("finish-"+(nDays()-1),p=>{editTo.delete(nDays()-1);setFinish(p);});
   editTo.forEach(k=>{ const el=document.getElementById((k===nDays()-1?"finish-":"night-")+k); if(el&&document.activeElement!==el){ el.focus(); el.select(); el.addEventListener("blur",()=>setTimeout(()=>{ if(editTo.has(k)&&el.value.trim()===el.defaultValue.trim()){ editTo.delete(k); renderDetails(); } },400)); } });
-  hook("addstop",p=>{ const k2=curDay()!=null?curDay():dayForPoint(p); addOpen=false; if(insertVia(k2,p)!==false) changed(); else renderDetails(); });
+  hook("addstop",p=>{ addOpen=false;
+    if(!trip.round&&!trip.end){ const q=Object.assign({},p); delete q.stay; trip.end=q; delete trip.daysSet; changed(); return; } // no destination yet: this is it
+    const k2=curDay()!=null?curDay():dayForPoint(p); if(insertVia(k2,p)===false){ renderDetails(); return; }
+    if(p.stay){ const i=trip.days[k2].vias.indexOf(p); if(i>=0) sleepAt(k2,i); } // a place to stay is a night: the trip gets a day
+    changed(); });
   { const k=curDay(); if(k==null) return; const d=trip.days[k];
     d.vias.forEach((v,i)=>hook(`via-${k}-${i}`,p=>replaceVia(k,i,p)));
     hook("addvia-"+k,p=>{if(insertVia(k,p)!==false) changed(); else renderDetails();});
@@ -850,7 +885,7 @@ $("details").addEventListener("click",e=>{
   const mv=t.closest("[data-morevias]"); if(mv){viaOpen.add(+mv.dataset.morevias);renderDetails();return;}
   const et=t.closest("[data-editto]"); if(et){editTo.add(+et.dataset.editto);renderDetails();return;}
   const cl=t.closest("[data-clear]"); if(cl){ const id=cl.dataset.clear, m=id.match(/^(night|finish|via)-(\d+)(?:-(\d+))?$/); if(!m) return;
-    if(m[1]==="night"){trip.days[+m[2]].to=null;trip.days[+m[2]].noAutoNight=true;editTo.add(+m[2]);} else if(m[1]==="finish"){trip.round=true;} else {trip.days[+m[2]].vias.splice(+m[3],1);trip.days[+m[2]].legs=[];}
+    if(m[1]==="night"){trip.days[+m[2]].to=null;trip.days[+m[2]].noAutoNight=true;editTo.add(+m[2]);} else if(m[1]==="finish"){trip.end=null;} else {trip.days[+m[2]].vias.splice(+m[3],1);trip.days[+m[2]].legs=[];}
     changed(); return; }
   const fk=t.closest("[data-fuelk]"); if(fk&&goGap(+fk.dataset.fuelk)) return; if(fk){const k2=+fk.dataset.fuelk; if(ui.tab==="ov"){ fuelOpen.add(k2); const tb=document.querySelector(`[data-day="${k2}"]`); if(tb){ tb.click(); return; } } fuelOpen.has(k2)?fuelOpen.delete(k2):fuelOpen.add(k2); renderDetails(); return;}
   const af=t.closest("[data-addfill]"); if(af){const f=fp.fills.find(x=>x.id===af.dataset.addfill); if(f){insertVia(+af.dataset.day,pt(f.name&&f.name!=="Fuel"?f.name:"Fuel stop",f.lat,f.lon,{fuelHere:true}));changed();} return;}

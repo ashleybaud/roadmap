@@ -73,10 +73,10 @@ input[type=text],input[type=email],input[type=number],input[type=time],input[typ
 .box .boxsub{font:500 .85rem "IBM Plex Mono",monospace;text-transform:none;letter-spacing:0;color:var(--muted);margin-left:6px}
 .box.planbox{border-color:#B26A00;padding:8px 10px 10px}.box.planbox .boxh{display:none}
 .planbox .tripbar{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px;padding-bottom:0}
-.planbox .tripbar>.field:nth-child(4),.planbox .tripbar>.field:nth-child(5){grid-column:1/-1}
-.planbox .tripbar>.field:nth-child(4)>.lbl,.planbox .tripbar>.field:nth-child(5)>.lbl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.planbox .tripbar>.field:nth-child(4) .inbtn::before{content:"▶";align-self:center;font-size:12px;width:16px;color:#0B6E4F}
-.planbox .tripbar>.field:nth-child(5) .inbtn::before{content:"🏁";align-self:center;font-size:12px;width:16px}
+.planbox #startField,.planbox #endField{grid-column:1/-1}
+.planbox #startField>.lbl,.planbox #endField>.lbl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.planbox #startField .inbtn::before{content:"▶";align-self:center;font-size:12px;width:16px;color:#0B6E4F}
+.planbox #endField .inbtn::before{content:"🏁";align-self:center;font-size:12px;width:16px}
 .planbox .tripbar input,.planbox .tripbar select{font-size:14px;padding:5px 8px;height:32px}
 .planbox .tripbar .lbl{font-size:.62rem}
 .planbox .tripbar .stayfield{grid-column:auto}
@@ -94,7 +94,7 @@ input[type=text],input[type=email],input[type=number],input[type=time],input[typ
 .trow .tkm{font:500 .8rem "IBM Plex Mono",monospace;color:var(--muted);white-space:nowrap}
 .trow .tctl{display:inline-flex;gap:4px;align-items:center}.tbtn{border:1px solid var(--line);background:var(--bg);border-radius:5px;width:26px;height:26px;cursor:pointer;font-size:11px;line-height:1;color:var(--ink)}.tbtn:disabled{opacity:.3;cursor:default}
 .tday{display:flex;gap:10px;align-items:baseline;padding:10px 6px 2px;font-weight:700;border-bottom:2px solid var(--ink)}
-.tadd{margin-top:8px}.rname.tadd{display:flex;gap:8px;align-items:center}
+.tadd{margin-top:8px}.roundchk,.tbwhen{grid-column:1/-1}.roundchk{display:flex;gap:6px;align-items:center;font-size:13px;margin:4px 0 2px}.tbwhen{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;width:100%}.tbwhen .field{flex:1;min-width:110px}.stepper{display:flex;align-items:center;border:1px solid var(--line,#ccd);border-radius:6px;height:36px;background:#fff}.stepper button{width:34px;height:100%;border:0;background:none;font-size:18px;cursor:pointer;color:inherit}.stepper b{flex:1;text-align:center;min-width:24px}.rname.tadd{display:flex;gap:8px;align-items:center}
 .srow2{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line)}.srow2 .sn{flex:1;min-width:0}.srow2 .sact{display:flex;gap:8px;align-items:center;white-space:nowrap}.srow2 .avi.trio{cursor:default}
 .snext{margin-top:8px}
 @media (max-width:640px){.trow{grid-template-columns:26px 1fr auto}.trow .tkm{grid-column:2;grid-row:2;margin-top:-4px}.trow .tctl{grid-row:1/3;grid-column:3}}
@@ -475,7 +475,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .days .ovday{padding:6px 0;border-top:0}
 .wherebox{display:inline-block;min-width:220px;vertical-align:middle}
 .tripbar{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;border-bottom:0}
-.tripbar>.field:nth-child(4){order:-2}.tripbar>.field:nth-child(5){order:-1}
+#startField{order:-2}#endField{order:-1}
 @media (max-width:420px){.tripbar{grid-template-columns:1fr!important}}
 .tripbar input[type=date]{font-variant-numeric:tabular-nums;padding-inline:8px}
 .ep.need{color:var(--warn);font-style:italic}
@@ -641,8 +641,8 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
     <div class="ggrid">
       <section><h3>1. Start</h3><ul>
         <li><b>New</b> starts a fresh trip (with Undo). <b>Open</b> loads a pick, a rider's route or one you saved. <b>GPX</b> plans from a file. <b>🧭 Near me</b> shows what's around you.</li>
-        <li>Set <b>From</b>, <b>Finish</b>, your dates and what you like to <b>Stay in</b>. Each day gets a tab.</li>
-        <li>More than one day? Your <b>night stops are picked for you</b>: the trip is split into even days, each night in a town on the way. Change any of them; yours are kept.</li>
+        <li>You start from <b>your location</b> (tap it to change). Type <b>Where to?</b>, then <b>+ Add a stop</b> for anything on the way. Tick <b>Round trip</b> to finish where you start. Each day gets a tab.</li>
+        <li><b>The days follow the trip.</b> A long trip is split into days by your <b>longest day</b> setting, each night in a town with beds. Tap 🛏 on a stop to sleep there (one day more), ✕ on a night to ride through (one day less), or use <b>Days − +</b>. Add a place to stay as a stop and it becomes a night. Set only when you <b>Leave</b>.</li>
         <li><b>✏ Draw</b> lets you tap the map point to point, following roads or in a straight line for tracks the map doesn't show.</li></ul></section>
       <section><h3>2. Stops</h3><ul>
         <li><b>Your stops</b> have a green bar. <b>SUGGESTED</b> stops are fuel the app adds; ✕ removes one for good.</li>
@@ -714,11 +714,12 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
     <button type="button" id="tbNear" title="Routes, passes and places around you"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg><span>Near me</span></button>
     <button type="button" id="tbDraw" title="Draw your own line: tap the map point to point"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/><circle cx="4" cy="20" r="0.6"/></svg><span>Draw</span></button>
   </nav>
-    <div class="field"><label class="lbl" for="startDate">Leave</label><input id="startDate" type="date"></div>
-    <div class="field"><label class="lbl" for="endDate">Back</label><input id="endDate" type="date"></div>
-    <div class="field ac"><label class="lbl" for="startPlace">From</label><div class="inbtn"><input id="startPlace" type="text" autocomplete="off" placeholder="My location or a town"><button class="icon" id="clearStart" type="button" title="Clear" aria-label="Clear" hidden>✕</button><button class="icon" id="useLoc" type="button" title="Use my location" aria-label="Use my location">⌖</button></div><div class="sugg" hidden></div></div>
-    <div class="field ac"><label class="lbl" for="endPlace">Finish</label><div class="inbtn"><input id="endPlace" type="text" autocomplete="off" placeholder="Back where I started"><button class="icon" id="sameStart" type="button" title="Finish where I started" aria-label="Finish where I started" hidden>✕</button></div><div class="sugg" hidden></div></div>
-      <div class="field stayfield"><label class="lbl" for="stayType">Stay in</label><select id="stayType"><option value="any">Anything</option><option value="camp">⛺ Camping</option><option value="guest">Guesthouse / B&amp;B</option><option value="hotel">Hotel / Lodge</option><option value="self">Self-catering</option><option value="back">Backpackers</option></select></div>
+    <div class="field ac" id="startField"><label class="lbl" for="startPlace">From</label><div class="inbtn"><input id="startPlace" type="text" autocomplete="off" placeholder="My location or a town"><button class="icon" id="clearStart" type="button" title="Clear" aria-label="Clear" hidden>✕</button><button class="icon" id="useLoc" type="button" title="Use my location" aria-label="Use my location">⌖</button></div><div class="sugg" hidden></div></div>
+    <div class="field ac" id="endField"><label class="lbl" for="endPlace">Where to?</label><div class="inbtn"><input id="endPlace" type="text" autocomplete="off" placeholder="Where to?"><button class="icon" id="sameStart" type="button" title="Clear" aria-label="Clear" hidden>✕</button></div><div class="sugg" hidden></div></div>
+    <label class="chk roundchk"><input type="checkbox" id="roundTrip"> Round trip: finish where I start</label>
+    <div class="tbwhen"><div class="field"><label class="lbl" for="startDate">Leave</label><input id="startDate" type="date"></div>
+    <div class="field"><span class="lbl">Days</span><div class="stepper"><button type="button" id="dMinus" aria-label="One day less">−</button><b id="dN">1</b><button type="button" id="dPlus" aria-label="One day more">+</button></div></div>
+      <div class="field stayfield"><label class="lbl" for="stayType">Stay in</label><select id="stayType"><option value="any">Anything</option><option value="camp">⛺ Camping</option><option value="guest">Guesthouse / B&amp;B</option><option value="hotel">Hotel / Lodge</option><option value="self">Self-catering</option><option value="back">Backpackers</option></select></div></div>
   </section>
 </div>
 
@@ -767,7 +768,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
   <form method="dialog" style="display:flex;flex-direction:column;gap:12px">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px"><h2 id="wTitle" style="margin:0">Plan a trip, day by day</h2><button class="icon" value="cancel" formnovalidate title="Close without changes" aria-label="Close">✕</button></div>
     <button class="btn ghost" type="button" data-tryroute style="align-self:flex-start">Not sure yet? Try a finished route first ›</button>
-    <p class="note" style="margin:0">Pick where you start, your dates and where you sleep each night. The app works out the route, fuel stops, sunset, weather and what to watch for, for every day.</p>
+    <p class="note" style="margin:0">Say where you're going and when you leave. The days and night stops follow. The app works out the route, fuel stops, sunset, weather and what to watch for, for every day.</p>
     <div class="row2">
       <div class="field"><label class="lbl" for="wVehicle">Travelling by</label><select id="wVehicle"><option value="bike">Motorbike</option><option value="jeep">Jeep / 4x4</option><option value="car">Car</option></select></div>
       <div class="field"><label class="lbl" for="wStyle">Roads you like</label><select id="wStyle"><option value="rough">Road less travelled: gravel and back roads</option><option value="mixed">Mixed: plenty of gravel, tar to link it up</option><option value="tar">Tar: main roads</option></select></div>
@@ -777,8 +778,8 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
       <div class="field"><label class="lbl" for="wRange">Stop at least every (km)</label><input id="wRange" type="number" min="0" max="1200" step="5"></div>
     </div>
     <ol class="wsteps">
-      <li><b>From and dates:</b> where you start, when you leave and when you're back.</li>
-      <li><b>Night stops:</b> picked for you on trips of more than one day. Change any you like, and add stops along the way.</li>
+      <li><b>Where to?</b> You start from your location. Add your destination and any stops, and when you leave.</li>
+      <li><b>Days and nights:</b> worked out from your longest day. Tap 🛏 on a stop to sleep there, or change any night.</li>
       <li><b>Each day:</b> open its tab for fuel stops, what's open when you arrive, and anything to watch for.</li>
       <li><b>Ride it:</b> straight onto your Garmin or bike app as GPX, or open it on your phone in Google Maps or Waze. Plus a PDF to print.</li>
     </ol>
@@ -1006,7 +1007,8 @@ async function searchPlaces(q,c,signal){
   const variants=[...new Set([q,q.replace(/\d+/g,""),q.replace(/\s+/g,"")])].filter(v=>v.trim().length>=3);
   const res=await Promise.all(variants.map(v=>fetch(`${PHOTON}?q=${encodeURIComponent(v)}&limit=6&lat=${c.lat.toFixed(3)}&lon=${c.lng.toFixed(3)}&location_bias_scale=0.5`,{signal}).then(r=>r.json()).catch(()=>({features:[]}))));
   res.flatMap(j=>j.features||[]).forEach(f=>{const p=f.properties;const [lon,lat]=f.geometry.coordinates;
-    out.push({name:p.name||p.street||q,sub:[p.city||p.county,p.state,p.country].filter(x=>x&&x!==p.name).join(", "),lat,lon});});
+    const stay=p.osm_key==="tourism"&&/^(hotel|motel|guest_house|hostel|chalet|apartment|camp_site|caravan_site|alpine_hut|wilderness_hut)$/.test(p.osm_value||"");
+    out.push({name:p.name||p.street||q,sub:[stay?"🛏 place to stay":"",p.city||p.county,p.state,p.country].filter(x=>x&&x!==p.name).join(", "),lat,lon,stay});});
   const seen=new Set(); return out.filter(r=>{const k=norm(r.name)+Math.round(r.lat*20)+","+Math.round(r.lon*20);if(seen.has(k))return false;seen.add(k);return true;}).slice(0,8);
 }
 
@@ -1267,7 +1269,7 @@ function migrate(){
   const start=old.date||tomorrow, f=st[0], l=st[st.length-1];
   return {startDate:start,endDate:addDays(start,days.length-1),start:pt(f.name,f.lat,f.lon),end:pt(l.name,l.lat,l.lon),round:!!old.round,days};
 }
-const freshTrip=()=>({startDate:tomorrow,endDate:tomorrow,start:pt("My location",null,null),end:null,round:true,days:[{to:null,style:"default",vias:[],legs:[]}]});
+const freshTrip=()=>({startDate:tomorrow,endDate:tomorrow,start:pt("My location",null,null),end:null,round:false,days:[{to:null,style:"default",vias:[],legs:[]}]});
 const trip=store.get("rr4-trip")||migrate()||freshTrip();
 if(trip.sugV!==5){ (trip.days||[]).forEach(d=>{ const n=(d.vias||[]).length; d.vias=(d.vias||[]).filter(v=>!v.auto); if(d.vias.length!==n) d.legs=[]; d.fresh=true; delete d.noMore; }); trip.sugV=5; }
 if(trip.startDate<ymd(new Date())){const n=trip.days.length;trip.startDate=tomorrow;trip.endDate=addDays(tomorrow,n-1);}
@@ -1292,6 +1294,30 @@ function syncDays(){
   while(trip.days.length<n) trip.days.splice(trip.days.length-1,0,{to:null,style:"default",vias:[],legs:[]});
   while(trip.days.length>n){const last=trip.days.pop(),prev=trip.days[trip.days.length-1]; if(prev.to&&!prev.to.autoNight) prev.vias.push(Object.assign(prev.to,{type:"pass"})); prev.to=null; prev.vias.push(...last.vias); prev.legs=[];}
   if(ui.tab!=="ov"&&ui.tab>=trip.days.length) ui.tab="ov";
+}
+// how many days a one-way trip needs: the riding time over your "longest day" setting. Worked out once per trip; − / + or your own night stops take over
+function autoDayCount(){
+  if(trip.daysSet||trip.round||!plan||!trip.end||trip.gpx||trip.pick||trip.days.slice(0,-1).some(d=>d.to&&!d.to.autoNight)) return false; // your own nights: you decide the days
+  const own=trip.days.flatMap(d=>d.vias.filter(v=>!v.auto&&!v.autoNight)).map(v=>v.lat.toFixed(3)+","+v.lon.toFixed(3));
+  const sig=[trip.start.lat.toFixed(3),trip.start.lon.toFixed(3),trip.end.lat.toFixed(3),trip.end.lon.toFixed(3),settings.maxHours,settings.vehicle,settings.style,...own].join("|");
+  if(trip.autoDaysSig===sig) return false; trip.autoDaysSig=sig;
+  const mins=plan.days.reduce((t,d,k)=>t+(d?dayMinutes(k):0),0), want=Math.max(1,Math.min(14,Math.ceil(mins/(Math.max(2,+settings.maxHours||8)*60)-0.1)));
+  if(want===nDays()) { save(); return false; }
+  trip.endDate=addDays(trip.startDate,want-1); syncDays(); save(); return true;
+}
+// sleep at a stop: it becomes that day's night stop and the rest of the day moves to a new day
+function sleepAt(k,i){
+  const d=trip.days[k], v=d.vias[i]; if(!v) return;
+  const nd={to:d.to,style:d.style,vias:d.vias.slice(i+1),legs:[]};
+  d.vias=d.vias.slice(0,i); d.to=Object.assign(v,{type:undefined}); delete d.to.auto; delete d.to.autoNight; d.legs=[]; delete d.noAutoNight;
+  trip.days.splice(k+1,0,nd); trip.daysSet=true; trip.endDate=addDays(trip.startDate,nDays()-1);
+}
+// no night here: the two days become one, the night stop stays on the way (a suggested one just goes)
+function dropNight(k){
+  const d=trip.days[k], nx=trip.days[k+1]; if(!nx) return;
+  if(d.to&&!d.to.autoNight) d.vias.push(Object.assign(d.to,{type:"pass"}));
+  d.vias.push(...nx.vias); d.to=nx.to; d.legs=[]; trip.days.splice(k+1,1); trip.daysSet=true; trip.endDate=addDays(trip.startDate,nDays()-1);
+  if(ui.tab!=="ov"&&ui.tab>=nDays()) ui.tab="ov";
 }
 const endPt=()=>trip.round?trip.start:trip.end;
 const dayFrom=k=>k===0?trip.start:trip.days[k-1].to;
@@ -1324,6 +1350,7 @@ async function recalc(){
     });
     if(!geom.length){plan=null;fp=null;$("status").textContent="Pick where you're going to see the route.";renderAll();return;}
     plan={days,geom,cum,total:acc,ptKm}; planStale=false;
+    if(autoDayCount()){ recalc(); return; }
     $("status").textContent="Finding fuel and places…";
     renderAll();
     loadWeather(my).then(()=>{if(my===seq) renderAll();}).catch(()=>{wx=null;});
@@ -1414,7 +1441,7 @@ function wireSearch(input,list,onPick,opt){
   let start0=input.value;
   // the From and Finish boxes are wired once and used again and again: each visit starts fresh
   input.addEventListener("focus",()=>{ done=false; start0=input.value; hits=null; pickWhenReady=false; });
-  const pick=h=>{ if(done) return; done=true; list.hidden=true; input.blur(); onPick(pt(h.name,h.lat,h.lon)); };
+  const pick=h=>{ if(done) return; done=true; list.hidden=true; input.blur(); onPick(pt(h.name,h.lat,h.lon,h.stay?{stay:true}:null)); };
   const run=q=>{ ctl?.abort(); ctl=new AbortController(); list.innerHTML=`<div class="note" style="padding:8px">Searching…</div>`; list.hidden=false;
     const c=map?map.getCenter():{lat:-33,lng:19};
     pending=searchPlaces(q,c,ctl.signal).then(r=>{ if(opt&&opt.near) r=nearTrip(r); hits=r; hitsQ=q; pending=null;
@@ -1439,19 +1466,25 @@ function nearTrip(r){ const a=trip.start&&trip.start.lat!=null?trip.start:null, 
 
 /* ---------- trip bar ---------- */
 function renderTripBar(){
-  $("startDate").value=trip.startDate; $("endDate").value=trip.endDate; $("stayType").value=trip.stayType||"any"; $("endDate").min=trip.startDate;
+  $("startDate").value=trip.startDate; $("stayType").value=trip.stayType||"any"; $("dN").textContent=nDays(); $("dMinus").disabled=nDays()<2;
+  $("roundTrip").checked=!!trip.round; $("endField").hidden=!!trip.round;
   if(document.activeElement!==$("startPlace")) $("startPlace").value=trip.start&&trip.start.lat!=null?trip.start.name:"";
   const noStart=!trip.start||trip.start.lat==null; $("startPlace").classList.toggle("need",noStart); $("startPlace").placeholder=noStart?"Tap ⌖ or type a town":"My location or a town";
   if(document.activeElement!==$("endPlace")) $("endPlace").value=trip.round||!trip.end?"":trip.end.name;
+  $("endPlace").classList.toggle("need",!trip.round&&!trip.end&&!!trip.start&&trip.start.lat!=null);
   $("sameStart").hidden=!!trip.round||!trip.end; $("clearStart").hidden=!trip.start||trip.start.lat==null;
 }
 $("stayType").addEventListener("change",e=>{ trip.stayType=e.target.value; trip.days.forEach(d=>{ if(d.stayType===trip.stayType) delete d.stayType; }); save(); renderDetails(); drawMap(); });
-$("startDate").addEventListener("change",e=>{const n=nDays();trip.startDate=e.target.value||tomorrow;if(trip.endDate<trip.startDate)trip.endDate=addDays(trip.startDate,n-1);changed();});
-$("endDate").addEventListener("change",e=>{trip.endDate=e.target.value<trip.startDate?trip.startDate:e.target.value;changed();});
-wireSearch($("startPlace"),$("startPlace").parentElement.nextElementSibling,p=>{trip.start=p;changed();});
-wireSearch($("endPlace"),$("endPlace").parentElement.nextElementSibling,p=>{trip.end=p;trip.round=false;changed();});
-$("endPlace").addEventListener("change",e=>{ if(!e.target.value.trim()&&!trip.round){trip.round=true;changed();} });
-$("sameStart").addEventListener("click",()=>{trip.round=true;changed();});
+// the days follow the trip: one more for every night stop. Leave is the only date; − / + adds or drops a day
+$("startDate").addEventListener("change",e=>{const n=nDays();trip.startDate=e.target.value||tomorrow;trip.endDate=addDays(trip.startDate,n-1);changed();});
+function setDayCount(n){ n=Math.max(1,Math.min(60,n)); trip.daysSet=true; trip.endDate=addDays(trip.startDate,n-1); changed(); }
+$("dMinus").addEventListener("click",()=>setDayCount(nDays()-1));
+$("dPlus").addEventListener("click",()=>setDayCount(nDays()+1));
+$("roundTrip").addEventListener("change",e=>{ trip.round=e.target.checked; delete trip.daysSet; changed(); });
+wireSearch($("startPlace"),$("startPlace").parentElement.nextElementSibling,p=>{trip.start=p;delete trip.daysSet;changed();});
+wireSearch($("endPlace"),$("endPlace").parentElement.nextElementSibling,p=>{ if(p.stay&&trip.start&&trip.start.lat!=null){ p=Object.assign({},p); delete p.stay; } trip.end=p;trip.round=false;delete trip.daysSet;changed();});
+$("endPlace").addEventListener("change",e=>{ if(!e.target.value.trim()&&trip.end){trip.end=null;changed();} });
+$("sameStart").addEventListener("click",()=>{trip.end=null;changed();});
 // tapping a place box means you want to change it: select what's there so typing replaces it
 document.addEventListener("focusin",e=>{ const el=e.target; if(el&&el.tagName==="INPUT"&&el.type==="text"&&el.closest(".ac")&&el.value) setTimeout(()=>{ try{ el.select(); }catch(x){} },0); });
 let toastT;
@@ -2063,7 +2096,11 @@ function wireDetails(){
   hook("whereto-0",p=>{ trip.days[0].vias.push(p); trip.days[0].legs=[]; changed(); });
   hook("finish-"+(nDays()-1),p=>{editTo.delete(nDays()-1);setFinish(p);});
   editTo.forEach(k=>{ const el=document.getElementById((k===nDays()-1?"finish-":"night-")+k); if(el&&document.activeElement!==el){ el.focus(); el.select(); el.addEventListener("blur",()=>setTimeout(()=>{ if(editTo.has(k)&&el.value.trim()===el.defaultValue.trim()){ editTo.delete(k); renderDetails(); } },400)); } });
-  hook("addstop",p=>{ const k2=curDay()!=null?curDay():dayForPoint(p); addOpen=false; if(insertVia(k2,p)!==false) changed(); else renderDetails(); });
+  hook("addstop",p=>{ addOpen=false;
+    if(!trip.round&&!trip.end){ const q=Object.assign({},p); delete q.stay; trip.end=q; delete trip.daysSet; changed(); return; } // no destination yet: this is it
+    const k2=curDay()!=null?curDay():dayForPoint(p); if(insertVia(k2,p)===false){ renderDetails(); return; }
+    if(p.stay){ const i=trip.days[k2].vias.indexOf(p); if(i>=0) sleepAt(k2,i); } // a place to stay is a night: the trip gets a day
+    changed(); });
   { const k=curDay(); if(k==null) return; const d=trip.days[k];
     d.vias.forEach((v,i)=>hook(`via-${k}-${i}`,p=>replaceVia(k,i,p)));
     hook("addvia-"+k,p=>{if(insertVia(k,p)!==false) changed(); else renderDetails();});
@@ -2098,7 +2135,7 @@ $("details").addEventListener("click",e=>{
   const mv=t.closest("[data-morevias]"); if(mv){viaOpen.add(+mv.dataset.morevias);renderDetails();return;}
   const et=t.closest("[data-editto]"); if(et){editTo.add(+et.dataset.editto);renderDetails();return;}
   const cl=t.closest("[data-clear]"); if(cl){ const id=cl.dataset.clear, m=id.match(/^(night|finish|via)-(\d+)(?:-(\d+))?$/); if(!m) return;
-    if(m[1]==="night"){trip.days[+m[2]].to=null;trip.days[+m[2]].noAutoNight=true;editTo.add(+m[2]);} else if(m[1]==="finish"){trip.round=true;} else {trip.days[+m[2]].vias.splice(+m[3],1);trip.days[+m[2]].legs=[];}
+    if(m[1]==="night"){trip.days[+m[2]].to=null;trip.days[+m[2]].noAutoNight=true;editTo.add(+m[2]);} else if(m[1]==="finish"){trip.end=null;} else {trip.days[+m[2]].vias.splice(+m[3],1);trip.days[+m[2]].legs=[];}
     changed(); return; }
   const fk=t.closest("[data-fuelk]"); if(fk&&goGap(+fk.dataset.fuelk)) return; if(fk){const k2=+fk.dataset.fuelk; if(ui.tab==="ov"){ fuelOpen.add(k2); const tb=document.querySelector(`[data-day="${k2}"]`); if(tb){ tb.click(); return; } } fuelOpen.has(k2)?fuelOpen.delete(k2):fuelOpen.add(k2); renderDetails(); return;}
   const af=t.closest("[data-addfill]"); if(af){const f=fp.fills.find(x=>x.id===af.dataset.addfill); if(f){insertVia(+af.dataset.day,pt(f.name&&f.name!=="Fuel"?f.name:"Fuel stop",f.lat,f.lon,{fuelHere:true}));changed();} return;}
@@ -3800,12 +3837,12 @@ function stopRows(kOnly){
     d.vias.forEach((v,i)=>{ if(v.lat==null) return; const j=i+1, L=pd&&pd.legs[j-1], km=L?Math.round(onDay?L.b-pd.a:L.b):null;
       const canUp=!v.auto&&(i>0||k>0), canDn=!v.auto&&(i<d.vias.length-1||k<nDays()-1);
       h+=`<li class="trow ${v.auto?"auto":""} ${isSel(k,j)?"on":""}" ${pd?`data-selstop="${k}:${j}"`:""}><span class="tmk ${v.auto?"sug":""}">${v.auto?"⛽":numOf[k+":"+i]}</span><span class="tnm"><b>${esc(v.name)}</b>${v.auto?` <span class="autotag">Suggested${v.fuelHere?" fuel":""}</span>`:""}</span><span class="tkm">${km!=null?"km "+km:""}</span>
-        <span class="tctl">${onDay&&pd?legTools(k,j):""}${v.auto?"":`<button type="button" class="tbtn" data-tmove="${k}:${i}:-1" ${canUp?"":"disabled"} title="Move up">▲</button><button type="button" class="tbtn" data-tmove="${k}:${i}:1" ${canDn?"":"disabled"} title="Move down">▼</button>`}<button type="button" class="tbtn" data-tdel="${k}:${i}" title="Remove this stop">✕</button></span></li>`; });
+        <span class="tctl">${onDay&&pd?legTools(k,j):""}${v.auto||(k===nDays()-1&&!dayTo(k))?"":`<button type="button" class="tbtn" data-tsleep="${k}:${i}" title="Sleep here: this becomes a night stop and the trip gets a day">🛏</button>`}${v.auto?"":`<button type="button" class="tbtn" data-tmove="${k}:${i}:-1" ${canUp?"":"disabled"} title="Move up">▲</button><button type="button" class="tbtn" data-tmove="${k}:${i}:1" ${canDn?"":"disabled"} title="Move down">▼</button>`}<button type="button" class="tbtn" data-tdel="${k}:${i}" title="Remove this stop">✕</button></span></li>`; });
     const to=dayTo(k);
     if(!to||to.lat==null){ h+=`<li class="trow need"><span class="tmk">${last?"🏁":"🛏"}</span><span class="tnm">${last?`<span class="note">Set a finish above, or add a stop</span>`:toCell(k)}</span></li>`; return; }
     const j=pd?pd.pts.length-1:null, km=pd?Math.round(onDay?pd.km:pd.b):null, arr=pd?fmtT(arrMin(k,j)):"";
     h+=`<li class="trow end ${last?"fin":"night"} ${pd&&isSel(k,j)?"on":""}" ${pd?`data-selstop="${k}:${j}"`:""}><span class="tmk">${last?(trip.round?"⟲":"🏁"):"🛏"}</span><span class="tnm">${last?`<b>${esc(to.name)}</b><span class="note"> ${trip.round?"back home":"finish"}</span>`:`${toCell(k)} <span class="note">night ${k+1}</span>`}</span><span class="tkm">${km!=null?"km "+km:""}${arr?` · ${arr}`:""}</span>
-      <span class="tctl">${onDay&&pd?legTools(k,j):""}${last?"":`<button type="button" class="tbtn" data-clear="night-${k}" title="Change the night stop">✕</button>`}</span></li>`;
+      <span class="tctl">${onDay&&pd?legTools(k,j):""}${last?"":`<button type="button" class="tbtn" data-dropnight="${k}" title="No night here: one day less">✕</button>`}</span></li>`;
   });
   h+=`</ol>`;
   return h;
@@ -3855,6 +3892,8 @@ document.addEventListener("click",e=>{
   const t=e.target; if(!t.closest) return;
   const mv=t.closest("[data-tmove]"); if(mv){ const [k,i,dir]=mv.dataset.tmove.split(":").map(Number); moveStop(k,i,dir); return; }
   const dl=t.closest("[data-tdel]"); if(dl){ const [k,i]=dl.dataset.tdel.split(":").map(Number), d=trip.days[k], v=d.vias[i]; if(v&&v.auto){ d.noAuto=[...(d.noAuto||[]),v.name]; d.noMore=true; } d.vias.splice(i,1); d.legs=[]; selStop=null; changed(); return; }
+  const sl=t.closest("[data-tsleep]"); if(sl){ const [k2,i2]=sl.dataset.tsleep.split(":").map(Number); sleepAt(k2,i2); changed(); return; }
+  const dn=t.closest("[data-dropnight]"); if(dn){ dropNight(+dn.dataset.dropnight); changed(); return; }
   if(t.closest("[data-addopen]")){ addOpen=true; renderDetails(); const el=document.getElementById("addstop"); if(el) el.focus(); return; }
   if(t.closest("[data-addclose]")){ addOpen=false; renderDetails(); return; }
   const sr=t.closest("[data-selstop]"); if(sr&&!t.closest("button,a,input,select,details,label")){ const [k,j]=sr.dataset.selstop.split(":").map(Number); selStop={k,j}; ovFocus=null;
