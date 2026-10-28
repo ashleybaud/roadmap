@@ -1,0 +1,69 @@
+[
+{
+"id": "nurburgring",
+"fav": "nurburgring",
+"title": "How to drive a lap of the Nürburgring",
+"short": "Yes, you. In a rental, your own car or the passenger seat. Here's how, what it costs and what nobody tells you.",
+"checked": "2026-10-28",
+"hook": [
+"Most people think the Nordschleife is for racing drivers and YouTubers. It isn't. On tourist days it's a toll road. You buy a lap, the barrier lifts, and you're on the same 20.8 km the factories use to sell you cars. Hatchbacks, motorhomes, GT3s and bikes, all on the same lap.",
+"I did mine on a public Sunday. I'd watched a hundred onboard videos and recognised nothing. I'd go back tomorrow."
+],
+"sections": [
+{"h": "Three ways to do it", "items": [
+"<b>Passenger lap (the clever first time).</b> A pro drives, you scream. From about €120 in a Hyundai i30N or Genesis G70, €360 to €390 in an M5 CS, M3 or 911 GT3 RS, up to about €500 in an AMG GT Black Series. Some cars take up to three passengers, so split it.",
+"<b>Rent a track car.</b> Companies in Nürburg rent cars built for the Ring. The cheapest two-lap packages start around €120 to €160 for a BMW 325i, Swift Sport or Fiesta ST, plus fuel and lap tickets. All-inclusive deals in quicker cars run from about €280 up to €650 and more.",
+"<b>Bring your own.</b> Car or bike, road-legal and insured. Read your policy: most normal policies exclude the Nürburgring, so you pay for anything you break."
+]},
+{"h": "What it costs", "items": [
+"Tourist lap: €30 Monday to Thursday, €35 Friday to Sunday and public holidays (2026 prices).",
+"Grand Prix track: €35 for a 15-minute session, any day.",
+"Load €100 or more and you get bonus credit: 10% from €100, 15% from €200, 20% from €500.",
+"Season card: €2,750 to €3,000. Only if you live there or have a problem."
+]},
+{"h": "When it's open", "items": [
+"The 2026 season ran from 7 March to 15 November. Weekends mostly, plus many weekday evenings.",
+"Opening times change week to week and the track closes for events and crashes. Check the official calendar the day before and on the day.",
+"Green Hell Driving Days open the track all day: in 2026, 1 to 3 May and 2 to 4 October."
+]},
+{"h": "How to book", "items": [
+"Make an account on the Nürburgring website, load credit, and you get a QR code for the barrier.",
+"Or buy a Green Hell card at the ticket office opposite the entrance, the ED petrol station or the Ring info centre.",
+"Taxi laps and rentals: book on the company's own site, weeks ahead in summer and around race weekends."
+]},
+{"h": "The rules that matter", "items": [
+"It's a public road with German road rules. Overtake on the left only. Keep right when someone's quicker.",
+"50 km/h and no overtaking under yellow flags, in incident zones and roadworks.",
+"Carry your licence and the car's papers. Foreign drivers need proof of insurance.",
+"You pay for everything you damage: the barrier, the clean-up, the tow. With a rental, the excess can be up to about half the car's value unless you buy extra cover.",
+"Bikes: full protective kit and lights on."
+]},
+{"h": "What nobody tells you", "items": [
+"Do a taxi lap first. You'll learn more in eight minutes than in a hundred videos.",
+"Your first lap is not a fast lap. Nobody cares about your time except you.",
+"Watch your mirrors more than the road ahead. The fast guys arrive from nowhere.",
+"Go and watch from Brünnchen or Pflanzgarten on a busy day. It's half the fun.",
+"The village is the whole scene: car parks full of things you've only seen online. Bring a chair."
+]},
+{"h": "Getting there and staying", "items": [
+"Fly into Frankfurt or Cologne-Bonn, about 1h30 and 1h by car. Düsseldorf and Luxembourg work too.",
+"Stay in Nürburg, Adenau or Müllenbach. Book early for summer weekends and race weeks.",
+"Make it a road trip: Spa-Francorchamps is about 1h30 away, and the Mosel valley is on the way."
+]}
+],
+"links": [
+["Taxi laps and co-pilot laps", "https://www.getyourguide.com/s/?q=N%C3%BCrburgring", "Book a passenger lap"],
+["Places to stay near the track", "https://www.booking.com/searchresults.html?latitude=50.3466&longitude=6.9606&radius=15", "Nürburg, Adenau, Müllenbach"],
+["Flights to Frankfurt", "https://www.skyscanner.net/transport/flights-to/fra/", "Compare fares"],
+["Hire a car to get there", "https://www.discovercars.com/", "Pick up at the airport"]
+],
+"sources": [
+["Nürburgring: 2026 tourist drive dates and prices", "https://mobil.nuerburgring.de/news/vorfreude-auf-die-gruene-hoelle-nuerburgring-gibt-termine-fuer-touristenfahrten-2026-bekannt?locale=en"],
+["Oversteer48: prices, tickets and bonus credit", "https://oversteer48.com/nurburgring-prices/"],
+["Oversteer48: tourist driving rules", "https://oversteer48.com/nurburgring-rules/"],
+["Oversteer48: rental cars", "https://oversteer48.com/nurburgring-car-rental/"],
+["Oversteer48: taxi laps", "https://oversteer48.com/nurburgring-taxi/"]
+],
+"official": ["Official opening times", "https://www.nuerburgring.de/"]
+}
+]

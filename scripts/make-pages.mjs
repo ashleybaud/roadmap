@@ -8,6 +8,7 @@ const SITE = "https://onetrackmind.online";
 const BLOG = "https://onetrackmind.co.za";
 // blog photos: served from media/blog/ once copied off the old site (scripts/fetch-blog-media.mjs); the old address until then
 const STORIES = JSON.parse(fs.readFileSync(path.join(ROOT, "data/stories/stories.json"), "utf8").replace(/https?:\/\/(?:www\.)?onetrackmind\.co\.za\/wp-content\/uploads\/([^"\s\\]+)/g, (m, r) => { try { return fs.existsSync(path.join(ROOT, "media/blog", decodeURIComponent(r))) ? "/media/blog/" + r : m; } catch { return m; } }));
+const HOWTO = JSON.parse(fs.readFileSync(path.join(ROOT, "data/howto/howto.json"), "utf8"));
 const FAV = JSON.parse(fs.readFileSync(path.join(ROOT, "data/favourites/favourites.json"), "utf8"));
 const picks = JSON.parse(fs.readFileSync(path.join(ROOT, "data/picks/picks.json"), "utf8")).routes;
 const live = picks.filter(r => !r.draft);
@@ -48,7 +49,7 @@ h1{font-size:2.4rem;margin:28px 0 6px}h2{font-size:1.5rem;margin:30px 0 8px}
 .stats{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}.stat{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:8px 14px}.stat b{display:block;font:700 1.4rem "Barlow Condensed",sans-serif}.stat span{font-size:.8rem;color:var(--muted)}
 ol.days{padding-left:0;list-style:none}ol.days li{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 14px;margin:8px 0}ol.days .d{font:600 .8rem "IBM Plex Mono",monospace;color:var(--muted)}
 blockquote{margin:14px 0;padding:4px 16px;border-left:3px solid var(--accent);background:var(--chip)}
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin:14px 0}.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px 14px;text-decoration:none;color:var(--ink)}.card b{display:block;color:var(--accent)}.cards.pcards{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}.card.pcard{display:flex;flex-direction:column;gap:4px;padding:10px}.card.pcard>img{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:4px;margin:0 0 6px;background:var(--chip,#e4e9df)}.card.pcard .lead{color:var(--ink);font-size:.92rem}.card.pcard[hidden],.fsec[hidden]{display:none}.chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 4px}.chips button{font:600 .95rem "IBM Plex Sans",system-ui,sans-serif;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}.chips button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}.card span{font-size:.85rem;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin:14px 0}.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px 14px;text-decoration:none;color:var(--ink)}.card b{display:block;color:var(--accent)}.cards.pcards{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}.card.pcard{display:flex;flex-direction:column;gap:4px;padding:10px}.card.pcard>img{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:4px;margin:0 0 6px;background:var(--chip,#e4e9df)}.card.pcard .lead{color:var(--ink);font-size:.92rem}.card.pcard[hidden],.fsec[hidden]{display:none}.howlink{font-weight:600;margin:6px 0}.howto ul li{margin:4px 0}.sources{font-size:.85rem}.chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 4px}.chips button{font:600 .95rem "IBM Plex Sans",system-ui,sans-serif;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}.chips button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}.card span{font-size:.85rem;color:var(--muted)}
 footer{border-top:1px solid var(--line);margin:40px 0 0;padding:16px 0 30px;color:var(--muted);font-size:.9rem}
 .note{font-size:.9rem;color:var(--muted)}
 .spbox{margin:34px 0 0;padding:12px 14px;border:1px dashed var(--line);border-radius:6px;font-size:.92rem;color:var(--muted)}.spbox b{color:var(--ink)}
@@ -86,7 +87,7 @@ function page({ url, title, desc, body, ld, image, active }) {
 ${(Array.isArray(ld) ? ld : [ld]).filter(Boolean).map(x => `<script type="application/ld+json">${JSON.stringify(x)}</script>`).join("\n")}
 </head>
 <body><div class="wrap">
-<header><a class="logo" href="/">OneTrackMind</a><div class="motto">Recce. Ride. Report.</div><nav class="hdrlinks" aria-label="Site">${[["/","Plan a trip"],["/routes/","Routes"]].map(([h,t])=>`<a href="${h}"${active===h?' class="on" aria-current="page"':""}>${t}</a>`).join("")}<details class="navdd"><summary${["/about/","/favourites/"].includes(active)?' class="on"':""}>About</summary><div class="ddm"><a href="/about/">About OneTrackMind</a><a href="/favourites/">Founder's fav's</a></div></details></nav></header><script>document.addEventListener("click",function(e){document.querySelectorAll(".navdd[open]").forEach(function(d){if(!d.contains(e.target))d.open=false;});});</script>
+<header><a class="logo" href="/">OneTrackMind</a><div class="motto">Recce. Ride. Report.</div><nav class="hdrlinks" aria-label="Site">${[["/","Plan a trip"],["/routes/","Routes"]].map(([h,t])=>`<a href="${h}"${active===h?' class="on" aria-current="page"':""}>${t}</a>`).join("")}<details class="navdd"><summary${["/about/","/favourites/"].includes(active)?' class="on"':""}>About</summary><div class="ddm"><a href="/about/">About OneTrackMind</a><a href="/favourites/">Founder's fav's</a><a href="/how-to/">How to</a></div></details></nav></header><script>document.addEventListener("click",function(e){document.querySelectorAll(".navdd[open]").forEach(function(d){if(!d.contains(e.target))d.open=false;});});</script>
 ${body}
 <aside class="spbox"><span>OneTrackMind is free thanks to</span> <a href="https://alterego.co.za" target="_blank" rel="noopener sponsored"><b>AlterEgo</b>, made-to-order wear for petrolheads</a> · <a href="/advertise/">Your brand here ›</a></aside>
 <footer>OneTrackMind: plan road trips anywhere, on the roads less travelled, then ride them on your GPS or phone. Free for riders and drivers. · <a href="/advertise/">Advertise</a> · <a href="/terms.html">Terms and disclaimer</a> · <a href="/privacy.html">Privacy</a> · <a href="/rules.html">Rules</a> · <a href="mailto:hello@onetrackmind.online">hello@onetrackmind.online</a></footer>
@@ -186,6 +187,7 @@ function favPage(x) {
 <div class="meta">${esc(x.area)}${x.year ? ` · first went ${x.year}` : ""}</div>
 <p class="intro">${esc(x.short)}</p>
 ${x.text.map(t => `<p>${esc(t)}</p>`).join("\n")}
+${HOWTO.some(g => g.fav === x.id) ? `<p class="howlink"><a href="/how-to/${HOWTO.find(g => g.fav === x.id).id}/">How to do it: cost, dates, booking ›</a></p>` : ""}
 <a class="cta" href="/?fav=${esc(x.id)}">Plan a trip here</a>
 <p class="note">Opens the planner with ${esc(x.name)} as your finish. Set where you start and how many days, and it works out the route, fuel, night stops and weather.</p>
 ${getThere(x)}
@@ -225,6 +227,7 @@ function favIndex() {
   const sec = (id, title, note, html) => `<section class="fsec" id="${id}"><h2>${title}</h2>${note ? `<p class="note">${note}</p>` : ""}<div class="cards pcards">${html}</div></section>`;
   const body = `<main><h1>Founder's fav's</h1>
 <p class="intro">The places I'd send you to, and the trips and races behind them. Twenty-odd years of riding and driving through Southern Africa and Europe. Every place has how to get there, where to sleep, and a button that plans the trip for you.</p>
+<p class="howlink">New: <a href="/how-to/nurburgring/">how to drive a lap of the Nürburgring</a> · <a href="/how-to/">all How-to guides ›</a></p>
 <nav class="chips" aria-label="Show">${CH.map(([k, t], i) => `<button type="button" data-f="${k}"${i ? "" : ' class="on"'}>${t}</button>`).join("")}</nav>
 ${GROUPS.map(([g, t]) => { const L = FAV.filter(x => x.group === g); return L.length ? sec(g, g === "petrol" ? "Motorsport: tracks, museums, factories" : t, "", L.map(card).join("")) : ""; }).join("\n")}
 ${sec("btrips", "The trips", "Day by day, as they happened.", multi.map(tripCard).join(""))}
@@ -365,6 +368,35 @@ function aboutPage() {
   return page({ active: "/about/", url: "/about/", title: "About OneTrackMind and its founder", desc: "OneTrackMind is a free road-trip planner for motorbikes, 4x4s and cars, built by Ashley, who spent 25 years selling speed at Ducati and KTM Cape Town, has ridden Namibia since 2003, and built OneTrackMind: the free multi-day trip planner he wished he'd had.", body, ld });
 }
 
+/* how to do it: the guides. Plant the seed, then show exactly how: cost, dates, booking, rules, and what nobody tells you */
+function howtoPage(g) {
+  const f = FAV.find(x => x.id === g.fav), r = f && f.trip && pickById(f.trip), st = f && favStory(f);
+  const body = `<main class="story howto">
+<p class="note"><a href="/how-to/">How to</a></p>
+<h1>${esc(g.title)}</h1>
+<div class="meta">Checked ${fmtDate(g.checked)} · prices and dates change, check before you book</div>
+${st && st.img ? `<img class="cover" src="${esc(st.img)}" alt="${esc(g.title)}">` : ""}
+<p class="intro">${esc(g.short)}</p>
+${g.hook.map(t => `<p>${esc(t)}</p>`).join("\n")}
+${g.sections.map(x => `<h2>${esc(x.h)}</h2><ul>${x.items.map(t => `<li>${t}</li>`).join("")}</ul>`).join("\n")}
+<section class="gethere"><h2>Book it</h2><ul>${g.links.map(([t, u, d]) => `<li><a href="${esc(u)}" target="_blank" rel="noopener sponsored">${esc(t)} ›<span>${esc(d)}</span></a></li>`).join("")}<li><a href="${esc(g.official[1])}" target="_blank" rel="noopener">${esc(g.official[0])} ›<span>Check the day before you go</span></a></li></ul>
+<p class="note">Some of these links pay OneTrackMind a small fee if you book, at no cost to you. It's what keeps the planner free.</p></section>
+${f ? `<a class="cta" href="/?fav=${esc(f.id)}">Plan the road trip there</a> <a class="cta ghost" href="/favourites/${esc(f.id)}/">More about the place</a>` : ""}
+${r ? `<p class="note">Or take the trip I did: <a href="/routes/${esc(r.id)}/">${esc(r.title)}</a>.</p>` : ""}
+<h2>Where this comes from</h2><ul class="sources">${g.sources.map(([t, u]) => `<li><a href="${esc(u)}" target="_blank" rel="noopener">${esc(t)}</a></li>`).join("")}</ul>
+</main>`;
+  const ld = { "@context": "https://schema.org", "@type": "HowTo", name: g.title, description: g.short, url: `${SITE}/how-to/${g.id}/`, author: FOUNDER, dateModified: g.checked, step: g.sections.map(x => ({ "@type": "HowToSection", name: x.h, itemListElement: x.items.map(t => ({ "@type": "HowToStep", text: t.replace(/<[^>]+>/g, "") })) })) };
+  return page({ active: "/favourites/", url: `/how-to/${g.id}/`, title: `${g.title}: cost, dates, booking and rules · OneTrackMind`, desc: g.short, body, ld });
+}
+function howtoIndex() {
+  const body = `<main><h1>How to</h1>
+<p class="intro">Things you didn't know you could do, and exactly how to do them. Drive the Nürburgring, take your own car on a track, see the factories where your heroes were built. What it costs, when, how to book, and what nobody tells you.</p>
+<div class="cards pcards">${HOWTO.map(g => { const f = FAV.find(x => x.id === g.fav), st = f && favStory(f); return `<a class="card pcard" href="/how-to/${g.id}/">${st && st.img ? `<img src="${esc(st.img)}" alt="" loading="lazy">` : f ? `<img class="maptile" src="${tileOf(f.lat, f.lon, 9)}" alt="" loading="lazy">` : ""}<b>${esc(g.title)}</b><span class="lead">${esc(g.short)}</span></a>`; }).join("")}</div>
+<p class="note">More coming: a track day in South Africa, Spa-Francorchamps, Motor Valley in four days, the Isle of Man TT.</p>
+<a class="cta" href="/">Plan your own</a></main>`;
+  return page({ active: "/favourites/", url: "/how-to/", title: "How to: drive the Nürburgring, do a track day, visit the factories · OneTrackMind", desc: "Practical guides from a petrolhead who's done it: what it costs, when it's open, how to book and what nobody tells you.", body, ld: { "@context": "https://schema.org", "@type": "CollectionPage", name: "How to", url: SITE + "/how-to/" } });
+}
+
 function write(rel, s) { const p = path.join(ROOT, rel); fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, s); }
 fs.rmSync(path.join(ROOT, "routes"), { recursive: true, force: true });
 live.forEach(r => write(`routes/${r.id}/index.html`, routePage(r)));
@@ -377,7 +409,10 @@ FAV.forEach(x => write(`favourites/${x.id}/index.html`, favPage(x)));
 fs.rmSync(path.join(ROOT, "blog"), { recursive: true, force: true });
 { const M = seriesOf(); write("blog/index.html", storiesIndex(M)); M.forEach((L, n) => { L.forEach(x => write(`blog/${x.slug}/index.html`, storyPage(x, L))); if (L.length > 1) write(`blog/${tripSlug(n, L)}/index.html`, tripPage(n, L)); }); }
 write("advertise/index.html", advertisePage());
-const urls = ["/", "/routes/", "/favourites/", "/about/", "/advertise/", ...live.map(r => `/routes/${r.id}/`), ...FAV.map(x => `/favourites/${x.id}/`), "/blog/", ...STORIES.map(x => `/blog/${x.slug}/`), ...[...seriesOf().entries()].filter(([, L]) => L.length > 1).map(([n, L]) => `/blog/${tripSlug(n, L)}/`), "/terms.html", "/privacy.html", "/rules.html"];
+fs.rmSync(path.join(ROOT, "how-to"), { recursive: true, force: true });
+write("how-to/index.html", howtoIndex());
+HOWTO.forEach(g => write(`how-to/${g.id}/index.html`, howtoPage(g)));
+const urls = ["/", "/routes/", "/favourites/", "/about/", "/advertise/", "/how-to/", ...HOWTO.map(g => `/how-to/${g.id}/`), ...live.map(r => `/routes/${r.id}/`), ...FAV.map(x => `/favourites/${x.id}/`), "/blog/", ...STORIES.map(x => `/blog/${x.slug}/`), ...[...seriesOf().entries()].filter(([, L]) => L.length > 1).map(([n, L]) => `/blog/${tripSlug(n, L)}/`), "/terms.html", "/privacy.html", "/rules.html"];
 write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${today}</lastmod></url>`).join("\n")}\n</urlset>\n`);
 write("robots.txt", `# Everyone welcome, search engines and AI assistants included.\nUser-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${SITE}/sitemap.xml\n`);
 write("llms.txt", `# OneTrackMind
