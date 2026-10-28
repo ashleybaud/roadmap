@@ -205,7 +205,7 @@ function favStory(x) {
   const k = favKey(x.name), rx = new RegExp(k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"); let best = null;
   STORIES.forEach(p => { const n = (p.title.match(rx) ? 100 : 0) + (p.html.replace(/<[^>]+>/g, " ").match(new RegExp(rx.source, "gi")) || []).length; if (n && (!best || n > best.n)) best = { p, n }; });
   if (!best) return null;
-  const h = best.p.html, at = h.search(rx), imgs = [...h.matchAll(/<img[^>]+src="([^"]+)"/g)];
+  const h = best.p.html, at = h.search(rx), imgs = [...h.matchAll(/<img[^>]+src="([^"]+)"/g)].filter(m => /\/media\/blog\/|wp-content\/uploads/.test(m[1]) && !/emoji/i.test(m[1]));
   const near = imgs.find(m => m.index >= at) || imgs[imgs.length - 1];
   return { p: best.p, img: (best.p.title.match(rx) ? best.p.cover : near && near[1]) || best.p.cover };
 }
