@@ -67,6 +67,7 @@ input[type=text],input[type=email],input[type=number],input[type=time],input[typ
 .avi.trio.on{outline:3px solid #D9A441;outline-offset:1px}
 .numpin{width:22px;height:22px;border-radius:50%;color:#fff;border:2px solid #fff;font:700 11px/18px system-ui,sans-serif;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.4)}
 .ovlist{border:1px solid var(--line);border-top:0;border-radius:0 0 8px 8px;padding:8px 12px;margin:-6px 0 10px;background:var(--panel,#fff)}.ovhead{display:flex;gap:8px;align-items:baseline}.ovhead .linkbtn{margin-left:auto}.ovrows{list-style:none;padding:0;margin:6px 0}.ovrows li{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px dashed var(--line)}.ovrows .num{flex:0 0 22px;height:22px;border-radius:50%;color:#fff;font:700 11px/22px system-ui,sans-serif;text-align:center}.ovrows .ovn{flex:1;min-width:0}.ovrows .sact{display:flex;gap:8px;align-items:center;white-space:nowrap}
+.stop.slim{padding:4px 10px;background:none;border-style:dashed}.enddetail{margin:-4px 0 10px;border:1px solid var(--line);border-radius:0 0 8px 8px;padding:8px 12px}
 .staybadge{display:inline-block;white-space:nowrap;background:#2F5BA8;color:#fff;font:600 12px/1 system-ui,sans-serif;padding:5px 7px;border-radius:12px;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.35);cursor:pointer}#map.zoomin .staybadge{display:none}
 .favmk{width:26px;height:26px;border-radius:50%;background:#D9A441;color:#18201C;border:2px solid #18201C;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.35)}
 .btn.wa{background:#25D366;border-color:#25D366;color:#073B1E}
@@ -1849,7 +1850,8 @@ function sumBox(k,big){
     ${!pd&&!msg?"":pd?`<div class="sicons"><span class="sl">${fuelBtn(k)}</span><span class="sr">${sunSpan(k)+wxLink(k)}<span class="flags">${flagIcons(r,k)}</span></span></div>${gradeBar(dayGrade(k),big)}${elevLine(k)}${big||nDays()===1?elevProfile(k):""}${riskHtml(r,k)}${big?fuelList(k):""}${!big&&nDays()>1?gtkLine(k):""}`:`<div class="note">${msg}</div>`}
   </div>${big?"":ovList(k)}`;
 }
-function dayHead(k){ return sumBox(k,true)+(!planStale&&plan&&plan.days[k]?gtkHtml(k):"")+`<h3 class="detailh">Stops</h3>`; }
+function dayHead(k){ const pd=!planStale&&plan&&plan.days[k], jl=pd?pd.pts.length-1:-1, endOpen=pd&&stopFocus&&stopFocus.k===k&&stopFocus.j===jl;
+  return sumBox(k,true)+(endOpen?`<div class="stop open enddetail">${stopDetail(k,jl,stopFocus.cat)}</div>`:"")+(pd?gtkHtml(k):"")+`<h3 class="detailh">Stops</h3>`; }
 function gtkLine(k){ if(planStale||!plan||!plan.days[k]) return ""; const g=goodToKnow(k), n=g.filter(x=>x.lvl!=="info").length, bad=g.some(x=>x.lvl==="bad");
   return n?`<div class="gtkline ${bad?"gbad":"gwarn"}">⚠ ${n} thing${n>1?"s":""} to know ›</div>`:""; }
 
@@ -1940,6 +1942,8 @@ function stopList(k){
       </div></details>`:"";
     const autoTag=p.auto?(p.fuelHere?`<span class="autotag" title="Fuel and food here. You asked to stop at least every ${esc(String(settings.range))} km.">Suggested stop${p.detour?` · +${p.detour} km`:""}</span>`
       :`<span class="autotag nofuel" title="No fuel on our map here, and none closer. Ask locally or carry extra.">Suggested stop · fuel not confirmed${p.detour?` · +${p.detour} km`:""}</span>`):"";
+    // the day ends where the summary line above already says: just the last stretch's tools here, no second Colesberg block
+    if(isTo){ h+=`<li class="stop slim"><div class="sl2"><span class="sl2l"><span class="note">The stretch into ${esc(p.name)}</span> <span class="selev">${L?legElevTxt(L.a,L.b).replace(/^ · /,""):""}</span></span><span class="stools">${way}${tools}${opts}</span></div></li>`; return; }
     h+=`<li class="stop ${open?"open":""} ${p.auto?"auto":isTo||isFrom?"":"mine"} ${isTo&&!last?"night":""}" data-sname="${esc(p.name)}"><div class="shead"><div class="sl1"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab ${isTo&&!last?"nightlab":""}">${lab}</span><b>${esc(p.name)}</b></button><span class="sright"><span class="trioset">${trio}</span><span class="avail">${icons}</span>${isFrom?"":`<span class="skm">km ${km}</span>`}</span></div>
       <div class="sl2"><span class="sl2l">${p.auto?`<span class="autotag ${p.fuelHere?"":"nofuel"}" title="${p.fuelHere?"Suggested fuel stop":"Suggested stop: no fuel on our map here"}">Suggested${p.fuelHere?"":" · fuel?"}${p.detour?` · +${p.detour} km`:""}</span>`:""}<span class="selev">${L?legElevTxt(L.a,L.b).replace(/^ · /,""):""}</span></span><span class="stools">${way}${tools}${opts}</span></div></div>${open&&plan?stopDetail(k,j,stopFocus.cat):""}</li>`;
   });

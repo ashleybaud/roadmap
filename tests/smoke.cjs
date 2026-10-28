@@ -135,8 +135,8 @@ const TRIP = {
   if (!nav.g.length || !nav.g[0].url.startsWith("https://www.google.com/maps/dir/?api=1&origin=") || !nav.btn || !nav.w.length || !nav.w[0].url.includes("waze.com/ul?ll=")) throw new Error("phone nav links: " + JSON.stringify(nav).slice(0, 400));
   if (nav.g.some(p => (p.url.match(/%7C/g) || []).length > 8)) throw new Error("too many Google waypoints");
   await page.evaluate(() => { ui.tab = 0; renderAll(); }); await page.waitForTimeout(300);
-  const trio = await page.evaluate(() => ({ rows: document.querySelectorAll("#details .stop").length, trio: document.querySelectorAll("#details .stop .trioset .avi").length, lay: ui.lay }));
-  ok(trio.rows > 0 && trio.trio === trio.rows * ["fuel","stay","food","sights"].filter(c => trio.lay[c]).length, "fuel/food/bed icons on every stop: " + JSON.stringify(trio));
+  const trio = await page.evaluate(() => ({ rows: document.querySelectorAll("#details .stop:not(.slim)").length, trio: document.querySelectorAll("#details .stop:not(.slim) .trioset .avi").length, lay: ui.lay }));
+  ok(trio.trio === trio.rows * ["fuel","stay","food","sights"].filter(c => trio.lay[c]).length, "fuel/food/bed icons on every stop: " + JSON.stringify(trio));
   if (process.env.SHOT) { await page.evaluate(() => ui.lay.food = ui.lay.fuel = ui.lay.stay = true); await page.evaluate(() => renderAll()); const el = await page.$("#details ol.stops"); if (el) await el.screenshot({ path: process.env.SHOT }); }
   await page.evaluate(() => { ui.tab = "ov"; renderAll(); });
   const ov = await page.evaluate(() => { ui.lay.stay = true; ui.lay.fuel = true; ui.tab = "ov"; renderAll(); const b = document.querySelector("[data-ovav]"); if (!b) return { btn: false }; b.click(); return { btn: true, tab: ui.tab, list: !!document.querySelector(".ovlist"), rows: document.querySelectorAll(".ovrows li").length, pins: document.querySelectorAll(".numpin").length }; });

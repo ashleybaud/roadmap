@@ -636,7 +636,8 @@ function sumBox(k,big){
     ${!pd&&!msg?"":pd?`<div class="sicons"><span class="sl">${fuelBtn(k)}</span><span class="sr">${sunSpan(k)+wxLink(k)}<span class="flags">${flagIcons(r,k)}</span></span></div>${gradeBar(dayGrade(k),big)}${elevLine(k)}${big||nDays()===1?elevProfile(k):""}${riskHtml(r,k)}${big?fuelList(k):""}${!big&&nDays()>1?gtkLine(k):""}`:`<div class="note">${msg}</div>`}
   </div>${big?"":ovList(k)}`;
 }
-function dayHead(k){ return sumBox(k,true)+(!planStale&&plan&&plan.days[k]?gtkHtml(k):"")+`<h3 class="detailh">Stops</h3>`; }
+function dayHead(k){ const pd=!planStale&&plan&&plan.days[k], jl=pd?pd.pts.length-1:-1, endOpen=pd&&stopFocus&&stopFocus.k===k&&stopFocus.j===jl;
+  return sumBox(k,true)+(endOpen?`<div class="stop open enddetail">${stopDetail(k,jl,stopFocus.cat)}</div>`:"")+(pd?gtkHtml(k):"")+`<h3 class="detailh">Stops</h3>`; }
 function gtkLine(k){ if(planStale||!plan||!plan.days[k]) return ""; const g=goodToKnow(k), n=g.filter(x=>x.lvl!=="info").length, bad=g.some(x=>x.lvl==="bad");
   return n?`<div class="gtkline ${bad?"gbad":"gwarn"}">⚠ ${n} thing${n>1?"s":""} to know ›</div>`:""; }
 
@@ -727,6 +728,8 @@ function stopList(k){
       </div></details>`:"";
     const autoTag=p.auto?(p.fuelHere?`<span class="autotag" title="Fuel and food here. You asked to stop at least every ${esc(String(settings.range))} km.">Suggested stop${p.detour?` · +${p.detour} km`:""}</span>`
       :`<span class="autotag nofuel" title="No fuel on our map here, and none closer. Ask locally or carry extra.">Suggested stop · fuel not confirmed${p.detour?` · +${p.detour} km`:""}</span>`):"";
+    // the day ends where the summary line above already says: just the last stretch's tools here, no second Colesberg block
+    if(isTo){ h+=`<li class="stop slim"><div class="sl2"><span class="sl2l"><span class="note">The stretch into ${esc(p.name)}</span> <span class="selev">${L?legElevTxt(L.a,L.b).replace(/^ · /,""):""}</span></span><span class="stools">${way}${tools}${opts}</span></div></li>`; return; }
     h+=`<li class="stop ${open?"open":""} ${p.auto?"auto":isTo||isFrom?"":"mine"} ${isTo&&!last?"night":""}" data-sname="${esc(p.name)}"><div class="shead"><div class="sl1"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab ${isTo&&!last?"nightlab":""}">${lab}</span><b>${esc(p.name)}</b></button><span class="sright"><span class="trioset">${trio}</span><span class="avail">${icons}</span>${isFrom?"":`<span class="skm">km ${km}</span>`}</span></div>
       <div class="sl2"><span class="sl2l">${p.auto?`<span class="autotag ${p.fuelHere?"":"nofuel"}" title="${p.fuelHere?"Suggested fuel stop":"Suggested stop: no fuel on our map here"}">Suggested${p.fuelHere?"":" · fuel?"}${p.detour?` · +${p.detour} km`:""}</span>`:""}<span class="selev">${L?legElevTxt(L.a,L.b).replace(/^ · /,""):""}</span></span><span class="stools">${way}${tools}${opts}</span></div></div>${open&&plan?stopDetail(k,j,stopFocus.cat):""}</li>`;
   });
