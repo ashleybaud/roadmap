@@ -1907,7 +1907,7 @@ function stopList(k){
     const lab=isFrom?"From":isTo?(last?(trip.round?"⟲ Home":"🏁 Finish"):`🛏 Night ${k+1}`):`Stop ${j}`;
     const av=placesOk?stopAvail(p):null;
     const TRIO=["fuel","stay","food","sights"].filter(c=>ui.lay[c]), trio=AV.filter(a=>TRIO.includes(a[0])).map(a=>{ const n=av?av[a[0]].length:0; return `<button type="button" class="avi trio ${open&&stopFocus.cat===a[0]?"on":""} ${n?"":"none"}" ${n?`data-av="${k}:${j}:${a[0]}"`:"disabled"} title="${esc(a[2])}: ${av?(n||"none")+(a[0]==="stay"||a[0]==="sights"?" within 5 km":" at the stop"):"loading"}">${a[1]}</button>`; }).join("");
-    const icons=av?AV.filter(a=>!TRIO.includes(a[0])&&av[a[0]].length).map(a=>`<button type="button" class="avi ${open&&stopFocus.cat===a[0]?"on":""}" data-av="${k}:${j}:${a[0]}" title="${esc(a[2])}: ${av[a[0]].length}">${a[1]}</button>`).join(""):"";
+    const icons=av?AV.filter(a=>!["fuel","stay","food","sights"].includes(a[0])&&av[a[0]].length).map(a=>`<button type="button" class="avi ${open&&stopFocus.cat===a[0]?"on":""}" data-av="${k}:${j}:${a[0]}" title="${esc(a[2])}: ${av[a[0]].length}">${a[1]}</button>`).join(""):"";
     const fq=legFast(d,j-1), way=p.straight&&!lg.track?`<span class="note gpxnote" title="A straight line to this point: a track the map doesn't show">Straight</span>`:lg.track||(L&&L.gpx)?(L&&L.gpx?`<span class="note gpxnote" title="This stretch follows your GPX file">GPX</span>`:""):(settings.style==="tar"?`<span class="legway one" title="Main roads, like normal sat-nav">${STYLE_ICON.fast}</span>`:`<span class="legway one"><button type="button" data-legsty="${j-1}:${fq?0:1}" class="on" title="${fq?"Quick way, main roads":esc(styleName())} to here. Tap for ${fq?esc(styleName()):"the quick way"}">${fq?STYLE_ICON.fast:STYLE_ICON.default}</button></span>`);
     const tools="";
     const isVia2=!isFrom&&!isTo, mtool=`${isVia2?`${p.auto?"":`<button class="btn small ghost" type="button" data-vren="${vi}">✎ Rename</button>`}<button class="btn small ghost" type="button" data-vup="${vi}" ${vi===0?"disabled":""}>↑ Move up</button><button class="btn small ghost" type="button" data-vdel="${vi}">✕ Remove this stop</button>`:""}`;
@@ -2064,7 +2064,7 @@ $("details").addEventListener("change",async e=>{
 });
 
 /* ---------- stop panel: the way in plus the town ---------- */
-function stayFor(p){ return stays.find(x=>x.night===p); }
+function stayFor(p){ return p&&(stays.find(x=>x.night===p)||stays.find(x=>x.night&&x.night.name===p.name&&hav(x.night,p)<0.3)); } // same place, even if the trip was copied (undo, reload)
 function scope(k,j){
   const pd=plan&&plan.days[k]; if(!pd) return null; const jj=j==="last"?pd.pts.length-1:j, p=pd.pts[jj]; if(!p) return null;
   const b=jj>0?pd.legs[jj-1].b:pd.a, a=jj>0?pd.legs[jj-1].a:pd.a; return {a,b,p,jj};
