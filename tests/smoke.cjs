@@ -138,8 +138,9 @@ const TRIP = {
   const sh = await page.evaluate(async () => { renderDetails(); const btns = document.querySelectorAll("[data-sharetrip]").length; const f = window.fetch; let sent = null;
     window.fetch = (u, o) => { if (String(u) === "/api/share") { sent = JSON.parse(o.body); return Promise.resolve(new Response('{"id":"abc23xyz"}', { status: 200 })); } return f(u, o); };
     Object.defineProperty(navigator, "share", { value: undefined, configurable: true });
-    await shareTrip(); window.fetch = f; return { btns, days: sent && sent.trip.days.length, toast: document.getElementById("toast").textContent }; });
-  ok(sh.btns >= 1 && sh.days >= 2 && sh.toast.includes("/?s=abc23xyz"), "share link: " + JSON.stringify(sh));
+    localStorage.setItem("otm-myname", "Sam");
+    await shareTrip(); window.fetch = f; return { btns, days: sent && sent.trip.days.length, toast: document.getElementById("toast").textContent, text: shareText("x") }; });
+  ok(sh.btns >= 1 && sh.days >= 2 && sh.toast.includes("/?s=abc23xyz") && sh.text.startsWith("Sam thought you might like this trip"), "share link: " + JSON.stringify(sh));
   console.log("share:", JSON.stringify(sh).slice(0, 160));
   await page.evaluate(() => { Object.keys(trip).forEach(x => delete trip[x]); Object.assign(trip, { startDate: tomorrow, endDate: addDays(tomorrow, 1), start: pt("Cape Town", -33.925, 18.424), end: pt("Upington", -28.448, 21.256), round: false, sugV: 5, days: [{ to: null, style: "default", vias: [], legs: [] }, { to: null, style: "default", vias: [], legs: [] }] }); plan = null; changed(); });
   await page.waitForFunction(() => trip.days[0].to && plan && !planStale && plan.days.filter(Boolean).length === 2, null, { timeout: 30000 }).catch(() => {});

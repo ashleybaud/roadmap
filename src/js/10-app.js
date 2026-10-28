@@ -1036,6 +1036,8 @@ function downloadGpx(k){
   setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},2000);
   $("status").textContent=dev==="closed"?`Saved ${file}. Your bike's own app can't import GPX: open the file in Calimoto, Kurviger or OsmAnd on your phone instead.`
     :`Saved ${file} for your ${GPS_NAME[dev]}. Open it from your downloads and share it to the app${dev==="bmw"?" (shown as a route: your stops plus shaping points, 50 at most)":""}.`;
+  // on a phone, people try to open the file in Waze or Google Maps, which can't read GPX
+  if(/iPhone|iPad|Android/i.test(navigator.userAgent)){ const t=$("toast"); t.innerHTML=`GPX is for a GPS or apps like OsmAnd, Calimoto or Kurviger. <b>Waze and Google Maps can't open it.</b> <button type="button" class="linkbtn" data-navlinks>Open in Google Maps / Waze</button>`; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,20000); }
 }
 
 /* ---------- settings + glue ---------- */

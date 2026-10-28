@@ -1,8 +1,19 @@
 /* ---------- Share this trip: one short link anyone can open, no account. They get the whole plan, then Google Maps / Waze or GPX. ---------- */
 function shareText(url){
-  const km=tripKm();
-  return `${defaultTitle()}${km?`, ${km.toLocaleString()} km`:""}. Open the plan on your phone, then tap Google Maps / Waze to navigate, or GPX for your GPS:`;
+  const km=tripKm(), who=myName();
+  const nights=trip.days.slice(0,-1).map(d=>d.to&&d.to.name).filter(Boolean);
+  const stay=$("stayType")&&$("stayType").selectedIndex>0?$("stayType").selectedOptions[0].textContent:"";
+  const veh=(VEHICLES[settings.vehicle]||"").replace(/^\S+\s/,"");
+  return `${who?who+" thought":"Thought"} you might like this trip: ${defaultTitle()}${km?`, ${km.toLocaleString()} km`:""}.\n`
+    +`${[veh,styleName()+" roads",stay&&"staying in "+stay.toLowerCase()].filter(Boolean).join(" · ")}${nights.length?`\nNights: ${nights.join(", ")}`:""}\n`
+    +`Open it on your phone, then tap Google Maps / Waze to navigate (or GPX for a GPS). Change anything you like:`;
 }
+// the sender's first name for "Ashley thought you might like this trip": from the account, or asked once and kept on this device
+function myName(){ let n=""; try{ n=(localStorage.getItem("otm-myname")||"").trim(); }catch(e){} if(!n&&acct&&acct.user&&acct.user.name) n=acct.user.name.split(" ")[0]; return n; }
+function askName(){ return new Promise(res=>{ let n=""; try{ n=localStorage.getItem("otm-myname"); }catch(e){} if(n!=null&&n!==""||acct&&acct.user&&acct.user.name) return res();
+  const d=document.createElement("dialog"); d.className="namedlg";
+  d.innerHTML=`<form method="dialog"><label class="lbl" for="myName">Your first name, for the message</label><input id="myName" type="text" maxlength="30" autocomplete="given-name" placeholder="e.g. Sam"><div class="btns" style="justify-content:flex-end;margin-top:10px"><button class="btn small ghost" value="skip">Skip</button><button class="btn small" value="ok">Send</button></div></form>`;
+  document.body.appendChild(d); d.addEventListener("close",()=>{ const v=d.returnValue==="ok"?d.querySelector("input").value.trim():""; try{ localStorage.setItem("otm-myname",v||" "); }catch(e){} d.remove(); res(); }); d.showModal(); }); }
 let shareBusy=false;
 async function shareLink(){
   const t=JSON.parse(JSON.stringify(trip)); delete t.savedId; delete t.savedTitle; delete t.sharedId;
@@ -12,14 +23,14 @@ async function shareLink(){
 // straight into WhatsApp: the window opens on the tap (so it isn't blocked), then gets the link
 async function shareWhatsApp(btn){
   if(!plan||planStale){ $("status").textContent="Plan the trip first, then share it."; return; }
-  const w=window.open("","_blank"); const was=btn&&btn.textContent; if(btn) btn.textContent="Making the link…";
+  await askName(); const w=window.open("","_blank"); const was=btn&&btn.textContent; if(btn) btn.textContent="Making the link…";
   try{ const {url,text}=await shareLink(), wa=`https://wa.me/?text=${encodeURIComponent(text+" "+url)}`; if(w) w.location.href=wa; else location.href=wa; }
   catch(e){ if(w) w.close(); $("status").textContent=e.message||"Couldn't make the link. Check your connection."; }
   finally{ if(btn) btn.textContent=was; }
 }
 async function shareTrip(btn){
   if(!plan||planStale){ $("status").textContent="Plan the trip first, then share it."; return; }
-  if(shareBusy) return; shareBusy=true; const was=btn&&btn.textContent; if(btn) btn.textContent="Making the link…";
+  if(shareBusy) return; await askName(); shareBusy=true; const was=btn&&btn.textContent; if(btn) btn.textContent="Making the link…";
   try{
     const {url,text}=await shareLink();
     if(navigator.share){ try{ await navigator.share({title:defaultTitle(),text,url}); }catch(e){ if(e&&e.name!=="AbortError") showShare(url,text); } }
