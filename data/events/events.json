@@ -1836,6 +1836,24 @@
   "checked": "2026-10-28"
  },
  {
+  "category": "bikes",
+  "tickets": "https://www.iomttraces.com",
+  "confirmed": true,
+  "id": "isle-of-man-tt-2027",
+  "name": "Isle of Man TT Races",
+  "series": "Isle of Man TT",
+  "start": "2027-05-31",
+  "end": "2027-06-12",
+  "venue": "Snaefell Mountain Course",
+  "city": "Douglas",
+  "country": "Isle of Man",
+  "lat": 54.1508,
+  "lon": -4.4818,
+  "url": "https://www.iomttraces.com",
+  "source": "https://www.iomttraces.com/latest/news/tt-2027-dates-isle-of-man-tt-races/",
+  "checked": "2026-10-28"
+ },
+ {
   "category": "rally",
   "tickets": "",
   "confirmed": true,
