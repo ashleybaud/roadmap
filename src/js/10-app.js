@@ -983,7 +983,7 @@ function drawPanelLayer(){
 }
 
 /* ---------- icon bar: what to show on the map ---------- */
-const LAY=[["fuel","⛽","Fuel","Fuel stations on the route"],["stay","🏨","Places to stay","Places to stay at your night stops"],["food","🍴","Food","Places to eat"],["sights","★","Sights","Sights, viewpoints and passes"],["med","🏥","Medical","Hospitals and clinics"],["rep","📣","Rider reports","What riders reported on the road lately"],["spots","📍","Riders' places","Places riders marked: viewpoints, farm stalls, stays"],["fav","🏁","Founder's favourites","Places the founder would send you, and petrolhead places"],["road","🛣","Road grade","The route coloured by terrain grade, Race to Single"]];
+const LAY=[["fuel","⛽","Fuel","Fuel stations on the route"],["stay","🏨","Places to stay","Places to stay at your night stops"],["food","🍴","Food","Places to eat"],["sights","★","Sights","Sights, viewpoints and passes"],["med","🏥","Medical","Hospitals and clinics"],["rep","📣","Rider reports","What riders reported on the road lately"],["spots","📍","Riders' places","Places riders marked: viewpoints, farm stalls, stays"],["fav","🏁","Founder's fav's","Places the founder would send you, and petrolhead places"],["road","🛣","Road grade","The route coloured by terrain grade, Race to Single"]];
 ui.lay=Object.assign({fuel:true,stay:!!ui.sleep,food:!!ui.types.food,sights:true,med:false,rep:true,spots:true,fav:true},ui.lay||{}); if(ui.lay.fav===undefined) ui.lay.fav=true; if(ui.lay.rep===undefined) ui.lay.rep=true; if(ui.lay.spots===undefined) ui.lay.spots=true;
 function renderLayers(){
   $("iconbar").innerHTML=`<span class="ibhead">On the map</span>`+LAY.map(([id,ic,w,t])=>{ const on=!!ui.lay[id];

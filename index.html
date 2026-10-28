@@ -576,7 +576,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
   <header>
     <div><h1><a class="homelink" href="/" title="Home">OneTrackMind</a> <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><div class="note"><b>Built by riders:</b> add your favourite routes, mark the places worth stopping.</div></div>
     <div class="btns"><span class="lbl mono" id="hdrSummary"></span><button class="btn ghost" id="feedback" type="button">Send feedback</button><button class="btn" id="addBtn" type="button" hidden>+ Add yours</button><button class="btn ghost" id="reviewBtn" type="button" hidden>Review</button><button class="btn ghost" id="acctBtn" type="button" hidden>Sign in</button><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
-    <nav class="hdrlinks" style="order:9" aria-label="Site"><a href="/" class="on" aria-current="page">Plan a trip</a><a href="/routes/">Routes</a><a href="/favourites/">Founder's favourites</a><a href="/about/">About</a></nav>
+    <nav class="hdrlinks" style="order:9" aria-label="Site"><a href="/" class="on" aria-current="page">Plan a trip</a><a href="/routes/">Routes</a><a href="/favourites/">Founder's fav's</a><a href="/about/">About</a></nav>
     <section class="hero" style="order:10" aria-label="What it does">
       <h2 class="herohead">Plan it. Book it. <span>Ride it.</span></h2>
       <p class="herosub">Forget BaseCamp and five different apps. Route a multi-day trip in minutes, sort your beds, then send it straight to your GPS, your bike's app or your phone and navigate from there.</p>
@@ -652,7 +652,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
     <div class="sponsors"><span class="lbl">OneTrackMind is free thanks to</span>
       <a class="spons" href="https://alterego.co.za" target="_blank" rel="noopener sponsored"><b>AlterEgo</b><span>Made-to-order wear for petrolheads</span></a>
       <a class="spons open" href="/advertise/"><b>Your brand here</b><span>Sponsor or advertise ›</span></a></div>
-    <div class="note">OneTrackMind: plan road trips anywhere, on the roads less travelled, then ride them on your GPS or phone. · <a href="/favourites/">Founder's favourites</a> · <a href="/advertise/">Advertise</a> · <a href="/about/">About</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> · <a href="mailto:hello@onetrackmind.online">hello@onetrackmind.online</a></div>
+    <div class="note">OneTrackMind: plan road trips anywhere, on the roads less travelled, then ride them on your GPS or phone. · <a href="/favourites/">Founder's fav's</a> · <a href="/advertise/">Advertise</a> · <a href="/about/">About</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> · <a href="mailto:hello@onetrackmind.online">hello@onetrackmind.online</a></div>
   </footer>
 </div>
 
@@ -1014,16 +1014,23 @@ async function routeLeg(a,b,lg){
   // freeway icon (Liaison) and Tar: normal navigation, fastest by the main roads, like a phone would. Gravel-aware routing only for gravel styles
   const normal=style==="fast"||style==="tar";
   if(!normal) try{ out=await brouterLeg(a,b,veh,style,alts); }catch(e){ out=null; } // road-surface aware routing first
-  if(!out) try{
+  const stadia=async()=>{
     const body={locations:[a,b].map(p=>({lat:p.lat,lon:p.lon,type:"break"})),costing:car?"auto":"motorcycle",costing_options:car?{auto:(veh==="jeep"?STYLE_CAR:STYLE_SEDAN)[normal?"tar":style]||STYLE_CAR.rough}:{motorcycle:STYLE[normal?"tar":style]||STYLE.rough},...(alts?{alternates:2}:{}),units:"kilometers",directions_type:"none"};
-    const ctl=new AbortController(), tm=setTimeout(()=>ctl.abort(),alts?15000:10000);
-    const r=await fetch(ROUTER,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body),signal:ctl.signal}); clearTimeout(tm);
-    const j=await r.json(); if(!j.trip) throw new Error(j.error||"no route");
-    out=[j.trip,...(j.alternates||[]).map(x=>x.trip)].map(t=>({km:t.summary.length,min:t.summary.time/60,geom:decode6(t.legs[0].shape)}));
-  }catch(e){
-    const r=await fetch(OSRM+[a,b].map(p=>p.lon.toFixed(5)+","+p.lat.toFixed(5)).join(";")+"?overview=full&geometries=geojson"+(alts?"&alternatives=2":"")); if(!r.ok) throw new Error("route");
-    const j=await r.json(); if(j.code!=="Ok") throw new Error(j.code);
-    out=j.routes.map(x=>({km:x.distance/1000,min:x.duration/60,geom:x.geometry.coordinates.map(([lo,la])=>({lat:la,lon:lo}))}));
+    const ctl=new AbortController(), tm=setTimeout(()=>ctl.abort(),alts?20000:15000);
+    try{ const r=await fetch(ROUTER,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body),signal:ctl.signal});
+      if(r.status===429) throw Object.assign(new Error("busy"),{busy:true});
+      const j=await r.json(); if(!j.trip) throw new Error(j.error||"no route");
+      return [j.trip,...(j.alternates||[]).map(x=>x.trip)].map(t=>({km:t.summary.length,min:t.summary.time/60,geom:decode6(t.legs[0].shape)}));
+    } finally{ clearTimeout(tm); } };
+  // every router can say no or hang: try each in turn, with time limits, so the planner never waits forever
+  if(!out) try{ out=await stadia(); }catch(e){ if(e.busy){ await new Promise(r=>setTimeout(r,1200)); try{ out=await stadia(); }catch(e2){} } }
+  if(!out&&normal) try{ out=await brouterLeg(a,b,veh,"tar",alts); }catch(e){ out=null; }
+  if(!out){
+    const ctl=new AbortController(), tm=setTimeout(()=>ctl.abort(),20000);
+    try{ const r=await fetch(OSRM+[a,b].map(p=>p.lon.toFixed(5)+","+p.lat.toFixed(5)).join(";")+"?overview=full&geometries=geojson"+(alts?"&alternatives=2":""),{signal:ctl.signal}); if(!r.ok) throw new Error("route");
+      const j=await r.json(); if(j.code!=="Ok") throw new Error(j.code);
+      out=j.routes.map(x=>({km:x.distance/1000,min:x.duration/60,geom:x.geometry.coordinates.map(([lo,la])=>({lat:la,lon:lo}))}));
+    } finally{ clearTimeout(tm); }
   }
   cache.set(key,out); return out;
 }
@@ -2179,7 +2186,7 @@ function drawPanelLayer(){
 }
 
 /* ---------- icon bar: what to show on the map ---------- */
-const LAY=[["fuel","⛽","Fuel","Fuel stations on the route"],["stay","🏨","Places to stay","Places to stay at your night stops"],["food","🍴","Food","Places to eat"],["sights","★","Sights","Sights, viewpoints and passes"],["med","🏥","Medical","Hospitals and clinics"],["rep","📣","Rider reports","What riders reported on the road lately"],["spots","📍","Riders' places","Places riders marked: viewpoints, farm stalls, stays"],["fav","🏁","Founder's favourites","Places the founder would send you, and petrolhead places"],["road","🛣","Road grade","The route coloured by terrain grade, Race to Single"]];
+const LAY=[["fuel","⛽","Fuel","Fuel stations on the route"],["stay","🏨","Places to stay","Places to stay at your night stops"],["food","🍴","Food","Places to eat"],["sights","★","Sights","Sights, viewpoints and passes"],["med","🏥","Medical","Hospitals and clinics"],["rep","📣","Rider reports","What riders reported on the road lately"],["spots","📍","Riders' places","Places riders marked: viewpoints, farm stalls, stays"],["fav","🏁","Founder's fav's","Places the founder would send you, and petrolhead places"],["road","🛣","Road grade","The route coloured by terrain grade, Race to Single"]];
 ui.lay=Object.assign({fuel:true,stay:!!ui.sleep,food:!!ui.types.food,sights:true,med:false,rep:true,spots:true,fav:true},ui.lay||{}); if(ui.lay.fav===undefined) ui.lay.fav=true; if(ui.lay.rep===undefined) ui.lay.rep=true; if(ui.lay.spots===undefined) ui.lay.spots=true;
 function renderLayers(){
   $("iconbar").innerHTML=`<span class="ibhead">On the map</span>`+LAY.map(([id,ic,w,t])=>{ const on=!!ui.lay[id];
@@ -3620,7 +3627,7 @@ async function autoNights(){
   return changed;
 }
 
-/* ---------- Founder's favourites in the planner: /?fav=<id> sets it as your finish; a map layer shows them all ---------- */
+/* ---------- Founder's fav's in the planner: /?fav=<id> sets it as your finish; a map layer shows them all ---------- */
 let favList=null;
 const loadFavs=()=>favList?Promise.resolve(favList):fetch("/data/favourites/favourites.json").then(r=>r.ok?r.json():[]).then(j=>favList=j).catch(()=>favList=[]);
 { const m=location.search.match(/[?&]fav=([\w-]+)/); if(m){ history.replaceState(null,"",location.pathname);
@@ -3634,7 +3641,7 @@ const loadFavs=()=>favList?Promise.resolve(favList):fetch("/data/favourites/favo
   },300); } }
 function drawFavs(){
   if(!favList){ loadFavs().then(()=>{ if(favList.length) drawMap(); }); return; }
-  favList.forEach(x=>{ const html=`<b>${esc(x.name)}</b><br><span class="note">Founder's favourite · ${esc(x.area)}</span><br>${esc(x.short)}<br><a href="/favourites/${x.id}/">Read it</a> · <button type="button" class="linkbtn" data-favgo="${x.id}">Go here</button>`;
+  favList.forEach(x=>{ const html=`<b>${esc(x.name)}</b><br><span class="note">Founder's fav · ${esc(x.area)}</span><br>${esc(x.short)}<br><a href="/favourites/${x.id}/">Read it</a> · <button type="button" class="linkbtn" data-favgo="${x.id}">Go here</button>`;
     L.marker([x.lat,x.lon],{icon:L.divIcon({className:"",html:`<div class="favmk" title="${esc(x.name)}">${x.petrol?"🏁":"★"}</div>`,iconSize:[26,26],iconAnchor:[13,13]}),zIndexOffset:700}).bindTooltip(x.name).bindPopup(html).addTo(layer); });
 }
 document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-favgo]"); if(!b) return; const x=(favList||[]).find(f=>f.id===b.dataset.favgo); if(!x) return; map.closePopup(); setFinish(pt(x.name,x.lat,x.lon)); });

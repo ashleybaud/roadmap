@@ -47,16 +47,23 @@ async function routeLeg(a,b,lg){
   // freeway icon (Liaison) and Tar: normal navigation, fastest by the main roads, like a phone would. Gravel-aware routing only for gravel styles
   const normal=style==="fast"||style==="tar";
   if(!normal) try{ out=await brouterLeg(a,b,veh,style,alts); }catch(e){ out=null; } // road-surface aware routing first
-  if(!out) try{
+  const stadia=async()=>{
     const body={locations:[a,b].map(p=>({lat:p.lat,lon:p.lon,type:"break"})),costing:car?"auto":"motorcycle",costing_options:car?{auto:(veh==="jeep"?STYLE_CAR:STYLE_SEDAN)[normal?"tar":style]||STYLE_CAR.rough}:{motorcycle:STYLE[normal?"tar":style]||STYLE.rough},...(alts?{alternates:2}:{}),units:"kilometers",directions_type:"none"};
-    const ctl=new AbortController(), tm=setTimeout(()=>ctl.abort(),alts?15000:10000);
-    const r=await fetch(ROUTER,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body),signal:ctl.signal}); clearTimeout(tm);
-    const j=await r.json(); if(!j.trip) throw new Error(j.error||"no route");
-    out=[j.trip,...(j.alternates||[]).map(x=>x.trip)].map(t=>({km:t.summary.length,min:t.summary.time/60,geom:decode6(t.legs[0].shape)}));
-  }catch(e){
-    const r=await fetch(OSRM+[a,b].map(p=>p.lon.toFixed(5)+","+p.lat.toFixed(5)).join(";")+"?overview=full&geometries=geojson"+(alts?"&alternatives=2":"")); if(!r.ok) throw new Error("route");
-    const j=await r.json(); if(j.code!=="Ok") throw new Error(j.code);
-    out=j.routes.map(x=>({km:x.distance/1000,min:x.duration/60,geom:x.geometry.coordinates.map(([lo,la])=>({lat:la,lon:lo}))}));
+    const ctl=new AbortController(), tm=setTimeout(()=>ctl.abort(),alts?20000:15000);
+    try{ const r=await fetch(ROUTER,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body),signal:ctl.signal});
+      if(r.status===429) throw Object.assign(new Error("busy"),{busy:true});
+      const j=await r.json(); if(!j.trip) throw new Error(j.error||"no route");
+      return [j.trip,...(j.alternates||[]).map(x=>x.trip)].map(t=>({km:t.summary.length,min:t.summary.time/60,geom:decode6(t.legs[0].shape)}));
+    } finally{ clearTimeout(tm); } };
+  // every router can say no or hang: try each in turn, with time limits, so the planner never waits forever
+  if(!out) try{ out=await stadia(); }catch(e){ if(e.busy){ await new Promise(r=>setTimeout(r,1200)); try{ out=await stadia(); }catch(e2){} } }
+  if(!out&&normal) try{ out=await brouterLeg(a,b,veh,"tar",alts); }catch(e){ out=null; }
+  if(!out){
+    const ctl=new AbortController(), tm=setTimeout(()=>ctl.abort(),20000);
+    try{ const r=await fetch(OSRM+[a,b].map(p=>p.lon.toFixed(5)+","+p.lat.toFixed(5)).join(";")+"?overview=full&geometries=geojson"+(alts?"&alternatives=2":""),{signal:ctl.signal}); if(!r.ok) throw new Error("route");
+      const j=await r.json(); if(j.code!=="Ok") throw new Error(j.code);
+      out=j.routes.map(x=>({km:x.distance/1000,min:x.duration/60,geom:x.geometry.coordinates.map(([lo,la])=>({lat:la,lon:lo}))}));
+    } finally{ clearTimeout(tm); }
   }
   cache.set(key,out); return out;
 }

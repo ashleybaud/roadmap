@@ -1,4 +1,4 @@
-/* ---------- Founder's favourites in the planner: /?fav=<id> sets it as your finish; a map layer shows them all ---------- */
+/* ---------- Founder's fav's in the planner: /?fav=<id> sets it as your finish; a map layer shows them all ---------- */
 let favList=null;
 const loadFavs=()=>favList?Promise.resolve(favList):fetch("/data/favourites/favourites.json").then(r=>r.ok?r.json():[]).then(j=>favList=j).catch(()=>favList=[]);
 { const m=location.search.match(/[?&]fav=([\w-]+)/); if(m){ history.replaceState(null,"",location.pathname);
@@ -12,7 +12,7 @@ const loadFavs=()=>favList?Promise.resolve(favList):fetch("/data/favourites/favo
   },300); } }
 function drawFavs(){
   if(!favList){ loadFavs().then(()=>{ if(favList.length) drawMap(); }); return; }
-  favList.forEach(x=>{ const html=`<b>${esc(x.name)}</b><br><span class="note">Founder's favourite · ${esc(x.area)}</span><br>${esc(x.short)}<br><a href="/favourites/${x.id}/">Read it</a> · <button type="button" class="linkbtn" data-favgo="${x.id}">Go here</button>`;
+  favList.forEach(x=>{ const html=`<b>${esc(x.name)}</b><br><span class="note">Founder's fav · ${esc(x.area)}</span><br>${esc(x.short)}<br><a href="/favourites/${x.id}/">Read it</a> · <button type="button" class="linkbtn" data-favgo="${x.id}">Go here</button>`;
     L.marker([x.lat,x.lon],{icon:L.divIcon({className:"",html:`<div class="favmk" title="${esc(x.name)}">${x.petrol?"🏁":"★"}</div>`,iconSize:[26,26],iconAnchor:[13,13]}),zIndexOffset:700}).bindTooltip(x.name).bindPopup(html).addTo(layer); });
 }
 document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-favgo]"); if(!b) return; const x=(favList||[]).find(f=>f.id===b.dataset.favgo); if(!x) return; map.closePopup(); setFinish(pt(x.name,x.lat,x.lon)); });
