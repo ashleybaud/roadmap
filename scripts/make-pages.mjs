@@ -69,15 +69,17 @@ html[data-mode="motorsport"]{--bg:#0E0E10;--panel:#19191C;--ink:#F1F1EE;--muted:
 html[data-mode="motorsport"] .hero{background:#000;border-color:#E10600}
 html[data-mode="motorsport"] .herosteps li{border-left-color:#E10600}
 html[data-mode="motorsport"] .btn.share,html[data-mode="motorsport"] .ib.on{color:#111}
-.hdrlinks{grid-template-columns:repeat(3,auto) 1fr!important}
+.hdrlinks{grid-template-columns:repeat(4,auto) 1fr!important}
 .modesw{justify-self:end;align-self:center;margin-right:8px;display:flex;border:1px solid color-mix(in srgb,var(--bg) 40%,transparent);border-radius:999px;overflow:hidden}
 .modesw button{font:700 .95rem "Barlow Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.06em;background:none;border:0;color:var(--bg);padding:5px 12px;cursor:pointer;opacity:.7}
 .modesw button.on{background:#D9A441;color:#18201C;opacity:1}
 html[data-mode="motorsport"] .modesw button.on{background:#F2C500;color:#111}
-@media(max-width:640px){.hdrlinks{grid-template-columns:repeat(3,auto)!important}.modesw{grid-column:1/-1;justify-self:start;margin:4px 0 6px 8px}}
+@media(max-width:640px){.hdrlinks{grid-template-columns:repeat(4,auto)!important}.modesw{grid-column:1/-1;justify-self:start;margin:4px 0 6px 8px}}
 
 .spstrip{display:none;align-items:center;gap:12px;margin:10px 0 0;padding:6px 12px 6px 6px;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:6px;background:var(--panel);color:var(--ink);text-decoration:none;font-size:.95rem;order:9}.spstrip img{width:44px;height:44px;object-fit:cover;border-radius:4px}.spstrip em{font-style:normal;color:var(--muted)}html[data-mode="motorsport"] .spstrip{display:flex}
 .packbox{display:flex;align-items:center;gap:12px;margin:16px 0;padding:8px 12px 8px 8px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);text-decoration:none}.packbox img{width:72px;height:72px;object-fit:cover;border-radius:6px}.packbox span{display:block;color:var(--muted);font-size:.9rem}
+
+.recbox{border:1px solid var(--line);border-radius:10px;padding:14px;background:var(--panel);margin:14px 0}.recstat{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;text-align:center}.recstat b{display:block;font:700 2rem var(--f-display,"Barlow Condensed",sans-serif)}.recstat span{color:var(--muted);font-size:.85rem}.recbtns{margin:12px 0 4px}.recbtns .cta{font-size:1.2rem;padding:14px 28px}.ride{display:flex;flex-direction:column;gap:6px;margin:8px 0;padding:10px}.ride .rname{font:700 1.1rem var(--f-display,"Barlow Condensed",sans-serif);background:var(--bg);color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:6px 8px}
 `;
 
 function page({ url, title, desc, body, ld, image, active }) {
@@ -103,7 +105,7 @@ function page({ url, title, desc, body, ld, image, active }) {
 ${(Array.isArray(ld) ? ld : [ld]).filter(Boolean).map(x => `<script type="application/ld+json">${JSON.stringify(x)}</script>`).join("\n")}
 </head>
 <body><div class="wrap">
-<header><a class="logo" href="/">OneTrackMind</a><div class="motto">Recce. Ride. Report.</div><nav class="hdrlinks" aria-label="Site">${[["/","Plan a trip"],["/routes/","Routes"]].map(([h,t])=>`<a href="${h}"${active===h?' class="on" aria-current="page"':""}>${t}</a>`).join("")}<details class="navdd"><summary${["/about/","/favourites/"].includes(active)?' class="on"':""}>About</summary><div class="ddm"><a href="/about/">About OneTrackMind</a><a href="/favourites/">Founder's fav's</a><a href="/how-to/">How to</a></div></details><div class="modesw" role="group" aria-label="Mode"><button type="button" data-mode="safari">Safari</button><button type="button" data-mode="motorsport">Motorsport</button></div></nav><a class="spstrip" href="https://alterego.online/products/build-race-repeat-hoodie?utm_source=onetrackmind&utm_medium=sponsor" target="_blank" rel="noopener sponsored"><img src="https://alterego.online/cdn/shop/files/3158941636033974733_2048.jpg?v=1792398701&width=240" alt="" loading="lazy"><span><em>Sponsored by</em> <b>AlterEgo</b>: Build Race Repeat hoodie, made to order, from $65 ›</span></a></header><script>(function(){var h=document.documentElement,b=document.querySelectorAll(".modesw button");function s(m,u){h.setAttribute("data-mode",m);b.forEach(function(x){x.classList.toggle("on",x.dataset.mode===m)});if(u){try{localStorage.setItem("otm-mode",m)}catch(e){}document.dispatchEvent(new CustomEvent("otm-mode",{detail:m}))}}b.forEach(function(x){x.onclick=function(){s(x.dataset.mode,1)}});s(h.getAttribute("data-mode")||"safari",0)})();</script><script>document.addEventListener("click",function(e){document.querySelectorAll(".navdd[open]").forEach(function(d){if(!d.contains(e.target))d.open=false;});});</script>
+<header><a class="logo" href="/">OneTrackMind</a><div class="motto">Recce. Ride. Report.</div><nav class="hdrlinks" aria-label="Site">${[["/","Plan a trip"],["/routes/","Routes"],["/record/","Record"]].map(([h,t])=>`<a href="${h}"${active===h?' class="on" aria-current="page"':""}>${t}</a>`).join("")}<details class="navdd"><summary${["/about/","/favourites/"].includes(active)?' class="on"':""}>About</summary><div class="ddm"><a href="/about/">About OneTrackMind</a><a href="/favourites/">Founder's fav's</a><a href="/how-to/">How to</a></div></details><div class="modesw" role="group" aria-label="Mode"><button type="button" data-mode="safari">Safari</button><button type="button" data-mode="motorsport">Motorsport</button></div></nav><a class="spstrip" href="https://alterego.online/products/build-race-repeat-hoodie?utm_source=onetrackmind&utm_medium=sponsor" target="_blank" rel="noopener sponsored"><img src="https://alterego.online/cdn/shop/files/3158941636033974733_2048.jpg?v=1792398701&width=240" alt="" loading="lazy"><span><em>Sponsored by</em> <b>AlterEgo</b>: Build Race Repeat hoodie, made to order, from $65 ›</span></a></header><script>(function(){var h=document.documentElement,b=document.querySelectorAll(".modesw button");function s(m,u){h.setAttribute("data-mode",m);b.forEach(function(x){x.classList.toggle("on",x.dataset.mode===m)});if(u){try{localStorage.setItem("otm-mode",m)}catch(e){}document.dispatchEvent(new CustomEvent("otm-mode",{detail:m}))}}b.forEach(function(x){x.onclick=function(){s(x.dataset.mode,1)}});s(h.getAttribute("data-mode")||"safari",0)})();</script><script>document.addEventListener("click",function(e){document.querySelectorAll(".navdd[open]").forEach(function(d){if(!d.contains(e.target))d.open=false;});});</script>
 ${body}
 <aside class="spbox"><span>OneTrackMind is free thanks to</span> <a href="https://alterego.online/?utm_source=onetrackmind&utm_medium=sponsor" target="_blank" rel="noopener sponsored"><b>AlterEgo</b>, made-to-order wear for petrolheads</a> · <a href="/advertise/">Your brand here ›</a></aside>
 <footer>OneTrackMind: plan road trips anywhere, on the roads less travelled, then ride them on your GPS or phone. Free for riders and drivers. · <a href="/advertise/">Advertise</a> · <a href="/terms.html">Terms and disclaimer</a> · <a href="/privacy.html">Privacy</a> · <a href="/rules.html">Rules</a> · <a href="mailto:hello@onetrackmind.online">hello@onetrackmind.online</a></footer>
@@ -407,6 +409,54 @@ ${r ? `<p class="note">Or take the trip I did: <a href="/routes/${esc(r.id)}/">$
   const ld = { "@context": "https://schema.org", "@type": "HowTo", name: g.title, description: g.short, url: `${SITE}/how-to/${g.id}/`, author: FOUNDER, dateModified: g.checked, step: g.sections.map(x => ({ "@type": "HowToSection", name: x.h, itemListElement: x.items.map(t => ({ "@type": "HowToStep", text: t.replace(/<[^>]+>/g, "") })) })) };
   return page({ active: "/favourites/", url: `/how-to/${g.id}/`, title: `${g.title}: cost, dates, booking and rules · OneTrackMind`, desc: g.short, body, ld });
 }
+
+function recordPage() {
+  const body = `<main class="rec"><h1>Record a ride</h1>
+<p class="intro">Tap Start, put the phone in your tank bag or pocket, ride. Tap Stop when you're done. The ride saves on this phone and you can send it to your computer, or load it into the planner, whenever you like.</p>
+<p class="note"><b>Keep the screen on and this page open.</b> Phones, iPhones especially, stop tracking when the screen locks or you switch app. Plug it in on a long day. Works with no signal: the GPS doesn't need data.</p>
+<section class="recbox"><div class="recstat"><div><b id="rDist">0.0</b><span>km</span></div><div><b id="rTime">0:00</b><span>time</span></div><div><b id="rSpd">0</b><span>km/h</span></div><div><b id="rPts">0</b><span>points</span></div></div>
+<div class="recbtns"><button class="cta" id="rStart" type="button">Start</button><button class="cta ghost" id="rStop" type="button" hidden>Stop and save</button></div>
+<p class="note" id="rMsg" aria-live="polite"></p></section>
+<section id="rResume" hidden><p>A ride was still recording when this page closed (<span id="rResInfo"></span>).</p><button class="cta" id="rResSave" type="button">Save it</button> <button class="cta ghost" id="rResDrop" type="button">Throw it away</button></section>
+<h2>Saved on this phone</h2><div id="rList"><p class="note">No rides yet.</p></div>
+<p class="note">Load a saved ride into the <a href="/">planner</a> with its GPX button, or share the file to your computer, Garmin or Strava.</p></main>
+<script>(function(){
+var K="otm-rec",R="otm-rides",$=function(i){return document.getElementById(i)},cur=null,wid=null,tm=null,lock=null;
+function ld(k,d){try{return JSON.parse(localStorage.getItem(k))||d}catch(e){return d}}
+function sv(k,v){try{localStorage.setItem(k,JSON.stringify(v));return true}catch(e){$("rMsg").textContent="This phone is out of space for saved rides. Download one and delete it.";return false}}
+function hav(a,b){var r=Math.PI/180,x=(b[1]-a[1])*r*Math.cos((a[0]+b[0])/2*r),y=(b[0]-a[0])*r;return Math.sqrt(x*x+y*y)*6371008.8}
+function dist(p){var d=0;for(var i=1;i<p.length;i++)d+=hav(p[i-1],p[i]);return d}
+function hm(s){s=Math.round(s);var h=Math.floor(s/3600),m=Math.floor(s%3600/60),c=s%60;return h?h+":"+(m<10?"0":"")+m+":"+(c<10?"0":"")+c:m+":"+(c<10?"0":"")+c}
+function show(){if(!cur)return;var p=cur.pts,l=p[p.length-1];$("rDist").textContent=(cur.d/1000).toFixed(1);$("rTime").textContent=hm((Date.now()-cur.t0)/1000);$("rPts").textContent=p.length;$("rSpd").textContent=l&&l[4]!=null?Math.round(l[4]*3.6):0}
+function onPos(g){var c=g.coords;if(c.accuracy>50)return;var p=cur.pts,l=p[p.length-1],pt=[+c.latitude.toFixed(6),+c.longitude.toFixed(6),c.altitude!=null?Math.round(c.altitude):null,Math.round(g.timestamp/1000),c.speed!=null?+c.speed.toFixed(1):null];
+ if(l){var d=hav(l,pt);if(d<8&&pt[3]-l[3]<10)return;if(d>5000&&pt[3]-l[3]<20)return;cur.d+=d}p.push(pt);sv(K,cur);show()}
+function onErr(e){$("rMsg").textContent=e.code===1?"Location is blocked. Allow location for this site in your browser settings, then tap Start again.":"Can't get a GPS fix yet. Keep going, it finds you in a minute out in the open."}
+function wl(){try{if(navigator.wakeLock)navigator.wakeLock.request("screen").then(function(x){lock=x}).catch(function(){})}catch(e){}}
+document.addEventListener("visibilitychange",function(){if(cur&&document.visibilityState==="visible")wl()});
+function begin(){if(!navigator.geolocation){$("rMsg").textContent="This browser can't do GPS.";return}
+ if(!cur)cur={t0:Date.now(),d:0,pts:[]};$("rStart").hidden=true;$("rStop").hidden=false;$("rMsg").textContent="Recording. Waiting for GPS…";
+ wid=navigator.geolocation.watchPosition(function(g){$("rMsg").textContent="Recording. Keep this page open.";onPos(g)},onErr,{enableHighAccuracy:true,maximumAge:0,timeout:30000});tm=setInterval(show,1000);wl();sv(K,cur)}
+function end(){if(wid!=null)navigator.geolocation.clearWatch(wid);wid=null;clearInterval(tm);try{if(lock)lock.release()}catch(e){}lock=null;$("rStart").hidden=false;$("rStop").hidden=true}
+function keep(c){if(c.pts.length<2){$("rMsg").textContent="Too short to save: no movement recorded.";try{localStorage.removeItem(K)}catch(e){}return}
+ var s=new Date(c.t0),n=s.toLocaleDateString("en-ZA",{day:"numeric",month:"short",year:"numeric"})+" ride",a=ld(R,[]);a.unshift({id:String(c.t0),name:n,t0:c.t0,d:c.d||dist(c.pts),secs:c.pts[c.pts.length-1][3]-c.pts[0][3],pts:c.pts});
+ if(sv(R,a)){try{localStorage.removeItem(K)}catch(e){}$("rMsg").textContent="Saved: "+(c.d/1000).toFixed(1)+" km."}list()}
+function gpx(r){var x='<?xml version="1.0" encoding="UTF-8"?>\\n<gpx version="1.1" creator="OneTrackMind" xmlns="http://www.topografix.com/GPX/1/1"><trk><name>'+r.name.replace(/[<&>]/g,"")+'</name><trkseg>';
+ r.pts.forEach(function(p){x+='<trkpt lat="'+p[0]+'" lon="'+p[1]+'">'+(p[2]!=null?'<ele>'+p[2]+'</ele>':'')+'<time>'+new Date(p[3]*1000).toISOString()+'</time></trkpt>'});return x+'</trkseg></trk></gpx>'}
+function file(r){return new File([gpx(r)],r.name.replace(/[^\\w\\- ]+/g,"").trim().replace(/ +/g,"-")+".gpx",{type:"application/gpx+xml"})}
+function list(){var a=ld(R,[]),b=$("rList");if(!a.length){b.innerHTML='<p class="note">No rides yet.</p>';return}
+ b.innerHTML=a.map(function(r){return '<div class="card ride" data-id="'+r.id+'"><input class="rname" value="'+r.name.replace(/"/g,"&quot;")+'" aria-label="Ride name"><span>'+(r.d/1000).toFixed(1)+' km · '+hm(r.secs)+' · '+r.pts.length+' points</span><div><button class="cta" data-a="dl" type="button">Download GPX</button> '+(navigator.canShare?'<button class="cta ghost" data-a="sh" type="button">Share</button> ':'')+'<button class="cta ghost" data-a="rm" type="button">Delete</button></div></div>'}).join("")}
+$("rList").addEventListener("change",function(e){if(!e.target.classList.contains("rname"))return;var a=ld(R,[]),r=a.find(function(x){return x.id===e.target.closest(".ride").dataset.id});if(r){r.name=e.target.value||r.name;sv(R,a)}});
+$("rList").addEventListener("click",function(e){var b=e.target.closest("[data-a]");if(!b)return;var a=ld(R,[]),id=b.closest(".ride").dataset.id,r=a.find(function(x){return x.id===id});if(!r)return;
+ var nm=b.closest(".ride").querySelector(".rname").value;if(nm)r.name=nm;
+ if(b.dataset.a==="dl"){var f=file(r),u=URL.createObjectURL(f),l=document.createElement("a");l.href=u;l.download=f.name;document.body.appendChild(l);l.click();l.remove();setTimeout(function(){URL.revokeObjectURL(u)},4000)}
+ else if(b.dataset.a==="sh"){var f2=file(r);if(navigator.canShare({files:[f2]}))navigator.share({files:[f2],title:r.name}).catch(function(){});else $("rMsg").textContent="Sharing isn't available here. Use Download."}
+ else if(b.dataset.a==="rm"){b.dataset.a="rm2";b.textContent="Tap again to delete";return}
+ else if(b.dataset.a==="rm2"){sv(R,a.filter(function(x){return x.id!==id}));list()}});
+$("rStart").onclick=begin;$("rStop").onclick=function(){end();var c=cur;cur=null;if(c)keep(c);show()};
+var old=ld(K,null);if(old&&old.pts&&old.pts.length){cur=null;$("rResume").hidden=false;$("rResInfo").textContent=(old.d/1000).toFixed(1)+" km";$("rResSave").onclick=function(){$("rResume").hidden=true;keep(old)};$("rResDrop").onclick=function(){$("rResume").hidden=true;try{localStorage.removeItem(K)}catch(e){}}}
+list();})();</script>`;
+  return page({ active: "/record/", url: "/record/", title: "Record a ride: GPS track saved on your phone · OneTrackMind", desc: "Record your ride on your phone, save it, and download it as a GPX file afterwards. Works with no signal.", body });
+}
 function howtoIndex() {
   const body = `<main><h1>How to</h1>
 <p class="intro">Things you didn't know you could do, and exactly how to do them. Drive the Nürburgring, take your own car on a track, see the factories where your heroes were built. What it costs, when, how to book, and what nobody tells you.</p>
@@ -430,8 +480,9 @@ fs.rmSync(path.join(ROOT, "blog"), { recursive: true, force: true });
 write("advertise/index.html", advertisePage());
 fs.rmSync(path.join(ROOT, "how-to"), { recursive: true, force: true });
 write("how-to/index.html", howtoIndex());
+write("record/index.html", recordPage());
 HOWTO.forEach(g => write(`how-to/${g.id}/index.html`, howtoPage(g)));
-const urls = ["/", "/routes/", "/favourites/", "/about/", "/advertise/", "/how-to/", ...HOWTO.map(g => `/how-to/${g.id}/`), ...live.map(r => `/routes/${r.id}/`), ...FAV.map(x => `/favourites/${x.id}/`), "/blog/", ...STORIES.map(x => `/blog/${x.slug}/`), ...[...seriesOf().entries()].filter(([, L]) => L.length > 1).map(([n, L]) => `/blog/${tripSlug(n, L)}/`), "/terms.html", "/privacy.html", "/rules.html"];
+const urls = ["/", "/routes/", "/favourites/", "/about/", "/advertise/", "/how-to/", "/record/", ...HOWTO.map(g => `/how-to/${g.id}/`), ...live.map(r => `/routes/${r.id}/`), ...FAV.map(x => `/favourites/${x.id}/`), "/blog/", ...STORIES.map(x => `/blog/${x.slug}/`), ...[...seriesOf().entries()].filter(([, L]) => L.length > 1).map(([n, L]) => `/blog/${tripSlug(n, L)}/`), "/terms.html", "/privacy.html", "/rules.html"];
 write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${today}</lastmod></url>`).join("\n")}\n</urlset>\n`);
 write("robots.txt", `# Everyone welcome, search engines and AI assistants included.\nUser-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${SITE}/sitemap.xml\n`);
 write("llms.txt", `# OneTrackMind
