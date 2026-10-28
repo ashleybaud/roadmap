@@ -98,6 +98,9 @@ input[type=text],input[type=email],input[type=number],input[type=time],input[typ
 .srow2{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line)}.srow2 .sn{flex:1;min-width:0}.srow2 .sact{display:flex;gap:8px;align-items:center;white-space:nowrap}.srow2 .avi.trio{cursor:default}
 .snext{margin-top:8px}
 @media (max-width:640px){.trow{grid-template-columns:26px 1fr auto}.trow .tkm{grid-column:2;grid-row:2;margin-top:-4px}.trow .tctl{grid-row:1/3;grid-column:3}}
+.herotoggle{position:absolute;top:10px;right:12px;background:transparent;border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:6px;padding:3px 10px;font:600 .8rem var(--f-body);cursor:pointer}
+.herotoggle:hover{border-color:#3FB48A;color:#3FB48A}
+.hero.shut{padding:8px 14px}.hero.shut .herohead{font-size:1.15rem;margin:0}.hero.shut>*:not(.herohead):not(.herotoggle){display:none}.hero.shut .herotoggle{top:6px}
 .staybadge{display:inline-block;white-space:nowrap;background:#2F5BA8;color:#fff;font:600 12px/1 system-ui,sans-serif;padding:5px 7px;border-radius:12px;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.35);cursor:pointer}#map.zoomin .staybadge{display:none}
 .favmk{width:26px;height:26px;border-radius:50%;background:#D9A441;color:#18201C;border:2px solid #18201C;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.35)}
 .btn.wa{background:#25D366;border-color:#25D366;color:#073B1E}
@@ -254,7 +257,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 header h1{font-size:2.7rem;font-weight:700;letter-spacing:-.005em;text-transform:uppercase}
 @media (max-width:640px){header h1{font-size:1.7rem}header{gap:6px;padding-bottom:6px}header .note{display:none}.motto{font-size:.95rem;margin:0}header .btns .btn{padding:4px 10px;font-size:.85rem}#hdrSummary{display:none}.guide .gh{font-size:1.1rem}.guide>summary{padding:6px 0}}
 .motto{font-family:var(--f-display);font-weight:700;font-size:1.2rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:2px 0}
-.hero{flex-basis:100%;background:#18201C;border:1px solid var(--line);color:#fff;border-radius:12px;padding:16px 18px;margin-top:4px}
+.hero{position:relative;flex-basis:100%;background:#18201C;border:1px solid var(--line);color:#fff;border-radius:12px;padding:16px 18px;margin-top:4px}
 .herohead{font-family:var(--f-display);font-weight:700;text-transform:uppercase;font-size:2.4rem;line-height:1;margin:0;letter-spacing:.01em;color:#fff}
 .herohead span{color:#3FB48A}
 .herosub{margin:8px 0 12px;font-size:1.08rem;max-width:62rem;color:#fff;opacity:.92}
@@ -619,6 +622,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
     <div class="btns"><span class="lbl mono" id="hdrSummary"></span><button class="btn ghost" id="feedback" type="button">Send feedback</button><button class="btn" id="addBtn" type="button" hidden>+ Add yours</button><button class="btn ghost" id="reviewBtn" type="button" hidden>Review</button><button class="btn ghost" id="acctBtn" type="button" hidden>Sign in</button><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
     <nav class="hdrlinks" style="order:9" aria-label="Site"><a href="/" class="on" aria-current="page">Plan a trip</a><a href="/routes/">Routes</a><a href="/favourites/">Founder's fav's</a><a href="/about/">About</a></nav>
     <section class="hero" style="order:10" aria-label="What it does">
+      <button type="button" class="herotoggle" id="heroToggle" aria-expanded="true" title="Hide this">Hide ▴</button>
       <h2 class="herohead">Plan it. Book it. <span>Ride it.</span></h2>
       <p class="herosub">Forget BaseCamp and five different apps. Route a multi-day trip in minutes, sort your beds, then send it straight to your GPS, your bike's app or your phone and navigate from there.</p>
       <ol class="herosteps">
@@ -3590,6 +3594,12 @@ async function tryRoute(){
   }catch(e){ $("status").textContent="Couldn't open the sample route. Try Open › Find a route."; }
 }
 document.addEventListener("click",e=>{ if(e.target.closest&&e.target.closest("[data-tryroute]")){ e.preventDefault(); tryRoute(); } });
+
+/* the "Plan it. Book it. Ride it." header folds away once read; it stays folded on this device until opened again */
+{ const h=document.querySelector(".hero"), b=$("heroToggle");
+  const set=shut=>{ if(!h||!b) return; h.classList.toggle("shut",shut); b.textContent=shut?"What it does ▾":"Hide ▴"; b.setAttribute("aria-expanded",String(!shut)); };
+  let shut=false; try{ shut=localStorage.getItem("otm-hero-shut")==="1"; }catch(e){} set(shut);
+  if(b) b.addEventListener("click",()=>{ shut=!shut; set(shut); try{ localStorage.setItem("otm-hero-shut",shut?"1":"0"); }catch(e){} }); }
 
 /* ---------- Draw: technical riders build the day point to point on the map ----------
    Each tap adds the next point at the end of the day (before its night stop or finish), in the order tapped.

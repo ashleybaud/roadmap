@@ -40,3 +40,9 @@ async function tryRoute(){
   }catch(e){ $("status").textContent="Couldn't open the sample route. Try Open › Find a route."; }
 }
 document.addEventListener("click",e=>{ if(e.target.closest&&e.target.closest("[data-tryroute]")){ e.preventDefault(); tryRoute(); } });
+
+/* the "Plan it. Book it. Ride it." header folds away once read; it stays folded on this device until opened again */
+{ const h=document.querySelector(".hero"), b=$("heroToggle");
+  const set=shut=>{ if(!h||!b) return; h.classList.toggle("shut",shut); b.textContent=shut?"What it does ▾":"Hide ▴"; b.setAttribute("aria-expanded",String(!shut)); };
+  let shut=false; try{ shut=localStorage.getItem("otm-hero-shut")==="1"; }catch(e){} set(shut);
+  if(b) b.addEventListener("click",()=>{ shut=!shut; set(shut); try{ localStorage.setItem("otm-hero-shut",shut?"1":"0"); }catch(e){} }); }
