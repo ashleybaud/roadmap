@@ -1,7 +1,7 @@
 
 /* ================= v4: plan by dates ================= */
 const TABS={fuel:"Fuel",stay:"Stay",food:"Food",sight:"Sights"};
-const DAYCOL=["#0B6E4F","#2F5BA8","#9A6A33","#6B4E9B","#B3261E","#00838F","#5D4037"];
+const DAYCOL=["#0F7B8A","#2F5BA8","#9A6A33","#6B4E9B","#B3261E","#00838F","#5D4037"];
 function ymd(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 function addDays(s,n){const d=new Date(s+"T12:00:00");d.setDate(d.getDate()+n);return ymd(d);}
 const dayName=k=>dayDate(k).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"});
@@ -401,7 +401,7 @@ function routeSketch(){
   plan.days.forEach((d,k)=>{ if(!d) return; const pts=seg(d.a,d.b).filter((p,i,a)=>i%3===0||i===a.length-1);
     svg+=`<polyline fill="none" stroke="${DAYCOL[k%DAYCOL.length]}" stroke-width="3" points="${pts.map(p=>X(p.lon).toFixed(1)+","+Y(p.lat).toFixed(1)).join(" ")}"/>`; });
   const labels=[trip.start,...trip.days.slice(0,-1).map(d=>d.to),endPt()].filter((p,i,a)=>p&&p.lat!=null&&a.indexOf(p)===i);
-  labels.forEach(p=>{svg+=`<circle cx="${X(p.lon).toFixed(1)}" cy="${Y(p.lat).toFixed(1)}" r="5" fill="#fff" stroke="#18201C" stroke-width="2"/><text x="${(X(p.lon)+8).toFixed(1)}" y="${(Y(p.lat)+4).toFixed(1)}" font-size="12" font-weight="700" fill="#18201C">${esc(p.name)}</text>`;});
+  labels.forEach(p=>{svg+=`<circle cx="${X(p.lon).toFixed(1)}" cy="${Y(p.lat).toFixed(1)}" r="5" fill="#fff" stroke="#11262B" stroke-width="2"/><text x="${(X(p.lon)+8).toFixed(1)}" y="${(Y(p.lat)+4).toFixed(1)}" font-size="12" font-weight="700" fill="#11262B">${esc(p.name)}</text>`;});
   return svg+`</svg>`;
 }
 function printHtml(){
@@ -786,7 +786,7 @@ function dayBody(k,noStops){
   return h;
 }
 // one category at a stop on the map: plain numbered dots matching the list; the name shows on hover or tap
-const CATCOL={fuel:"#0B6E4F",food:"#B3261E",stay:"#2F5BA8",sights:"#9A6A33",shop:"#6B4E9B",toilets:"#00838F",cash:"#2F5BA8",repair:"#5D4037"};
+const CATCOL={fuel:"#0F7B8A",food:"#B3261E",stay:"#2F5BA8",sights:"#9A6A33",shop:"#6B4E9B",toilets:"#00838F",cash:"#2F5BA8",repair:"#5D4037"};
 function catPins(list,c,k,j){
   const night=c==="stay"&&j===plan.days[k].pts.length-1&&k<nDays()-1;
   list.forEach((p,i)=>{ const nm=p.name||AV.find(a=>a[0]===c)[2];
@@ -798,7 +798,7 @@ function catPins(list,c,k,j){
 var ovFocus=null; // var: renders can run before this line
 function drawOvLayer(){
   const {k,j,cat}=ovFocus, pd=plan&&plan.days[k], p=pd&&pd.pts[j]; if(!p) return false;
-  L.marker([p.lat,p.lon],{icon:dotIcon("#18201C",16)}).bindTooltip(p.name,{permanent:true,direction:"right",offset:[10,0],className:"maplbl"}).addTo(layer);
+  L.marker([p.lat,p.lon],{icon:dotIcon("#11262B",16)}).bindTooltip(p.name,{permanent:true,direction:"right",offset:[10,0],className:"maplbl"}).addTo(layer);
   const list=catPins(stopAvail(p)[cat],cat,k,j), pts=[...list,p].map(x=>[x.lat,x.lon]);
   const fit=()=>{ if(!ovFocus) return; if(pts.length<2) map.setView([p.lat,p.lon],14); else map.fitBounds(L.latLngBounds(pts),{padding:[30,30],maxZoom:15}); };
   fit(); setTimeout(fit,250); // again once the list below has opened and the page has settled
@@ -816,8 +816,8 @@ function drawStopLayer(){
   const {k,j,cat}=stopFocus, sc=scope(k,j); if(!sc) return false;
   const s=sc.jj>0&&!cat?seg(sc.a,sc.b):[];
   if(s.length>1) L.polyline(s.map(g=>[g.lat,g.lon]),{color:"#B26A00",weight:7}).addTo(layer);
-  L.marker([sc.p.lat,sc.p.lon],{icon:dotIcon("#18201C",16)}).bindTooltip(sc.p.name,{permanent:true,direction:"right",offset:[10,0],className:"maplbl"}).addTo(layer);
-  const av=stopAvail(sc.p), col={fuel:"#0B6E4F",food:"#B3261E",stay:"#2F5BA8",sights:"#9A6A33",shop:"#6B4E9B",toilets:"#00838F",cash:"#2F5BA8",repair:"#5D4037"};
+  L.marker([sc.p.lat,sc.p.lon],{icon:dotIcon("#11262B",16)}).bindTooltip(sc.p.name,{permanent:true,direction:"right",offset:[10,0],className:"maplbl"}).addTo(layer);
+  const av=stopAvail(sc.p), col={fuel:"#0F7B8A",food:"#B3261E",stay:"#2F5BA8",sights:"#9A6A33",shop:"#6B4E9B",toilets:"#00838F",cash:"#2F5BA8",repair:"#5D4037"};
   const shown=[]; AV.forEach(([c,ic])=>{ if(cat&&c!==cat) return; if(cat){ shown.push(...catPins(av[c],c,k,j)); return; } av[c].forEach(p=>{ shown.push(p); L.marker([p.lat,p.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:${col[c]}">${ic}</div>`,iconSize:[22,22],iconAnchor:[11,11]})}).bindTooltip(p.name||AV.find(a=>a[0]===c)[2]).addTo(layer); }); });
   const pts=[...s,...shown,sc.p].map(p=>[p.lat,p.lon]);
   if(!cat) map.setView([sc.p.lat,sc.p.lon],14); // the stop and what's around it
@@ -992,7 +992,7 @@ window.addEventListener("scroll",hidePeek,{passive:true});
 /* ---------- map ---------- */
 let map,layer,focusR=null,lastSel=null;
 function focusRange(a,b){focusR={a:Math.min(a,b),b:Math.max(a,b)}; drawMap(); if(window.innerWidth<=1000) $("map").scrollIntoView({behavior:"smooth",block:"start"});}
-const dotIcon=(c,sz,sq)=>L.divIcon({className:"",html:`<div style="width:${sz}px;height:${sz}px;background:${c};border:2px solid #18201C;border-radius:${sq?"2px":"50%"}"></div>`,iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]});
+const dotIcon=(c,sz,sq)=>L.divIcon({className:"",html:`<div style="width:${sz}px;height:${sz}px;background:${c};border:2px solid #11262B;border-radius:${sq?"2px":"50%"}"></div>`,iconSize:[sz,sz],iconAnchor:[sz/2,sz/2]});
 let lblLayer=null, ovHi=null;
 document.addEventListener("mouseover",e=>{ const o=e.target.closest&&e.target.closest(".ovday"); const k=o?+o.dataset.gotoday:null; if(k!==ovHi&&ui.tab==="ov"){ ovHi=k; drawMap(); } });
 function townLabels(){ if(!map||!lblLayer||!townList) return; lblLayer.clearLayers(); const z=map.getZoom(), bb=map.getBounds().pad(-0.03);
@@ -1026,7 +1026,7 @@ function drawMap(){
   const sel=ui.tab==="ov"?null:plan.days[ui.tab];
   const hl=sel?null:ovHi;
   plan.days.forEach((d,k)=>{ if(!d) return; const on=sel?k===ui.tab:(hl==null||hl===k), col=DAYCOL[k%DAYCOL.length];
-    const st=sel?{color:on?col:"#5C6660",weight:on?5:3,opacity:on?.9:.3}:{color:on?col:"#5C6660",weight:on?(k===0?7:5):3,opacity:on?.95:.25,dashArray:k>0?"10 8":null,lineCap:"butt"};
+    const st=sel?{color:on?col:"#54666A",weight:on?5:3,opacity:on?.9:.3}:{color:on?col:"#54666A",weight:on?(k===0?7:5):3,opacity:on?.95:.25,dashArray:k>0?"10 8":null,lineCap:"butt"};
     L.polyline(seg(d.a,d.b).map(g=>[g.lat,g.lon]),st).addTo(layer); });
   if(ui.lay.road) drawGradeLayer(sel);
   if(ui.lay.rep&&typeof drawReports==="function") drawReports(sel);
@@ -1052,11 +1052,11 @@ function drawMap(){
     m.on("click",()=>{ const k=trip.days.findIndex((d,i)=>plan.days[i]&&plan.days[i].pts.includes(p)&&(sel?i===ui.tab:true)); if(k<0) return; const j=plan.days[k].pts.indexOf(p); ui.tab=k; stopFocus={k,j}; saveUi(); renderAll(); });
   });
   if(fp&&ui.lay.fuel){
-    fuelStations.filter(f=>inR(f)&&f.off<=2).forEach(f=>L.marker([f.lat,f.lon],{icon:dotIcon("#0B6E4F",10,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
+    fuelStations.filter(f=>inR(f)&&f.off<=2).forEach(f=>L.marker([f.lat,f.lon],{icon:dotIcon("#0F7B8A",10,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
     const stopsHere=townPoints(), gapsOn=(fp.days||[]).flatMap(d=>d?d.probs:[]);
     const ftowns=stopTowns().filter(t=>t.fuel&&t.off>2&&inR(t)&&!stopsHere.some(p=>hav(p,t)<3)&&gapsOn.some(g=>t.km>=g.from-5&&t.km<=g.to+5)), lbl=sel&&ftowns.length<=8;
     if(sel||plan.days.filter(Boolean).length===1) ftowns.forEach(t=>{ const k=plan.days.findIndex(d=>d&&t.km>=d.a-1&&t.km<=d.b+1); if(k<0) return;
-      L.marker([t.lat,t.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:#0B6E4F">⛽</div>`,iconSize:[22,22],iconAnchor:[11,11]})})
+      L.marker([t.lat,t.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:#0F7B8A">⛽</div>`,iconSize:[22,22],iconAnchor:[11,11]})})
         .bindTooltip(t.name,lbl?{permanent:true,direction:"right",offset:[12,0],className:"maplbl"}:{})
         .bindPopup(`<b>${esc(t.name)}</b><br>${Math.round(t.off)} km off the route${t.food?" · food":""}<br><button class="btn small" type="button" data-addtown="${k}|${esc(t.name)}|${t.lat}|${t.lon}">Add as a stop</button>`).addTo(layer); });
   }
@@ -1066,15 +1066,15 @@ function drawMap(){
   if(ui.lay.stay) stays.forEach(s=>{ const k=trip.days.findIndex((d,i)=>d.to===s.night&&i<nDays()-1); if(k<0) return; const n=s.places.filter(p=>stayMatch(p,stayTypeOf(k))).length; if(!n||(trip.days[k].to&&trip.days[k].to.stay)) return;
     L.marker([s.night.lat,s.night.lon],{icon:L.divIcon({className:"",html:`<div class="staybadge" title="${n} places to stay. Tap to see them">🛏 ${n}</div>`,iconSize:[54,24],iconAnchor:[-14,30]}),zIndexOffset:900}).on("click",()=>map.setView([s.night.lat,s.night.lon],14)).addTo(layer); });
   if(ui.lay.stay) stays.forEach(s=>{ const k=trip.days.findIndex((d,i)=>d.to===s.night&&i<nDays()-1); if(k<0) return; s.places.filter(p=>stayMatch(p,stayTypeOf(k))).forEach(p=>{ const on=trip.days[k].to&&trip.days[k].to.stay&&trip.days[k].to.name===p.name&&hav(p,trip.days[k].to)<0.1;
-    L.marker([p.lat,p.lon],{icon:dotIcon(on?"#0B6E4F":"#2F5BA8",on?13:9)}).bindTooltip(p.name).bindPopup(`<b>${esc(p.name)}</b><br><span class="note">${esc((p.tags.tourism||"").replace(/_/g," "))}</span><br>${on?`<span class="okt">✓ Your stay, ${esc(dayName(k))}</span>`:`<button class="btn small" type="button" data-staynight="${k}:${esc(p.id)}">Stay here, ${esc(dayName(k))}</button>`}`).addTo(layer); }); });
+    L.marker([p.lat,p.lon],{icon:dotIcon(on?"#0F7B8A":"#2F5BA8",on?13:9)}).bindTooltip(p.name).bindPopup(`<b>${esc(p.name)}</b><br><span class="note">${esc((p.tags.tourism||"").replace(/_/g," "))}</span><br>${on?`<span class="okt">✓ Your stay, ${esc(dayName(k))}</span>`:`<button class="btn small" type="button" data-staynight="${k}:${esc(p.id)}">Stay here, ${esc(dayName(k))}</button>`}`).addTo(layer); }); });
   if(!focusR){ const g=sel?seg(sel.a,sel.b):plan.geom; if(g.length>1&&(window._refit||sel||lastSel!==ui.tab)){map.fitBounds(L.latLngBounds(g.map(x=>[x.lat,x.lon])),{padding:[24,24]});} if(!planStale) window._refit=false; lastSel=ui.tab; }
 }
 function drawPanelLayer(){
   const {k,j,tab}=panel, sc=scope(k,j); if(!sc) return;
   const s=sc.jj>0?seg(sc.a,sc.b):[];
   if(s.length>1) L.polyline(s.map(g=>[g.lat,g.lon]),{color:"#B26A00",weight:7}).addTo(layer);
-  L.marker([sc.p.lat,sc.p.lon],{icon:dotIcon("#18201C",16)}).bindTooltip(sc.p.name).addTo(layer);
-  const col={fuel:"#0B6E4F",stay:"#2F5BA8",food:"#B3261E",sight:"#9A6A33"}[tab], items=panelItems(k,j,tab);
+  L.marker([sc.p.lat,sc.p.lon],{icon:dotIcon("#11262B",16)}).bindTooltip(sc.p.name).addTo(layer);
+  const col={fuel:"#0F7B8A",stay:"#2F5BA8",food:"#B3261E",sight:"#9A6A33"}[tab], items=panelItems(k,j,tab);
   items.forEach(p=>L.marker([p.lat,p.lon],{icon:dotIcon(tab==="sight"?(TYPES.find(t=>t.id===p.kind)?.c||col):col,11,tab==="fuel")}).bindTooltip(p.name||"Fuel").addTo(layer));
   const pts=[...s,...items,sc.p].map(p=>[p.lat,p.lon]);
   if(tab==="stay"||sc.jj===0) map.setView([sc.p.lat,sc.p.lon],12); else if(pts.length>1) map.fitBounds(L.latLngBounds(pts),{padding:[30,30]});

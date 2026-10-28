@@ -6,7 +6,7 @@
 const GRADES=[
   {g:0,short:"?",name:"Surface unknown",text:"The map doesn't say what this road is. Often gravel in the countryside.",col:"#C9CEC5"},
   {g:1,short:"Race",name:"Race",text:"Tar and smooth roads. Any car, any bike.",col:"#7A847D"},
-  {g:2,short:"Pre-jeep",name:"Pre-jeep",text:"Graded gravel and good dirt roads. Fine in any car, cruising on a bike.",col:"#D9A441"},
+  {g:2,short:"Pre-jeep",name:"Pre-jeep",text:"Graded gravel and good dirt roads. Fine in any car, cruising on a bike.",col:"#F2C500"},
   {g:3,short:"Jeep",name:"Jeep",text:"Rough tracks: corrugations, loose stones, ruts. Slow in a car, clearance helps; fun on a bike.",col:"#D9702B"},
   {g:4,short:"Pre-single",name:"Pre-single",text:"Rocks, steep climbs, sand, river crossings. 4x4 (low range at times) or an adventure bike. Not for cars.",col:"#B3261E"},
   {g:5,short:"Single",name:"Single",text:"Bike-only single track or serious 4x4 terrain. Experienced riders and drivers only.",col:"#2A0F0D"},

@@ -11,7 +11,7 @@ const TYPES=[
   {id:"pass",n:"Mountain passes",c:"#6B4E9B",on:true},
   {id:"sight",n:"Sights & history",c:"#9A6A33",on:true},
   {id:"food",n:"Food & coffee",c:"#B3261E",on:false},
-  {id:"camp",n:"Campsites",c:"#0B6E4F",on:false}
+  {id:"camp",n:"Campsites",c:"#0F7B8A",on:false}
 ];
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
