@@ -137,7 +137,7 @@ const TRIP = {
   await page.evaluate(() => { ui.tab = 0; renderAll(); }); await page.waitForTimeout(300);
   const trio = await page.evaluate(() => ({ rows: document.querySelectorAll("#details .stop").length, trio: document.querySelectorAll("#details .stop .trioset .avi").length, lay: ui.lay }));
   ok(trio.rows > 0 && trio.trio === trio.rows * ["fuel","stay","food","sights"].filter(c => trio.lay[c]).length, "fuel/food/bed icons on every stop: " + JSON.stringify(trio));
-  if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT });
+  if (process.env.SHOT) { await page.evaluate(() => ui.lay.food = ui.lay.fuel = ui.lay.stay = true); await page.evaluate(() => renderAll()); const el = await page.$("#details ol.stops"); if (el) await el.screenshot({ path: process.env.SHOT }); }
   await page.evaluate(() => { ui.tab = "ov"; renderAll(); });
   const ov = await page.evaluate(() => { ui.lay.stay = true; ui.lay.fuel = true; ui.tab = "ov"; renderAll(); const b = document.querySelector("[data-ovav]"); if (!b) return { btn: false }; b.click(); return { btn: true, tab: ui.tab, list: !!document.querySelector(".ovlist"), rows: document.querySelectorAll(".ovrows li").length, pins: document.querySelectorAll(".numpin").length }; });
   ok(!ov.btn || (ov.tab === "ov" && ov.list), "overview icon list: " + JSON.stringify(ov));

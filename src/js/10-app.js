@@ -537,6 +537,12 @@ function sleepText(){
 
 /* ---------- what's at a stop: fuel, food, shop, toilets, cash, repair ---------- */
 let amen=[];
+// solid icons for fuel, beds, food and sights on stop lines (emoji were too faint on Windows)
+const TRIO_SVG={fuel:'<path d="M5 3h8v8h1a2 2 0 0 1 2 2v4a1 1 0 0 0 2 0V9l-2-2 1.4-1.4L20 8v9a3 3 0 0 1-6 0v-4h-1v8H5zM7 5v4h4V5z"/>',
+  stay:'<path d="M2 6h2v7h7V8h8a3 3 0 0 1 3 3v8h-2v-3H4v3H2zM7.5 12.5a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4z"/>',
+  food:'<path d="M6 2h1.4v6h1V2h1.2v6h1V2H12v8a2.2 2.2 0 0 1-1.8 2.2V22H7.8v-9.8A2.2 2.2 0 0 1 6 10zM17.5 2C16 2 14 4.2 14 8v5h2v9h2V2z"/>',
+  sights:'<path d="M12 2l2.9 6.6 7.1.6-5.4 4.7 1.6 7L12 17.3 5.8 20.9l1.6-7L2 9.2l7.1-.6z"/>'};
+const trioIcon=c=>`<svg viewBox="0 0 24 24" aria-hidden="true">${TRIO_SVG[c]}</svg>`;
 const AV=[["fuel","⛽","Fuel"],["food","🍴","Food"],["stay","🛏","Places to stay"],["sights","★","Sights"],["shop","🛒","Shop"],["toilets","🚻","Toilets"],["cash","🏧","Cash (ATM)"],["repair","🔧","Tyres and repair"]];
 function stopAvail(p){
   const near=(list)=>list.filter(x=>hav(x,p)<=1).map(x=>Object.assign(x,{dstop:hav(x,p)})).sort((a,b)=>a.dstop-b.dstop);
@@ -612,7 +618,7 @@ function dayWay(k){
 function dayTrio(k){
   const pd=!planStale&&plan&&plan.days[k]; if(!pd||!placesOk) return ""; const j=pd.pts.length-1, p=pd.pts[j], av=stopAvail(p);
   const on=["fuel","stay","food","sights"].filter(c=>ui.lay[c]&&!(c==="stay"&&k===nDays()-1&&trip.round)); if(!on.length) return "";
-  return `<span class="trioset">${AV.filter(a=>on.includes(a[0])).map(a=>{ const n=av[a[0]].length; return `<button type="button" class="avi trio ${n?"":"none"} ${ovFocus&&ovFocus.k===k&&ovFocus.cat===a[0]?"on":""}" ${n?`data-ovav="${k}:${j}:${a[0]}"`:"disabled"} title="${esc(a[2])} at ${esc(p.name)}: ${n||"none"}">${a[1]}</button>`; }).join("")}</span>`;
+  return `<span class="trioset">${AV.filter(a=>on.includes(a[0])).map(a=>{ const n=av[a[0]].length; return `<button type="button" class="avi trio ${n?"":"none"} ${ovFocus&&ovFocus.k===k&&ovFocus.cat===a[0]?"on":""}" ${n?`data-ovav="${k}:${j}:${a[0]}"`:"disabled"} data-c="${a[0]}" title="${esc(a[2])} at ${esc(p.name)}: ${n||"none"}">${trioIcon(a[0])}</button>`; }).join("")}</span>`;
 }
 document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-ovav]"); if(!b) return; const [k,j,c]=b.dataset.ovav.split(":"); const same=ovFocus&&ovFocus.k===+k&&ovFocus.cat===c; ovFocus=same?null:{k:+k,j:+j,cat:c}; if(!ovFocus) window._refit=true; renderAll(); if(ovFocus&&window.innerWidth<=1000) $("map").scrollIntoView({behavior:"smooth",block:"start"}); });
 function fromCell(k){ const from=dayFrom(k); if(!from||from.lat==null) return `<span class="ep need">${k===0?"Set your start":"Pick the night before"}</span>`; return `<span class="ep">${k===0?"▶":"🛏"} ${esc(from.name)}</span>`; }
@@ -707,7 +713,7 @@ function stopList(k){
     const open=stopFocus&&stopFocus.k===k&&stopFocus.j===j, km=j>0?Math.round(pd.legs[j-1].b-pd.a):0;
     const lab=isFrom?"From":isTo?(last?(trip.round?"⟲ Home":"🏁 Finish"):`🛏 Night ${k+1}`):`Stop ${j}`;
     const av=placesOk?stopAvail(p):null;
-    const TRIO=["fuel","stay","food","sights"].filter(c=>ui.lay[c]), trio=AV.filter(a=>TRIO.includes(a[0])).map(a=>{ const n=av?av[a[0]].length:0; return `<button type="button" class="avi trio ${open&&stopFocus.cat===a[0]?"on":""} ${n?"":"none"}" ${n?`data-av="${k}:${j}:${a[0]}"`:"disabled"} title="${esc(a[2])}: ${av?(n||"none")+(a[0]==="stay"||a[0]==="sights"?" within 5 km":" at the stop"):"loading"}">${a[1]}</button>`; }).join("");
+    const TRIO=["fuel","stay","food","sights"].filter(c=>ui.lay[c]), trio=AV.filter(a=>TRIO.includes(a[0])).map(a=>{ const n=av?av[a[0]].length:0; return `<button type="button" class="avi trio ${open&&stopFocus.cat===a[0]?"on":""} ${n?"":"none"}" ${n?`data-av="${k}:${j}:${a[0]}"`:"disabled"} data-c="${a[0]}" title="${esc(a[2])}: ${av?(n||"none")+(a[0]==="stay"||a[0]==="sights"?" within 5 km":" at the stop"):"loading"}">${trioIcon(a[0])}</button>`; }).join("");
     const icons=av?AV.filter(a=>!["fuel","stay","food","sights"].includes(a[0])&&av[a[0]].length).map(a=>`<button type="button" class="avi ${open&&stopFocus.cat===a[0]?"on":""}" data-av="${k}:${j}:${a[0]}" title="${esc(a[2])}: ${av[a[0]].length}">${a[1]}</button>`).join(""):"";
     const fq=legFast(d,j-1), way=p.straight&&!lg.track?`<span class="note gpxnote" title="A straight line to this point: a track the map doesn't show">Straight</span>`:lg.track||(L&&L.gpx)?(L&&L.gpx?`<span class="note gpxnote" title="This stretch follows your GPX file">GPX</span>`:""):(settings.style==="tar"?`<span class="legway one" title="Main roads, like normal sat-nav">${STYLE_ICON.fast}</span>`:`<span class="legway one"><button type="button" data-legsty="${j-1}:${fq?0:1}" class="on" title="${fq?"Quick way, main roads":esc(styleName())} to here. Tap for ${fq?esc(styleName()):"the quick way"}">${fq?STYLE_ICON.fast:STYLE_ICON.default}</button></span>`);
     const tools="";
@@ -721,8 +727,8 @@ function stopList(k){
       </div></details>`:"";
     const autoTag=p.auto?(p.fuelHere?`<span class="autotag" title="Fuel and food here. You asked to stop at least every ${esc(String(settings.range))} km.">Suggested stop${p.detour?` · +${p.detour} km`:""}</span>`
       :`<span class="autotag nofuel" title="No fuel on our map here, and none closer. Ask locally or carry extra.">Suggested stop · fuel not confirmed${p.detour?` · +${p.detour} km`:""}</span>`):"";
-    h+=`<li class="stop ${open?"open":""} ${p.auto?"auto":isTo||isFrom?"":"mine"} ${isTo&&!last?"night":""}" data-sname="${esc(p.name)}"><div class="shead"><div class="sl1"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab ${isTo&&!last?"nightlab":""}">${lab}</span><b>${esc(p.name)}</b></button><span class="sright"><span class="avail">${icons}</span>${isFrom?"":`<span class="skm">km ${km}</span>`}</span></div>
-      <div class="sl2"><span class="sl2l">${p.auto?`<span class="autotag ${p.fuelHere?"":"nofuel"}" title="${p.fuelHere?"Suggested fuel stop":"Suggested stop: no fuel on our map here"}">Suggested${p.fuelHere?"":" · fuel?"}${p.detour?` · +${p.detour} km`:""}</span>`:""}<span class="selev">${L?legElevTxt(L.a,L.b).replace(/^ · /,""):""}</span></span><span class="stools"><span class="trioset">${trio}</span>${way}${tools}${opts}</span></div></div>${open&&plan?stopDetail(k,j,stopFocus.cat):""}</li>`;
+    h+=`<li class="stop ${open?"open":""} ${p.auto?"auto":isTo||isFrom?"":"mine"} ${isTo&&!last?"night":""}" data-sname="${esc(p.name)}"><div class="shead"><div class="sl1"><button type="button" class="sname" data-stop="${k}:${j}"><span class="rlab ${isTo&&!last?"nightlab":""}">${lab}</span><b>${esc(p.name)}</b></button><span class="sright"><span class="trioset">${trio}</span><span class="avail">${icons}</span>${isFrom?"":`<span class="skm">km ${km}</span>`}</span></div>
+      <div class="sl2"><span class="sl2l">${p.auto?`<span class="autotag ${p.fuelHere?"":"nofuel"}" title="${p.fuelHere?"Suggested fuel stop":"Suggested stop: no fuel on our map here"}">Suggested${p.fuelHere?"":" · fuel?"}${p.detour?` · +${p.detour} km`:""}</span>`:""}<span class="selev">${L?legElevTxt(L.a,L.b).replace(/^ · /,""):""}</span></span><span class="stools">${way}${tools}${opts}</span></div></div>${open&&plan?stopDetail(k,j,stopFocus.cat):""}</li>`;
   });
   h+=`</ol><div class="rname"><span class="lbl" style="white-space:nowrap">Add a stop</span>${searchBox("addvia-"+k,"","Town, pass or place on this day",true)}</div>`;
   return h;

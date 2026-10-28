@@ -59,7 +59,12 @@ input[type=text],input[type=email],input[type=number],input[type=time],input[typ
 .btn.small{padding:4px 8px;font-size:.8rem}
 .btn.share{background:#0B6E4F;border-color:#0B6E4F;color:#fff}
 .namedlg{border:1px solid var(--ink);border-radius:8px;padding:16px;max-width:320px;width:90vw;background:var(--bg);color:var(--ink)}.namedlg input{width:100%;margin-top:6px}
-.trioset{display:inline-flex;gap:2px;margin-right:4px}.avi.trio.none{opacity:.25;cursor:default}
+.trioset{display:inline-flex;gap:4px;margin-right:6px;vertical-align:middle}
+.avi.trio{width:28px;height:28px;padding:0;border-radius:6px;border:0;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;background:#2F5BA8}
+.avi.trio svg{width:18px;height:18px;fill:#fff}
+.avi.trio[data-c=fuel]{background:#0B6E4F}.avi.trio[data-c=food]{background:#B3261E}.avi.trio[data-c=stay]{background:#2F5BA8}.avi.trio[data-c=sights]{background:#9A6A33}
+.avi.trio.none{background:transparent;border:1.5px dashed var(--line);cursor:default}.avi.trio.none svg{fill:var(--muted);opacity:.5}
+.avi.trio.on{outline:3px solid #D9A441;outline-offset:1px}
 .numpin{width:22px;height:22px;border-radius:50%;color:#fff;border:2px solid #fff;font:700 11px/18px system-ui,sans-serif;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.4)}
 .ovlist{border:1px solid var(--line);border-top:0;border-radius:0 0 8px 8px;padding:8px 12px;margin:-6px 0 10px;background:var(--panel,#fff)}.ovhead{display:flex;gap:8px;align-items:baseline}.ovhead .linkbtn{margin-left:auto}.ovrows{list-style:none;padding:0;margin:6px 0}.ovrows li{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px dashed var(--line)}.ovrows .num{flex:0 0 22px;height:22px;border-radius:50%;color:#fff;font:700 11px/22px system-ui,sans-serif;text-align:center}.ovrows .ovn{flex:1;min-width:0}.ovrows .sact{display:flex;gap:8px;align-items:center;white-space:nowrap}
 .staybadge{display:inline-block;white-space:nowrap;background:#2F5BA8;color:#fff;font:600 12px/1 system-ui,sans-serif;padding:5px 7px;border-radius:12px;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.35);cursor:pointer}#map.zoomin .staybadge{display:none}
@@ -607,7 +612,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
       <section><h3>2. Stops</h3><ul>
         <li><b>Your stops</b> have a green bar. <b>SUGGESTED</b> stops are fuel the app adds; ✕ removes one for good.</li>
         <li><b>🛏 Night</b> stops are boxed. "town" means you haven't picked a place to sleep yet.</li>
-        <li>Tap a stop to see it on the map and what's there. Every stop shows the icons you've switched on under <b>On the map</b> (fuel, places to stay, food, sights) next to its road icon: tap one to zoom to the stop and see just those (faded means none). <b>⋯</b> renames, moves or removes it.</li>
+        <li>Tap a stop to see it on the map and what's there. Every stop shows the icons you've switched on under <b>On the map</b> (fuel, places to stay, food, sights) on its main line: tap one to zoom to the stop and see just those (faded means none). <b>⋯</b> renames, moves or removes it.</li>
         <li>Press and hold the map (click on a computer) to add a stop, swap one, or sleep there.</li></ul></section>
       <section><h3>3. Roads</h3><ul>
         <li>Each stretch shows how you get there: <b>brown</b> is your road choice from Settings, <b>blue</b> (the freeway) is the quickest way by the main roads, the same as normal sat-nav. Tap it to switch. On <b>Tar</b> every stretch is the freeway.</li>
