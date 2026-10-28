@@ -54,6 +54,8 @@ async function recalc(){
   const my=++seq; syncDays(); save();
   if(!trip.start||trip.start.lat==null){ plan=null; fp=null; if(!/Getting|Tap/.test($("status").textContent))$("status").textContent="Pick where you start."; renderAll(); return; }
   $("status").textContent="Working out the route…"; planStale=true; renderAll();
+  try{ if(await autoNights()){ if(my!==seq) return; $("status").textContent="Picked your night stops. Change any of them. Working out the route…"; renderAll(); } }catch(e){}
+  if(my!==seq) return;
   try{
     const gs=gpxSlices(), gtr=(k,j)=>gs&&gs[k]&&gs[k][j]||null;
     const res=await Promise.all(trip.days.map((d,k)=>{const pts=dayPts(k); if(!pts) return null; 

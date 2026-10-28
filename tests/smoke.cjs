@@ -141,6 +141,11 @@ const TRIP = {
     await shareTrip(); window.fetch = f; return { btns, days: sent && sent.trip.days.length, toast: document.getElementById("toast").textContent }; });
   ok(sh.btns >= 1 && sh.days >= 2 && sh.toast.includes("/?s=abc23xyz"), "share link: " + JSON.stringify(sh));
   console.log("share:", JSON.stringify(sh).slice(0, 160));
+  await page.evaluate(() => { Object.keys(trip).forEach(x => delete trip[x]); Object.assign(trip, { startDate: tomorrow, endDate: addDays(tomorrow, 1), start: pt("Cape Town", -33.925, 18.424), end: pt("Upington", -28.448, 21.256), round: false, sugV: 5, days: [{ to: null, style: "default", vias: [], legs: [] }, { to: null, style: "default", vias: [], legs: [] }] }); plan = null; changed(); });
+  await page.waitForFunction(() => trip.days[0].to && plan && !planStale && plan.days.filter(Boolean).length === 2, null, { timeout: 30000 }).catch(() => {});
+  const nt = await page.evaluate(() => ({ night: trip.days[0].to && trip.days[0].to.name, auto: !!(trip.days[0].to && trip.days[0].to.autoNight), days: plan ? plan.days.filter(Boolean).map(d => Math.round(d.km)) : null }));
+  ok(nt.night && nt.auto && nt.days && nt.days.length === 2, "auto night stop: " + JSON.stringify(nt));
+  console.log("auto night:", JSON.stringify(nt));
   await page.evaluate(() => tryRoute());
   await page.waitForFunction(() => trip.pick === "swartberg-loop", null, { timeout: 8000 }).catch(() => {});
   const tr = await page.evaluate(() => ({ pick: trip.pick, hero: !!document.querySelector(".hero [data-tryroute]"), welcome: !!document.querySelector("#welcome [data-tryroute]") }));
