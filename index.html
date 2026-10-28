@@ -225,6 +225,11 @@ header h1{font-size:2.7rem;font-weight:700;letter-spacing:-.005em;text-transform
 .herobtn{background:#3FB48A!important;border-color:#3FB48A!important;color:#0d1410!important;font-weight:700}
 @media (max-width:640px){body.hastrip .herocta{display:none}.herocta span{font-size:.82rem}}
 .evt{border-collapse:collapse;margin:4px 0;font-size:.9rem}.evt td,.evt th{padding:2px 10px 2px 0;text-align:left}.evt td+td,.evt th+th{text-align:right}
+.rtveh{display:flex;flex-wrap:wrap;gap:6px}.rtveh select,.rtveh input{flex:1 1 110px;min-width:0}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}.seg button{border:0;background:transparent;padding:6px 14px;font:inherit;cursor:pointer;color:var(--ink)}.seg button.on{background:var(--accent);color:#fff}
+.ticks{display:flex;flex-wrap:wrap;gap:6px}.ticks label{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:16px;padding:3px 10px;font-size:.9rem;cursor:pointer}.ticks input{margin:0}.ticks label:has(input:checked){background:color-mix(in srgb,var(--accent) 18%,transparent);border-color:var(--accent)}
+.rtphotos{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0}.rtphotos .ph{position:relative;width:72px;height:72px;border-radius:6px;overflow:hidden;background:var(--chip)}.rtphotos .ph img{width:100%;height:100%;object-fit:cover}.rtphotos .ph button{position:absolute;top:2px;right:2px;border:0;border-radius:50%;width:22px;height:22px;background:rgba(0,0,0,.6);color:#fff;cursor:pointer;line-height:1}.rtphotos .ph.busy::after{content:"…";position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.45);color:#fff;font-weight:700}
+.rreps{margin:6px 0}.rrep{border-top:1px solid var(--line);padding:8px 0}.rrep .ticks span{border:1px solid var(--line);border-radius:12px;padding:1px 8px;font-size:.82rem}.rrep .rph{display:flex;gap:6px;margin-top:6px;overflow-x:auto}.rrep .rph img{height:84px;border-radius:6px}
 .testtag{font-family:var(--f-mono);font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;background:var(--warn);color:var(--onfill);padding:2px 6px;border-radius:4px;vertical-align:middle}
 a.btn{text-decoration:none;display:inline-flex;align-items:center}
 .print{display:none}
@@ -761,11 +766,18 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
 </dialog>
 <dialog id="rateDlg" class="welcome" aria-labelledby="rtTitle">
   <form class="dlgwrap" id="rateForm">
-    <div class="dlghead"><div><h2 id="rtTitle">Rate this route</h2><div class="note">Only if you've ridden it. Your grade helps the next rider pick the right bike and skills.</div></div><button class="icon" type="button" data-rtclose aria-label="Close">✕</button></div>
-    <div class="field"><span class="lbl">How good is it?</span><div class="stars" id="rtStars"></div></div>
+    <div class="dlghead"><div><h2 id="rtTitle">Ride report</h2><div class="note">Only if you've ridden it. Short and honest helps the next rider most.</div></div><button class="icon" type="button" data-rtclose aria-label="Close">✕</button></div>
+    <div class="row2"><div class="field"><label class="lbl" for="rtDate">When did you ride it?</label><input id="rtDate" type="date"></div>
+      <div class="field"><label class="lbl" for="rtVeh">On</label><div class="rtveh"><select id="rtVeh"><option value="bike">Motorbike</option><option value="jeep">4x4</option><option value="car">Car</option></select><input id="rtModel" type="text" maxlength="40" placeholder="Model (optional)"></div></div></div>
+    <div class="row2"><div class="field"><span class="lbl">How good is it?</span><div class="stars" id="rtStars"></div></div>
+      <div class="field"><span class="lbl">Ride it again?</span><div class="seg" id="rtAgain"><button type="button" data-again="1">Yes</button><button type="button" data-again="0">No</button></div></div></div>
     <div class="field"><label class="lbl" for="rtGrade">How hard did you find it?</label><select id="rtGrade"></select></div>
-    <div class="row2"><div class="field"><label class="lbl" for="rtDate">When did you ride it?</label><input id="rtDate" type="date"></div><div class="field"><label class="lbl" for="rtVeh">On</label><select id="rtVeh"><option value="bike">Motorbike</option><option value="jeep">Jeep / 4x4</option><option value="car">Car</option></select></div></div>
-    <div class="btns" style="justify-content:flex-end"><span class="note" id="rtMsg"></span><button class="btn" type="submit">Save rating</button></div>
+    <div class="field"><span class="lbl">What you found (tick any)</span><div class="ticks" id="rtTicks"></div></div>
+    <div class="field"><label class="lbl" for="rtFuel">Fuel</label><select id="rtFuel"><option value="">Didn't need any</option><option value="ok">Fuel where expected</option><option value="missing">Fuel missing somewhere (say where below)</option></select></div>
+    <div class="field"><label class="lbl" for="rtLine">In one line <span class="note" id="rtCount">200 left</span></label><textarea id="rtLine" rows="2" maxlength="200" placeholder="The bit the next rider needs to know"></textarea></div>
+    <div class="field"><span class="lbl">Photos (up to 5)</span><div class="rtphotos" id="rtPhotos"></div><label class="btn small ghost" id="rtAddPh">+ Add photos<input type="file" accept="image/*" multiple hidden id="rtFiles"></label><div class="note" id="rtPhMsg"></div></div>
+    <div id="rtHuman"></div>
+    <div class="btns" style="justify-content:flex-end"><span class="note" id="rtMsg"></span><button class="btn" type="submit">Send report</button></div>
   </form>
 </dialog>
 <dialog id="addDlg" class="welcome" aria-labelledby="adTitle">
@@ -2470,7 +2482,7 @@ async function api(path,opt){
 /* ticked "send me new routes" when signing in: record the yes once signed in (on whichever device finishes the sign-in) */
 async function flushNews(){ try{ if(acct.user&&!acct.user.news&&localStorage.getItem("otm-wantnews")==="1"){ await api("/api/account",{method:"POST",body:{news:true}}); acct.user.news=true; localStorage.removeItem("otm-wantnews"); } }catch(e){} }
 async function loadMe(){
-  try{ const j=await api("/api/auth/me"); acct.ready=!!(j&&j.ready); acct.user=j&&j.user||null; acct.admin=!!(j&&j.admin); acct.contributor=!!(j&&j.contributor); }catch(e){ acct.ready=false; acct.user=null; }
+  try{ const j=await api("/api/auth/me"); acct.ready=!!(j&&j.ready); acct.user=j&&j.user||null; acct.admin=!!(j&&j.admin); acct.contributor=!!(j&&j.contributor); acct.turnstile=j&&j.turnstile||null; acct.media=!!(j&&j.media); }catch(e){ acct.ready=false; acct.user=null; }
   // ticked "Become a contributor" when signing in: record it now
   try{ if(acct.user&&!acct.contributor&&localStorage.getItem("otm-wantcontrib")==="1"){ await api("/api/account",{method:"POST",body:{contributor:true}}); acct.contributor=true; localStorage.removeItem("otm-wantcontrib"); } }catch(e){}
   await flushNews();
@@ -2495,11 +2507,11 @@ function renderAcct(msg){
       <form id="aForm" class="dlgwrap"><div class="field"><label class="lbl" for="aEmail">Your email</label><input id="aEmail" type="email" autocomplete="email" required></div>
       <label class="chk"><input type="checkbox" id="aContrib" ${acct.wantContrib?"checked":""}> Become a contributor: I'll add routes, places and road reports, and I agree to the <a href="/rules.html" target="_blank">contributor rules</a></label>
       <label class="chk"><input type="checkbox" id="aNews" ${acct.wantNews?"checked":""}> Send me new routes and trip ideas, about once a month. Unsubscribe any time.</label>
-      <div class="btns" style="justify-content:flex-end"><button class="btn" type="submit">Email me a link</button></div></form>
+      <div id="aHuman"></div><div class="btns" style="justify-content:flex-end"><button class="btn" type="submit">Email me a link</button></div></form>
       <p class="note" style="margin:0">We keep your email and the routes you save, nothing else. See <a href="/privacy.html" target="_blank">privacy</a> and <a href="/terms.html" target="_blank">terms</a>.</p>`;
     $("aForm").onsubmit=async e=>{ e.preventDefault(); const email=$("aEmail").value.trim(), btn=e.target.querySelector("button[type=submit]")||e.target.querySelector(".btns button"); btn.disabled=true; btn.textContent="Sending…";
       try{ if($("aContrib").checked) localStorage.setItem("otm-wantcontrib","1"); else localStorage.removeItem("otm-wantcontrib"); }catch(err){} acct.wantNews=$("aNews").checked; try{ if(acct.wantNews) localStorage.setItem("otm-wantnews","1"); else localStorage.removeItem("otm-wantnews"); }catch(err){}
-      try{ const j=await api("/api/auth/start",{method:"POST",body:{email,back:"/"}}); acctMode="sent"; acct.sentTo=email; startWaiting(j.poll); renderAcct(); }
+      try{ const turnstile=typeof humanToken==="function"?await humanToken($("aHuman")):null; const j=await api("/api/auth/start",{method:"POST",body:{email,back:"/",turnstile}}); acctMode="sent"; acct.sentTo=email; startWaiting(j.poll); renderAcct(); }
       catch(err){ btn.disabled=false; btn.textContent="Email me a link"; renderAcct({err:1,text:err.message}); $("aEmail").value=email; } };
     setTimeout(()=>$("aEmail")&&$("aEmail").focus(),50);
   } else if(acctMode==="sent"){
@@ -2824,31 +2836,89 @@ $("repForm").addEventListener("submit",async e=>{ e.preventDefault();
   catch(err){ $("rpMsg").textContent=err.message; } });
 document.addEventListener("click",e=>{ const r=e.target.closest&&e.target.closest("[data-repat]"); if(!r) return; const [lat,lon,...n]=r.dataset.repat.split(","); openReport({lat:+lat,lon:+lon,name:n.join(",")}); });
 
-/* ratings: a pick or a shared route */
+/* ride reports (ratings grown up): a pick or a shared route */
 const rateKey=()=>trip.pick?"pick:"+trip.pick:(trip.savedId||trip.sharedId||"");
+const TICKS={goodgravel:"Good gravel",corrugations:"Corrugations",sand:"Sand",rocks:"Rocks",rivers:"River crossings",washaways:"Washaways",roadtyres:"Road tyres OK",twoup:"Two-up OK",need4x4:"Needs 4x4",lowrange:"Needs low range",towing:"Towing OK"};
 let rating={key:"",data:null};
 async function loadRating(){ const k=rateKey(); if(!acct.ready||!k||k===rating.key) return; rating={key:k,data:null};
   try{ rating.data=await api("/api/ratings?route="+encodeURIComponent(k)); renderDetails(); }catch(e){} }
+const mediaUrl=k=>"/api/media/"+k;
+function repHtml(r){
+  const when=r.rode_on?new Date(r.rode_on).toLocaleDateString("en-GB",{month:"short",year:"numeric"}):"";
+  return `<div class="rrep"><div><b>${"★".repeat(r.stars||0)}</b> · ${esc(r.name||"A rider")} · ${esc({bike:"Motorbike",jeep:"4x4",car:"Car"}[r.vehicle]||"")}${r.model?" ("+esc(r.model)+")":""} · ${when}${r.again===1?" · would ride it again":r.again===0?" · once was enough":""}</div>
+    ${r.line?`<div>${esc(r.line)}</div>`:""}${(r.ticks||[]).length||r.fuel?`<div class="ticks" style="margin-top:4px">${(r.ticks||[]).map(t=>`<span>${esc(TICKS[t]||t)}</span>`).join("")}${r.fuel==="missing"?`<span>⛽ fuel missing</span>`:r.fuel==="ok"?`<span>⛽ fuel OK</span>`:""}</div>`:""}
+    ${(r.photos||[]).length?`<div class="rph">${r.photos.map(k=>`<a href="${mediaUrl(k)}" target="_blank" rel="noopener"><img src="${mediaUrl(k)}" alt="Rider's photo" loading="lazy"></a>`).join("")}</div>`:""}</div>`;
+}
 function rateLine(){
   if(!acct.ready||!rateKey()) return ""; const d=rating.key===rateKey()?rating.data:null;
-  const sum=d&&d.n?`<span>★ ${d.stars} from ${d.n} rider${d.n>1?"s":""}${d.grade?` · riders say ${GRADES[Math.round(d.grade)].name}`:""}</span>`:`<span class="note">No ratings yet.</span>`;
-  return `<div class="rateline">${sum}<button class="linkbtn" type="button" data-rate>${d&&d.mine?"Change your rating":"Rode it? Rate it"}</button></div>`;
+  const sum=d&&d.n?`<span>★ ${d.stars} from ${d.n} rider${d.n>1?"s":""}${d.grade?` · riders say ${GRADES[Math.round(d.grade)].name}`:""}</span>`:`<span class="note">No ride reports yet.</span>`;
+  const reps=d&&d.reports&&d.reports.length?`<details class="rreps"><summary class="linkbtn">${d.reports.length} ride report${d.reports.length>1?"s":""} ›</summary>${d.reports.map(repHtml).join("")}</details>`:"";
+  const pend=d&&d.mine&&d.mine.status==="pending"?` <span class="note">(yours is waiting for a quick check)</span>`:"";
+  return `<div class="rateline">${sum}<button class="linkbtn" type="button" data-rate>${d&&d.mine?"Change your report":"Rode it? Send a ride report"}</button>${pend}</div>${reps}`;
 }
-let rtStars=0;
+
+/* Turnstile: an invisible "are you human" check, only when its site key is set up */
+let tsLoad=null;
+function humanToken(holder){
+  if(!acct.turnstile) return Promise.resolve(null);
+  tsLoad=tsLoad||new Promise((res,rej)=>{ const s=document.createElement("script"); s.src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit"; s.async=true; s.onload=res; s.onerror=()=>rej(new Error("The human check didn't load. Check your connection.")); document.head.appendChild(s); });
+  return tsLoad.then(()=>new Promise((res,rej)=>{ holder.innerHTML=""; const el=document.createElement("div"); holder.appendChild(el);
+    window.turnstile.render(el,{sitekey:acct.turnstile,appearance:"interaction-only",callback:t=>res(t),"error-callback":()=>rej(new Error("The human check failed. Try again."))}); }));
+}
+
+/* photos: shrunk on the phone to ~1600 px, checked for size, light and focus, then uploaded */
+async function prepPhoto(file){
+  const bmp=await createImageBitmap(file,{imageOrientation:"from-image"}).catch(()=>null);
+  if(!bmp) throw new Error("That file isn't a photo we can read.");
+  if(Math.min(bmp.width,bmp.height)<700) throw new Error("Too small. Use the original photo.");
+  const t=document.createElement("canvas"), tw=256, th=Math.round(256*bmp.height/bmp.width); t.width=tw; t.height=th;
+  const tx=t.getContext("2d"); tx.drawImage(bmp,0,0,tw,th); const px=tx.getImageData(0,0,tw,th).data;
+  const g=new Float32Array(tw*th); let sum=0; for(let i=0;i<tw*th;i++){ g[i]=0.299*px[i*4]+0.587*px[i*4+1]+0.114*px[i*4+2]; sum+=g[i]; }
+  if(sum/(tw*th)<28) throw new Error("Too dark. Try another.");
+  let lsum=0,lsq=0,n=0; for(let y=1;y<th-1;y++) for(let x=1;x<tw-1;x++){ const i=y*tw+x, l=g[i-1]+g[i+1]+g[i-tw]+g[i+tw]-4*g[i]; lsum+=l; lsq+=l*l; n++; }
+  if(lsq/n-(lsum/n)**2<18) throw new Error("Too blurry. Try another.");
+  const k=Math.min(1,1600/Math.max(bmp.width,bmp.height)), c=document.createElement("canvas"); c.width=Math.round(bmp.width*k); c.height=Math.round(bmp.height*k);
+  c.getContext("2d").drawImage(bmp,0,0,c.width,c.height);
+  let q=0.82, blob; do{ blob=await new Promise(r=>c.toBlob(r,"image/jpeg",q)); q-=0.1; }while(blob&&blob.size>650000&&q>0.4);
+  return blob;
+}
+let rtStars=0, rtAgain=null, rtPh=[];
+function drawPhotos(){ $("rtPhotos").innerHTML=rtPh.map((p,i)=>`<div class="ph${p.key?"":" busy"}"><img src="${p.url}" alt=""><button type="button" data-rmph="${i}" aria-label="Remove">×</button></div>`).join(""); $("rtAddPh").hidden=rtPh.length>=5; }
+$("rtFiles").addEventListener("change",async e=>{ const files=[...e.target.files].slice(0,5-rtPh.length); e.target.value=""; $("rtPhMsg").textContent="";
+  for(const f of files){ let blob; try{ blob=await prepPhoto(f); }catch(err){ $("rtPhMsg").textContent=`${f.name}: ${err.message}`; continue; }
+    const p={url:URL.createObjectURL(blob),key:null}; rtPh.push(p); drawPhotos();
+    try{ const r=await fetch("/api/photos",{method:"POST",headers:{"Content-Type":"image/jpeg"},body:blob,credentials:"same-origin"}); const j=await r.json().catch(()=>({}));
+      if(!r.ok) throw new Error(j.error||"Upload failed."); p.key=j.key; }
+    catch(err){ rtPh=rtPh.filter(x=>x!==p); $("rtPhMsg").textContent=err.message; }
+    drawPhotos(); } });
 function openRate(){
-  if(!acct.user){ acct.why="Sign in to rate this route. Ratings only come from riders who've ridden it."; openAcct("signin"); return; }
-  const m=rating.data&&rating.data.mine; rtStars=m?m.stars:0; $("rtMsg").textContent="";
+  if(!acct.user){ acct.why="Sign in to send a ride report. Reports only come from riders who've ridden it."; openAcct("signin"); return; }
+  const m=rating.data&&rating.data.mine; rtStars=m?m.stars:0; rtAgain=m&&m.again!=null?m.again:null; rtPh=(m&&m.photos||[]).map(k=>({key:k,url:mediaUrl(k)})); $("rtMsg").textContent=""; $("rtPhMsg").textContent=acct.media?"":"Photos switch on soon. Send the report without them for now.";
   $("rtStars").innerHTML=[1,2,3,4,5].map(i=>`<button type="button" data-st="${i}" class="${i<=rtStars?"on":""}" aria-label="${i} star${i>1?"s":""}">★</button>`).join("");
+  $("rtAgain").querySelectorAll("button").forEach(b=>b.classList.toggle("on",rtAgain!=null&&+b.dataset.again===rtAgain));
   $("rtGrade").innerHTML=GRADES.slice(1).map(x=>`<option value="${x.g}">${x.name} (${vehNote(x.g)})</option>`).join("");
-  const G=tripGrade(); $("rtGrade").value=m?m.grade:(G&&G.top||2); $("rtDate").value=m?m.rode_on:""; $("rtDate").max=ymd(new Date()); $("rtVeh").value=m&&m.vehicle||settings.vehicle||"bike";
+  const G=tripGrade(); $("rtGrade").value=m?m.grade:(G&&G.top||2); $("rtDate").value=m?m.rode_on:""; $("rtDate").max=ymd(new Date()); $("rtVeh").value=m&&m.vehicle||settings.vehicle||"bike"; $("rtModel").value=m&&m.model||"";
+  $("rtTicks").innerHTML=Object.entries(TICKS).map(([k,v])=>`<label><input type="checkbox" value="${k}" ${m&&(m.ticks||[]).includes(k)?"checked":""}> ${v}</label>`).join("");
+  $("rtFuel").value=m&&m.fuel||""; $("rtLine").value=m&&m.line||""; $("rtCount").textContent=`${200-$("rtLine").value.length} left`;
+  $("rtAddPh").hidden=!acct.media; drawPhotos(); if(!acct.media) $("rtAddPh").hidden=true;
   $("rateDlg").showModal();
 }
+$("rtLine").addEventListener("input",()=>{ $("rtCount").textContent=`${200-$("rtLine").value.length} left`; });
 $("rateDlg").addEventListener("click",e=>{ if(e.target===$("rateDlg")||e.target.closest("[data-rtclose]")){ $("rateDlg").close(); return; }
-  const s=e.target.closest("[data-st]"); if(s){ rtStars=+s.dataset.st; $("rtStars").querySelectorAll("button").forEach(b=>b.classList.toggle("on",+b.dataset.st<=rtStars)); } });
+  const s=e.target.closest("[data-st]"); if(s){ rtStars=+s.dataset.st; $("rtStars").querySelectorAll("button").forEach(b=>b.classList.toggle("on",+b.dataset.st<=rtStars)); return; }
+  const a=e.target.closest("[data-again]"); if(a){ rtAgain=+a.dataset.again; $("rtAgain").querySelectorAll("button").forEach(b=>b.classList.toggle("on",b===a)); return; }
+  const r=e.target.closest("[data-rmph]"); if(r){ rtPh.splice(+r.dataset.rmph,1); drawPhotos(); } });
 $("rateForm").addEventListener("submit",async e=>{ e.preventDefault();
-  if(!rtStars){ $("rtMsg").textContent="Pick 1 to 5 stars."; return; } if(!$("rtDate").value){ $("rtMsg").textContent="When did you ride it?"; return; }
-  try{ await api("/api/ratings",{method:"POST",body:{route:rateKey(),stars:rtStars,grade:+$("rtGrade").value,rode_on:$("rtDate").value,vehicle:$("rtVeh").value}}); $("rateDlg").close(); rating.key=""; loadRating(); $("status").textContent="Thanks for rating it."; }
-  catch(err){ $("rtMsg").textContent=err.message; } });
+  if(!$("rtDate").value){ $("rtMsg").textContent="When did you ride it?"; return; } if(!rtStars){ $("rtMsg").textContent="Pick 1 to 5 stars."; return; }
+  if(rtPh.some(p=>!p.key)){ $("rtMsg").textContent="Wait for the photos to finish uploading."; return; }
+  const btn=e.target.querySelector("button[type=submit]"); btn.disabled=true; $("rtMsg").textContent="Sending…";
+  try{ const turnstile=await humanToken($("rtHuman"));
+    const j=await api("/api/ratings",{method:"POST",body:{route:rateKey(),stars:rtStars,grade:+$("rtGrade").value,rode_on:$("rtDate").value,vehicle:$("rtVeh").value,model:$("rtModel").value,
+      again:rtAgain==null?null:!!rtAgain,ticks:[...$("rtTicks").querySelectorAll("input:checked")].map(x=>x.value),fuel:$("rtFuel").value,line:$("rtLine").value,photos:rtPh.map(p=>p.key),turnstile}});
+    $("rateDlg").close(); rating.key=""; loadRating(); $("status").textContent=j.status==="pending"?"Thanks. Your report goes live after a quick check.":"Thanks. Your report is live.";
+    if(typeof track==="function") track("report"); }
+  catch(err){ $("rtMsg").textContent=err.message; }
+  btn.disabled=false; });
 document.addEventListener("click",e=>{ if(e.target.closest&&e.target.closest("[data-rate]")) openRate(); });
 
 // after every render: fetch what's missing (cheap; each loads once per route)
@@ -2910,7 +2980,7 @@ async function voteSpot(id,undo){ if(!acct.user){ acct.why="Sign in to say you'v
 /* ---------- approval list (OneTrackMind only) ---------- */
 let revQ=null;
 async function refreshReview(){ const b=$("reviewBtn"); if(!acct.admin){ b.hidden=true; return; }
-  try{ revQ=await api("/api/admin/queue"); const n=revQ.routes.length+revQ.spots.length+revQ.reports.length+revQ.feedback.length; b.hidden=false; b.textContent=n?`Review (${n})`:"Review"; }catch(e){ b.hidden=true; } }
+  try{ revQ=await api("/api/admin/queue"); const n=revQ.routes.length+revQ.spots.length+revQ.reports.length+revQ.feedback.length+(revQ.rides||[]).length; b.hidden=false; b.textContent=n?`Review (${n})`:"Review"; }catch(e){ b.hidden=true; } }
 let riders=null;
 async function loadRiders(){ try{ riders=await api("/api/admin/riders"); }catch(e){ riders={err:e.message}; } if($("revDlg").open) renderReview(); }
 $("reviewBtn").addEventListener("click",async()=>{ await refreshReview(); riders=null; renderReview(); $("revDlg").showModal(); loadRiders(); });
@@ -2923,9 +2993,10 @@ function renderReview(){
   h+=`<div class="rvh">Riders signed up</div>`+(!R?`<div class="note">Loading…</div>`:R.err?`<div class="note">${esc(R.err)}</div>`:
     `<div class="note"><b>${R.total}</b> signed up · <b>${R.week}</b> this week · <b>${R.news}</b> want the monthly email · <b>${R.contributors}</b> contributors</div>
     <div class="btns" style="margin:6px 0"><a class="btn small" href="/api/admin/riders?csv=1" download>Download mailing list (CSV)</a></div>
-    ${(()=>{ const E=R.events||{}, L=[["visit","Visits"],["try","Tapped Try a route"],["plan","Planned a trip"],["pick","Opened a pick"],["gpx","Downloaded a GPX"],["gpx_all","Whole-trip GPX"],["group","Group ride pack"],["gmaps","Opened Google Maps"],["waze","Opened Waze"],["pdf","Saved a PDF"],["save","Saved a route"],["near","Used Near me"],["book","Clicked a booking link"]];
+    ${(()=>{ const E=R.events||{}, L=[["visit","Visits"],["try","Tapped Try a route"],["plan","Planned a trip"],["pick","Opened a pick"],["gpx","Downloaded a GPX"],["gpx_all","Whole-trip GPX"],["group","Group ride pack"],["gmaps","Opened Google Maps"],["waze","Opened Waze"],["pdf","Saved a PDF"],["save","Saved a route"],["near","Used Near me"],["book","Clicked a booking link"],["report","Sent a ride report"]];
       return `<div class="rvh">What riders did</div><table class="evt"><tr><th></th><th>7 days</th><th>30 days</th></tr>${L.map(([k,t])=>`<tr><td>${t}</td><td>${(E[k]||{}).d7||0}</td><td>${(E[k]||{}).d30||0}</td></tr>`).join("")}</table><div class="note">Counted once per visit, no personal data. Started 28 Oct 2026.</div>`; })()}
     <details><summary class="note">Latest ${R.riders.length}</summary>${R.riders.map(x=>`<div class="note">${esc(x.email)}${x.name?" · "+esc(x.name):""} · joined ${when(x.created)}${x.news?" · ✉ yes":""}${x.contributor?" · contributor":""}</div>`).join("")}</details>`);
+  h+=`<div class="rvh">Ride reports (${(q.rides||[]).length})</div>`+(q.rides||[]).map(r=>`<div class="rrow"><div><div class="rt">${esc(r.route_id.replace(/^pick:/,""))} · ${"★".repeat(r.stars)}</div><div class="note">${who(r)} · rode ${esc(r.rode_on)}</div>${r.line?`<div class="pkb">${esc(r.line)}</div>`:""}${r.photos.length?`<div class="rph">${r.photos.map(k=>`<img src="/api/media/${esc(k)}" alt="" style="height:64px;border-radius:6px">`).join(" ")}</div>`:""}</div>${act("ride",r.id)}</div>`).join("");
   h+=`<div class="rvh">Routes to share (${q.routes.length})</div>`+q.routes.map(r=>`<div class="rrow"><div><div class="rt">${esc(r.title)}</div><div class="note">${who(r)} · ${r.km||"?"} km · ${r.days} day${r.days>1?"s":""} · ${when(r.updated)}</div>${r.summary?`<div class="pkb">${esc(r.summary)}</div>`:""}<button class="linkbtn small" type="button" data-rvopen="${r.id}">Open it in the planner</button></div>${act("route",r.id)}</div>`).join("");
   h+=`<div class="rvh">Places (${q.spots.length})</div>`+q.spots.map(p=>`<div class="rrow"><div><div class="rt">${SPOT_ICON[p.kind]||""} ${esc(p.name)}</div><div class="note">${esc(p.label)} · ${who(p)} · ${when(p.created)}</div>${p.note?`<div class="pkb">${esc(p.note)}</div>`:""}<button class="linkbtn small" type="button" data-rvmap="${p.lat},${p.lon}">Show on the map</button></div>${act("spot",p.id)}</div>`).join("");
   h+=`<div class="rvh">Road reports (${q.reports.length})</div>`+q.reports.map(r=>`<div class="rrow"><div><div class="rt">${esc(r.label)}</div><div class="note">${who(r)} · seen ${esc(r.seen_on)}</div>${r.text?`<div class="pkb">${esc(r.text)}</div>`:""}<button class="linkbtn small" type="button" data-rvmap="${r.lat},${r.lon}">Show on the map</button></div>${act("report",r.id)}</div>`).join("");
@@ -3327,7 +3398,7 @@ try{ if(trip&&trip.start&&trip.start.lat!=null) document.body.classList.add("has
 
 /* ---------- what riders do: anonymous daily counts (no names, emails, places or IP kept) ---------- */
 /* Each kind is counted at most once per page visit, so a rider re-planning ten times counts as one "planned". */
-const EVENT_NAMES=["visit","plan","try","pick","gpx","gpx_all","group","gmaps","waze","pdf","save","near","book","signin"];
+const EVENT_NAMES=["visit","plan","try","pick","gpx","gpx_all","group","gmaps","waze","pdf","save","near","book","signin","report"];
 const tracked=new Set();
 function track(name){
   if(!EVENT_NAMES.includes(name)||tracked.has(name)) return; tracked.add(name);

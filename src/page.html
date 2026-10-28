@@ -225,6 +225,11 @@ header h1{font-size:2.7rem;font-weight:700;letter-spacing:-.005em;text-transform
 .herobtn{background:#3FB48A!important;border-color:#3FB48A!important;color:#0d1410!important;font-weight:700}
 @media (max-width:640px){body.hastrip .herocta{display:none}.herocta span{font-size:.82rem}}
 .evt{border-collapse:collapse;margin:4px 0;font-size:.9rem}.evt td,.evt th{padding:2px 10px 2px 0;text-align:left}.evt td+td,.evt th+th{text-align:right}
+.rtveh{display:flex;flex-wrap:wrap;gap:6px}.rtveh select,.rtveh input{flex:1 1 110px;min-width:0}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}.seg button{border:0;background:transparent;padding:6px 14px;font:inherit;cursor:pointer;color:var(--ink)}.seg button.on{background:var(--accent);color:#fff}
+.ticks{display:flex;flex-wrap:wrap;gap:6px}.ticks label{display:inline-flex;align-items:center;gap:4px;border:1px solid var(--line);border-radius:16px;padding:3px 10px;font-size:.9rem;cursor:pointer}.ticks input{margin:0}.ticks label:has(input:checked){background:color-mix(in srgb,var(--accent) 18%,transparent);border-color:var(--accent)}
+.rtphotos{display:flex;flex-wrap:wrap;gap:6px;margin:4px 0}.rtphotos .ph{position:relative;width:72px;height:72px;border-radius:6px;overflow:hidden;background:var(--chip)}.rtphotos .ph img{width:100%;height:100%;object-fit:cover}.rtphotos .ph button{position:absolute;top:2px;right:2px;border:0;border-radius:50%;width:22px;height:22px;background:rgba(0,0,0,.6);color:#fff;cursor:pointer;line-height:1}.rtphotos .ph.busy::after{content:"…";position:absolute;inset:0;display:grid;place-items:center;background:rgba(0,0,0,.45);color:#fff;font-weight:700}
+.rreps{margin:6px 0}.rrep{border-top:1px solid var(--line);padding:8px 0}.rrep .ticks span{border:1px solid var(--line);border-radius:12px;padding:1px 8px;font-size:.82rem}.rrep .rph{display:flex;gap:6px;margin-top:6px;overflow-x:auto}.rrep .rph img{height:84px;border-radius:6px}
 .testtag{font-family:var(--f-mono);font-size:.62rem;letter-spacing:.06em;text-transform:uppercase;background:var(--warn);color:var(--onfill);padding:2px 6px;border-radius:4px;vertical-align:middle}
 a.btn{text-decoration:none;display:inline-flex;align-items:center}
 .print{display:none}
@@ -761,11 +766,18 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
 </dialog>
 <dialog id="rateDlg" class="welcome" aria-labelledby="rtTitle">
   <form class="dlgwrap" id="rateForm">
-    <div class="dlghead"><div><h2 id="rtTitle">Rate this route</h2><div class="note">Only if you've ridden it. Your grade helps the next rider pick the right bike and skills.</div></div><button class="icon" type="button" data-rtclose aria-label="Close">✕</button></div>
-    <div class="field"><span class="lbl">How good is it?</span><div class="stars" id="rtStars"></div></div>
+    <div class="dlghead"><div><h2 id="rtTitle">Ride report</h2><div class="note">Only if you've ridden it. Short and honest helps the next rider most.</div></div><button class="icon" type="button" data-rtclose aria-label="Close">✕</button></div>
+    <div class="row2"><div class="field"><label class="lbl" for="rtDate">When did you ride it?</label><input id="rtDate" type="date"></div>
+      <div class="field"><label class="lbl" for="rtVeh">On</label><div class="rtveh"><select id="rtVeh"><option value="bike">Motorbike</option><option value="jeep">4x4</option><option value="car">Car</option></select><input id="rtModel" type="text" maxlength="40" placeholder="Model (optional)"></div></div></div>
+    <div class="row2"><div class="field"><span class="lbl">How good is it?</span><div class="stars" id="rtStars"></div></div>
+      <div class="field"><span class="lbl">Ride it again?</span><div class="seg" id="rtAgain"><button type="button" data-again="1">Yes</button><button type="button" data-again="0">No</button></div></div></div>
     <div class="field"><label class="lbl" for="rtGrade">How hard did you find it?</label><select id="rtGrade"></select></div>
-    <div class="row2"><div class="field"><label class="lbl" for="rtDate">When did you ride it?</label><input id="rtDate" type="date"></div><div class="field"><label class="lbl" for="rtVeh">On</label><select id="rtVeh"><option value="bike">Motorbike</option><option value="jeep">Jeep / 4x4</option><option value="car">Car</option></select></div></div>
-    <div class="btns" style="justify-content:flex-end"><span class="note" id="rtMsg"></span><button class="btn" type="submit">Save rating</button></div>
+    <div class="field"><span class="lbl">What you found (tick any)</span><div class="ticks" id="rtTicks"></div></div>
+    <div class="field"><label class="lbl" for="rtFuel">Fuel</label><select id="rtFuel"><option value="">Didn't need any</option><option value="ok">Fuel where expected</option><option value="missing">Fuel missing somewhere (say where below)</option></select></div>
+    <div class="field"><label class="lbl" for="rtLine">In one line <span class="note" id="rtCount">200 left</span></label><textarea id="rtLine" rows="2" maxlength="200" placeholder="The bit the next rider needs to know"></textarea></div>
+    <div class="field"><span class="lbl">Photos (up to 5)</span><div class="rtphotos" id="rtPhotos"></div><label class="btn small ghost" id="rtAddPh">+ Add photos<input type="file" accept="image/*" multiple hidden id="rtFiles"></label><div class="note" id="rtPhMsg"></div></div>
+    <div id="rtHuman"></div>
+    <div class="btns" style="justify-content:flex-end"><span class="note" id="rtMsg"></span><button class="btn" type="submit">Send report</button></div>
   </form>
 </dialog>
 <dialog id="addDlg" class="welcome" aria-labelledby="adTitle">

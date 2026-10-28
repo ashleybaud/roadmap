@@ -4,20 +4,23 @@ import { handle, json, body, db, requireUser, sameOrigin, now, HttpError, isAdmi
 async function admin(env, request) { const u = await requireUser(env, request); if (!isAdmin(env, u)) throw new HttpError(403, "OneTrackMind only."); return u; }
 export const onRequestGet = handle(async ({ request, env }) => {
   await admin(env, request); const D = await db(env);
-  const [routes, spots, reports, feedback] = await D.batch([
+  const [routes, spots, reports, feedback, rides] = await D.batch([
     D.prepare(`SELECT r.id, r.title, r.summary, r.km, r.days, r.vehicle, r.updated, u.email, u.name AS who, u.id AS uid FROM routes r JOIN users u ON u.id = r.user_id WHERE r.visibility = 'review' ORDER BY r.updated LIMIT 100`),
     D.prepare(`SELECT s.id, s.kind, s.name, s.note, s.lat, s.lon, s.created, u.email, u.name AS who, u.id AS uid FROM spots s JOIN users u ON u.id = s.user_id WHERE s.status = 'pending' ORDER BY s.created LIMIT 200`),
     D.prepare(`SELECT r.id, r.kind, r.text, r.lat, r.lon, r.seen_on, r.created, u.email, u.name AS who, u.id AS uid FROM reports r JOIN users u ON u.id = r.user_id WHERE r.status = 'pending' AND r.expires > ? ORDER BY r.created LIMIT 200`).bind(now()),
     D.prepare(`SELECT id, kind, text, email, page, lat, lon, created FROM feedback WHERE status = 'new' ORDER BY created DESC LIMIT 200`),
+    D.prepare(`SELECT r.route_id, r.user_id AS uid, r.stars, r.grade, r.rode_on, r.vehicle, r.model, r.again, r.ticks, r.fuel, r.line, r.photos, r.created, u.email, u.name AS who FROM route_ratings r JOIN users u ON u.id = r.user_id WHERE r.status = 'pending' ORDER BY r.created LIMIT 100`),
   ]);
   return json({ routes: routes.results, spots: spots.results.map(s => ({ ...s, label: SPOT_KINDS[s.kind] || s.kind })),
-    reports: reports.results.map(r => ({ ...r, label: (REPORT_KINDS[r.kind] || {}).label || r.kind })), feedback: feedback.results });
+    reports: reports.results.map(r => ({ ...r, label: (REPORT_KINDS[r.kind] || {}).label || r.kind })), feedback: feedback.results,
+    rides: rides.results.map(r => ({ ...r, id: r.route_id + "|" + r.uid, ticks: JSON.parse(r.ticks || "[]"), photos: JSON.parse(r.photos || "[]") })) });
 });
 export const onRequestPost = handle(async ({ request, env }) => {
   sameOrigin(request); await admin(env, request); const b = await body(request, 2000), D = await db(env), ok = b.action === "approve", id = String(b.id || "");
   if (b.type === "route") await D.prepare(`UPDATE routes SET visibility = ? WHERE id = ? AND visibility = 'review'`).bind(ok ? "public" : "private", id).run();
   else if (b.type === "spot") await D.prepare(`UPDATE spots SET status = ?, reviewed = ? WHERE id = ?`).bind(ok ? "ok" : "rejected", now(), id).run();
   else if (b.type === "report") await D.prepare(`UPDATE reports SET status = ? WHERE id = ?`).bind(ok ? "ok" : "rejected", id).run();
+  else if (b.type === "ride") { const [rid, uid] = id.split("|"); await D.prepare(`UPDATE route_ratings SET status = ? WHERE route_id = ? AND user_id = ?`).bind(ok ? "ok" : "rejected", rid, uid).run(); }
   else if (b.type === "feedback") await D.prepare(`UPDATE feedback SET status = 'done' WHERE id = ?`).bind(id).run();
   else if (b.type === "user" && b.action === "block") await D.batch([
     D.prepare(`UPDATE users SET blocked = 1, trusted = 0 WHERE id = ?`).bind(id),

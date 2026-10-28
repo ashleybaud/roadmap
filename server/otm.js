@@ -25,6 +25,8 @@ const SCHEMA = [
   `CREATE INDEX IF NOT EXISTS spots_pos ON spots(status, lat, lon)`,
   // anonymous daily counts of what riders do (planned a trip, downloaded a GPX...): no user, no IP
   `CREATE TABLE IF NOT EXISTS events (day TEXT NOT NULL, name TEXT NOT NULL, n INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (day, name))`,
+  // photos riders upload (stored in R2 under key); used for daily limits and clean-up
+  `CREATE TABLE IF NOT EXISTS photos (key TEXT PRIMARY KEY, user_id TEXT NOT NULL, bytes INTEGER, created INTEGER NOT NULL)`,
   `CREATE TABLE IF NOT EXISTS spot_votes (spot_id TEXT NOT NULL, user_id TEXT NOT NULL, created INTEGER NOT NULL, PRIMARY KEY (spot_id, user_id))`,
 ];
 // columns added after tables already existed (each runs once; "duplicate column" errors are expected afterwards)
@@ -42,6 +44,14 @@ const MIGRATIONS = [
   // "send me new routes and trip ideas": off unless the rider ticks it; news_at = when they last said yes or no (consent record)
   `ALTER TABLE users ADD COLUMN news INTEGER NOT NULL DEFAULT 0`,
   `ALTER TABLE users ADD COLUMN news_at INTEGER`,
+  // ride reports (a rating grown up): ride again, condition ticks, fuel, one line, photos (R2 keys), approval for new riders
+  `ALTER TABLE route_ratings ADD COLUMN again INTEGER`,
+  `ALTER TABLE route_ratings ADD COLUMN ticks TEXT`,
+  `ALTER TABLE route_ratings ADD COLUMN fuel TEXT`,
+  `ALTER TABLE route_ratings ADD COLUMN line TEXT`,
+  `ALTER TABLE route_ratings ADD COLUMN photos TEXT`,
+  `ALTER TABLE route_ratings ADD COLUMN model TEXT`,
+  `ALTER TABLE route_ratings ADD COLUMN status TEXT NOT NULL DEFAULT 'ok'`,
 ];
 let schemaReady = null;
 export async function db(env) {
@@ -165,3 +175,15 @@ export async function userFor(D, email) {
   else await D.prepare(`UPDATE users SET last_seen = ? WHERE id = ?`).bind(t, u.id).run();
   return u;
 }
+
+/* ---------- Cloudflare Turnstile (invisible human check). Only enforced once TURNSTILE_SECRET is set. ---------- */
+export async function humanCheck(env, request, token) {
+  if (!env.TURNSTILE_SECRET) return;
+  if (!token) throw new HttpError(400, "Please wait for the human check, then try again.");
+  const f = new FormData(); f.append("secret", env.TURNSTILE_SECRET); f.append("response", String(token).slice(0, 2048));
+  const ip = request.headers.get("CF-Connecting-IP"); if (ip) f.append("remoteip", ip);
+  const r = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", { method: "POST", body: f }).then(x => x.json()).catch(() => null);
+  if (!r || !r.success) throw new HttpError(403, "The human check didn't pass. Reload the page and try again.");
+}
+/* the ticks a ride report can carry (fixed list, so reports stay short and comparable) */
+export const REPORT_TICKS = { goodgravel: "Good gravel", corrugations: "Corrugations", sand: "Sand", rocks: "Rocks", rivers: "River crossings", washaways: "Washaways", roadtyres: "Road tyres OK", twoup: "Two-up OK", need4x4: "Needs 4x4", lowrange: "Needs low range", towing: "Towing OK" };

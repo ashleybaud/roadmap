@@ -11,7 +11,7 @@ async function api(path,opt){
 /* ticked "send me new routes" when signing in: record the yes once signed in (on whichever device finishes the sign-in) */
 async function flushNews(){ try{ if(acct.user&&!acct.user.news&&localStorage.getItem("otm-wantnews")==="1"){ await api("/api/account",{method:"POST",body:{news:true}}); acct.user.news=true; localStorage.removeItem("otm-wantnews"); } }catch(e){} }
 async function loadMe(){
-  try{ const j=await api("/api/auth/me"); acct.ready=!!(j&&j.ready); acct.user=j&&j.user||null; acct.admin=!!(j&&j.admin); acct.contributor=!!(j&&j.contributor); }catch(e){ acct.ready=false; acct.user=null; }
+  try{ const j=await api("/api/auth/me"); acct.ready=!!(j&&j.ready); acct.user=j&&j.user||null; acct.admin=!!(j&&j.admin); acct.contributor=!!(j&&j.contributor); acct.turnstile=j&&j.turnstile||null; acct.media=!!(j&&j.media); }catch(e){ acct.ready=false; acct.user=null; }
   // ticked "Become a contributor" when signing in: record it now
   try{ if(acct.user&&!acct.contributor&&localStorage.getItem("otm-wantcontrib")==="1"){ await api("/api/account",{method:"POST",body:{contributor:true}}); acct.contributor=true; localStorage.removeItem("otm-wantcontrib"); } }catch(e){}
   await flushNews();
@@ -36,11 +36,11 @@ function renderAcct(msg){
       <form id="aForm" class="dlgwrap"><div class="field"><label class="lbl" for="aEmail">Your email</label><input id="aEmail" type="email" autocomplete="email" required></div>
       <label class="chk"><input type="checkbox" id="aContrib" ${acct.wantContrib?"checked":""}> Become a contributor: I'll add routes, places and road reports, and I agree to the <a href="/rules.html" target="_blank">contributor rules</a></label>
       <label class="chk"><input type="checkbox" id="aNews" ${acct.wantNews?"checked":""}> Send me new routes and trip ideas, about once a month. Unsubscribe any time.</label>
-      <div class="btns" style="justify-content:flex-end"><button class="btn" type="submit">Email me a link</button></div></form>
+      <div id="aHuman"></div><div class="btns" style="justify-content:flex-end"><button class="btn" type="submit">Email me a link</button></div></form>
       <p class="note" style="margin:0">We keep your email and the routes you save, nothing else. See <a href="/privacy.html" target="_blank">privacy</a> and <a href="/terms.html" target="_blank">terms</a>.</p>`;
     $("aForm").onsubmit=async e=>{ e.preventDefault(); const email=$("aEmail").value.trim(), btn=e.target.querySelector("button[type=submit]")||e.target.querySelector(".btns button"); btn.disabled=true; btn.textContent="Sending…";
       try{ if($("aContrib").checked) localStorage.setItem("otm-wantcontrib","1"); else localStorage.removeItem("otm-wantcontrib"); }catch(err){} acct.wantNews=$("aNews").checked; try{ if(acct.wantNews) localStorage.setItem("otm-wantnews","1"); else localStorage.removeItem("otm-wantnews"); }catch(err){}
-      try{ const j=await api("/api/auth/start",{method:"POST",body:{email,back:"/"}}); acctMode="sent"; acct.sentTo=email; startWaiting(j.poll); renderAcct(); }
+      try{ const turnstile=typeof humanToken==="function"?await humanToken($("aHuman")):null; const j=await api("/api/auth/start",{method:"POST",body:{email,back:"/",turnstile}}); acctMode="sent"; acct.sentTo=email; startWaiting(j.poll); renderAcct(); }
       catch(err){ btn.disabled=false; btn.textContent="Email me a link"; renderAcct({err:1,text:err.message}); $("aEmail").value=email; } };
     setTimeout(()=>$("aEmail")&&$("aEmail").focus(),50);
   } else if(acctMode==="sent"){
