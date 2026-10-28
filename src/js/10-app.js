@@ -545,7 +545,7 @@ const TRIO_SVG={fuel:'<path d="M5 3h8v8h1a2 2 0 0 1 2 2v4a1 1 0 0 0 2 0V9l-2-2 1
 const trioIcon=c=>`<svg viewBox="0 0 24 24" aria-hidden="true">${TRIO_SVG[c]}</svg>`;
 const AV=[["fuel","⛽","Fuel"],["food","🍴","Food"],["stay","🛏","Places to stay"],["sights","★","Sights"],["shop","🛒","Shop"],["toilets","🚻","Toilets"],["cash","🏧","Cash (ATM)"],["repair","🔧","Tyres and repair"]];
 function stopAvail(p){
-  const near=(list)=>list.filter(x=>hav(x,p)<=1).map(x=>Object.assign(x,{dstop:hav(x,p)})).sort((a,b)=>a.dstop-b.dstop);
+  const near=(list)=>list.filter(x=>hav(x,p)<=1).map(x=>Object.assign(x,{dstop:hav(x,p)})).sort((a,b)=>a.dstop-b.dstop).filter((x,i,arr)=>arr.findIndex(y=>(x.id&&y.id===x.id)||(y.name===x.name&&hav(x,y)<0.05))===i); // the same place listed twice in the data shows once
   const fuel=near(fuelAll), food=near(pois.filter(x=>x.kind==="food"));
   const by=k=>near(amen.filter(x=>x.kind===k));
   const toilets=[...by("toilets"),...fuel.filter(f=>/\bT\b/.test(f.tags?.extra||"")).map(f=>Object.assign({},f,{kind:"toilets",name:(f.name||"Fuel station")+" (at the fuel station)"}))];
@@ -765,7 +765,8 @@ function drawOvLayer(){
   const {k,j,cat}=ovFocus, pd=plan&&plan.days[k], p=pd&&pd.pts[j]; if(!p) return false;
   L.marker([p.lat,p.lon],{icon:dotIcon("#18201C",16)}).bindTooltip(p.name,{permanent:true,direction:"right",offset:[10,0],className:"maplbl"}).addTo(layer);
   const list=catPins(stopAvail(p)[cat],cat,k,j), pts=[...list,p].map(x=>[x.lat,x.lon]);
-  if(pts.length<2) map.setView([p.lat,p.lon],14); else map.fitBounds(L.latLngBounds(pts),{padding:[30,30],maxZoom:16});
+  const fit=()=>{ if(!ovFocus) return; if(pts.length<2) map.setView([p.lat,p.lon],14); else map.fitBounds(L.latLngBounds(pts),{padding:[30,30],maxZoom:15}); };
+  fit(); setTimeout(fit,250); // again once the list below has opened and the page has settled
   return true;
 }
 function ovList(k){
@@ -1038,7 +1039,7 @@ function drawPanelLayer(){
 }
 
 /* ---------- icon bar: what to show on the map ---------- */
-const LAY=[["fuel","⛽","Fuel","Fuel stations on the route"],["stay","🛏","Places to stay","Places to stay at your night stops"],["food","🍴","Food","Places to eat"],["sights","★","Sights","Sights, viewpoints and passes"],["med","🏥","Medical","Hospitals and clinics"],["rep","📣","Rider reports","What riders reported on the road lately"],["spots","📍","Riders' places","Places riders marked: viewpoints, farm stalls, stays"],["fav","🏁","Founder's fav's","Places the founder would send you, and petrolhead places"],["road","🛣","Road grade","The route coloured by terrain grade, Race to Single"]];
+const LAY=[["fuel","⛽","Fuel","Fuel stations on the route"],["stay","🛏","Places to stay","Places to stay at your night stops"],["food","🍴","Food","Places to eat"],["sights","★","Sights","Sights, viewpoints and passes"],["med","🏥","Medical","Hospitals and clinics"],["rep","📣","Rider reports","What riders reported on the road lately"],["spots","📍","Riders' places","Places riders marked: viewpoints, farm stalls, stays"],["fav","♥","Founder's fav's","Places the founder would send you, and petrolhead places"],["road","🛣","Road grade","The route coloured by terrain grade, Race to Single"]];
 ui.lay=Object.assign({fuel:true,stay:!!ui.sleep,food:!!ui.types.food,sights:true,med:false,rep:true,spots:true,fav:true},ui.lay||{}); if(ui.lay.fav===undefined) ui.lay.fav=true; if(ui.lay.rep===undefined) ui.lay.rep=true; if(ui.lay.spots===undefined) ui.lay.spots=true;
 function renderLayers(){
   $("iconbar").innerHTML=`<span class="ibhead">On the map</span>`+LAY.map(([id,ic,w,t])=>{ const on=!!ui.lay[id];
