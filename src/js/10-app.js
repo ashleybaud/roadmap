@@ -518,7 +518,11 @@ function sleepList(){
   const n=nDays(); if(n<2) return "";
   const rows=trip.days.slice(0,n-1).map((d,k)=>{ const to=d.to;
     if(!to) return `<div class="slrow"><span class="sln">${esc(dayName(k))}</span><span class="warnt">No night stop yet</span></div>`;
-    if(!to.stay) return `<div class="slrow"><span class="sln">${esc(dayName(k))}</span><span><b>${esc(to.name)}</b> <span class="nbadge warn">town</span><br><button class="linkbtn" type="button" data-pickstay="${k}">Choose where you sleep</button></span></div>`;
+    if(!to.stay){ // the top places to stay right on the line, so a multi-day trip is sorted in one place
+      const all=staysFor(k), top=all.slice(0,3), ci=addDays(trip.startDate,k), co=addDays(trip.startDate,k+1);
+      const opts=top.length?`<ul class="slopts">${top.map((p,i)=>`<li><span><b>${esc(p.name)}</b>${i===0?` <span class="sugtag">Suggested</span>`:""}<span class="note"> ${esc((p.tags.tourism||"").replace(/_/g," "))} · ${p.dist.toFixed(1)} km</span></span><span class="sact"><a href="${esc(bookingUrl(p.name+", "+to.name,ci,co))}" target="_blank" rel="sponsored noopener">Book</a><button class="btn small ${i===0?"":"ghost"}" type="button" data-staynight="${k}:${esc(p.id)}">Stay here</button></span></li>`).join("")}</ul>${all.length>3?`<button class="linkbtn small" type="button" data-pickstay="${k}">See all ${all.length}</button>`:""}`
+        :`<div class="note">${placesOk?`Nothing listed nearby for your Stay in choice. <button class="linkbtn small" type="button" data-pickstay="${k}">See other kinds</button>`:"Finding places to stay…"}</div>`;
+      return `<div class="slrow slpick"><span class="sln">${esc(dayName(k))}</span><span><b>${esc(to.name)}</b> <span class="nbadge warn">pick a bed</span>${opts}</span></div>`; }
     const town=to.town&&to.town.name;
     return `<div class="slrow"><span class="sln">${esc(dayName(k))}</span><span><b>${esc(to.name)}</b>${town?` <span class="note">${esc(town)}</span>`:""}${to.kind?` <span class="note">· ${esc(to.kind)}</span>`:""}<br><span class="sact">${stayContacts(to,town)}</span></span>
       <span>${to.booked?"":`<a class="linkbtn small" href="${esc(bookingUrl(to.name+(town?", "+town:""),addDays(trip.startDate,k),addDays(trip.startDate,k+1)))}" target="_blank" rel="sponsored noopener">Book</a> `}<button class="btn small ${to.booked?"":"ghost"}" type="button" data-booked="${k}">${to.booked?"Booked ✓":"Mark booked"}</button></span></div>`; }).join("");
