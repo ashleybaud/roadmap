@@ -722,7 +722,7 @@ function dayBody(k){
   if(m) h+=`<details class="medbox"><summary><span class="lbl">Medical</span> ${m.near.length} hospital${m.near.length===1?"":"s"} and clinics near the route · furthest point ${fmtFar(m.far)} km from a hospital</summary>
     ${m.near.map(x=>`<div class="item"><div class="meta"><b>${esc(x.name||(x.type==="hospital"?"Hospital":"Clinic"))}</b><span class="note">${x.type==="hospital"?"Hospital":"Clinic"} · km ${Math.round(x.km-pd.a)} · ${x.off<0.5?"on the route":x.off.toFixed(1)+" km off"}${x.phone?` · <a href="tel:${esc(x.phone.replace(/[^\d+]/g,""))}">${esc(x.phone)}</a>`:""}</span></div></div>`).join("")||`<div class="note">None listed within 25 km of the route.</div>`}
     <div class="note">Emergency from a mobile: 112. Check the local numbers before you go.</div></details>`;
-  h+=`<div class="btns"><button class="btn small" type="button" data-gpx="${k}">GPX file</button>${nDays()===1?`<button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}`:""}<span class="note">GPX for your bike's GPS or a phone app.</span></div><div class="btns phonenav"><span class="lbl">On your phone</span>${navButtons(k)}<button class="btn small share" type="button" data-sharetrip>Share this trip ↗</button><button class="btn small wa" type="button" data-sharewa title="Send this trip on WhatsApp">WhatsApp this trip</button></div>`;
+  h+=`<div class="btns"><button class="btn small" type="button" data-gpx="${k}">GPX file</button>${nDays()===1?`<button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}`:""}<span class="note">GPX for your bike's GPS or a phone app.</span></div><div class="btns phonenav"><span class="lbl">On your phone</span>${navButtons(k)}<button class="btn small share" type="button" data-sharetrip>Share this trip ↗</button><button class="btn small wa" type="button" data-sharewa title="Send this trip on WhatsApp">WhatsApp this trip</button>${nameBtn()}</div>`;
   return h;
 }
 function drawStopLayer(){
@@ -747,7 +747,7 @@ function overviewHtml(){
   h+=tripTotals();
   h+=sleepList();
   if(plan&&!planStale&&settings.vehicle!=="bike"&&trip.start) h+=`<div class="btns partnerrow"><a class="btn small ghost" href="${esc(carHireUrl(trip.start.name))}" target="_blank" rel="sponsored noopener">Hire a ${settings.vehicle==="jeep"?"4x4":"car"} ↗</a><span class="note">Self-drive? Compare hire companies.</span></div>`;
-  if(plan&&!planStale) h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px"><button class="btn small share" type="button" data-sharetrip title="A link anyone can open: the whole plan, then Google Maps / Waze or GPX">Share this trip ↗</button><button class="btn small wa" type="button" data-sharewa title="Send this trip on WhatsApp">WhatsApp this trip</button>${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">${esc(dayName(k))} GPX</button>`:"").join("")}<button class="btn small" type="button" data-gpx="all">Whole trip GPX</button><button class="btn small" type="button" data-navlinks title="Open each day in Google Maps or Waze on your phone">Google Maps / Waze</button><button class="btn small ghost" type="button" data-grouppack title="Every GPX format in one zip, with a read-me, for a group ride">Group ride pack ↓</button><button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}</div></div>`;
+  if(plan&&!planStale) h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px"><button class="btn small share" type="button" data-sharetrip title="A link anyone can open: the whole plan, then Google Maps / Waze or GPX">Share this trip ↗</button><button class="btn small wa" type="button" data-sharewa title="Send this trip on WhatsApp">WhatsApp this trip</button>${nameBtn()}${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">${esc(dayName(k))} GPX</button>`:"").join("")}<button class="btn small" type="button" data-gpx="all">Whole trip GPX</button><button class="btn small" type="button" data-navlinks title="Open each day in Google Maps or Waze on your phone">Google Maps / Waze</button><button class="btn small ghost" type="button" data-grouppack title="Every GPX format in one zip, with a read-me, for a group ride">Group ride pack ↓</button><button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}</div></div>`;
   return h+clearLink()+footNote();
 }
 function footNote(){ return `<div class="note">${placesOk&&dataDate?`Map data from OpenStreetMap, as of ${esc(dataDate)}. Weather from Open-Meteo. Phone ahead on remote legs. `:""}Plan with it, check before you go: you ride at your own risk. <a href="/terms.html">Terms and disclaimer</a> · <a href="/privacy.html">Privacy</a></div>`; }
@@ -927,7 +927,7 @@ let startSeen="";
 function drawMap(){
   if(!window.L) return; ensureMap();
   if(!plan){ const s0=trip.start; if(s0&&s0.lat!=null){ L.marker([s0.lat,s0.lon],{icon:L.divIcon({className:"",html:`<div class="pin pstart">▶</div>`,iconSize:[28,28],iconAnchor:[14,14]})}).bindTooltip("Start: "+s0.name,{permanent:true,direction:"right",offset:[14,0],className:"maplbl"}).addTo(layer);
-      const key=s0.lat+","+s0.lon; if(startSeen!==key){ startSeen=key; map.setView([s0.lat,s0.lon],9,{animate:false}); } } return; }
+      const key=s0.lat+","+s0.lon; if(startSeen!==key){ startSeen=key; map.setView([s0.lat,s0.lon],9,{animate:false}); } } if(ui.lay.fav&&typeof drawFavs==="function") drawFavs(); return; }
   townLabels();
   const sel=ui.tab==="ov"?null:plan.days[ui.tab];
   const hl=sel?null:ovHi;
@@ -937,6 +937,7 @@ function drawMap(){
   if(ui.lay.road) drawGradeLayer(sel);
   if(ui.lay.rep&&typeof drawReports==="function") drawReports(sel);
   if(ui.lay.spots&&typeof drawSpots==="function") drawSpots();
+  if(ui.lay.fav&&typeof drawFavs==="function") drawFavs();
   if(panel){ drawPanelLayer(); return; }
   if(stopFocus&&sel&&stopFocus.k===ui.tab&&drawStopLayer()) return;
   if(focusR){ const s=seg(focusR.a,focusR.b); if(s.length>1){L.polyline(s.map(g=>[g.lat,g.lon]),{color:"#B26A00",weight:7}).addTo(layer); map.fitBounds(L.latLngBounds(s.map(g=>[g.lat,g.lon])),{padding:[30,30]});} }
@@ -982,8 +983,8 @@ function drawPanelLayer(){
 }
 
 /* ---------- icon bar: what to show on the map ---------- */
-const LAY=[["fuel","⛽","Fuel","Fuel stations on the route"],["stay","🛏","Stay","Places to stay at night stops"],["food","🍴","Food","Places to eat"],["sights","★","Sights","Sights, viewpoints and passes"],["med","🏥","Medical","Hospitals and clinics"],["rep","📣","Rider reports","What riders reported on the road lately"],["spots","📍","Riders' places","Places riders marked: viewpoints, farm stalls, stays"],["road","🛣","Road grade","The route coloured by terrain grade, Race to Single"]];
-ui.lay=Object.assign({fuel:true,stay:!!ui.sleep,food:!!ui.types.food,sights:true,med:false,rep:true,spots:true},ui.lay||{}); if(ui.lay.rep===undefined) ui.lay.rep=true; if(ui.lay.spots===undefined) ui.lay.spots=true;
+const LAY=[["fuel","⛽","Fuel","Fuel stations on the route"],["stay","🏨","Places to stay","Places to stay at your night stops"],["food","🍴","Food","Places to eat"],["sights","★","Sights","Sights, viewpoints and passes"],["med","🏥","Medical","Hospitals and clinics"],["rep","📣","Rider reports","What riders reported on the road lately"],["spots","📍","Riders' places","Places riders marked: viewpoints, farm stalls, stays"],["fav","🏁","Founder's favourites","Places the founder would send you, and petrolhead places"],["road","🛣","Road grade","The route coloured by terrain grade, Race to Single"]];
+ui.lay=Object.assign({fuel:true,stay:!!ui.sleep,food:!!ui.types.food,sights:true,med:false,rep:true,spots:true,fav:true},ui.lay||{}); if(ui.lay.fav===undefined) ui.lay.fav=true; if(ui.lay.rep===undefined) ui.lay.rep=true; if(ui.lay.spots===undefined) ui.lay.spots=true;
 function renderLayers(){
   $("iconbar").innerHTML=`<span class="ibhead">On the map</span>`+LAY.map(([id,ic,w,t])=>{ const on=!!ui.lay[id];
     return `<button type="button" class="ib ${on?"on":""}" data-lay="${id}" title="${esc(w)}: ${esc(t)}" aria-label="${esc(w)}" aria-pressed="${on}">${ic}</button>`; }).join("")

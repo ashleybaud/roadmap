@@ -1,0 +1,1120 @@
+[
+{
+"id": "orange-river-road",
+"name": "The Orange River road",
+"group": "na",
+"area": "Rosh Pinah to Noordoewer, southern Namibia",
+"lat": -28.38,
+"lon": 17.43,
+"short": "My favourite piece of road anywhere. I've said it twice now, so it must be true.",
+"text": [
+"The C13 follows the Orange River from Rosh Pinah to Noordoewer, and for most of the way it's you, the gravel, a green ribbon of river on one side and mountains that look like someone forgot to finish them on the other. South Africa is a stone's throw across the water. Nobody waves back.",
+"I first rode it in 2004, too fast and on the wrong tyres, and again in 2020, slower and wiser, which mostly means older. Both times I stopped more than I meant to. Not because anything broke. It's just that kind of road."
+],
+"tips": [
+"Fill up in Rosh Pinah or Noordoewer. There's nothing in between that sells fuel.",
+"Ride it west to east in the afternoon and the sun is behind you.",
+"Corrugations come and go. Air down a little and stand up."
+],
+"air": [
+"Cape Town",
+"CPT"
+],
+"trip": "namibia-2020-orange-river",
+"year": 2020,
+"tours": null,
+"petrol": false
+},
+{
+"id": "epupa-falls",
+"name": "Epupa Falls",
+"group": "na",
+"area": "Kunene River, far north-west Namibia",
+"lat": -17.0,
+"lon": 13.25,
+"short": "Palm trees, a river the colour of tea, and Angola just across the water.",
+"text": [
+"Epupa is where the Kunene stops behaving and breaks into a hundred channels over the rocks. You get there on a long road through Himba country, and then suddenly there are makalani palms and the noise of water, which after days of dust feels like cheating.",
+"I've been twice, in 2017 and again in 2020. The second time I knew the rule and still had to be reminded by a local: don't swim. The crocodiles don't care how far you've come."
+],
+"tips": [
+"Fill up in Opuwo. It's the last proper fuel.",
+"Watch the sunset from the hill above the falls.",
+"Book a campsite on the river if you can. The lodges fill up."
+],
+"air": [
+"Windhoek",
+"WDH"
+],
+"trip": "namibia-2017-epupa",
+"year": 2017,
+"tours": null,
+"petrol": false
+},
+{
+"id": "canyon-roadhouse",
+"name": "Canyon Roadhouse",
+"group": "na",
+"area": "Near Fish River Canyon, southern Namibia",
+"lat": -27.53,
+"lon": 17.81,
+"short": "Old cars, cold beer, middle of nowhere. My kind of church.",
+"text": [
+"The Canyon Roadhouse is a lodge that decided to be a scrapyard museum as well, and somehow it works. There are rusting trucks and pickups parked inside and out, the bar is full of old number plates, and the beer is cold enough to make you forget the corrugations it took to get there.",
+"On the Orange River trip in 2020 we pulled in filthy, sunburnt and arguing about the route. Twenty minutes later nobody remembered what the argument was about."
+],
+"tips": [
+"Book ahead in the dry season.",
+"Fish River Canyon viewpoint at Hobas is a short ride away. Go at sunrise.",
+"Fuel is available, but don't count on it. Fill up in Grünau or Keetmanshoop."
+],
+"air": [
+"Cape Town",
+"CPT"
+],
+"trip": "namibia-2020-orange-river",
+"year": 2020,
+"tours": null,
+"petrol": false
+},
+{
+"id": "sendelingsdrif-pont",
+"name": "Sendelingsdrif pont",
+"group": "na",
+"area": "Orange River border crossing, Richtersveld",
+"lat": -28.12,
+"lon": 16.89,
+"short": "A border crossing on a pont that runs when the river lets it.",
+"text": [
+"Sendelingsdrif is a border post and a pont, and that's about it. The pont takes a car or a few bikes at a time across the Orange, between the Richtersveld on the South African side and the diamond country on the Namibian side. When the river's up, it doesn't run, and you go the long way round. Nobody apologises.",
+"In 2004 I sat on the bank waiting for it, watching the water and wondering if I'd brought enough of everything. I hadn't. It worked out anyway."
+],
+"tips": [
+"Check the pont is running before you commit. Call ahead or ask in Alexander Bay or Rosh Pinah.",
+"Border hours are short. Get there early.",
+"Have your vehicle papers and a letter of authority if the bike or car isn't in your name."
+],
+"air": [
+"Cape Town",
+"CPT"
+],
+"trip": "namibia-2004-orange-river-mouth",
+"year": 2004,
+"tours": null,
+"petrol": false
+},
+{
+"id": "oranjemund",
+"name": "Oranjemund and the diamond coast",
+"group": "na",
+"area": "Orange River mouth, south-west Namibia",
+"lat": -28.55,
+"lon": 16.43,
+"short": "A town that was off-limits for most of its life, at the mouth of the river.",
+"text": [
+"For decades Oranjemund was a company town inside the diamond area, and you needed a permit just to visit. Now you can drive in, which still feels slightly illicit. It's a neat, green, odd little place with a golf course, wind, fog and a lot of very serious fences.",
+"I rode in on the 2004 trip mostly because I'd been told I couldn't. Honestly the best bit is the river mouth and the birds. The diamonds stay where they are."
+],
+"tips": [
+"Stay on the public roads. The restricted area is still restricted, and they mean it.",
+"It's cold and foggy far more often than you'd expect in a desert.",
+"Fuel and supplies are in town."
+],
+"air": [
+"Cape Town",
+"CPT"
+],
+"trip": "namibia-2004-orange-river-mouth",
+"year": 2004,
+"tours": null,
+"petrol": false
+},
+{
+"id": "klein-aus-vista",
+"name": "Klein-Aus Vista and the desert horses",
+"group": "na",
+"area": "Aus, on the edge of the Namib",
+"lat": -26.66,
+"lon": 16.27,
+"short": "Wild horses living on the edge of a desert, and a lodge in the mountains above them.",
+"text": [
+"Nobody is quite sure how the horses of the Namib got there. Shipwreck, soldiers or a runaway stud farm, depending on who's telling it. What's certain is that they're there, at the Garub waterhole outside Aus, thin, tough and completely unbothered by you.",
+"We stayed at Klein-Aus Vista on the 2020 Orange River trip. Big skies, good food, and a cold that came down the mountain at night like it had a grudge."
+],
+"tips": [
+"The Garub viewpoint is on the B4 towards Lüderitz. Go early or late for the horses.",
+"Bring warm clothes. The desert nights are properly cold.",
+"Lüderitz and Kolmanskop ghost town are an easy ride west."
+],
+"air": [
+"Windhoek",
+"WDH"
+],
+"trip": "namibia-2020-orange-river",
+"year": 2020,
+"tours": null,
+"petrol": false
+},
+{
+"id": "sesriem",
+"name": "Sesriem and the Tsauchab",
+"group": "na",
+"area": "Gateway to Sossusvlei, Namib Desert",
+"lat": -24.49,
+"lon": 15.8,
+"short": "The doorway to the big red dunes, and a little canyon most people walk straight past.",
+"text": [
+"Sesriem is where the road to Sossusvlei starts: the dunes, Deadvlei and the dead trees you've seen on every screensaver. They're even better in person. But the bit I liked most was the Sesriem Canyon itself, a narrow slot the Tsauchab River cut into the gravel, cool and quiet while everyone else queues for Dune 45.",
+"On the 2017 Epupa trip we got there tired and late and nearly skipped it. Glad we didn't."
+],
+"tips": [
+"Stay inside the park gate if you want to be on the dunes at sunrise. It's worth the price.",
+"The last 5 km to Sossusvlei is deep sand. Take the shuttle unless you have a 4x4 and know what you're doing.",
+"Fuel at Sesriem and Solitaire. Solitaire also has the apple pie everyone talks about. It's fine."
+],
+"air": [
+"Windhoek",
+"WDH"
+],
+"trip": "namibia-2017-epupa",
+"year": 2017,
+"tours": null,
+"petrol": false
+},
+{
+"id": "skeleton-coast",
+"name": "Skeleton Coast, Torra Bay to Henties Bay",
+"group": "na",
+"area": "Atlantic coast, north-west Namibia",
+"lat": -20.33,
+"lon": 13.24,
+"short": "Fog, shipwrecks and 200 km between fuel. You'll love it or hate it.",
+"text": [
+"The salt road down the Skeleton Coast is flat, straight and grey, and somehow one of the most memorable roads I've ridden. The fog rolls in off the Atlantic, the wrecks rust on the beach, and seals bark at you from Cape Cross. There is nothing out here and that's the point.",
+"On the 2020 Tortoise trip we ran it south with one eye on the fuel gauge the whole way. Two hundred kilometres between pumps sounds fine on paper. It feels longer in the fog."
+],
+"tips": [
+"Fill up at Terrace Bay or Torra Bay if they're open, otherwise plan to Henties Bay.",
+"The salt road is slippery when the fog wets it. Ease off.",
+"Park gates have opening hours. Check them, or you'll be camping at a gate."
+],
+"air": [
+"Windhoek",
+"WDH"
+],
+"trip": "namibia-2020-tortoise",
+"year": 2020,
+"tours": null,
+"petrol": false
+},
+{
+"id": "grootberg-lodge",
+"name": "Grootberg Lodge",
+"group": "na",
+"area": "Klip River valley, Damaraland",
+"lat": -19.85,
+"lon": 14.13,
+"short": "A lodge on the lip of an escarpment, with a driveway that earns the view.",
+"text": [
+"Grootberg sits right on the edge of the plateau, and from the deck you look out over the whole of the Klip River valley. The driveway up is steep and rocky, so a 4x4 or a bike makes sense. In a hire car you'll leave it at the bottom and they'll fetch you.",
+"We arrived in 2017 covered in dust and slightly shaky from the last climb. Then a cold drink and that view, and suddenly we were experts."
+],
+"tips": [
+"Book ahead. It's small.",
+"Ask about the rhino and elephant tracking with the local guides.",
+"Fuel in Kamanjab or Palmwag before you head up."
+],
+"air": [
+"Windhoek",
+"WDH"
+],
+"trip": "namibia-2017-epupa",
+"year": 2017,
+"tours": null,
+"petrol": false
+},
+{
+"id": "opuwo",
+"name": "Opuwo",
+"group": "na",
+"area": "Kunene Region, north-west Namibia",
+"lat": -18.06,
+"lon": 13.84,
+"short": "The last real town before the far north. Fuel, food, and Himba country all around.",
+"text": [
+"Opuwo is not pretty, and doesn't try to be. It's a dusty working town where Himba women in ochre shop next to farmers in khaki and lost tourists in rented Hiluxes. It's also your last proper fuel, food and tyre repair before Epupa and the Kunene.",
+"I've stopped there on both northern trips and both times spent longer than planned. It's the kind of place where you just sit and watch."
+],
+"tips": [
+"Fill everything: fuel, water, food.",
+"If you visit a Himba village, go with a local guide who knows the family.",
+"The Opuwo Country Lodge on the hill is worth it for the view alone."
+],
+"air": [
+"Windhoek",
+"WDH"
+],
+"trip": "namibia-2020-tortoise",
+"year": 2020,
+"tours": null,
+"petrol": false
+},
+{
+"id": "etosha-namutoni",
+"name": "Etosha from Namutoni",
+"group": "na",
+"area": "Eastern Etosha National Park",
+"lat": -18.81,
+"lon": 16.94,
+"short": "A white salt pan the size of a small country, and animals that queue for the waterholes.",
+"text": [
+"Etosha is a self-drive game park done right. The pan is huge and blinding, the roads are gravel, and the waterholes are where everything happens. Pick one, switch off, and wait. Something always turns up.",
+"We came in through Namutoni on the 2020 trip. I'm not a patient man, but an hour at Klein Namutoni waterhole fixed that for a day."
+],
+"tips": [
+"Motorbikes aren't allowed in the park. Bikers need a car or a guided drive.",
+"Stay at the camps inside the park so you can be at the waterholes at sunrise.",
+"Gates close at sunset. They don't wait."
+],
+"air": [
+"Windhoek",
+"WDH"
+],
+"trip": "namibia-2020-tortoise",
+"year": 2020,
+"tours": null,
+"petrol": false
+},
+{
+"id": "hakskeenpan",
+"name": "Hakskeenpan and Speedweek",
+"group": "petrol",
+"area": "Kalahari, Northern Cape",
+"lat": -26.78,
+"lon": 20.08,
+"short": "A dry pan in the Kalahari where grown men try to go very, very fast.",
+"text": [
+"Hakskeenpan is a perfectly flat, perfectly dry lake bed on the edge of the Kalahari, and every year Speedweek turns it into a top-speed track. Cars, bikes, anything with an engine and an owner with something to prove. It's also where the Bloodhound land speed car came to test.",
+"I went in 2014 for Speedweek. The heat, the dust, the sound of something flat out across the pan and then the silence. I came home sunburnt, deaf and wanting a faster car."
+],
+"tips": [
+"It's a long way from anywhere: plan the night before in Upington.",
+"Bring shade, water and more water.",
+"The roads in are long gravel. Fine for any car if you drive to the conditions."
+],
+"air": [
+"Cape Town",
+"CPT"
+],
+"trip": "speedweek-hakskeenpan",
+"year": 2014,
+"tours": "Hakskeenpan Speedweek",
+"petrol": true
+},
+{
+"id": "augrabies-falls",
+"name": "Augrabies Falls",
+"group": "za",
+"area": "Orange River, Northern Cape",
+"lat": -28.59,
+"lon": 20.34,
+"short": "The Orange River throwing itself into a granite gorge.",
+"text": [
+"After hundreds of kilometres of flat Northern Cape, Augrabies comes out of nowhere: the whole Orange River squeezing through a crack in the granite and dropping into a gorge. The rock is polished smooth and the noise goes right through you.",
+"We stopped on the way back from Speedweek in 2014, mostly for the shade. Stayed for the sunset."
+],
+"tips": [
+"Stay on the paths. The polished rock is lethal, and people have died here.",
+"Go after good rains upcountry and the falls are huge.",
+"Upington is the nearest proper town for fuel and supplies."
+],
+"air": [
+"Cape Town",
+"CPT"
+],
+"trip": "speedweek-hakskeenpan",
+"year": 2014,
+"tours": null,
+"petrol": false
+},
+{
+"id": "sutherland",
+"name": "Sutherland",
+"group": "za",
+"area": "Roggeveld, Northern Cape",
+"lat": -32.4,
+"lon": 20.66,
+"short": "The coldest town in the country, under the clearest sky you'll ever see.",
+"text": [
+"Sutherland is a small Karoo town famous for two things: being freezing and having the Southern African Large Telescope on the hill. The air is so clear and dark at night that you'll see more stars than you knew existed.",
+"I've ridden through it in winter and couldn't feel my fingers for an hour. I'd still go back tomorrow."
+],
+"tips": [
+"Book a night tour at SALT or one of the private stargazing farms.",
+"In winter the roads can ice up. Ride or drive in the middle of the day.",
+"The gravel roads from Sutherland to Calvinia and the Tankwa are superb."
+],
+"air": [
+"Cape Town",
+"CPT"
+],
+"trip": "speedweek-hakskeenpan",
+"year": 2014,
+"tours": null,
+"petrol": false
+},
+{
+"id": "piekenierskloof-pass",
+"name": "Piekenierskloof Pass",
+"group": "za",
+"area": "Citrusdal, Western Cape",
+"lat": -32.55,
+"lon": 18.98,
+"short": "The pass that says you've left Cape Town behind.",
+"text": [
+"Piekenierskloof is the N7's climb out of the Swartland and over into the Olifants River valley. It's not wild or difficult, just a properly good set of bends with orange orchards and the Cederberg spread out in front of you.",
+"Every northern trip I've done has started here. It's where the city noise finally leaves your head."
+],
+"tips": [
+"The Piekenierskloof Mountain Resort at the top does a decent breakfast.",
+"Citrusdal below has fuel, coffee and the hot springs at The Baths.",
+"Look out for trucks on the climb."
+],
+"air": [
+"Cape Town",
+"CPT"
+],
+"trip": "namibia-2020-orange-river",
+"year": 2020,
+"tours": null,
+"petrol": false
+},
+{
+"id": "montagu-pass",
+"name": "Montagu Pass",
+"group": "za",
+"area": "George to Herold, Outeniqua mountains",
+"lat": -33.88,
+"lon": 22.42,
+"short": "Gravel, old stone bridges, and my first proper pass, in Ducati leathers on a 950.",
+"text": [
+"Montagu Pass was built in the 1840s and it still feels like it. Narrow gravel, dry-stone walls, old bridges and the toll house at the bottom. The main road over the Outeniquas goes past it a few kilometres away, and almost nobody bothers.",
+"The first time I rode it I was in full Ducati race leathers on a 950, which tells you everything about what I knew back then. I've been back many times since, dressed more sensibly. It's still my favourite pass in the Cape."
+],
+"tips": [
+"Ride it uphill from George. The views open up behind you.",
+"The road is narrow: watch for cars coming down.",
+"Herold's Bay and the Outeniqua Pass make it an easy loop."
+],
+"air": [
+"George",
+"GRJ"
+],
+"trip": "seven-passes-prince-alfred",
+"year": 2020,
+"tours": null,
+"petrol": false
+},
+{
+"id": "seven-passes-road",
+"name": "The Seven Passes road",
+"group": "za",
+"area": "George to Knysna, Garden Route",
+"lat": -33.94,
+"lon": 22.83,
+"short": "Forest, gravel and old bridges, the original road from George to Knysna.",
+"text": [
+"The Seven Passes road was the main way from George to Knysna before the N2. It dips in and out of seven river valleys through the indigenous forest, over narrow bridges, on a mix of tar and gravel. On a quiet morning you won't see another car.",
+"We rode it on the 2020 Seven Passes trip, wet, cold and grinning. Every valley is a little different and every one is too short."
+],
+"tips": [
+"It's slippery after rain. Ride it gently.",
+"Stop at the Karatara and Barrington settlements for a breather.",
+"Combine it with Prince Alfred's Pass for a full day."
+],
+"air": [
+"George",
+"GRJ"
+],
+"trip": "seven-passes-prince-alfred",
+"year": 2020,
+"tours": null,
+"petrol": false
+},
+{
+"id": "prince-alfreds-pass",
+"name": "Prince Alfred's Pass and Angie's G Spot",
+"group": "za",
+"area": "Knysna to Uniondale",
+"lat": -33.7,
+"lon": 23.04,
+"short": "Blind corners on a long gravel pass, and the best lunch stop on it.",
+"text": [
+"Prince Alfred's Pass climbs out of the Knysna forest and over the mountains to Uniondale, about 70 km of gravel with blind corners, steep drops and very few places to pass. Halfway along, at De Vlugt, is Angie's G Spot. Yes, really. Stop there.",
+"On the 2020 trip we had lunch at Angie's and stayed far too long. It's that kind of place: big plates, cold drinks, and nobody in a hurry."
+],
+"tips": [
+"Use your horn on the blind corners. Some locals drive it like they own it, because they do.",
+"The surface changes with the weather. Check before you go.",
+"Fuel in Knysna or Uniondale. Nothing in between."
+],
+"air": [
+"George",
+"GRJ"
+],
+"trip": "seven-passes-prince-alfred",
+"year": 2020,
+"tours": null,
+"petrol": false
+},
+{
+"id": "seweweekspoort",
+"name": "Seweweekspoort",
+"group": "za",
+"area": "Swartberg, between Laingsburg and Calitzdorp",
+"lat": -33.38,
+"lon": 21.4,
+"short": "A gravel gorge road straight through the Swartberg.",
+"text": [
+"Seweweekspoort is a 17 km gravel road that follows a river through a crack in the Swartberg, crossing it again and again between walls of folded red rock. It's one of those roads where you keep stopping to look up.",
+"We rode it on the 2019 trip heading east. I've never managed to go through without at least three photo stops."
+],
+"tips": [
+"It floods after heavy rain. Check before you go.",
+"Combine it with the Swartberg Pass or Meiringspoort for a loop.",
+"The Ladismith and Zoar side has fuel and supplies."
+],
+"air": [
+"Cape Town",
+"CPT"
+],
+"trip": "wild-coast-2019",
+"year": 2019,
+"tours": null,
+"petrol": false
+},
+{
+"id": "coffee-bay",
+"name": "Coffee Bay and Hole in the Wall",
+"group": "za",
+"area": "Wild Coast, Eastern Cape",
+"lat": -32.04,
+"lon": 29.11,
+"short": "The Wild Coast at its wildest: green hills, cows on the beach and a rock with a hole in it.",
+"text": [
+"Coffee Bay is where the Wild Coast stops being a name on a map. Rolling green hills, round huts, cows on the beach, and down the road the Hole in the Wall, a huge rock in the sea with the ocean punched right through it.",
+"On the 2019 trip the road in was more pothole than road, and the animals had right of way. By the time we got there, nobody cared."
+],
+"tips": [
+"Drive in daylight. The roads are full of animals, taxis and potholes.",
+"Hire a local guide for the coastal walk between Coffee Bay and Hole in the Wall.",
+"Fuel up in Mthatha."
+],
+"air": [
+"East London",
+"ELS"
+],
+"trip": "wild-coast-2019",
+"year": 2019,
+"tours": null,
+"petrol": false
+},
+{
+"id": "kei-mouth-pont",
+"name": "The Kei Mouth pont",
+"group": "za",
+"area": "Great Kei River, Eastern Cape",
+"lat": -32.68,
+"lon": 28.38,
+"short": "A river crossing on a hand-run pont, the old way into the Transkei.",
+"text": [
+"The Kei Mouth pont carries cars and bikes across the Great Kei River on a cable, the way it's been done for a long time. It's a short crossing but it feels like a border: on the other side the Wild Coast begins.",
+"We crossed on the 2019 trip, watched by a crowd of kids and one very unimpressed dog. Best R100 I've ever spent."
+],
+"tips": [
+"Check it's running before you go. Weather and the river decide.",
+"Morgan Bay and Kei Mouth have good places to stay.",
+"The road on the far side is gravel and gets rough in the wet."
+],
+"air": [
+"East London",
+"ELS"
+],
+"trip": "wild-coast-2019",
+"year": 2019,
+"tours": null,
+"petrol": false
+},
+{
+"id": "baviaanskloof",
+"name": "Baviaanskloof",
+"group": "za",
+"area": "Between Willowmore and Patensie, Eastern Cape",
+"lat": -33.6,
+"lon": 24.2,
+"short": "River crossings, steep passes and a valley with almost nobody in it.",
+"text": [
+"The Baviaanskloof is a long, narrow valley of gravel tracks, river crossings and steep little passes, protected as wilderness and mostly empty. You'll see more kudu and baboons than people.",
+"I did it in a day once, which is both possible and silly. Take two."
+],
+"tips": [
+"A 4x4 or adventure bike is the right tool. Some crossings are deep after rain.",
+"Permits are needed for the reserve section. Get them at the gate.",
+"Fuel up in Willowmore or Patensie. There's none in the kloof."
+],
+"air": [
+"Gqeberha (Port Elizabeth)",
+"PLZ"
+],
+"trip": "baviaanskloof-in-a-day",
+"year": null,
+"tours": null,
+"petrol": false
+},
+{
+"id": "semonkong",
+"name": "Semonkong and Maletsunyane Falls",
+"group": "za",
+"area": "Lesotho highlands",
+"lat": -29.87,
+"lon": 28.06,
+"short": "One of the highest single-drop waterfalls in Africa, in the mountains of Lesotho.",
+"text": [
+"Maletsunyane Falls drops nearly 200 metres in one go into a gorge outside Semonkong, a small mountain town where people still ride ponies wrapped in blankets. The road in climbs through passes and villages that feel a world away from South Africa, even though they're next door.",
+"In 2016 we arrived cold, wet and shaking from the last pass. The falls were roaring. It was worth every shiver."
+],
+"tips": [
+"Bring warm, waterproof clothes, even in summer.",
+"Semonkong Lodge can arrange pony treks to the bottom of the falls.",
+"Border posts close early. Check times before you go."
+],
+"air": [
+"Johannesburg",
+"JNB"
+],
+"trip": "lesotho-2016",
+"year": 2016,
+"tours": null,
+"petrol": false
+},
+{
+"id": "malealea",
+"name": "Malealea",
+"group": "za",
+"area": "Lesotho lowlands to highlands",
+"lat": -29.83,
+"lon": 27.6,
+"short": "Mountain villages, ponies and gravel, and the Gate of Paradise on the way in.",
+"text": [
+"Malealea is a village at the end of a road in the Lesotho mountains, with a lodge that's become the base for pony trekking and walking. The road in goes through the Gate of Paradise pass, and the sign isn't lying.",
+"On the 2016 trip we sat in the evening and listened to the village choir. Then it rained so hard the next morning that we had to wait a day for the track to drain. Nobody complained."
+],
+"tips": [
+"The lodge arranges pony treks and village walks.",
+"The last stretch is gravel and can be muddy.",
+"Fuel in Mafeteng or Maseru."
+],
+"air": [
+"Johannesburg",
+"JNB"
+],
+"trip": "lesotho-2016",
+"year": 2016,
+"tours": null,
+"petrol": false
+},
+{
+"id": "simola-hill-climb",
+"name": "Simola Hill Climb",
+"group": "petrol",
+"area": "Knysna, Garden Route",
+"lat": -34.02,
+"lon": 23.07,
+"short": "Where I race. The event to plan a Garden Route trip around.",
+"text": [
+"The Simola Hill Climb runs up a twisting road through the Simola estate above Knysna every year, timed runs one at a time for classic cars on one day and modern machinery on the next. Spectators are right next to the road, and the town is full of cars all week.",
+"I race it. Which mostly means I spend a year building a car and then two minutes finding out what I got wrong. Come and watch. It's the best weekend of the year."
+],
+"tips": [
+"Book beds in Knysna well in advance. The town fills up.",
+"Get a spot on the hill early on the Saturday.",
+"Ride or drive the Seven Passes road and Prince Alfred's Pass the same week."
+],
+"air": [
+"George",
+"GRJ"
+],
+"trip": "simola-road-trip",
+"year": 2025,
+"tours": "Knysna Simola Hill Climb",
+"petrol": true
+},
+{
+"id": "franschhoek-motor-museum",
+"name": "Franschhoek Motor Museum",
+"group": "petrol",
+"area": "L'Ormarins, Franschhoek",
+"lat": -33.88,
+"lon": 19.0,
+"short": "Hundreds of cars on a wine estate. Two things I'm qualified to judge.",
+"text": [
+"The Franschhoek Motor Museum sits on the L'Ormarins wine estate and rotates through a collection of hundreds of cars and bikes, from early brass-era machines to race cars, in old farm buildings with mountains behind them.",
+"I went for an hour and left after four. Then I had a glass of wine. In that order, obviously."
+],
+"tips": [
+"Book online. Entry is by time slot.",
+"Take the wine tram if you're planning to taste.",
+"Combine with a ride over Franschhoek Pass."
+],
+"air": [
+"Cape Town",
+"CPT"
+],
+"trip": null,
+"year": null,
+"tours": "Franschhoek Motor Museum",
+"petrol": true
+},
+{
+"id": "kyalami",
+"name": "Kyalami",
+"group": "petrol",
+"area": "Midrand, Gauteng",
+"lat": -25.99,
+"lon": 28.06,
+"short": "The old Grand Prix circuit, with track days and the Porsche Experience Centre.",
+"text": [
+"Kyalami hosted the South African Grand Prix for decades and it's still the country's best-known circuit. These days it runs track days, racing, and the Porsche Experience Centre, where you can drive a Porsche properly on a proper track.",
+"I've watched there, and done the walk of shame from the pits after a car let me down. Still love the place."
+],
+"tips": [
+"Track days and driving experiences need booking well ahead.",
+"Check the calendar for race weekends.",
+"Johannesburg airport is half an hour away."
+],
+"air": [
+"Johannesburg",
+"JNB"
+],
+"trip": null,
+"year": null,
+"tours": "Kyalami track day",
+"petrol": true
+},
+{
+"id": "killarney",
+"name": "Killarney Raceway",
+"group": "petrol",
+"area": "Cape Town",
+"lat": -33.81,
+"lon": 18.53,
+"short": "Club racing and track days on a Saturday, ten minutes from the city.",
+"text": [
+"Killarney is Cape Town's circuit: club racing, motorbike racing, drag nights and track days, all in the shadow of Table Mountain. Racing is cheap to watch and you can walk around the paddock.",
+"It's my home track. I've won nothing there, but I've learnt everything there."
+],
+"tips": [
+"Check the Western Province Motor Club calendar for race days.",
+"Track days are open to road cars and bikes. Book early.",
+"Bring a hat. There's no shade."
+],
+"air": [
+"Cape Town",
+"CPT"
+],
+"trip": null,
+"year": null,
+"tours": "Cape Town track day",
+"petrol": true
+},
+{
+"id": "east-london-gp",
+"name": "East London Grand Prix Circuit",
+"group": "petrol",
+"area": "East London, Eastern Cape",
+"lat": -33.04,
+"lon": 27.86,
+"short": "The old Grand Prix track by the sea, still racing.",
+"text": [
+"Prince George Circuit in East London hosted Formula One back in the 1960s, and it still runs races and track days on the coast. It's fast, old-school and windy, and the history is right there in the bends.",
+"Not one I've raced, but every time I'm in East London I end up there."
+],
+"tips": [
+"Check the Border Motorsport Club calendar.",
+"Combine it with the Wild Coast trip to the north.",
+"East London airport is close by."
+],
+"air": [
+"East London",
+"ELS"
+],
+"trip": null,
+"year": null,
+"tours": null,
+"petrol": true
+},
+{
+"id": "nurburgring",
+"name": "The Nürburgring Nordschleife",
+"group": "petrol",
+"area": "Eifel mountains, Germany",
+"lat": 50.3466,
+"lon": 6.9606,
+"short": "Twenty kilometres of the most famous track on earth, open to the public on a Sunday.",
+"text": [
+"On tourist days you can pay at the gate and drive the Nordschleife in whatever you turned up in: rental hatchbacks, motorhomes, GT3s and bikes all on the same lap. It's 20.8 km, about 73 corners, and it does not forgive. Or take a taxi lap with someone who knows it, which is the clever option.",
+"I did a lap on a public Sunday in 2018. I'd watched a hundred onboard videos and recognised nothing. My lap time was best measured with a calendar. I'd go back tomorrow."
+],
+"tips": [
+"Check the tourist-day calendar. Opening times change week to week and closures are common.",
+"Rental track cars are available in Nürburg. Read the insurance small print twice.",
+"Watch from Brünnchen or Pflanzgarten on a busy day. It's half the fun."
+],
+"air": [
+"Frankfurt",
+"FRA"
+],
+"trip": "eu-road-trip-2018",
+"year": 2018,
+"tours": "Nürburgring taxi lap",
+"petrol": true
+},
+{
+"id": "goodwood",
+"name": "Goodwood Festival of Speed and Revival",
+"group": "petrol",
+"area": "West Sussex, England",
+"lat": 50.86,
+"lon": -0.75,
+"short": "The hill, the paddock, the noise. A garden party where everything runs on petrol.",
+"text": [
+"The Festival of Speed in July sends everything from 1900s racers to current F1 cars up the hill past the house, and you can walk right through the paddock while they warm up. The Revival in September is at the old circuit, with everyone dressed as if it's 1960, cars included.",
+"I went in 2018 and spent the whole day with a stupid grin and ringing ears. The paddock alone is worth the flight."
+],
+"tips": [
+"Tickets sell out. Buy early.",
+"Stay in Chichester or further out and come in early. Traffic is heavy.",
+"Wear walking shoes. You'll walk miles."
+],
+"air": [
+"London Gatwick",
+"LGW"
+],
+"trip": "eu-road-trip-2018",
+"year": 2018,
+"tours": "Goodwood Festival of Speed",
+"petrol": true
+},
+{
+"id": "spa-francorchamps",
+"name": "Spa-Francorchamps",
+"group": "petrol",
+"area": "Ardennes, Belgium",
+"lat": 50.437,
+"lon": 5.971,
+"short": "Eau Rouge in the flesh. It's steeper than it looks on TV. Much steeper.",
+"text": [
+"Spa is the circuit drivers talk about the way the rest of us talk about holidays. In the Ardennes forest, long and fast, with Eau Rouge and Raidillon rising so steeply you have to see it to believe it. There are track days, races most weekends and a museum in the old abbey at Stavelot.",
+"Standing at the bottom of Eau Rouge in 2018 I finally understood why they all lift. Or say they don't."
+],
+"tips": [
+"Check the calendar for open pit-lane or track days.",
+"The weather changes every ten minutes. Pack for all of it.",
+"The old circuit roads around Malmedy and Stavelot are public and lovely to drive."
+],
+"air": [
+"Brussels",
+"BRU"
+],
+"trip": "eu-road-trip-2018",
+"year": 2018,
+"tours": "Spa-Francorchamps",
+"petrol": true
+},
+{
+"id": "eisriesenwelt",
+"name": "Eisriesenwelt and Burg Hohenwerfen",
+"group": "eu",
+"area": "Werfen, near Salzburg, Austria",
+"lat": 47.503,
+"lon": 13.19,
+"short": "Ice caves inside a mountain and a castle on a rock. \"Short walk\" is a lie.",
+"text": [
+"Eisriesenwelt is the biggest ice cave in the world, a few kilometres of frozen halls inside the mountain above Werfen, lit by the lamps you carry. Below it, Burg Hohenwerfen sits on a rock in the valley like it was drawn by a child who'd just discovered castles.",
+"The brochure said a short walk to the cave. It is a walk, a cable car, another walk and about 700 steps. In 2019 I did it in jeans and regretted all of it except the cave."
+],
+"tips": [
+"Wear proper shoes and a warm jacket. It's below freezing inside, even in summer.",
+"Get there early. The tours fill up.",
+"Do the castle's falconry show the same day."
+],
+"air": [
+"Salzburg",
+"SZG"
+],
+"trip": "eu-road-trip-2019",
+"year": 2019,
+"tours": "Eisriesenwelt",
+"petrol": false
+},
+{
+"id": "tavullia",
+"name": "Tavullia and the VR46 MotoRanch",
+"group": "petrol",
+"area": "Pesaro, Italy",
+"lat": 43.896,
+"lon": 12.75,
+"short": "Valentino Rossi's home town, where the whole village is painted yellow.",
+"text": [
+"Tavullia is a small hill town near Pesaro that is entirely devoted to its most famous son. The flags are yellow, the speed limit signs say 46, and there's a fan club shop and café that feels like a shrine. Down the road is the ranch where Rossi trains on dirt.",
+"I went in 2018 as a grown man with grey in my beard and bought a cap anyway. No regrets."
+],
+"tips": [
+"The fan club café is the place to start.",
+"Misano circuit is twenty minutes away. Check for race weekends.",
+"The roads into the hills behind Pesaro are superb on a bike."
+],
+"air": [
+"Bologna",
+"BLQ"
+],
+"trip": "eu-road-trip-2018",
+"year": 2018,
+"tours": "Misano MotoGP",
+"petrol": true
+},
+{
+"id": "motor-valley",
+"name": "Motor Valley",
+"group": "petrol",
+"area": "Emilia-Romagna, Italy",
+"lat": 44.647,
+"lon": 10.925,
+"short": "Ducati, Ferrari, Lamborghini, Pagani and Maserati, all within an hour of each other.",
+"text": [
+"Motor Valley is the stretch of Emilia-Romagna between Bologna and Modena where half of the world's most beautiful machines are made. Ducati in Borgo Panigale, Lamborghini in Sant'Agata, Ferrari in Maranello, Pagani in San Cesario and Maserati in Modena, each with a museum and most with factory tours.",
+"After years of selling Ducatis, going to Borgo Panigale in 2017 felt like going home. Then I went to the others and remembered I'm a car guy too. Expensive week."
+],
+"tips": [
+"Book factory tours well in advance. Some are only on certain days.",
+"Stay in Modena: central to everything, and the food is ridiculous.",
+"Hire a car with some character. You'll feel silly in a diesel hatchback."
+],
+"air": [
+"Bologna",
+"BLQ"
+],
+"trip": "motor-valley-2017",
+"year": 2017,
+"tours": "Motor Valley Italy",
+"petrol": true
+},
+{
+"id": "maranello",
+"name": "Maranello",
+"group": "petrol",
+"area": "Modena, Italy",
+"lat": 44.53,
+"lon": 10.862,
+"short": "The home of Ferrari: museum, factory tour, and test drives in the town.",
+"text": [
+"Maranello is Ferrari's town. The Museo Ferrari has the cars, the trophies and the simulator, the factory tour runs past the Fiorano test track, and outside a dozen shops will rent you a Ferrari for a fifteen-minute drive in the hills.",
+"In 2017 I did the drive, sweated through my shirt and drove at about the speed of a tractor because it wasn't mine. Still counts."
+],
+"tips": [
+"The museum shuttle links Maranello and the Enzo Ferrari museum in Modena.",
+"Test drives in town are short and pricey. Pick a route with some bends.",
+"Ristorante Cavallino opposite the factory gate is a pilgrimage."
+],
+"air": [
+"Bologna",
+"BLQ"
+],
+"trip": "motor-valley-2017",
+"year": 2017,
+"tours": "Ferrari Maranello",
+"petrol": true
+},
+{
+"id": "alfa-romeo-museum",
+"name": "Alfa Romeo Museum, Arese",
+"group": "petrol",
+"area": "Arese, near Milan, Italy",
+"lat": 45.553,
+"lon": 9.052,
+"short": "La macchina del tempo. Every Alfa that mattered, under one roof.",
+"text": [
+"The Alfa Romeo museum at Arese, near Milan, tells the whole story from the first car in 1910 through the racing years to now, and the race car hall is the kind of room you stand in with your mouth open.",
+"I race an Alfa. Of course I went. I came out in 2017 having learnt three things about my own car I'd been doing wrong."
+],
+"tips": [
+"Combine it with Monza, half an hour away.",
+"Book online for the guided tours of the archive.",
+"Milan's ring road traffic is hard work. Leave early."
+],
+"air": [
+"Milan Malpensa",
+"MXP"
+],
+"trip": "motor-valley-2017",
+"year": 2017,
+"tours": "Alfa Romeo Museum Arese",
+"petrol": true
+},
+{
+"id": "monaco",
+"name": "Monaco and the Riviera coast road",
+"group": "eu",
+"area": "Monaco and the French Riviera",
+"lat": 43.738,
+"lon": 7.425,
+"short": "The Grand Prix streets you can drive any day, and the coast roads either side.",
+"text": [
+"You can drive the Monaco Grand Prix circuit on any normal day. It's just streets. The tunnel, the hairpin, the harbour, all of it at 30 km/h behind a delivery van. Then take the corniche roads along the coast to Nice or into Italy and remember why everyone wants to live here.",
+"In 2018 I did a slow lap of the circuit, three times, because the traffic lights kept stopping me. Best traffic jam of my life."
+],
+"tips": [
+"Park in one of the public car parks. Don't even try on the street.",
+"The Moyenne Corniche has the best views. The Grande Corniche has the best bends.",
+"The Col de Turini in the mountains behind is a Monte Carlo Rally stage."
+],
+"air": [
+"Nice",
+"NCE"
+],
+"trip": "eu-road-trip-2018",
+"year": 2018,
+"tours": "Monaco",
+"petrol": true
+},
+{
+"id": "brooklands",
+"name": "Brooklands Museum",
+"group": "petrol",
+"area": "Weybridge, Surrey, England",
+"lat": 51.348,
+"lon": -0.469,
+"short": "The birthplace of British motorsport, banking and all.",
+"text": [
+"Brooklands was the world's first purpose-built motor racing circuit, opened in 1907, and you can still walk up the old concrete banking. The museum has racing cars, motorbikes, aircraft and Concorde, which is a lot of museum for one afternoon.",
+"I stood on the banking and tried to imagine doing that speed with no helmet. Couldn't."
+],
+"tips": [
+"Check for the special event days when the cars run.",
+"Mercedes-Benz World next door does driving experiences on its own track.",
+"Easy from Heathrow or central London by train."
+],
+"air": [
+"London Heathrow",
+"LHR"
+],
+"trip": null,
+"year": null,
+"tours": "Brooklands",
+"petrol": true
+},
+{
+"id": "stuttgart-museums",
+"name": "Porsche and Mercedes museums",
+"group": "petrol",
+"area": "Stuttgart, Germany",
+"lat": 48.834,
+"lon": 9.152,
+"short": "Two of the world's greatest car museums, a few kilometres apart.",
+"text": [
+"Stuttgart has the Porsche Museum in Zuffenhausen and the Mercedes-Benz Museum in Untertürkheim, and between them they cover most of the history of the car. The Mercedes one starts with the very first automobile; the Porsche one ends in the race car hall.",
+"Do both in a day and you'll have sore feet and a long wish list."
+],
+"tips": [
+"Buy tickets online for both.",
+"Porsche runs factory tours. Book ahead.",
+"The Black Forest roads are an hour away."
+],
+"air": [
+"Stuttgart",
+"STR"
+],
+"trip": null,
+"year": null,
+"tours": "Porsche Museum Stuttgart",
+"petrol": true
+},
+{
+"id": "stelvio",
+"name": "The Stelvio and the Alpine passes",
+"group": "petrol",
+"area": "Lombardy and South Tyrol, Italy",
+"lat": 46.528,
+"lon": 10.453,
+"short": "Forty-eight hairpins on one side. The road every petrolhead wants to tick off.",
+"text": [
+"The Stelvio Pass climbs to over 2,700 metres with 48 numbered hairpins on the Prato side and a long sweeping descent to Bormio on the other. Nearby are the Gavia, the Mortirolo, the Umbrail and the Bernina, so you can spend days up there and never repeat a road.",
+"It's the one road everyone tells you about. It's busy, it's slow in summer, and it's still worth it."
+],
+"tips": [
+"Go early in the morning or late in the day to beat the traffic and the cyclists.",
+"The pass is closed from about October to May. Check before you go.",
+"Bormio and Livigno are good bases."
+],
+"air": [
+"Milan Malpensa",
+"MXP"
+],
+"trip": null,
+"year": null,
+"tours": "Stelvio Pass",
+"petrol": true
+},
+{
+"id": "le-mans",
+"name": "Le Mans: the circuit and the museum",
+"group": "petrol",
+"area": "Le Mans, France",
+"lat": 47.95,
+"lon": 0.207,
+"short": "The 24 Hours, and the museum next to the track where the legends live.",
+"text": [
+"Le Mans is a town, a circuit and a race, and the race is the one every driver wants on their record. The Musée des 24 Heures by the main gate has the winning cars, and parts of the Mulsanne Straight are public road you can drive any day.",
+"Race week is a madhouse. Any other week you can stand at the start line and have it to yourself."
+],
+"tips": [
+"Race week tickets and camping sell out a year ahead.",
+"The museum is open year-round.",
+"Drive the public section of the Mulsanne Straight. Slowly. There are speed cameras."
+],
+"air": [
+"Paris",
+"CDG"
+],
+"trip": null,
+"year": null,
+"tours": "24 Hours of Le Mans",
+"petrol": true
+},
+{
+"id": "isle-of-man-tt",
+"name": "Isle of Man TT",
+"group": "petrol",
+"area": "Isle of Man",
+"lat": 54.15,
+"lon": -4.48,
+"short": "The most dangerous race in the world, on public roads, and you can ride the course.",
+"text": [
+"Every year in late May and early June the TT closes 60 km of public roads for the fastest, most frightening motorcycle racing on earth. The rest of the year, the Mountain Course is just a road, and you can ride it.",
+"Every biker should see it once. Then go home and give your mother a hug."
+],
+"tips": [
+"Book ferries and beds a year ahead for TT fortnight.",
+"The Mountain section is one-way during TT week. Ride it the rest of the year.",
+"Watch from Bray Hill or Ballaugh Bridge for the full effect."
+],
+"air": [
+"Isle of Man",
+"IOM"
+],
+"trip": null,
+"year": null,
+"tours": "Isle of Man TT",
+"petrol": true
+}
+]

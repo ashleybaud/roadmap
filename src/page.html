@@ -59,6 +59,7 @@ input[type=text],input[type=email],input[type=number],input[type=time],input[typ
 .btn.small{padding:4px 8px;font-size:.8rem}
 .btn.share{background:#0B6E4F;border-color:#0B6E4F;color:#fff}
 .namedlg{border:1px solid var(--ink);border-radius:8px;padding:16px;max-width:320px;width:90vw;background:var(--bg);color:var(--ink)}.namedlg input{width:100%;margin-top:6px}
+.favmk{width:26px;height:26px;border-radius:50%;background:#D9A441;color:#18201C;border:2px solid #18201C;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.35)}
 .btn.wa{background:#25D366;border-color:#25D366;color:#073B1E}
 .icon{border:1px solid var(--line);background:var(--panel);border-radius:4px;width:30px;height:30px;cursor:pointer;display:inline-grid;place-items:center;flex:none}
 .btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
@@ -575,7 +576,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
   <header>
     <div><h1><a class="homelink" href="/" title="Home">OneTrackMind</a> <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><div class="note"><b>Built by riders:</b> add your favourite routes, mark the places worth stopping.</div></div>
     <div class="btns"><span class="lbl mono" id="hdrSummary"></span><button class="btn ghost" id="feedback" type="button">Send feedback</button><button class="btn" id="addBtn" type="button" hidden>+ Add yours</button><button class="btn ghost" id="reviewBtn" type="button" hidden>Review</button><button class="btn ghost" id="acctBtn" type="button" hidden>Sign in</button><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
-    <nav class="hdrlinks" style="order:9" aria-label="Site"><a href="/" class="on" aria-current="page">Plan a trip</a><a href="/routes/">Routes</a><a href="/rides/">The founder's rides</a><a href="/about/">About</a></nav>
+    <nav class="hdrlinks" style="order:9" aria-label="Site"><a href="/" class="on" aria-current="page">Plan a trip</a><a href="/routes/">Routes</a><a href="/favourites/">Founder's favourites</a><a href="/about/">About</a></nav>
     <section class="hero" style="order:10" aria-label="What it does">
       <h2 class="herohead">Plan it. Book it. <span>Ride it.</span></h2>
       <p class="herosub">Forget BaseCamp and five different apps. Route a multi-day trip in minutes, sort your beds, then send it straight to your GPS, your bike's app or your phone and navigate from there.</p>
@@ -585,7 +586,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
         <li><b>Load your GPS</b><span>One tap: the right GPX for Garmin, BMW, KTM, Ducati or Harley.</span></li>
         <li><b>Or just ride with your phone</b><span>Each day opens in Google Maps or Waze. No GPS? No problem.</span></li>
       </ol>
-      <a class="heroband" id="heroBand" href="/rides/" hidden><b>Coming to Southern Africa?</b> <span>The trips I'd take you on: Namibia's Skeleton Coast and Epupa Falls, the Orange River, the Cape passes. Each one opens in the planner ›</span></a>
+      <a class="heroband" id="heroBand" href="/favourites/" hidden><b>Coming to Southern Africa?</b> <span>The trips I'd take you on: Namibia's Skeleton Coast and Epupa Falls, the Orange River, the Cape passes. Each one opens in the planner ›</span></a>
       <div class="herocta"><button class="btn herobtn" type="button" data-tryroute id="tryBtn">Try a route: Swartberg Pass in 2 days ›</button><span>Opens a finished trip. Change anything, or tap New to plan your own.</span></div>
     </section>
   </header>
@@ -651,7 +652,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
     <div class="sponsors"><span class="lbl">OneTrackMind is free thanks to</span>
       <a class="spons" href="https://alterego.co.za" target="_blank" rel="noopener sponsored"><b>AlterEgo</b><span>Made-to-order wear for petrolheads</span></a>
       <a class="spons open" href="/advertise/"><b>Your brand here</b><span>Sponsor or advertise ›</span></a></div>
-    <div class="note">OneTrackMind: plan road trips anywhere, on the roads less travelled, then ride them on your GPS or phone. · <a href="/rides/">The founder's rides</a> · <a href="/advertise/">Advertise</a> · <a href="/about/">About</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> · <a href="mailto:hello@onetrackmind.online">hello@onetrackmind.online</a></div>
+    <div class="note">OneTrackMind: plan road trips anywhere, on the roads less travelled, then ride them on your GPS or phone. · <a href="/favourites/">Founder's favourites</a> · <a href="/advertise/">Advertise</a> · <a href="/about/">About</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> · <a href="mailto:hello@onetrackmind.online">hello@onetrackmind.online</a></div>
   </footer>
 </div>
 

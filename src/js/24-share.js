@@ -54,3 +54,7 @@ document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closes
     const tt=$("toast"); tt.innerHTML=`Opened <b>${esc(r.title)}</b>. When it's planned, tap <b>Google Maps / Waze</b> to navigate, or <b>GPX</b> for your GPS. Change anything you like.`; tt.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>tt.hidden=true,20000);
     if(window.innerWidth<=1000) $("map").scrollIntoView({behavior:"smooth",block:"start"});
   }catch(e){ $("status").textContent=e.message||"That link didn't open."; } },300); } }
+
+// fix the name used in messages ("Ashleu" happens)
+function nameBtn(){ const n=myName(); return n?`<button type="button" class="linkbtn small" data-myname title="The name at the start of the message">Sent as ${esc(n)} · change</button>`:""; }
+document.addEventListener("click",async e=>{ if(!(e.target.closest&&e.target.closest("[data-myname]"))) return; try{ localStorage.removeItem("otm-myname"); }catch(x){} if(acct&&acct.user) acct.user.name=null; await askName(); renderDetails(); });
