@@ -1,6 +1,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+<script>(function(){var m="safari";try{var q=/[?&]mode=(safari|motorsport)/.exec(location.search);if(q){m=q[1];localStorage.setItem("otm-mode",m)}else m=localStorage.getItem("otm-mode")||"safari"}catch(e){}if(m!=="motorsport")m="safari";document.documentElement.setAttribute("data-mode",m)})();</script>
 <meta charset="utf-8">
 <meta name='impact-site-verification' value='b2c96c47-69eb-4d1d-9453-aa86bf1ccbb9'>
 <script type="text/javascript">
@@ -57,14 +58,14 @@ input[type=text],input[type=email],input[type=number],input[type=time],input[typ
 .btn{border:1px solid var(--ink);background:var(--ink);color:var(--bg);border-radius:4px;padding:7px 12px;font-weight:600;cursor:pointer;white-space:nowrap}
 .btn.ghost{background:transparent;color:var(--ink)}
 .btn.small{padding:4px 8px;font-size:.8rem}
-.btn.share{background:#0B6E4F;border-color:#0B6E4F;color:#fff}
+.btn.share{background:var(--accent);border-color:var(--accent);color:var(--onfill)}
 .namedlg{border:1px solid var(--ink);border-radius:8px;padding:16px;max-width:320px;width:90vw;background:var(--bg);color:var(--ink)}.namedlg input{width:100%;margin-top:6px}
 .trioset{display:inline-flex;gap:4px;margin-right:6px;vertical-align:middle}
 .avi.trio{width:28px;height:28px;padding:0;border-radius:6px;border:0;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;background:#2F5BA8}
 .avi.trio svg{width:18px;height:18px;fill:#fff}
-.avi.trio[data-c=fuel]{background:#0B6E4F}.avi.trio[data-c=food]{background:#B3261E}.avi.trio[data-c=stay]{background:#2F5BA8}.avi.trio[data-c=sights]{background:#9A6A33}
+.avi.trio[data-c=fuel]{background:var(--accent)}.avi.trio[data-c=food]{background:#B3261E}.avi.trio[data-c=stay]{background:#2F5BA8}.avi.trio[data-c=sights]{background:#9A6A33}
 .avi.trio.none{background:transparent;border:1.5px dashed var(--line);cursor:default}.avi.trio.none svg{fill:var(--muted);opacity:.5}
-.avi.trio.on{outline:3px solid #D9A441;outline-offset:1px}
+.avi.trio.on{outline:3px solid var(--gold);outline-offset:1px}
 .numpin{width:22px;height:22px;border-radius:50%;color:#fff;border:2px solid #fff;font:700 11px/18px system-ui,sans-serif;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.4)}
 .ovlist{border:1px solid var(--line);border-top:0;border-radius:0 0 8px 8px;padding:8px 12px;margin:-6px 0 10px;background:var(--panel,#fff)}.ovhead{display:flex;gap:8px;align-items:baseline}.ovhead .linkbtn{margin-left:auto}.ovrows{list-style:none;padding:0;margin:6px 0}.ovrows li{display:flex;align-items:center;gap:8px;padding:6px 0;border-top:1px dashed var(--line)}.ovrows .num{flex:0 0 22px;height:22px;border-radius:50%;color:#fff;font:700 11px/22px system-ui,sans-serif;text-align:center}.ovrows .ovn{flex:1;min-width:0}.ovrows .sact{display:flex;gap:8px;align-items:center;white-space:nowrap}
 .stop.slim{padding:4px 10px;background:none;border-style:dashed}.enddetail{margin:-4px 0 10px;border:1px solid var(--line);border-radius:0 0 8px 8px;padding:8px 12px}
@@ -82,7 +83,7 @@ input[type=text],input[type=email],input[type=number],input[type=time],input[typ
 .planbox .tripbar .stayfield{grid-column:auto}
 .planbox .tooltb>button,.planbox .tooltb>label{height:30px;padding:0 8px;font-size:.78rem}
 @media (max-width:640px){.planbox .tooltb>button,.planbox .tooltb>label{height:42px}}
-.box.tripbox{border-color:#0B6E4F}.box.tripbox .boxh{color:#0B6E4F}
+.box.tripbox{border-color:var(--accent)}.box.tripbox .boxh{color:var(--accent)}
 .box.stopbox{border-color:#2F5BA8}.box.stopbox .boxh{color:#2F5BA8}
 .box.detailbox{border-color:var(--ink)}
 .tstops{list-style:none;margin:8px 0 6px;padding:0}
@@ -99,7 +100,7 @@ input[type=text],input[type=email],input[type=number],input[type=time],input[typ
 .snext{margin-top:8px}
 @media (max-width:640px){.trow{grid-template-columns:26px 1fr auto}.trow .tkm{grid-column:2;grid-row:2;margin-top:-4px}.trow .tctl{grid-row:1/3;grid-column:3}}
 .herotoggle{position:absolute;top:10px;right:12px;background:transparent;border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:6px;padding:3px 10px;font:600 .8rem var(--f-body);cursor:pointer}
-.herotoggle:hover{border-color:#3FB48A;color:#3FB48A}
+.herotoggle:hover{border-color:var(--brand);color:var(--brand)}
 .hero.shut{padding:8px 14px}.hero.shut .herohead{font-size:1.15rem;margin:0}.hero.shut>*:not(.herohead):not(.herotoggle){display:none}.hero.shut .herotoggle{top:6px}
 .staybadge{display:inline-block;white-space:nowrap;background:#2F5BA8;color:#fff;font:600 12px/1 system-ui,sans-serif;padding:5px 7px;border-radius:12px;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.35);cursor:pointer}#map.zoomin .staybadge{display:none}
 .favmk{width:26px;height:26px;border-radius:50%;background:#D9A441;color:#18201C;border:2px solid #18201C;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.35)}
@@ -259,12 +260,12 @@ header h1{font-size:2.7rem;font-weight:700;letter-spacing:-.005em;text-transform
 .motto{font-family:var(--f-display);font-weight:700;font-size:1.2rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:2px 0}
 .hero{position:relative;flex-basis:100%;background:#18201C;border:1px solid var(--line);color:#fff;border-radius:12px;padding:16px 18px;margin-top:4px}
 .herohead{font-family:var(--f-display);font-weight:700;text-transform:uppercase;font-size:2.4rem;line-height:1;margin:0;letter-spacing:.01em;color:#fff}
-.herohead span{color:#3FB48A}
+.herohead span{color:var(--brand)}
 .herosub{margin:8px 0 12px;font-size:1.08rem;max-width:62rem;color:#fff;opacity:.92}
 .herosteps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;counter-reset:hs}
-.herosteps li{counter-increment:hs;background:rgba(255,255,255,.08);border-left:4px solid #3FB48A;border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
+.herosteps li{counter-increment:hs;background:rgba(255,255,255,.08);border-left:4px solid var(--brand);border-radius:8px;padding:10px 12px;display:flex;flex-direction:column;gap:4px}
 .herosteps b{font-family:var(--f-display);text-transform:uppercase;font-size:1.15rem;letter-spacing:.02em;color:#fff}
-.herosteps b::before{content:counter(hs) ". ";color:#3FB48A}
+.herosteps b::before{content:counter(hs) ". ";color:var(--brand)}
 .herosteps span{font-size:.92rem;line-height:1.35;color:#fff;opacity:.85}
 @media (max-width:900px){.herosteps{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:640px){body.hastrip .herosteps,body.hastrip .herosub{display:none}.hero{padding:12px}.herohead{font-size:1.75rem}.herosub{font-size:.95rem;margin:6px 0 10px}.herosteps{gap:6px}.herosteps li{padding:8px}.herosteps b{font-size:1rem}.herosteps span{font-size:.82rem}}
@@ -272,7 +273,7 @@ header h1{font-size:2.7rem;font-weight:700;letter-spacing:-.005em;text-transform
 .sitefoot{margin:28px 0 10px;padding-top:14px;border-top:1px solid var(--line)}.sponsors{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px}
 .spons{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:8px;padding:8px 14px;text-decoration:none;color:var(--ink);background:var(--panel)}.spons b{font-family:var(--f-display);text-transform:uppercase;letter-spacing:.03em;font-size:1.1rem}.spons span{font-size:.85rem;color:var(--muted)}.spons.open{border-style:dashed}.spons.open b{color:var(--accent)}
 .herocta{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-top:12px}.herocta span{color:#fff;opacity:.8;font-size:.92rem}
-.herobtn{background:#3FB48A!important;border-color:#3FB48A!important;color:#0d1410!important;font-weight:700}
+.herobtn{background:var(--brand)!important;border-color:var(--brand)!important;color:#0d1410!important;font-weight:700}
 @media (max-width:640px){body.hastrip .herocta{display:none}.herocta span{font-size:.82rem}}
 .evt{border-collapse:collapse;margin:4px 0;font-size:.9rem}.evt td,.evt th{padding:2px 10px 2px 0;text-align:left}.evt td+td,.evt th+th{text-align:right}
 .rtveh{display:flex;flex-wrap:wrap;gap:6px}.rtveh select,.rtveh input{flex:1 1 110px;min-width:0}
@@ -486,7 +487,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .ibhead{font-size:.72rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;margin-right:4px;flex-basis:100%}
 @media (min-width:641px){.ibhead{flex-basis:auto}}
 .ib{position:relative;width:44px;height:44px;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid var(--line);border-radius:8px;background:var(--bg);cursor:pointer;font-size:1.45rem;line-height:1;padding:0;filter:grayscale(.7);opacity:.6}
-.ib.on{background:#0B6E4F;border-color:#0B6E4F;filter:none;opacity:1}
+.ib.on{background:var(--accent);border-color:var(--accent);filter:none;opacity:1}
 .ib.on::after{content:"✓";position:absolute;top:1px;right:3px;font-size:.65rem;font-weight:700;color:#fff}
 .ib:disabled{cursor:not-allowed;opacity:.3;border-style:dashed}
 .ibmax{display:inline-flex;align-items:center;gap:4px;font-size:.85rem;font-weight:600;margin-left:2px}
@@ -547,7 +548,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .hdrlinks{display:grid;grid-template-columns:repeat(3,auto);justify-content:start;gap:0;margin:10px 0 0;background:var(--ink);border-radius:6px;overflow:hidden;width:100%}
 .hdrlinks a{font:700 1.15rem var(--f-display);text-transform:uppercase;letter-spacing:.06em;text-decoration:none;color:var(--bg);padding:9px 20px;border:0;border-bottom:4px solid transparent;background:none;border-radius:0;white-space:nowrap}
 .hdrlinks a:hover{background:color-mix(in srgb,var(--bg) 12%,transparent)}
-.hdrlinks a.on{border-bottom-color:#D9A441}
+.hdrlinks a.on{border-bottom-color:var(--gold)}
 @media (max-width:640px){.hdrlinks{grid-template-columns:repeat(2,minmax(0,1fr))}.hdrlinks a{font-size:.95rem;padding:8px 4px;text-align:center;letter-spacing:.03em}}
 .fdr{font-size:.8rem;color:var(--accent);font-weight:600;margin-top:2px}
 .drafttag{font:600 .7rem var(--f-mono);background:var(--warn);color:var(--onfill);padding:1px 6px;border-radius:3px;vertical-align:middle}
@@ -613,14 +614,25 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
 .mapemo{position:relative}
 .maplbl.mlnight{font-weight:800;border-width:2px;background:#18201C;color:#fff;border-color:#18201C}
 .pin.pnight{background:#18201C;color:#fff}
-.hdrlinks{overflow:visible!important;position:relative;z-index:1500}header,.hdr{position:relative;z-index:1500}.navdd{position:relative;display:flex}.navdd>summary{list-style:none;cursor:pointer;font:700 1.15rem var(--f-display,"Barlow Condensed","Arial Narrow",sans-serif);text-transform:uppercase;letter-spacing:.06em;color:var(--bg);padding:9px 20px;border-bottom:4px solid transparent;white-space:nowrap;width:100%}.navdd>summary::-webkit-details-marker{display:none}.navdd>summary::after{content:" ▾";font-size:.8em}.navdd>summary.on{border-bottom-color:#D9A441}.navdd>summary:hover{background:color-mix(in srgb,var(--bg) 12%,transparent)}.navdd .ddm{position:absolute;z-index:2000;top:100%;left:0;min-width:210px;background:var(--ink);border-radius:0 0 6px 6px;box-shadow:0 6px 16px rgba(0,0,0,.25);flex-direction:column;display:flex}.navdd:not([open]) .ddm{display:none}@media(hover:hover){.navdd:hover .ddm{display:flex}}.navdd .ddm a{text-align:left!important;padding:10px 18px!important}@media(max-width:700px){.hdrlinks{grid-template-columns:repeat(3,minmax(0,1fr))!important}.navdd>summary{font-size:.95rem;padding:8px 4px;text-align:center;letter-spacing:.03em}.navdd .ddm{left:auto;right:0}}</style>
+.hdrlinks{overflow:visible!important;position:relative;z-index:1500}header,.hdr{position:relative;z-index:1500}.navdd{position:relative;display:flex}.navdd>summary{list-style:none;cursor:pointer;font:700 1.15rem var(--f-display,"Barlow Condensed","Arial Narrow",sans-serif);text-transform:uppercase;letter-spacing:.06em;color:var(--bg);padding:9px 20px;border-bottom:4px solid transparent;white-space:nowrap;width:100%}.navdd>summary::-webkit-details-marker{display:none}.navdd>summary::after{content:" ▾";font-size:.8em}.navdd>summary.on{border-bottom-color:#D9A441}.navdd>summary:hover{background:color-mix(in srgb,var(--bg) 12%,transparent)}.navdd .ddm{position:absolute;z-index:2000;top:100%;left:0;min-width:210px;background:var(--ink);border-radius:0 0 6px 6px;box-shadow:0 6px 16px rgba(0,0,0,.25);flex-direction:column;display:flex}.navdd:not([open]) .ddm{display:none}@media(hover:hover){.navdd:hover .ddm{display:flex}}.navdd .ddm a{text-align:left!important;padding:10px 18px!important}@media(max-width:700px){.hdrlinks{grid-template-columns:repeat(3,minmax(0,1fr))!important}.navdd>summary{font-size:.95rem;padding:8px 4px;text-align:center;letter-spacing:.03em}.navdd .ddm{left:auto;right:0}}:root{--brand:#3FB48A;--gold:#D9A441}
+html[data-mode="motorsport"]{--bg:#0E0E10;--panel:#19191C;--ink:#F1F1EE;--muted:#A3A3AA;--line:#2F2F35;--accent:#F2C500;--chip:#26262B;--onfill:#111;--warn:#FF7A1A;--bad:#E10600;--brand:#F2C500;--gold:#E10600;color-scheme:dark}
+html[data-mode="motorsport"] .hero{background:#000;border-color:#E10600}
+html[data-mode="motorsport"] .herosteps li{border-left-color:#E10600}
+html[data-mode="motorsport"] .btn.share,html[data-mode="motorsport"] .ib.on{color:#111}
+.hdrlinks{grid-template-columns:repeat(3,auto) 1fr!important}
+.modesw{justify-self:end;align-self:center;margin-right:8px;display:flex;border:1px solid color-mix(in srgb,var(--bg) 40%,transparent);border-radius:999px;overflow:hidden}
+.modesw button{font:700 .95rem "Barlow Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.06em;background:none;border:0;color:var(--bg);padding:5px 12px;cursor:pointer;opacity:.7}
+.modesw button.on{background:#D9A441;color:#18201C;opacity:1}
+html[data-mode="motorsport"] .modesw button.on{background:#F2C500;color:#111}
+@media(max-width:640px){.hdrlinks{grid-template-columns:repeat(3,auto)!important}.modesw{grid-column:1/-1;justify-self:start;margin:4px 0 6px 8px}}
+</style>
 </head>
 <body>
 <div class="wrap">
   <header>
     <div><h1><a class="homelink" href="/" title="Home">OneTrackMind</a> <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><div class="note"><b>Built by riders:</b> add your favourite routes, mark the places worth stopping.</div></div>
     <div class="btns"><span class="lbl mono" id="hdrSummary"></span><button class="btn ghost" id="feedback" type="button">Send feedback</button><button class="btn" id="addBtn" type="button" hidden>+ Add yours</button><button class="btn ghost" id="reviewBtn" type="button" hidden>Review</button><button class="btn ghost" id="acctBtn" type="button" hidden>Sign in</button><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
-    <nav class="hdrlinks" style="order:9" aria-label="Site"><a href="/" class="on" aria-current="page">Plan a trip</a><a href="/routes/">Routes</a><details class="navdd"><summary>About</summary><div class="ddm"><a href="/about/">About OneTrackMind</a><a href="/favourites/">Founder's fav's</a><a href="/how-to/">How to</a></div></details></nav><script>document.addEventListener("click",function(e){document.querySelectorAll(".navdd[open]").forEach(function(d){if(!d.contains(e.target))d.open=false;});});</script>
+    <nav class="hdrlinks" style="order:9" aria-label="Site"><a href="/" class="on" aria-current="page">Plan a trip</a><a href="/routes/">Routes</a><details class="navdd"><summary>About</summary><div class="ddm"><a href="/about/">About OneTrackMind</a><a href="/favourites/">Founder's fav's</a><a href="/how-to/">How to</a></div></details><div class="modesw" role="group" aria-label="Mode"><button type="button" data-mode="safari">Safari</button><button type="button" data-mode="motorsport">Motorsport</button></div></nav><script>(function(){var h=document.documentElement,b=document.querySelectorAll(".modesw button");function s(m,u){h.setAttribute("data-mode",m);b.forEach(function(x){x.classList.toggle("on",x.dataset.mode===m)});if(u){try{localStorage.setItem("otm-mode",m)}catch(e){}document.dispatchEvent(new CustomEvent("otm-mode",{detail:m}))}}b.forEach(function(x){x.onclick=function(){s(x.dataset.mode,1)}});s(h.getAttribute("data-mode")||"safari",0)})();</script><script>document.addEventListener("click",function(e){document.querySelectorAll(".navdd[open]").forEach(function(d){if(!d.contains(e.target))d.open=false;});});</script>
     <section class="hero" style="order:10" aria-label="What it does">
       <button type="button" class="herotoggle" id="heroToggle" aria-expanded="true" title="Hide this">Hide ▴</button>
       <h2 class="herohead">Plan it. Book it. <span>Ride it.</span></h2>
@@ -2397,6 +2409,7 @@ function downloadGpx(k){
 SET_FIELDS.forEach(id=>$(id).value=settings[id]);
 $("openSettings").addEventListener("click",()=>{ renderHist(); $("settings").showModal(); });
 $("settings").addEventListener("close",()=>{
+  if($("style").value!==settings.style) settings.styleSet=true;
   const reroute=+$("corridor").value!==+settings.corridor||$("style").value!==settings.style||$("vehicle").value!==settings.vehicle;
   const prevVeh=settings.vehicle, typed=$("range").value; if(String(typed)!==String(settings.range)) settings.rangeSet=true;
   SET_FIELDS.forEach(id=>settings[id]=$(id).value); if(!settings.rangeSet&&prevVeh!==settings.vehicle){ settings.range=RANGE_DEF[settings.vehicle]||200; $("range").value=settings.range; } store.set("rr2-settings",settings);
@@ -2455,6 +2468,20 @@ $("map").addEventListener("click",e=>{ const sn=e.target.closest&&e.target.close
   const [k2,id]=sn.dataset.staynight.split(":"), x=(stayFor(dayTo(+k2))?.places||[]).find(q=>q.id===id); if(x){ map.closePopup(); chooseStay(+k2,x); } });
 
 ["vehicle","wVehicle"].forEach(id=>{ const el=$(id); if(el) el.addEventListener("change",()=>{ if(settings.rangeSet) return; const r=$(id==="vehicle"?"range":"wRange"); if(r) r.value=RANGE_DEF[el.value]||200; }); });
+
+/* Safari / Motorsport mode: colours are CSS; here the starting route style and the landing text follow the mode, unless the rider chose their own style */
+(function(){
+  const TXT={safari:["Ride it.","Forget BaseCamp and five different apps. Route a multi-day trip in minutes, sort your beds, then send it straight to your GPS, your bike's app or your phone and navigate from there."],
+    motorsport:["Chase it.","Tracks, factories, museums and race weekends, with the best roads in between. Route the trip, sort your beds, then send it to your GPS or phone."]};
+  function applyMode(m,change){
+    const t=TXT[m]||TXT.safari, hs=document.querySelector(".herohead span"), sub=document.querySelector(".herosub");
+    if(hs) hs.textContent=t[0]; if(sub) sub.textContent=t[1];
+    if(!settings.styleSet&&(change||!store.get("rr2-settings"))&&(settings.style==="rough"||settings.style==="tar")){ const want=m==="motorsport"?"tar":"rough";
+      if(settings.style!==want){ settings.style=want; if($("style")) $("style").value=want; store.set("rr2-settings",settings); showStyle(); if(change){ try{ recalc(); }catch(e){} } } }
+  }
+  applyMode(document.documentElement.getAttribute("data-mode")||"safari",false);
+  document.addEventListener("otm-mode",e=>applyMode(e.detail,true));
+})();
 
 /* ---------- good to know: per-day notes, worst first ----------
    Built only from data the app has: arrival times, opening hours, sunset, weather, fuel, towns,
