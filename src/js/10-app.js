@@ -594,6 +594,7 @@ function dayWay(k){
   if(gpx===n) return `<span class="dway" title="Follows your GPX file"><span class="note gpxnote">GPX</span></span>`;
   const rest=n-gpx, all=fast===rest, none=fast===0;
   const t=all?"Quick way all day":none?`${styleName()} all day`:`${styleName()}, with ${fast} stretch${fast>1?"es":""} the quick way`;
+  if(settings.style==="tar") return `<span class="dway" title="Main roads, like normal sat-nav">${STYLE_ICON.fast}</span>`;
   return `<span class="dway" title="${esc(t)}. Change it per stretch on the day's stops.">${none?STYLE_ICON.default:all?STYLE_ICON.fast:STYLE_ICON.default+STYLE_ICON.fast}</span>`;
 }
 function fromCell(k){ const from=dayFrom(k); if(!from||from.lat==null) return `<span class="ep need">${k===0?"Set your start":"Pick the night before"}</span>`; return `<span class="ep">${k===0?"▶":"🛏"} ${esc(from.name)}</span>`; }
@@ -689,7 +690,7 @@ function stopList(k){
     const lab=isFrom?"From":isTo?(last?(trip.round?"⟲ Home":"🏁 Finish"):`🛏 Night ${k+1}`):`Stop ${j}`;
     const av=placesOk?stopAvail(p):null;
     const icons=av?AV.filter(a=>av[a[0]].length).map(a=>`<button type="button" class="avi ${open&&stopFocus.cat===a[0]?"on":""}" data-av="${k}:${j}:${a[0]}" title="${esc(a[2])}: ${av[a[0]].length}">${a[1]}</button>`).join(""):"";
-    const fq=legFast(d,j-1), way=p.straight&&!lg.track?`<span class="note gpxnote" title="A straight line to this point: a track the map doesn't show">Straight</span>`:lg.track||(L&&L.gpx)?(L&&L.gpx?`<span class="note gpxnote" title="This stretch follows your GPX file">GPX</span>`:""):`<span class="seg2 legway" role="group" aria-label="Way to this stop"><button type="button" data-legsty="${j-1}:0" class="${fq?"":"on"}" title="${esc(styleName())} to here">${STYLE_ICON.default}</button><button type="button" data-legsty="${j-1}:1" class="${fq?"on":""}" title="Get me here quickly: main roads, like normal sat-nav">${STYLE_ICON.fast}</button></span>`;
+    const fq=legFast(d,j-1), way=p.straight&&!lg.track?`<span class="note gpxnote" title="A straight line to this point: a track the map doesn't show">Straight</span>`:lg.track||(L&&L.gpx)?(L&&L.gpx?`<span class="note gpxnote" title="This stretch follows your GPX file">GPX</span>`:""):(settings.style==="tar"?`<span class="legway one" title="Main roads, like normal sat-nav">${STYLE_ICON.fast}</span>`:`<span class="legway one"><button type="button" data-legsty="${j-1}:${fq?0:1}" class="on" title="${fq?"Quick way, main roads":esc(styleName())} to here. Tap for ${fq?esc(styleName()):"the quick way"}">${fq?STYLE_ICON.fast:STYLE_ICON.default}</button></span>`);
     const tools="";
     const isVia2=!isFrom&&!isTo, mtool=`${isVia2?`${p.auto?"":`<button class="btn small ghost" type="button" data-vren="${vi}">✎ Rename</button>`}<button class="btn small ghost" type="button" data-vup="${vi}" ${vi===0?"disabled":""}>↑ Move up</button><button class="btn small ghost" type="button" data-vdel="${vi}">✕ Remove this stop</button>`:""}`;
     const rtool=`${acct.ready?`<button class="linkbtn small" type="button" data-repat="${p.lat},${p.lon},${esc(p.name)}">Report the road here</button><button class="linkbtn small" type="button" data-spotat="${p.lat},${p.lon},${esc(p.name)}">Mark a place here</button>`:""}<button class="linkbtn small" type="button" data-fixat="${p.lat},${p.lon},${esc(p.name)}">Report a map mistake</button>`;
@@ -1060,8 +1061,8 @@ $("welcome").addEventListener("close",()=>{
 });
 $("howItWorks").addEventListener("click",openWelcome);
 try{ if(!localStorage.getItem("rr-welcome")) setTimeout(()=>((document.fonts&&document.fonts.ready)||Promise.resolve()).then(openWelcome),300); }catch(e){} // wait for fonts so the box doesn't jump
-const STYLE_TEXT={rough:"<b>Road less travelled</b>: gravel and back roads wherever they go",mixed:"<b>Mixed</b>: plenty of gravel, tar to link it up",tar:"<b>Tar</b>: sealed roads, gravel avoided"};
-function showStyle(){ $("styleBanner").innerHTML=`${VEHICLES[settings.vehicle]||VEHICLES.bike} · ${STYLE_TEXT[settings.style]||STYLE_TEXT.rough}. Change any stretch with its way icons. <button type="button" class="linkbtn" id="bannerEdit">Change</button>`; }
+const STYLE_TEXT={rough:"<b>Road less travelled</b>: gravel and back roads wherever they go",mixed:"<b>Mixed</b>: plenty of gravel, tar to link it up",tar:"<b>Tar</b>: main roads, like normal sat-nav"};
+function showStyle(){ $("styleBanner").innerHTML=`${VEHICLES[settings.vehicle]||VEHICLES.bike} · ${STYLE_TEXT[settings.style]||STYLE_TEXT.rough}.${settings.style==="tar"?"":" Tap a stretch's way icon to switch it to the quick way."} <button type="button" class="linkbtn" id="bannerEdit">Change</button>`; }
 document.addEventListener("click",e=>{ if(e.target.id==="bannerEdit") openWelcome(); });
 function render(){ renderAll(); }
 function renderAll(){
