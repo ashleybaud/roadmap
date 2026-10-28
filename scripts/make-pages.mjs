@@ -56,6 +56,9 @@ footer{border-top:1px solid var(--line);margin:40px 0 0;padding:16px 0 30px;colo
 .gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:8px;margin:14px 0}.gallery img{width:100%;aspect-ratio:3/2;object-fit:cover;margin:0}
 .cover{width:100%;max-height:420px;object-fit:cover;border-radius:8px;margin:14px 0}.tocome{background:var(--chip);border-radius:6px;padding:8px 12px;font-size:.9rem;color:var(--muted)}
 .serieshead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}.snav{display:flex;justify-content:space-between;gap:10px;margin:24px 0;flex-wrap:wrap}.snav a{max-width:48%}
+.cards.trips{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}.card.trip{display:flex;flex-direction:column;gap:4px}.card.trip>img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:4px;margin:-4px 0 6px}.card.trip .routemap{width:100%;height:auto;margin:-4px 0 6px}
+.routemap{display:block;width:100%;height:auto;margin:14px 0}.cta.ghost{background:transparent;color:var(--accent);border:2px solid var(--accent);margin-left:8px}
+.collage{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:8px;margin:12px 0}.collage .tile{position:relative;display:block;aspect-ratio:4/3;border-radius:6px;overflow:hidden;background:var(--chip);text-decoration:none}.collage .tile img{width:100%;height:100%;object-fit:cover;margin:0;border-radius:0}.collage .tile span{position:absolute;left:0;right:0;bottom:0;padding:8px 10px;background:linear-gradient(transparent,rgba(0,0,0,.75));color:#fff;display:flex;flex-direction:column}.collage .tile small{opacity:.8}
 .card.story img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:4px;margin:-4px 0 8px}
 .photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin:18px 0}.photos img{width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:6px}`;
 
@@ -212,10 +215,45 @@ const redirectPage = to => `<!doctype html><html lang="en"><head><meta charset="
 /* stories: the old onetrackmind.co.za blog, grouped into trips and series; images still served from the old site until they move */
 const seriesOf = () => { const m = new Map(); STORIES.forEach(x => { if (!m.has(x.series)) m.set(x.series, []); m.get(x.series).push(x); }); m.forEach(L => L.sort((a, b) => a.date.localeCompare(b.date))); return m; };
 const fmtDate = d => new Date(d + "T12:00:00").toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
+/* blog trips: a multi-day tour is one card on the Blog, and its own page: the route as the featured image, an overview, then a collage of the days */
+const TRIP_ROUTE = { "2020-01 Namibia (Tortoise)": "namibia-2020-tortoise", "Namibia 2017 (Epupa)": "namibia-2017-epupa", "2019-06 Wild Coast": "wild-coast-2019", "EU road trip 2018": "eu-road-trip-2018", "2019-09 EU road trip 2019 & KTM factory": "eu-road-trip-2019", "2017-11 Motor Valley & EICMA": "motor-valley-2017", "2020-02 Namibia 2": "namibia-2020-orange-river" };
+const tripName = n => n.replace(/^\d{4}-\d{2} /, "");
+const tripSlug = (n, L) => (tripName(n).replace(/&.*$/, "") + (/\b\d{4}\b/.test(tripName(n)) ? "" : " " + L[0].date.slice(0, 4))).toLowerCase().normalize("NFD").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").replace(/-(\d{4})-\1$/, "-$1");
+// the route drawn from its stops (start, stops along the way, nights): a clean outline map, no map tiles needed
+function routeSvg(r, w, h, big) {
+  const t = r.trip, pts = [t.start, ...t.days.flatMap(d => [...(d.vias || []), ...(d.to ? [d.to] : [])]), ...(t.end && !t.round ? [t.end] : t.round ? [t.start] : [])].filter(p => p && p.lat != null);
+  const nights = t.days.slice(0, -1).map(d => d.to).filter(Boolean);
+  let la0 = Math.min(...pts.map(p => p.lat)), la1 = Math.max(...pts.map(p => p.lat)), lo0 = Math.min(...pts.map(p => p.lon)), lo1 = Math.max(...pts.map(p => p.lon));
+  const k = Math.cos((la0 + la1) / 2 * Math.PI / 180), pad = big ? 34 : 14, sx = (w - 2 * pad) / Math.max(0.01, (lo1 - lo0) * k), sy = (h - 2 * pad) / Math.max(0.01, la1 - la0), sc = Math.min(sx, sy);
+  const ox = (w - (lo1 - lo0) * k * sc) / 2, oy = (h - (la1 - la0) * sc) / 2;
+  const xy = p => [(ox + (p.lon - lo0) * k * sc).toFixed(1), (oy + (la1 - p.lat) * sc).toFixed(1)];
+  const line = pts.map(xy).map(a => a.join(",")).join(" ");
+  const lab = (p, txt) => { const [x, y] = xy(p); return `<text x="${(+x + 8).toFixed(1)}" y="${(+y + 4).toFixed(1)}" font-size="${big ? 13 : 10}" font-family="IBM Plex Sans,system-ui,sans-serif" fill="#18201C" stroke="#EEF0EA" stroke-width="3" paint-order="stroke">${esc(txt)}</text>`; };
+  return `<svg class="routemap" viewBox="0 0 ${w} ${h}" role="img" aria-label="Route: ${esc(pts.map(p => p.name).join(", "))}"><rect width="${w}" height="${h}" rx="8" fill="#E4E9DF"/>
+<polyline points="${line}" fill="none" stroke="#0B6E4F" stroke-width="${big ? 4 : 3}" stroke-linejoin="round" stroke-linecap="round"/>
+${nights.map((p, i) => { const [x, y] = xy(p); return `<circle cx="${x}" cy="${y}" r="${big ? 6 : 4}" fill="#18201C"/>${big ? lab(p, p.name.replace(/,.*$/, "")) : ""}`; }).join("")}
+${(() => { const [x, y] = xy(t.start); return `<circle cx="${x}" cy="${y}" r="${big ? 8 : 5}" fill="#D9A441" stroke="#18201C" stroke-width="2"/>${lab(t.start, t.start.name)}`; })()}</svg>`;
+}
+function tripFacts(n, L) { const r = live.find(x => x.id === TRIP_ROUTE[n]); return { r, line: [r ? `${r.trip.days.length} days` : "", r && r.stats ? `${km(r.stats.km)} km` : "", r ? r.region : "", `${L.length} posts`].filter(Boolean).join(" · ") }; }
+function tripPage(n, L) {
+  const { r, line } = tripFacts(n, L), slug = tripSlug(n, L);
+  const body = `<main class="story">
+<p class="note"><a href="/blog/">Blog</a> · trip</p>
+<h1>${esc(tripName(n))}</h1>
+<div class="meta">${fmtDate(L[0].date)} – ${fmtDate(L[L.length - 1].date)} · ${esc(line)}</div>
+${r ? routeSvg(r, 820, 460, true) : (L[0].cover ? `<img class="cover" src="${esc(L[0].cover)}" alt="${esc(tripName(n))}">` : "")}
+${r ? `<p class="intro">${esc(r.blurb)}</p><a class="cta" href="/?pick=${esc(r.id)}">Open this trip in the planner</a> <a class="cta ghost" href="/routes/${esc(r.id)}/">Day by day</a>` : ""}
+<h2>The trip, day by day</h2>
+<div class="collage">${L.map((x, i) => `<a href="/blog/${esc(x.slug)}/" class="tile">${x.cover ? `<img src="${esc(x.cover)}" alt="" loading="lazy">` : ""}<span><b>${i + 1}. ${esc(x.title.replace(/^(\d{4}\s+)?/, ""))}</b><small>${fmtDate(x.date)}</small></span></a>`).join("")}</div>
+</main>`;
+  const ld = { "@context": "https://schema.org", "@type": "CollectionPage", name: tripName(n), url: `${SITE}/blog/${slug}/`, author: FOUNDER, hasPart: L.map(x => ({ "@type": "BlogPosting", headline: x.title, url: `${SITE}/blog/${x.slug}/` })) };
+  return page({ active: "/favourites/", url: `/blog/${slug}/`, title: `${tripName(n)}: the trip, day by day · OneTrackMind blog`, desc: `${tripName(n)}: ${line}. The whole trip on a map, then every day of it.`, body, ld });
+}
+
 function storyPage(x, L) {
   const i = L.indexOf(x), prev = L[i - 1], next = L[i + 1];
   const body = `<main class="story">
-<p class="note"><a href="/blog/">Blog</a>${L.length > 1 ? ` · ${esc(x.series)} · part ${i + 1} of ${L.length}` : ""}</p>
+<p class="note"><a href="/blog/">Blog</a>${L.length > 1 ? ` · <a href="/blog/${tripSlug(x.series, L)}/">${esc(tripName(x.series))}</a> · part ${i + 1} of ${L.length}` : ""}</p>
 <h1>${esc(x.title)}</h1>
 <div class="meta">${fmtDate(x.date)}</div>
 ${x.cover && !x.html.includes(x.cover) ? `<img class="cover" src="${esc(x.cover)}" alt="${esc(x.title)}" loading="eager">` : ""}
@@ -234,7 +272,7 @@ function storiesIndex(M) {
   const multi = groups.filter(([, L]) => L.length > 1), single = groups.filter(([, L]) => L.length === 1).map(([, L]) => L[0]);
   const body = `<main><h1>Blog</h1>
 <p class="intro">Twenty years of road trips, festivals, factories and museums, mostly on two wheels and mostly not to plan. Trips first, newest first.</p>
-${multi.map(([name, L]) => `<section><div class="serieshead"><h2>${esc(name.replace(/^\d{4}-\d{2} /, ""))}</h2><span class="note">${fmtDate(L[0].date).replace(/^\d+ /, "")} · ${L.length} parts</span></div><div class="cards">${L.map(card).join("")}</div></section>`).join("\n")}
+<h2>Trips</h2><div class="cards trips">${multi.map(([name, L]) => { const { r, line } = tripFacts(name, L); return `<a class="card trip" href="/blog/${tripSlug(name, L)}/">${r ? routeSvg(r, 300, 170, false) : L[0].cover ? `<img src="${esc(L[0].cover)}" alt="" loading="lazy">` : ""}<b>${esc(tripName(name))}</b><span>${fmtDate(L[0].date).replace(/^\d+ /, "")} · ${esc(line)}</span></a>`; }).join("")}</div>
 <section><h2>More posts</h2><div class="cards">${single.map(card).join("")}</div></section>
 <a class="cta" href="/">Plan your own</a></main>`;
   const ld = { "@context": "https://schema.org", "@type": "Blog", name: "OneTrackMind blog", url: SITE + "/blog/", author: FOUNDER };
@@ -294,9 +332,9 @@ write("rides/index.html", redirectPage("/favourites/#trips"));
 write("favourites/index.html", favIndex());
 FAV.forEach(x => write(`favourites/${x.id}/index.html`, favPage(x)));
 fs.rmSync(path.join(ROOT, "blog"), { recursive: true, force: true });
-{ const M = seriesOf(); write("blog/index.html", storiesIndex(M)); M.forEach(L => L.forEach(x => write(`blog/${x.slug}/index.html`, storyPage(x, L)))); }
+{ const M = seriesOf(); write("blog/index.html", storiesIndex(M)); M.forEach((L, n) => { L.forEach(x => write(`blog/${x.slug}/index.html`, storyPage(x, L))); if (L.length > 1) write(`blog/${tripSlug(n, L)}/index.html`, tripPage(n, L)); }); }
 write("advertise/index.html", advertisePage());
-const urls = ["/", "/routes/", "/favourites/", "/about/", "/advertise/", ...live.map(r => `/routes/${r.id}/`), ...FAV.map(x => `/favourites/${x.id}/`), "/blog/", ...STORIES.map(x => `/blog/${x.slug}/`), "/terms.html", "/privacy.html", "/rules.html"];
+const urls = ["/", "/routes/", "/favourites/", "/about/", "/advertise/", ...live.map(r => `/routes/${r.id}/`), ...FAV.map(x => `/favourites/${x.id}/`), "/blog/", ...STORIES.map(x => `/blog/${x.slug}/`), ...[...seriesOf().entries()].filter(([, L]) => L.length > 1).map(([n, L]) => `/blog/${tripSlug(n, L)}/`), "/terms.html", "/privacy.html", "/rules.html"];
 write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${today}</lastmod></url>`).join("\n")}\n</urlset>\n`);
 write("robots.txt", `# Everyone welcome, search engines and AI assistants included.\nUser-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${SITE}/sitemap.xml\n`);
 write("llms.txt", `# OneTrackMind
