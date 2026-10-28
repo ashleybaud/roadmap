@@ -1,6 +1,6 @@
 /* ---------- Founder's fav's in the planner: /?fav=<id> sets it as your finish; a map layer shows them all ---------- */
 var favList=null; // var: drawMap can run before this file does
-const loadFavs=()=>favList?Promise.resolve(favList):fetch("/data/favourites/favourites.json").then(r=>r.ok?r.json():[]).then(j=>favList=j).catch(()=>favList=[]);
+function loadFavs(){ return favList?Promise.resolve(favList):fetch("/data/favourites/favourites.json").then(r=>r.ok?r.json():[]).then(j=>favList=j).catch(()=>favList=[]); }
 { const m=location.search.match(/[?&]fav=([\w-]+)/); if(m){ history.replaceState(null,"",location.pathname);
   setTimeout(async()=>{ const x=(await loadFavs()).find(f=>f.id===m[1]); if(!x) return;
     try{ localStorage.setItem("rr-welcome","1"); if($("welcome").open) $("welcome").close(); }catch(e){}
@@ -11,7 +11,7 @@ const loadFavs=()=>favList?Promise.resolve(favList):fetch("/data/favourites/favo
     if(!trip.start||trip.start.lat==null) $("startPlace").focus();
   },300); } }
 function drawFavs(){
-  if(!favList){ loadFavs().then(()=>{ if(favList.length) drawMap(); }); return; }
+  if(!favList){ setTimeout(()=>loadFavs().then(()=>{ if(favList.length) drawMap(); }),0); return; } // later: this can run before the rest of this file has
   favList.forEach(x=>{ const html=`<b>${esc(x.name)}</b><br><span class="note">Founder's fav · ${esc(x.area)}</span><br>${esc(x.short)}<br><a href="/favourites/${x.id}/">Read it</a> · <button type="button" class="linkbtn" data-favgo="${x.id}">Go here</button>`;
     L.marker([x.lat,x.lon],{icon:L.divIcon({className:"",html:`<div class="favmk" title="${esc(x.name)}">${x.petrol?"🏁":"★"}</div>`,iconSize:[26,26],iconAnchor:[13,13]}),zIndexOffset:700}).bindTooltip(x.name).bindPopup(html).addTo(layer); });
 }

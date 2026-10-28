@@ -927,7 +927,7 @@ let startSeen="";
 function drawMap(){
   if(!window.L) return; ensureMap();
   if(!plan){ const s0=trip.start; if(s0&&s0.lat!=null){ L.marker([s0.lat,s0.lon],{icon:L.divIcon({className:"",html:`<div class="pin pstart">▶</div>`,iconSize:[28,28],iconAnchor:[14,14]})}).bindTooltip("Start: "+s0.name,{permanent:true,direction:"right",offset:[14,0],className:"maplbl"}).addTo(layer);
-      const key=s0.lat+","+s0.lon; if(startSeen!==key){ startSeen=key; map.setView([s0.lat,s0.lon],9,{animate:false}); } } if(ui.lay.fav&&typeof drawFavs==="function") drawFavs(); return; }
+      const key=s0.lat+","+s0.lon; if(startSeen!==key){ startSeen=key; map.setView([s0.lat,s0.lon],9,{animate:false}); } } try{ if(ui.lay.fav&&typeof drawFavs==="function") drawFavs(); }catch(e){} return; }
   townLabels();
   const sel=ui.tab==="ov"?null:plan.days[ui.tab];
   const hl=sel?null:ovHi;
@@ -937,7 +937,7 @@ function drawMap(){
   if(ui.lay.road) drawGradeLayer(sel);
   if(ui.lay.rep&&typeof drawReports==="function") drawReports(sel);
   if(ui.lay.spots&&typeof drawSpots==="function") drawSpots();
-  if(ui.lay.fav&&typeof drawFavs==="function") drawFavs();
+  try{ if(ui.lay.fav&&typeof drawFavs==="function") drawFavs(); }catch(e){} // an extra layer must never stop the route
   if(panel){ drawPanelLayer(); return; }
   if(stopFocus&&sel&&stopFocus.k===ui.tab&&drawStopLayer()) return;
   if(focusR){ const s=seg(focusR.a,focusR.b); if(s.length>1){L.polyline(s.map(g=>[g.lat,g.lon]),{color:"#B26A00",weight:7}).addTo(layer); map.fitBounds(L.latLngBounds(s.map(g=>[g.lat,g.lon])),{padding:[30,30]});} }
