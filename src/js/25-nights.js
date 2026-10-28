@@ -16,7 +16,7 @@ async function autoNights(){
     if(trip.days[a].to){ a++; continue; }
     let b=a; while(b<n-1&&!trip.days[b].to) b++;          // days a..b-1 have no night stop; day b ends at a known place
     const A=dayFrom(a), B=dayTo(b); if(!A||!B||A.lat==null||B.lat==null){ a=b+1; continue; }
-    const r=(await routeLeg(A,B,{fast:settings.style==="fast"}))[0], g=r.geom, cum=[0];
+    const r=(await routeLeg(A,B,{fast:true}))[0], g=r.geom, cum=[0];
     for(let i=1;i<g.length;i++) cum.push(cum[i-1]+hav(g[i-1],g[i]));
     const total=cum[cum.length-1], parts=b-a+1, seg=total/parts, step=Math.max(1,Math.floor(g.length/3000));
     for(let i=1;i<parts;i++){

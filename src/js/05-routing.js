@@ -44,9 +44,11 @@ async function routeLeg(a,b,lg){
   const key=(car?veh+"|":"")+style+(alts?"|alts":"")+"|"+[a,b].map(p=>p.lon.toFixed(5)+","+p.lat.toFixed(5)).join(";");
   if(cache.has(key)) return cache.get(key);
   let out;
-  try{ out=await brouterLeg(a,b,veh,style,alts); }catch(e){ out=null; } // road-surface aware routing first
+  // freeway icon (Liaison) and Tar: normal navigation, fastest by the main roads, like a phone would. Gravel-aware routing only for gravel styles
+  const normal=style==="fast"||style==="tar";
+  if(!normal) try{ out=await brouterLeg(a,b,veh,style,alts); }catch(e){ out=null; } // road-surface aware routing first
   if(!out) try{
-    const body={locations:[a,b].map(p=>({lat:p.lat,lon:p.lon,type:"break"})),costing:car?"auto":"motorcycle",costing_options:car?{auto:(veh==="jeep"?STYLE_CAR:STYLE_SEDAN)[style==="fast"?"mixed":style]||STYLE_CAR.rough}:{motorcycle:STYLE[style==="fast"?"mixed":style]||STYLE.rough},...(alts?{alternates:2}:{}),units:"kilometers",directions_type:"none"};
+    const body={locations:[a,b].map(p=>({lat:p.lat,lon:p.lon,type:"break"})),costing:car?"auto":"motorcycle",costing_options:car?{auto:(veh==="jeep"?STYLE_CAR:STYLE_SEDAN)[normal?"tar":style]||STYLE_CAR.rough}:{motorcycle:STYLE[normal?"tar":style]||STYLE.rough},...(alts?{alternates:2}:{}),units:"kilometers",directions_type:"none"};
     const ctl=new AbortController(), tm=setTimeout(()=>ctl.abort(),alts?15000:10000);
     const r=await fetch(ROUTER,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(body),signal:ctl.signal}); clearTimeout(tm);
     const j=await r.json(); if(!j.trip) throw new Error(j.error||"no route");
