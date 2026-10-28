@@ -1,0 +1,19 @@
+name: events-check
+on:
+  schedule: [{ cron: "0 5 * * 1" }]
+  workflow_dispatch:
+permissions: { contents: read, issues: write }
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node scripts/check-events.mjs
+      - name: Open an issue if anything needs a look
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: |
+          if grep -q "need a look" reports/events-check.md && ! grep -q " 0 need a look" reports/events-check.md; then
+            gh issue create --title "Events check $(date +%F): dates to confirm" --body-file reports/events-check.md
+          fi

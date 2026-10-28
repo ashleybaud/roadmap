@@ -18,3 +18,14 @@ function drawFavs(){
     L.marker([x.lat,x.lon],{icon:L.divIcon({className:"",html:`<div class="favmk" title="${esc(x.name)}">♥</div>`,iconSize:[26,26],iconAnchor:[13,13]}),zIndexOffset:700}).bindTooltip(x.name).bindPopup(html).addTo(layer); });
 }
 document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-favgo]"); if(!b) return; const x=(favList||[]).find(f=>f.id===b.dataset.favgo); if(!x) return; map.closePopup(); setFinish(pt(x.name,x.lat,x.lon)); });
+
+/* /?ev=<id>: set an event's venue as the finish */
+{ const m=location.search.match(/[?&]ev=([\w-]+)/); if(m){ history.replaceState(null,"",location.pathname);
+  setTimeout(async()=>{ let L=[]; try{ L=await (await fetch("/data/events/events.json")).json(); }catch(e){} const x=L.find(f=>f.id===m[1]); if(!x) return;
+    try{ localStorage.setItem("rr-welcome","1"); if($("welcome").open) $("welcome").close(); }catch(e){}
+    snapTrip(true); trip.end=pt(x.venue||x.name,x.lat,x.lon); trip.round=false; trip.days.forEach(d=>{ d.vias=[]; d.legs=[]; d.to=null; delete d.noAutoNight; });
+    if(trip.start&&trip.start.lat!=null&&hav(trip.start,x)<1) trip.start=pt("My location",null,null);
+    changed();
+    const t=$("toast"); t.innerHTML=`Finish set to <b>${esc(x.name)}</b> (${esc(x.start)}). Now set where you start and arrive by then.`; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,15000);
+    if(!trip.start||trip.start.lat==null) $("startPlace").focus();
+  },300); } }
