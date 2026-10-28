@@ -1,6 +1,6 @@
 /* ---------- what riders do: anonymous daily counts (no names, emails, places or IP kept) ---------- */
 /* Each kind is counted at most once per page visit, so a rider re-planning ten times counts as one "planned". */
-const EVENT_NAMES=["visit","plan","try","pick","gpx","gpx_all","group","gmaps","waze","pdf","save","near","book","signin","report"];
+const EVENT_NAMES=["visit","plan","try","pick","gpx","gpx_all","group","gmaps","waze","pdf","save","near","book","signin","report","share","shared_open"];
 const tracked=new Set();
 function track(name){
   if(!EVENT_NAMES.includes(name)||tracked.has(name)) return; tracked.add(name);

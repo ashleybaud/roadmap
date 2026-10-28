@@ -1,6 +1,6 @@
 // POST {name}: add one to today's anonymous count for that action. Nothing about the person is stored.
 import { handle, json, db, HttpError } from "../../server/otm.js";
-const NAMES = new Set(["visit", "plan", "try", "pick", "gpx", "gpx_all", "group", "gmaps", "waze", "pdf", "save", "near", "book", "signin", "report"]);
+const NAMES = new Set(["visit", "plan", "try", "pick", "gpx", "gpx_all", "group", "gmaps", "waze", "pdf", "save", "near", "book", "signin", "report", "share", "shared_open"]);
 export const onRequestPost = handle(async ({ request, env }) => {
   const origin = request.headers.get("Origin"); if (origin && new URL(origin).host !== new URL(request.url).host) throw new HttpError(403, "Wrong site.");
   let name = ""; try { name = String(JSON.parse((await request.text()).slice(0, 200)).name || ""); } catch (e) {}

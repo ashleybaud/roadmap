@@ -27,6 +27,9 @@ const SCHEMA = [
   `CREATE TABLE IF NOT EXISTS events (day TEXT NOT NULL, name TEXT NOT NULL, n INTEGER NOT NULL DEFAULT 0, PRIMARY KEY (day, name))`,
   // photos riders upload (stored in R2 under key); used for daily limits and clean-up
   `CREATE TABLE IF NOT EXISTS photos (key TEXT PRIMARY KEY, user_id TEXT NOT NULL, bytes INTEGER, created INTEGER NOT NULL)`,
+  // share links: anyone can send a planned trip as a short link (no account); ip_day only holds a hash for the daily limit
+  `CREATE TABLE IF NOT EXISTS shares (id TEXT PRIMARY KEY, title TEXT, data TEXT NOT NULL, ip_day TEXT, opens INTEGER NOT NULL DEFAULT 0, created INTEGER NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS shares_ip ON shares(ip_day)`,
   `CREATE TABLE IF NOT EXISTS spot_votes (spot_id TEXT NOT NULL, user_id TEXT NOT NULL, created INTEGER NOT NULL, PRIMARY KEY (spot_id, user_id))`,
 ];
 // columns added after tables already existed (each runs once; "duplicate column" errors are expected afterwards)

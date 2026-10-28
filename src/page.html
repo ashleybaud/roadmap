@@ -57,6 +57,7 @@ input[type=text],input[type=email],input[type=number],input[type=time],input[typ
 .btn{border:1px solid var(--ink);background:var(--ink);color:var(--bg);border-radius:4px;padding:7px 12px;font-weight:600;cursor:pointer;white-space:nowrap}
 .btn.ghost{background:transparent;color:var(--ink)}
 .btn.small{padding:4px 8px;font-size:.8rem}
+.btn.share{background:#0B6E4F;border-color:#0B6E4F;color:#fff}
 .icon{border:1px solid var(--line);background:var(--panel);border-radius:4px;width:30px;height:30px;cursor:pointer;display:inline-grid;place-items:center;flex:none}
 .btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .panel{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px 14px;min-width:0}
@@ -694,7 +695,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
   <div class="dlghead"><h2 id="navTitle">Navigate on your phone</h2><button class="icon" type="button" data-navclose aria-label="Close">✕</button></div>
   <p class="note" style="margin:0">Google Maps opens each day with its stops. Waze goes one stop at a time. Both pick their own roads between points: for gravel and back roads, the GPX in your GPS or in OsmAnd, Calimoto or Kurviger follows the line exactly.</p>
   <div id="navBody"></div>
-  <div class="btns" style="justify-content:flex-end"><button class="btn small ghost" type="button" data-navfile>Save as a file</button><button class="btn small" type="button" data-navshare>Send to my phone or the group</button></div>
+  <div class="btns" style="justify-content:flex-end"><button class="btn small ghost" type="button" data-navfile>Save as a file</button><button class="btn small ghost" type="button" data-navshare>Send these links</button><button class="btn small share" type="button" data-sharetrip>Share this trip ↗</button></div>
 </div></dialog>
 <dialog id="pinfoDlg" class="pinfo" aria-label="Place details"><div id="piBody"></div></dialog>
 <dialog id="gpsDlg" class="welcome" aria-labelledby="gpsTitle"><form method="dialog" style="display:flex;flex-direction:column;gap:10px">
