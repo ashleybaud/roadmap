@@ -134,6 +134,11 @@ const TRIP = {
   const nav = await page.evaluate(() => ({ g: gmParts(0), w: wazeStops(0), html: navHtml().length, btn: navButtons(0).includes("Google Maps") }));
   if (!nav.g.length || !nav.g[0].url.startsWith("https://www.google.com/maps/dir/?api=1&origin=") || !nav.btn || !nav.w.length || !nav.w[0].url.includes("waze.com/ul?ll=")) throw new Error("phone nav links: " + JSON.stringify(nav).slice(0, 400));
   if (nav.g.some(p => (p.url.match(/%7C/g) || []).length > 8)) throw new Error("too many Google waypoints");
+  await page.evaluate(() => { ui.tab = 0; renderAll(); }); await page.waitForTimeout(300);
+  const trio = await page.evaluate(() => ({ rows: document.querySelectorAll("#details .stop").length, trio: document.querySelectorAll("#details .stop .trioset .avi").length }));
+  ok(trio.rows > 0 && trio.trio === trio.rows * 3, "fuel/food/bed icons on every stop: " + JSON.stringify(trio));
+  if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT });
+  await page.evaluate(() => { ui.tab = "ov"; renderAll(); });
   console.log("phone nav:", nav.g.length, "google part(s),", nav.w.length, "waze stops; first:", nav.g[0].url.slice(0, 160));
   const sh = await page.evaluate(async () => { renderDetails(); const btns = document.querySelectorAll("[data-sharetrip]").length; const f = window.fetch; let sent = null;
     window.fetch = (u, o) => { if (String(u) === "/api/share") { sent = JSON.parse(o.body); return Promise.resolve(new Response('{"id":"abc23xyz"}', { status: 200 })); } return f(u, o); };
