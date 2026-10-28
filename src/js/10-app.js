@@ -279,7 +279,7 @@ $("dayTabs").addEventListener("click",e=>{if(e.target.closest("[data-key]")){$("
 
 /* ---------- details ---------- */
 const TB=document.querySelector(".tripbar");
-function renderDetails(){ hidePeek(); $("tbHold").append(TB); $("details").innerHTML=ui.tab==="ov"?overviewHtml():dayHtml(ui.tab); const slot=$("details").querySelector(".tbslot"); if(slot) slot.replaceWith(TB); wireDetails(); }
+function renderDetails(){ hidePeek(); $("tbHold").append(TB); $("details").innerHTML=ui.tab==="ov"?overviewHtml():dayHtml(ui.tab); const slot=$("details").querySelector(".tbslot"); TB.querySelectorAll(".tadd").forEach(x=>x.remove()); if(slot){ slot.replaceWith(TB); const a=$("details").querySelector(".planbox>.tadd"); if(a) TB.insertBefore(a,TB.querySelector(".tbwhen")); } wireDetails(); }
 
 /* ---------- weather, time zones (Open-Meteo, no key) ---------- */
 let wx=null, meds=null, fords=null;

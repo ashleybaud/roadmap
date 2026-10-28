@@ -94,7 +94,7 @@ input[type=text],input[type=email],input[type=number],input[type=time],input[typ
 .trow .tkm{font:500 .8rem "IBM Plex Mono",monospace;color:var(--muted);white-space:nowrap}
 .trow .tctl{display:inline-flex;gap:4px;align-items:center}.tbtn{border:1px solid var(--line);background:var(--bg);border-radius:5px;width:26px;height:26px;cursor:pointer;font-size:11px;line-height:1;color:var(--ink)}.tbtn:disabled{opacity:.3;cursor:default}
 .tday{display:flex;gap:10px;align-items:baseline;padding:10px 6px 2px;font-weight:700;border-bottom:2px solid var(--ink)}
-.tadd{margin-top:8px}.roundchk,.tbwhen{grid-column:1/-1}.roundchk{display:flex;gap:6px;align-items:center;font-size:13px;margin:4px 0 2px}.tbwhen{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;width:100%}.tbwhen .field{flex:1;min-width:110px}.stepper{display:flex;align-items:center;border:1px solid var(--line,#ccd);border-radius:6px;height:36px;background:#fff}.stepper button{width:34px;height:100%;border:0;background:none;font-size:18px;cursor:pointer;color:inherit}.stepper b{flex:1;text-align:center;min-width:24px}.rname.tadd{display:flex;gap:8px;align-items:center}
+.tadd{margin-top:8px}.roundchk,.tbwhen,.tripbar>.tadd{grid-column:1/-1}.tripbar>.tadd{justify-self:start;margin-top:0}.roundchk input{width:auto!important;height:auto!important;margin:0}.roundchk{display:flex;gap:6px;align-items:center;font-size:13px;margin:4px 0 2px}.tbwhen{display:flex;gap:8px;flex-wrap:wrap;align-items:flex-end;width:100%}.tbwhen .field{flex:1;min-width:110px}.stepper{display:flex;align-items:center;border:1px solid var(--line,#ccd);border-radius:6px;height:36px;background:#fff}.stepper button{width:34px;height:100%;border:0;background:none;font-size:18px;cursor:pointer;color:inherit}.stepper b{flex:1;text-align:center;min-width:24px}.rname.tadd{display:flex;gap:8px;align-items:center}
 .srow2{display:flex;align-items:center;gap:10px;padding:7px 0;border-bottom:1px dashed var(--line)}.srow2 .sn{flex:1;min-width:0}.srow2 .sact{display:flex;gap:8px;align-items:center;white-space:nowrap}.srow2 .avi.trio{cursor:default}
 .snext{margin-top:8px}
 @media (max-width:640px){.trow{grid-template-columns:26px 1fr auto}.trow .tkm{grid-column:2;grid-row:2;margin-top:-4px}.trow .tctl{grid-row:1/3;grid-column:3}}
@@ -1529,7 +1529,7 @@ $("dayTabs").addEventListener("click",e=>{if(e.target.closest("[data-key]")){$("
 
 /* ---------- details ---------- */
 const TB=document.querySelector(".tripbar");
-function renderDetails(){ hidePeek(); $("tbHold").append(TB); $("details").innerHTML=ui.tab==="ov"?overviewHtml():dayHtml(ui.tab); const slot=$("details").querySelector(".tbslot"); if(slot) slot.replaceWith(TB); wireDetails(); }
+function renderDetails(){ hidePeek(); $("tbHold").append(TB); $("details").innerHTML=ui.tab==="ov"?overviewHtml():dayHtml(ui.tab); const slot=$("details").querySelector(".tbslot"); TB.querySelectorAll(".tadd").forEach(x=>x.remove()); if(slot){ slot.replaceWith(TB); const a=$("details").querySelector(".planbox>.tadd"); if(a) TB.insertBefore(a,TB.querySelector(".tbwhen")); } wireDetails(); }
 
 /* ---------- weather, time zones (Open-Meteo, no key) ---------- */
 let wx=null, meds=null, fords=null;
@@ -3839,7 +3839,7 @@ function stopRows(kOnly){
       h+=`<li class="trow ${v.auto?"auto":""} ${isSel(k,j)?"on":""}" ${pd?`data-selstop="${k}:${j}"`:""}><span class="tmk ${v.auto?"sug":""}">${v.auto?"⛽":numOf[k+":"+i]}</span><span class="tnm"><b>${esc(v.name)}</b>${v.auto?` <span class="autotag">Suggested${v.fuelHere?" fuel":""}</span>`:""}</span><span class="tkm">${km!=null?"km "+km:""}</span>
         <span class="tctl">${onDay&&pd?legTools(k,j):""}${v.auto||(k===nDays()-1&&!dayTo(k))?"":`<button type="button" class="tbtn" data-tsleep="${k}:${i}" title="Sleep here: this becomes a night stop and the trip gets a day">🛏</button>`}${v.auto?"":`<button type="button" class="tbtn" data-tmove="${k}:${i}:-1" ${canUp?"":"disabled"} title="Move up">▲</button><button type="button" class="tbtn" data-tmove="${k}:${i}:1" ${canDn?"":"disabled"} title="Move down">▼</button>`}<button type="button" class="tbtn" data-tdel="${k}:${i}" title="Remove this stop">✕</button></span></li>`; });
     const to=dayTo(k);
-    if(!to||to.lat==null){ h+=`<li class="trow need"><span class="tmk">${last?"🏁":"🛏"}</span><span class="tnm">${last?`<span class="note">Set a finish above, or add a stop</span>`:toCell(k)}</span></li>`; return; }
+    if(!to||to.lat==null){ h+=`<li class="trow need"><span class="tmk">${last?"🏁":"🛏"}</span><span class="tnm">${last?`<span class="note">${trip.round?"Add a stop to ride to":"Where to? Type it above"}</span>`:toCell(k)}</span></li>`; return; }
     const j=pd?pd.pts.length-1:null, km=pd?Math.round(onDay?pd.km:pd.b):null, arr=pd?fmtT(arrMin(k,j)):"";
     h+=`<li class="trow end ${last?"fin":"night"} ${pd&&isSel(k,j)?"on":""}" ${pd?`data-selstop="${k}:${j}"`:""}><span class="tmk">${last?(trip.round?"⟲":"🏁"):"🛏"}</span><span class="tnm">${last?`<b>${esc(to.name)}</b><span class="note"> ${trip.round?"back home":"finish"}</span>`:`${toCell(k)} <span class="note">night ${k+1}</span>`}</span><span class="tkm">${km!=null?"km "+km:""}${arr?` · ${arr}`:""}</span>
       <span class="tctl">${onDay&&pd?legTools(k,j):""}${last?"":`<button type="button" class="tbtn" data-dropnight="${k}" title="No night here: one day less">✕</button>`}</span></li>`;
