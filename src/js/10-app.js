@@ -1206,17 +1206,3 @@ $("map").addEventListener("click",e=>{ const sn=e.target.closest&&e.target.close
   const [k2,id]=sn.dataset.staynight.split(":"), x=(stayFor(dayTo(+k2))?.places||[]).find(q=>q.id===id); if(x){ map.closePopup(); chooseStay(+k2,x); } });
 
 ["vehicle","wVehicle"].forEach(id=>{ const el=$(id); if(el) el.addEventListener("change",()=>{ if(settings.rangeSet) return; const r=$(id==="vehicle"?"range":"wRange"); if(r) r.value=RANGE_DEF[el.value]||200; }); });
-
-/* Safari / Motorsport mode: colours are CSS; here the starting route style and the landing text follow the mode, unless the rider chose their own style */
-(function(){
-  const TXT={safari:["Ride it.","Forget BaseCamp and five different apps. Route a multi-day trip in minutes, sort your beds, then send it straight to your GPS, your bike's app or your phone and navigate from there."],
-    motorsport:["Chase it.","Tracks, factories, museums and race weekends, with the best roads in between. Route the trip, sort your beds, then send it to your GPS or phone."]};
-  function applyMode(m,change){
-    const t=TXT[m]||TXT.safari, hs=document.querySelector(".herohead span"), sub=document.querySelector(".herosub");
-    if(hs) hs.textContent=t[0]; if(sub) sub.textContent=t[1];
-    if(!settings.styleSet&&(change||!store.get("rr2-settings"))&&(settings.style==="rough"||settings.style==="tar")){ const want=m==="motorsport"?"tar":"rough";
-      if(settings.style!==want){ settings.style=want; if($("style")) $("style").value=want; store.set("rr2-settings",settings); showStyle(); if(change){ try{ recalc(); }catch(e){} } } }
-  }
-  applyMode(document.documentElement.getAttribute("data-mode")||"safari",false);
-  document.addEventListener("otm-mode",e=>applyMode(e.detail,true));
-})();
