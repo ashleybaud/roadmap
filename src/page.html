@@ -654,7 +654,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
         <li><b>Tar</b> (in Settings) routes like normal sat-nav: main roads, no gravel. Road less travelled finds gravel, not passes: tap <b>Ride it</b> under Passes nearby.</li>
         <li>Grades, easy to hard: <b>Race</b> · <b>Pre-jeep</b> · <b>Jeep</b> · <b>Pre-single</b> · <b>Single</b>. Read for what you ride: Jeep is fun on a bike, slow in a car.</li></ul></section>
       <section><h3>4. Fuel</h3><ul>
-        <li>Set how far you go between fills ("Stop at least every"). Fuel towns are suggested at about that spacing.</li>
+        <li>Set how far you go between fills, with a safe margin (<b>Stop at least every</b> in Settings). It starts at <b>200 km for a bike</b> and <b>450 km for a car or 4x4</b>. A fuel town is suggested only when the next stretch is longer than that, and you're assumed to start each day with a full tank.</li>
         <li><b>Check fuel</b> means a stretch longer than that with no fuel on our map. Tap it to see where. Tank goes further? Change the setting.</li></ul></section>
       <section><h3>5. Where you sleep</h3><ul>
         <li>Each night lists places to stay, filtered by what you chose (camping, guesthouse…). Tap <b>Info</b> for details, <b>Stay here</b> to choose.</li>
@@ -892,7 +892,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
   <form method="dialog" style="display:flex;flex-direction:column;gap:12px">
     <h2>Settings</h2>
     <div class="row2">
-      <div class="field" style="grid-column:1/-1"><label class="lbl" for="range">Stop at least every (km)</label><input id="range" type="number" min="0" max="1200" step="5" value="150"><span class="note">How far you or your bike can go before you need fuel, food or a rest. We suggest towns with fuel at about this spacing. Set 0 to turn suggestions off.</span></div>
+      <div class="field" style="grid-column:1/-1"><label class="lbl" for="range">Stop at least every (km)</label><input id="range" type="number" min="0" max="1200" step="5" value="150"><span class="note">How far you go before you need fuel, with a safe margin left in the tank. Starts at 200 km for a bike and 450 km for a car or 4x4; change it to suit yours. We suggest towns with fuel within this distance. Set 0 to turn suggestions off.</span></div>
     </div>
     <div class="row2">
       <div class="field"><label class="lbl" for="leave">Leave each day at</label><input id="leave" type="time" value="08:00"></div>

@@ -26,6 +26,10 @@ if(trip.startDate<ymd(new Date())){const n=trip.days.length;trip.startDate=tomor
 
 const SET_FIELDS=["vehicle","range","leave","pace","corridor","style","maxHours","breakMin","gps"];
 const settings=Object.assign({range:200,reserve:30,leave:"08:00",pace:0,corridor:5,style:"rough",vehicle:"bike",fuelMode:"suggest",maxHours:8,breakMin:20,gps:"any"},store.get("rr2-settings")||{});
+// fuel range follows the vehicle until you set your own: 200 km on a bike, 450 km in a car or 4x4 (both with a margin)
+const RANGE_DEF={bike:200,car:450,jeep:450};
+if(settings.rangeSet===undefined&&+settings.range!==200&&+settings.range!==150) settings.rangeSet=true; // someone who already chose their own keeps it
+if(!settings.rangeSet) settings.range=RANGE_DEF[settings.vehicle]||200;
 const ui=Object.assign({types:Object.fromEntries(TYPES.map(t=>[t.id,t.on])),max:"10",sleep:false},store.get("rr4-ui")||{});
 ui.tab=ui.tab??"ov"; delete ui._lastSel;
 let passNear=[];
@@ -1109,7 +1113,8 @@ SET_FIELDS.forEach(id=>$(id).value=settings[id]);
 $("openSettings").addEventListener("click",()=>{ renderHist(); $("settings").showModal(); });
 $("settings").addEventListener("close",()=>{
   const reroute=+$("corridor").value!==+settings.corridor||$("style").value!==settings.style||$("vehicle").value!==settings.vehicle;
-  SET_FIELDS.forEach(id=>settings[id]=$(id).value); store.set("rr2-settings",settings);
+  const prevVeh=settings.vehicle, typed=$("range").value; if(String(typed)!==String(settings.range)) settings.rangeSet=true;
+  SET_FIELDS.forEach(id=>settings[id]=$(id).value); if(!settings.rangeSet&&prevVeh!==settings.vehicle){ settings.range=RANGE_DEF[settings.vehicle]||200; $("range").value=settings.range; } store.set("rr2-settings",settings);
   showStyle(); reroute?recalc():renderAll();
 });
 /* ---------- first visit: what this is and how to start (shown once; "How it works" brings it back) ---------- */
@@ -1117,7 +1122,7 @@ function openWelcome(){ $("wGps").value=settings.gps||"any"; $("welcome").return
 $("welcome").addEventListener("close",()=>{
   if($("welcome").returnValue!=="ok"){ try{localStorage.setItem("rr-welcome","1");}catch(e){} return; } // ✕, Cancel or Esc: nothing changes
   const was=[settings.vehicle,settings.style].join();
-  settings.vehicle=$("wVehicle").value; settings.style=$("wStyle").value; settings.gps=$("wGps").value; settings.maxHours=$("wHours").value; settings.range=$("wRange").value;
+  settings.vehicle=$("wVehicle").value; settings.style=$("wStyle").value; settings.gps=$("wGps").value; settings.maxHours=$("wHours").value; if(String($("wRange").value)!==String(settings.range)) settings.rangeSet=true; settings.range=settings.rangeSet?$("wRange").value:(RANGE_DEF[settings.vehicle]||200);
   store.set("rr2-settings",settings); SET_FIELDS.forEach(id=>$(id).value=settings[id]); try{localStorage.setItem("rr-welcome","1");}catch(e){}
   showStyle(); was!==[settings.vehicle,settings.style].join()?recalc():renderAll();
   if(!trip.start||trip.start.lat==null) $("startPlace").focus();
@@ -1163,3 +1168,5 @@ renderLayers(); showStyle(); syncDays(); renderAll(); recalc();
 // "Stay here" in a map popup (the map isn't inside the details panel)
 $("map").addEventListener("click",e=>{ const sn=e.target.closest&&e.target.closest("[data-staynight]"); if(!sn) return;
   const [k2,id]=sn.dataset.staynight.split(":"), x=(stayFor(dayTo(+k2))?.places||[]).find(q=>q.id===id); if(x){ map.closePopup(); chooseStay(+k2,x); } });
+
+["vehicle","wVehicle"].forEach(id=>{ const el=$(id); if(el) el.addEventListener("change",()=>{ if(settings.rangeSet) return; const r=$(id==="vehicle"?"range":"wRange"); if(r) r.value=RANGE_DEF[el.value]||200; }); });
