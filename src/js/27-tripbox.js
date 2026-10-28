@@ -44,7 +44,8 @@ function tripHead(kOnly){
   const km=plan&&!planStale?Math.round(plan.total):0, mins=plan&&!planStale?plan.days.reduce((t,d,k)=>t+(d?dayMinutes(k):0),0):0;
   return `Your trip${km?` <span class="boxsub">${nDays()} day${nDays()>1?"s":""} · ${km.toLocaleString()} km · ${fmtDur(mins)}</span>`:""}`;
 }
-function tripBox(kOnly){ return boxSec("tripbox",tripHead(kOnly),`<div class="tbslot"></div>${kOnly==null&&typeof gpxBar==="function"?gpxBar():""}${stopRows(kOnly)}`); }
+// the day view keeps only its stops and + Add a stop; From, Finish, dates and the tools live on the Overview
+function tripBox(kOnly){ return boxSec("tripbox",tripHead(kOnly),`${kOnly==null?`<div class="tbslot"></div>${typeof gpxBar==="function"?gpxBar():""}`:""}${stopRows(kOnly)}`); }
 // what's at the selected stop (the day's night stop until you pick another)
 function stopSummary(kOnly){
   if(!plan||planStale) return "";
