@@ -3628,7 +3628,7 @@ async function autoNights(){
 }
 
 /* ---------- Founder's fav's in the planner: /?fav=<id> sets it as your finish; a map layer shows them all ---------- */
-let favList=null;
+var favList=null; // var: drawMap can run before this file does
 const loadFavs=()=>favList?Promise.resolve(favList):fetch("/data/favourites/favourites.json").then(r=>r.ok?r.json():[]).then(j=>favList=j).catch(()=>favList=[]);
 { const m=location.search.match(/[?&]fav=([\w-]+)/); if(m){ history.replaceState(null,"",location.pathname);
   setTimeout(async()=>{ const x=(await loadFavs()).find(f=>f.id===m[1]); if(!x) return;
