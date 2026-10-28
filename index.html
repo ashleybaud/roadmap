@@ -221,6 +221,7 @@ header h1{font-size:2.7rem;font-weight:700;letter-spacing:-.005em;text-transform
 .herosteps span{font-size:.92rem;line-height:1.35;color:#fff;opacity:.85}
 @media (max-width:900px){.herosteps{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:640px){body.hastrip .herosteps,body.hastrip .herosub{display:none}.hero{padding:12px}.herohead{font-size:1.75rem}.herosub{font-size:.95rem;margin:6px 0 10px}.herosteps{gap:6px}.herosteps li{padding:8px}.herosteps b{font-size:1rem}.herosteps span{font-size:.82rem}}
+.heroband{display:block;margin-top:12px;padding:10px 14px;border-radius:8px;background:rgba(63,180,138,.16);border:1px solid #3FB48A;color:#fff;text-decoration:none}.heroband b{color:#3FB48A}.heroband span{opacity:.9}
 .herocta{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-top:12px}.herocta span{color:#fff;opacity:.8;font-size:.92rem}
 .herobtn{background:#3FB48A!important;border-color:#3FB48A!important;color:#0d1410!important;font-weight:700}
 @media (max-width:640px){body.hastrip .herocta{display:none}.herocta span{font-size:.82rem}}
@@ -577,7 +578,8 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
         <li><b>Load your GPS</b><span>One tap: the right GPX for Garmin, BMW, KTM, Ducati or Harley.</span></li>
         <li><b>Or just ride with your phone</b><span>Each day opens in Google Maps or Waze. No GPS? No problem.</span></li>
       </ol>
-      <div class="herocta"><button class="btn herobtn" type="button" data-tryroute>Try a route: Swartberg Pass in 2 days ›</button><span>Opens a finished trip. Change anything, or tap New to plan your own.</span></div>
+      <a class="heroband" id="heroBand" href="/rides/" hidden><b>Coming to Southern Africa?</b> <span>The trips I'd take you on: Namibia's Skeleton Coast and Epupa Falls, the Orange River, the Cape passes. Each one opens in the planner ›</span></a>
+      <div class="herocta"><button class="btn herobtn" type="button" data-tryroute id="tryBtn">Try a route: Swartberg Pass in 2 days ›</button><span>Opens a finished trip. Change anything, or tap New to plan your own.</span></div>
     </section>
   </header>
 
@@ -3424,7 +3426,12 @@ document.addEventListener("click",e=>{
 },true);
 
 /* ---------- "Try a route": one tap opens a finished founder trip, so a newcomer sees what it does before filling anything in ---------- */
-const TRY_PICK="swartberg-loop";
+let TRY_PICK="swartberg-loop";
+/* the right door: visitors from Southern Africa get a trip from home; everyone else gets the planner plus the Southern Africa band */
+const LOCAL=["ZA","NA","BW","LS","SZ","ZW","MZ"];
+fetch("/api/where").then(r=>r.ok?r.json():null).then(j=>{ const c=j&&j.country; if(!c||LOCAL.includes(c)) return;
+  TRY_PICK="namibia-2020-tortoise"; const b=$("tryBtn"); if(b) b.textContent="Try a route: Northern Namibia by 4x4, 8 days ›";
+  const h=$("heroBand"); if(h) h.hidden=false; }).catch(()=>{});
 async function tryRoute(){
   track("try");
   try{ if($("welcome").open){ try{ localStorage.setItem("rr-welcome","1"); }catch(e){} $("welcome").close(); }
