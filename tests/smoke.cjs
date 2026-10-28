@@ -135,8 +135,8 @@ const TRIP = {
   if (!nav.g.length || !nav.g[0].url.startsWith("https://www.google.com/maps/dir/?api=1&origin=") || !nav.btn || !nav.w.length || !nav.w[0].url.includes("waze.com/ul?ll=")) throw new Error("phone nav links: " + JSON.stringify(nav).slice(0, 400));
   if (nav.g.some(p => (p.url.match(/%7C/g) || []).length > 8)) throw new Error("too many Google waypoints");
   await page.evaluate(() => { ui.tab = 0; renderAll(); }); await page.waitForTimeout(300);
-  const trio = await page.evaluate(() => ({ rows: document.querySelectorAll("#details .stop").length, trio: document.querySelectorAll("#details .stop .trioset .avi").length }));
-  ok(trio.rows > 0 && trio.trio === trio.rows * 3, "fuel/food/bed icons on every stop: " + JSON.stringify(trio));
+  const trio = await page.evaluate(() => ({ rows: document.querySelectorAll("#details .stop").length, trio: document.querySelectorAll("#details .stop .trioset .avi").length, lay: ui.lay }));
+  ok(trio.rows > 0 && trio.trio === trio.rows * ["fuel","stay","food","sights"].filter(c => trio.lay[c]).length, "fuel/food/bed icons on every stop: " + JSON.stringify(trio));
   if (process.env.SHOT) await page.screenshot({ path: process.env.SHOT });
   await page.evaluate(() => { ui.tab = "ov"; renderAll(); });
   console.log("phone nav:", nav.g.length, "google part(s),", nav.w.length, "waze stops; first:", nav.g[0].url.slice(0, 160));

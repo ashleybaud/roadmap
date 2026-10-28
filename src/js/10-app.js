@@ -537,7 +537,7 @@ function sleepText(){
 
 /* ---------- what's at a stop: fuel, food, shop, toilets, cash, repair ---------- */
 let amen=[];
-const AV=[["fuel","⛽","Fuel"],["food","🍴","Food"],["stay","🛏","Places to stay"],["shop","🛒","Shop"],["toilets","🚻","Toilets"],["cash","🏧","Cash (ATM)"],["repair","🔧","Tyres and repair"]];
+const AV=[["fuel","⛽","Fuel"],["food","🍴","Food"],["stay","🛏","Places to stay"],["sights","★","Sights"],["shop","🛒","Shop"],["toilets","🚻","Toilets"],["cash","🏧","Cash (ATM)"],["repair","🔧","Tyres and repair"]];
 function stopAvail(p){
   const near=(list)=>list.filter(x=>hav(x,p)<=1).map(x=>Object.assign(x,{dstop:hav(x,p)})).sort((a,b)=>a.dstop-b.dstop);
   const fuel=near(fuelAll), food=near(pois.filter(x=>x.kind==="food"));
@@ -546,7 +546,8 @@ function stopAvail(p){
   // places to stay within 5 km, matching what you chose under Stay in (night stops use that night's choice)
   const kk=trip.days.findIndex((d,i)=>d.to===p&&i<nDays()-1), ty=kk>=0?stayTypeOf(kk):(trip.stayType||"any");
   const stay=(stayFor(p)?.places||[]).filter(x=>stayMatch(x,ty)&&hav(x,p)<=5).map(x=>Object.assign(x,{dstop:hav(x,p)})).sort((a,b)=>a.dstop-b.dstop);
-  return {fuel,food,stay,shop:by("shop"),toilets,cash:by("cash"),repair:by("repair")};
+  const sights=pois.filter(x=>["view","pass","sight"].includes(x.kind)&&Math.abs(x.lat-p.lat)<0.1&&hav(x,p)<=5).map(x=>Object.assign(x,{dstop:hav(x,p)})).sort((a,b)=>a.dstop-b.dstop);
+  return {fuel,food,stay,sights,shop:by("shop"),toilets,cash:by("cash"),repair:by("repair")};
 }
 function stopFuel(p){ return p.type==="fuel"||!!p.fuelHere||(placesOk&&fuelAll.some(f=>hav(f,p)<=1)); }
 function addStop(k,at,p){
@@ -699,7 +700,7 @@ function stopList(k){
     const open=stopFocus&&stopFocus.k===k&&stopFocus.j===j, km=j>0?Math.round(pd.legs[j-1].b-pd.a):0;
     const lab=isFrom?"From":isTo?(last?(trip.round?"⟲ Home":"🏁 Finish"):`🛏 Night ${k+1}`):`Stop ${j}`;
     const av=placesOk?stopAvail(p):null;
-    const TRIO=["fuel","food","stay"], trio=AV.filter(a=>TRIO.includes(a[0])).map(a=>{ const n=av?av[a[0]].length:0; return `<button type="button" class="avi trio ${open&&stopFocus.cat===a[0]?"on":""} ${n?"":"none"}" ${n?`data-av="${k}:${j}:${a[0]}"`:"disabled"} title="${esc(a[2])}: ${av?(n||"none")+(a[0]==="stay"?" within 5 km":" at the stop"):"loading"}">${a[1]}</button>`; }).join("");
+    const TRIO=["fuel","stay","food","sights"].filter(c=>ui.lay[c]), trio=AV.filter(a=>TRIO.includes(a[0])).map(a=>{ const n=av?av[a[0]].length:0; return `<button type="button" class="avi trio ${open&&stopFocus.cat===a[0]?"on":""} ${n?"":"none"}" ${n?`data-av="${k}:${j}:${a[0]}"`:"disabled"} title="${esc(a[2])}: ${av?(n||"none")+(a[0]==="stay"||a[0]==="sights"?" within 5 km":" at the stop"):"loading"}">${a[1]}</button>`; }).join("");
     const icons=av?AV.filter(a=>!TRIO.includes(a[0])&&av[a[0]].length).map(a=>`<button type="button" class="avi ${open&&stopFocus.cat===a[0]?"on":""}" data-av="${k}:${j}:${a[0]}" title="${esc(a[2])}: ${av[a[0]].length}">${a[1]}</button>`).join(""):"";
     const fq=legFast(d,j-1), way=p.straight&&!lg.track?`<span class="note gpxnote" title="A straight line to this point: a track the map doesn't show">Straight</span>`:lg.track||(L&&L.gpx)?(L&&L.gpx?`<span class="note gpxnote" title="This stretch follows your GPX file">GPX</span>`:""):(settings.style==="tar"?`<span class="legway one" title="Main roads, like normal sat-nav">${STYLE_ICON.fast}</span>`:`<span class="legway one"><button type="button" data-legsty="${j-1}:${fq?0:1}" class="on" title="${fq?"Quick way, main roads":esc(styleName())} to here. Tap for ${fq?esc(styleName()):"the quick way"}">${fq?STYLE_ICON.fast:STYLE_ICON.default}</button></span>`);
     const tools="";
@@ -738,7 +739,7 @@ function drawStopLayer(){
   const s=sc.jj>0&&!cat?seg(sc.a,sc.b):[];
   if(s.length>1) L.polyline(s.map(g=>[g.lat,g.lon]),{color:"#B26A00",weight:7}).addTo(layer);
   L.marker([sc.p.lat,sc.p.lon],{icon:dotIcon("#18201C",16)}).bindTooltip(sc.p.name,{permanent:true,direction:"right",offset:[10,0],className:"maplbl"}).addTo(layer);
-  const av=stopAvail(sc.p), col={fuel:"#0B6E4F",food:"#B3261E",stay:"#2F5BA8",shop:"#6B4E9B",toilets:"#00838F",cash:"#2F5BA8",repair:"#5D4037"};
+  const av=stopAvail(sc.p), col={fuel:"#0B6E4F",food:"#B3261E",stay:"#2F5BA8",sights:"#9A6A33",shop:"#6B4E9B",toilets:"#00838F",cash:"#2F5BA8",repair:"#5D4037"};
   const shown=[]; AV.forEach(([c,ic])=>{ if(cat&&c!==cat) return; av[c].forEach(p=>{ shown.push(p); L.marker([p.lat,p.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:${col[c]}">${ic}</div>`,iconSize:[22,22],iconAnchor:[11,11]})}).bindTooltip(p.name||AV.find(a=>a[0]===c)[2],cat?{permanent:true,direction:"right",offset:[12,0],className:"maplbl"}:{}).addTo(layer); }); });
   const pts=[...s,...shown,sc.p].map(p=>[p.lat,p.lon]);
   if(!cat) map.setView([sc.p.lat,sc.p.lon],14); // the stop and what's around it
