@@ -140,6 +140,10 @@ const TRIP = {
   const tr = await page.evaluate(() => ({ pick: trip.pick, hero: !!document.querySelector(".hero [data-tryroute]"), welcome: !!document.querySelector("#welcome [data-tryroute]") }));
   ok(tr.pick === "swartberg-loop" && tr.hero && tr.welcome, "Try a route: " + JSON.stringify(tr));
   console.log("try a route:", JSON.stringify(tr));
+  const dw = await page.evaluate(() => { const k = nDays() - 1, before = trip.days[k].vias.length; drawStart(); drawLine = true; drawAdd({ latlng: { lat: -33.2, lng: 18.9 } }); drawLine = false; drawAdd({ latlng: { lat: -33.0, lng: 19.0 } });
+    const d = trip.days[k], r = { added: d.vias.length - before, straight: !!d.vias.find(v => v.drawn && v.straight), road: d.vias.filter(v => v.drawn).length === 2 && !d.vias.filter(v => v.drawn)[1].straight }; drawUndo(); drawUndo(); r.undone = d.vias.length === before; drawStop(); return r; });
+  ok(dw.added === 2 && dw.straight && dw.road && dw.undone, "draw mode: " + JSON.stringify(dw));
+  console.log("draw:", JSON.stringify(dw));
   await browser.close(); srv.close();
   if (fails.length) { console.error("SMOKE TEST FAILED:\n - " + fails.join("\n - ")); process.exit(1); }
   console.log(`smoke test passed (fuel pill: "${title}")`);

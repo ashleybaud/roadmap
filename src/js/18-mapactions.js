@@ -54,6 +54,7 @@ function tapDay(ll){
 }
 let tapPt=null, tapK=null;
 function onMapTap(e){
+  if(typeof drawOn!=="undefined"&&drawOn) return; // drawing: the tap adds the next point instead
   if(!trip.start||trip.start.lat==null) return;
   const ll={lat:e.latlng.lat,lon:e.latlng.lng}, k=tapDay(ll); if(k==null) return;
   tapPt=tapName(ll); tapK=k; const d=trip.days[k], last=k===nDays()-1;

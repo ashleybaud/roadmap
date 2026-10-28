@@ -383,7 +383,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .tooltb{grid-column:1/-1;order:-3;display:flex;gap:6px;flex-wrap:wrap;margin:0 0 2px}
 .tooltb>button,.tooltb>label{display:inline-flex;align-items:center;gap:5px;height:34px;padding:0 10px;border:1px solid var(--line);border-radius:6px;background:var(--panel);color:var(--ink);cursor:pointer;font:600 .82rem var(--f-body)}
 .tooltb>button:hover,.tooltb>label:hover,.tooltb>button.on{border-color:var(--accent);color:var(--accent)}
-@media (max-width:640px){.tooltb{display:grid;grid-template-columns:repeat(4,minmax(0,1fr))}.tooltb>button,.tooltb>label{justify-content:center;padding:0 4px;font-size:.74rem;gap:3px}}
+@media (max-width:640px){.tooltb{display:grid;grid-template-columns:repeat(5,minmax(0,1fr))}.tooltb>button,.tooltb>label{flex-direction:column;justify-content:center;height:48px;padding:2px;font-size:.7rem;gap:2px;white-space:nowrap}}
 .nearstrip{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;border:2px solid var(--accent);border-radius:8px;padding:6px 10px;margin:6px 0}
 .nearstrip .icon{margin-left:auto}
 .nearme{width:16px;height:16px;border-radius:50%;background:#2F7DF6;border:3px solid #fff;box-shadow:0 0 0 2px #2F7DF6}
@@ -630,6 +630,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
 
       </div>
       <div id="map"></div>
+      <div id="drawStrip" class="nearstrip" hidden><b>✏ Drawing <span id="dwDay"></span></b><span class="note">Tap the map to add the next point.</span><span class="seg" id="dwMode"><button type="button" data-dw="road" class="on">Follow roads</button><button type="button" data-dw="line">Straight line</button></span><button class="btn small ghost" type="button" id="dwUndo">↶ Undo</button><button class="btn small" type="button" id="dwDone">Done</button></div>
       <div id="nearStrip" class="nearstrip" hidden><b>🧭 Near <span id="nsWhere"></span></b><label class="chk">within <select id="nearRad"><option>25</option><option>50</option><option selected>100</option><option>200</option></select> km</label><span class="note" id="nsCount"></span><button class="btn small" type="button" id="nsDay">Plan a day ride from here</button><button class="linkbtn small" type="button" id="nsLoc">Use my location</button><button class="icon" type="button" id="nsClose" title="Back to my trip" aria-label="Close">✕</button></div>
       <button type="button" class="markfab" id="markFab" hidden aria-label="Mark a place or report the road" title="Mark a place or report the road">📍</button>
     </div>
@@ -658,6 +659,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
     <button type="button" data-picks title="OneTrackMind picks, riders' routes and your saved routes"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 6.5h6l2 2h10v11H3z"/><path d="M3 10.5h18"/></svg><span>Open</span></button>
     <label title="Any route from a friend or your GPS: split into days with night stops and fuel"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 2.5h8.5l4.5 4.5v14.5H6z"/><path d="M14.5 2.5V7H19"/><path d="M12.5 18v-7M9.5 14l3-3 3 3"/></svg><span>GPX</span><input type="file" accept=".gpx,application/gpx+xml" id="tbGpx" data-tripgpx hidden></label>
     <button type="button" id="tbNear" title="Routes, passes and places around you"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9.5"/><path d="M15.5 8.5l-2 5-5 2 2-5z"/></svg><span>Near me</span></button>
+    <button type="button" id="tbDraw" title="Draw your own line: tap the map point to point"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l4-1 11-11-3-3L5 16z"/><path d="M14 6l3 3"/><circle cx="4" cy="20" r="0.6"/></svg><span>Draw</span></button>
   </nav>
     <div class="field"><label class="lbl" for="startDate">Leave</label><input id="startDate" type="date"></div>
     <div class="field"><label class="lbl" for="endDate">Back</label><input id="endDate" type="date"></div>
@@ -1238,7 +1240,7 @@ async function recalc(){
   try{
     const gs=gpxSlices(), gtr=(k,j)=>gs&&gs[k]&&gs[k][j]||null;
     const res=await Promise.all(trip.days.map((d,k)=>{const pts=dayPts(k); if(!pts) return null; 
-      return Promise.all(pts.slice(0,-1).map((a,j)=>routeLeg(a,pts[j+1],{fast:legFast(d,j),track:(d.legs[j]&&d.legs[j].track)||gtr(k,j),alts:d.legs[j]&&d.legs[j].wantAlts}))).then(opts=>({pts,opts}));}));
+      return Promise.all(pts.slice(0,-1).map((a,j)=>routeLeg(a,pts[j+1],{fast:legFast(d,j),track:(d.legs[j]&&d.legs[j].track)||gtr(k,j)||(pts[j+1].straight?[[pts[j].lat,pts[j].lon],[pts[j+1].lat,pts[j+1].lon]]:null),alts:d.legs[j]&&d.legs[j].wantAlts}))).then(opts=>({pts,opts}));}));
     if(my!==seq) return;
     const geom=[],cum=[],ptKm=new Map(),days=[]; let acc=0;
     res.forEach((r,k)=>{
@@ -1858,7 +1860,7 @@ function stopList(k){
     const lab=isFrom?"From":isTo?(last?(trip.round?"⟲ Home":"🏁 Finish"):`🛏 Night ${k+1}`):`Stop ${j}`;
     const av=placesOk?stopAvail(p):null;
     const icons=av?AV.filter(a=>av[a[0]].length).map(a=>`<button type="button" class="avi ${open&&stopFocus.cat===a[0]?"on":""}" data-av="${k}:${j}:${a[0]}" title="${esc(a[2])}: ${av[a[0]].length}">${a[1]}</button>`).join(""):"";
-    const fq=legFast(d,j-1), way=lg.track||(L&&L.gpx)?(L&&L.gpx?`<span class="note gpxnote" title="This stretch follows your GPX file">GPX</span>`:""):`<span class="seg2 legway" role="group" aria-label="Way to this stop"><button type="button" data-legsty="${j-1}:0" class="${fq?"":"on"}" title="${esc(styleName())} to here">${STYLE_ICON.default}</button><button type="button" data-legsty="${j-1}:1" class="${fq?"on":""}" title="Get me here quickly">${STYLE_ICON.fast}</button></span>`;
+    const fq=legFast(d,j-1), way=p.straight&&!lg.track?`<span class="note gpxnote" title="A straight line to this point: a track the map doesn't show">Straight</span>`:lg.track||(L&&L.gpx)?(L&&L.gpx?`<span class="note gpxnote" title="This stretch follows your GPX file">GPX</span>`:""):`<span class="seg2 legway" role="group" aria-label="Way to this stop"><button type="button" data-legsty="${j-1}:0" class="${fq?"":"on"}" title="${esc(styleName())} to here">${STYLE_ICON.default}</button><button type="button" data-legsty="${j-1}:1" class="${fq?"on":""}" title="Get me here quickly">${STYLE_ICON.fast}</button></span>`;
     const tools="";
     const isVia2=!isFrom&&!isTo, mtool=`${isVia2?`${p.auto?"":`<button class="btn small ghost" type="button" data-vren="${vi}">✎ Rename</button>`}<button class="btn small ghost" type="button" data-vup="${vi}" ${vi===0?"disabled":""}>↑ Move up</button><button class="btn small ghost" type="button" data-vdel="${vi}">✕ Remove this stop</button>`:""}`;
     const rtool=`${acct.ready?`<button class="linkbtn small" type="button" data-repat="${p.lat},${p.lon},${esc(p.name)}">Report the road here</button><button class="linkbtn small" type="button" data-spotat="${p.lat},${p.lon},${esc(p.name)}">Mark a place here</button>`:""}<button class="linkbtn small" type="button" data-fixat="${p.lat},${p.lon},${esc(p.name)}">Report a map mistake</button>`;
@@ -3193,6 +3195,7 @@ function tapDay(ll){
 }
 let tapPt=null, tapK=null;
 function onMapTap(e){
+  if(typeof drawOn!=="undefined"&&drawOn) return; // drawing: the tap adds the next point instead
   if(!trip.start||trip.start.lat==null) return;
   const ll={lat:e.latlng.lat,lon:e.latlng.lng}, k=tapDay(ll); if(k==null) return;
   tapPt=tapName(ll); tapK=k; const d=trip.days[k], last=k===nDays()-1;
@@ -3448,5 +3451,39 @@ async function tryRoute(){
   }catch(e){ $("status").textContent="Couldn't open the sample route. Try Open › Find a route."; }
 }
 document.addEventListener("click",e=>{ if(e.target.closest&&e.target.closest("[data-tryroute]")){ e.preventDefault(); tryRoute(); } });
+
+/* ---------- Draw: technical riders build the day point to point on the map ----------
+   Each tap adds the next point at the end of the day (before its night stop or finish), in the order tapped.
+   "Follow roads" routes to it on the road choice; "Straight line" draws a straight stretch for tracks the map doesn't know. */
+let drawOn=false, drawLine=false;
+function drawDay(){ const c=curDay(); return c!=null?c:nDays()-1; }
+function drawStrip(){ $("drawStrip").hidden=!drawOn; $("tbDraw").classList.toggle("on",drawOn); if(drawOn) $("dwDay").textContent=nDays()>1?dayName(drawDay()):"";
+  $("dwMode").querySelectorAll("button").forEach(b=>b.classList.toggle("on",(b.dataset.dw==="line")===drawLine));
+  const d=trip.days[drawDay()]; $("dwUndo").disabled=!(d&&d.vias.some(v=>v.drawn)); }
+function drawStart(){
+  if(!trip.start||trip.start.lat==null){ $("status").textContent="Pick where you start first, then draw from there."; return; }
+  if(typeof nearOff==="function") nearOff(); drawOn=true; drawStrip(); map&&map.closePopup();
+  $("status").textContent="Drawing: tap the map, point to point. Straight line is for tracks the map doesn't show.";
+  if(window.innerWidth<=1000) $("map").scrollIntoView({behavior:"smooth",block:"start"});
+}
+function drawStop(){ drawOn=false; drawStrip(); $("status").textContent="Done drawing. Tap ✏ Draw to carry on."; }
+function drawAdd(e){
+  if(!drawOn) return; const k=drawDay(), d=trip.days[k]; if(!d) return;
+  const ll={lat:e.latlng.lat,lon:e.latlng.lng}, p=tapName(ll); p.drawn=true; if(p.name==="Point on the map"||/^Near /.test(p.name)) p.name=`Point ${d.vias.filter(v=>v.drawn).length+1}${p.name.startsWith("Near ")?" "+p.name.toLowerCase():""}`;
+  const pts=[dayFrom(k),...d.vias], prev=pts[pts.length-1];
+  if(prev&&hav(prev,p)<0.05){ $("status").textContent="That's on top of the last point. Tap a bit further on."; return; }
+  if(drawLine) p.straight=true; // the stretch into this point is a straight line (a track the map doesn't know)
+  const n=d.vias.length; d.vias.push(p); if(d.legs.length>n) d.legs.splice(n,0,undefined);
+  $("status").textContent=`${p.name} added${drawLine?" (straight line)":""}. Working out the route…`; changed(); drawStrip();
+}
+function drawUndo(){ const k=drawDay(), d=trip.days[k]; if(!d) return; let i=-1; d.vias.forEach((v,j)=>{ if(v.drawn) i=j; }); if(i<0) return;
+  const v=d.vias.splice(i,1)[0]; if(d.legs.length>i) d.legs.splice(i,1); $("status").textContent=`Removed ${v.name}.`; changed(); drawStrip(); }
+$("tbDraw").addEventListener("click",()=>drawOn?drawStop():drawStart());
+$("dwDone").addEventListener("click",drawStop); $("dwUndo").addEventListener("click",drawUndo);
+$("dwMode").addEventListener("click",e=>{ const b=e.target.closest("[data-dw]"); if(!b) return; drawLine=b.dataset.dw==="line"; drawStrip(); });
+// while drawing, a tap adds a point instead of opening the "add a stop / sleep here" box
+{ let hooked=false; const hook=()=>{ if(map&&!hooked){ map.on("click",drawAdd); hooked=true; } };
+  const _em=ensureMap; ensureMap=function(){ _em(); hook(); }; hook(); }
+document.addEventListener("keydown",e=>{ if(!drawOn) return; if(e.key==="Escape") drawStop(); if((e.ctrlKey||e.metaKey)&&e.key==="z"){ e.preventDefault(); drawUndo(); } });
 
 </script></body></html>

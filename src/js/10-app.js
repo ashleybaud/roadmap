@@ -57,7 +57,7 @@ async function recalc(){
   try{
     const gs=gpxSlices(), gtr=(k,j)=>gs&&gs[k]&&gs[k][j]||null;
     const res=await Promise.all(trip.days.map((d,k)=>{const pts=dayPts(k); if(!pts) return null; 
-      return Promise.all(pts.slice(0,-1).map((a,j)=>routeLeg(a,pts[j+1],{fast:legFast(d,j),track:(d.legs[j]&&d.legs[j].track)||gtr(k,j),alts:d.legs[j]&&d.legs[j].wantAlts}))).then(opts=>({pts,opts}));}));
+      return Promise.all(pts.slice(0,-1).map((a,j)=>routeLeg(a,pts[j+1],{fast:legFast(d,j),track:(d.legs[j]&&d.legs[j].track)||gtr(k,j)||(pts[j+1].straight?[[pts[j].lat,pts[j].lon],[pts[j+1].lat,pts[j+1].lon]]:null),alts:d.legs[j]&&d.legs[j].wantAlts}))).then(opts=>({pts,opts}));}));
     if(my!==seq) return;
     const geom=[],cum=[],ptKm=new Map(),days=[]; let acc=0;
     res.forEach((r,k)=>{
@@ -677,7 +677,7 @@ function stopList(k){
     const lab=isFrom?"From":isTo?(last?(trip.round?"⟲ Home":"🏁 Finish"):`🛏 Night ${k+1}`):`Stop ${j}`;
     const av=placesOk?stopAvail(p):null;
     const icons=av?AV.filter(a=>av[a[0]].length).map(a=>`<button type="button" class="avi ${open&&stopFocus.cat===a[0]?"on":""}" data-av="${k}:${j}:${a[0]}" title="${esc(a[2])}: ${av[a[0]].length}">${a[1]}</button>`).join(""):"";
-    const fq=legFast(d,j-1), way=lg.track||(L&&L.gpx)?(L&&L.gpx?`<span class="note gpxnote" title="This stretch follows your GPX file">GPX</span>`:""):`<span class="seg2 legway" role="group" aria-label="Way to this stop"><button type="button" data-legsty="${j-1}:0" class="${fq?"":"on"}" title="${esc(styleName())} to here">${STYLE_ICON.default}</button><button type="button" data-legsty="${j-1}:1" class="${fq?"on":""}" title="Get me here quickly">${STYLE_ICON.fast}</button></span>`;
+    const fq=legFast(d,j-1), way=p.straight&&!lg.track?`<span class="note gpxnote" title="A straight line to this point: a track the map doesn't show">Straight</span>`:lg.track||(L&&L.gpx)?(L&&L.gpx?`<span class="note gpxnote" title="This stretch follows your GPX file">GPX</span>`:""):`<span class="seg2 legway" role="group" aria-label="Way to this stop"><button type="button" data-legsty="${j-1}:0" class="${fq?"":"on"}" title="${esc(styleName())} to here">${STYLE_ICON.default}</button><button type="button" data-legsty="${j-1}:1" class="${fq?"on":""}" title="Get me here quickly">${STYLE_ICON.fast}</button></span>`;
     const tools="";
     const isVia2=!isFrom&&!isTo, mtool=`${isVia2?`${p.auto?"":`<button class="btn small ghost" type="button" data-vren="${vi}">✎ Rename</button>`}<button class="btn small ghost" type="button" data-vup="${vi}" ${vi===0?"disabled":""}>↑ Move up</button><button class="btn small ghost" type="button" data-vdel="${vi}">✕ Remove this stop</button>`:""}`;
     const rtool=`${acct.ready?`<button class="linkbtn small" type="button" data-repat="${p.lat},${p.lon},${esc(p.name)}">Report the road here</button><button class="linkbtn small" type="button" data-spotat="${p.lat},${p.lon},${esc(p.name)}">Mark a place here</button>`:""}<button class="linkbtn small" type="button" data-fixat="${p.lat},${p.lon},${esc(p.name)}">Report a map mistake</button>`;
