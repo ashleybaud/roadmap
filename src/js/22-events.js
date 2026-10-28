@@ -46,3 +46,7 @@ document.addEventListener("click",e=>{ if(e.target.closest&&e.target.closest("[d
   const set=shut=>{ if(!h||!b) return; h.classList.toggle("shut",shut); if(!shut&&b.dataset.u) h.classList.add("uopen"); else h.classList.remove("uopen"); b.textContent=shut?"What it does ▾":"Hide ▴"; b.setAttribute("aria-expanded",String(!shut)); };
   let shut=false; try{ shut=localStorage.getItem("otm-hero-shut")==="1"; }catch(e){} set(shut);
   if(b) b.addEventListener("click",()=>{ shut=!shut; b.dataset.u=shut?"":"1"; set(shut); try{ localStorage.setItem("otm-hero-shut",shut?"1":"0"); }catch(e){} }); }
+
+/* "Stories from the road": the three newest blog posts with photos, built into data/latest.json at deploy time */
+fetch("/data/latest.json").then(r=>r.ok?r.json():[]).then(L=>{ const s=$("latest"); if(!s||!L.length) return;
+  s.querySelector(".lcards").innerHTML=L.map(x=>`<a href="${esc(x.url)}"><img src="${esc(x.cover)}" alt="" loading="lazy"><b>${esc(x.title)}</b></a>`).join(""); s.hidden=false; }).catch(()=>{});
