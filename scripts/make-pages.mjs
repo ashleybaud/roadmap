@@ -516,7 +516,12 @@ fs.rmSync(path.join(ROOT, "how-to"), { recursive: true, force: true });
 write("how-to/index.html", howtoIndex());
 write("record/index.html", recordPage());
 write("events/index.html", eventsPage());
-fs.writeFileSync(path.join(ROOT, "data/latest.json"), JSON.stringify([...seriesOf().entries()].filter(([, L]) => L.length > 1).map(([n, L]) => ({ title: tripName(n), url: `/blog/${tripSlug(n, L)}/`, cover: coverOf(L), date: L[L.length - 1].date })).filter(x => /^\/media\/blog\//.test(x.cover || "")).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3)));
+{ const S = s => STORIES.find(x => x.slug === s), tort = [...seriesOf().entries()].find(([n]) => /Tortoise/.test(n));
+  const pick = [
+    ["A lap of the Nürburgring, on a public Sunday", "On motorcycles, first time ever. Here's how you do it too.", "/how-to/nurburgring/", S("euroadtrip2018-belgium")],
+    ["Namibia 2017: how not to adventure bike", "A small problem in the desert, and a bakkie rescue.", "/blog/namibia-2017-day-7/", S("namibia-2017-day-7")],
+    ["Namibia by Tortoise", "Nine days up the Skeleton Coast and Epupa, with the air conditioning on.", tort ? `/blog/${tripSlug(tort[0], tort[1])}/` : "", tort ? { cover: coverOf(tort[1]) } : null]];
+  fs.writeFileSync(path.join(ROOT, "data/latest.json"), JSON.stringify(pick.filter(x => x[3] && x[3].cover && x[2]).map(([title, hook, url, s]) => ({ title, hook, url, cover: s.cover })))); }
 HOWTO.forEach(g => write(`how-to/${g.id}/index.html`, howtoPage(g)));
 const urls = ["/", "/routes/", "/favourites/", "/about/", "/advertise/", "/how-to/", "/record/", "/events/", ...HOWTO.map(g => `/how-to/${g.id}/`), ...live.map(r => `/routes/${r.id}/`), ...FAV.map(x => `/favourites/${x.id}/`), "/blog/", ...STORIES.map(x => `/blog/${x.slug}/`), ...[...seriesOf().entries()].filter(([, L]) => L.length > 1).map(([n, L]) => `/blog/${tripSlug(n, L)}/`), "/terms.html", "/privacy.html", "/rules.html"];
 write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${today}</lastmod></url>`).join("\n")}\n</urlset>\n`);

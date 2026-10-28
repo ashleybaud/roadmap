@@ -49,4 +49,4 @@ document.addEventListener("click",e=>{ if(e.target.closest&&e.target.closest("[d
 
 /* "Stories from the road": the three newest blog posts with photos, built into data/latest.json at deploy time */
 fetch("/data/latest.json").then(r=>r.ok?r.json():[]).then(L=>{ const s=$("latest"); if(!s||!L.length) return;
-  s.querySelector(".lcards").innerHTML=L.map(x=>`<a href="${esc(x.url)}"><img src="${esc(x.cover)}" alt="" loading="lazy"><b>${esc(x.title)}</b></a>`).join(""); s.hidden=false; }).catch(()=>{});
+  s.querySelector(".lcards").innerHTML=L.map(x=>`<a href="${esc(x.url)}"><img src="${esc(x.cover)}" alt="" loading="lazy"><b>${esc(x.title)}</b><span>${esc(x.hook||"")}</span></a>`).join(""); s.hidden=false; }).catch(()=>{});
