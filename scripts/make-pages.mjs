@@ -48,7 +48,7 @@ h1{font-size:2.4rem;margin:28px 0 6px}h2{font-size:1.5rem;margin:30px 0 8px}
 .stats{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0}.stat{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:8px 14px}.stat b{display:block;font:700 1.4rem "Barlow Condensed",sans-serif}.stat span{font-size:.8rem;color:var(--muted)}
 ol.days{padding-left:0;list-style:none}ol.days li{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 14px;margin:8px 0}ol.days .d{font:600 .8rem "IBM Plex Mono",monospace;color:var(--muted)}
 blockquote{margin:14px 0;padding:4px 16px;border-left:3px solid var(--accent);background:var(--chip)}
-.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin:14px 0}.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px 14px;text-decoration:none;color:var(--ink)}.card b{display:block;color:var(--accent)}.card span{font-size:.85rem;color:var(--muted)}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px;margin:14px 0}.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px 14px;text-decoration:none;color:var(--ink)}.card b{display:block;color:var(--accent)}.cards.pcards{grid-template-columns:repeat(auto-fill,minmax(250px,1fr))}.card.pcard{display:flex;flex-direction:column;gap:4px;padding:10px}.card.pcard>img{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:4px;margin:0 0 6px;background:var(--chip,#e4e9df)}.card.pcard .lead{color:var(--ink);font-size:.92rem}.card.pcard[hidden],.fsec[hidden]{display:none}.chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 4px}.chips button{font:600 .95rem "IBM Plex Sans",system-ui,sans-serif;padding:7px 14px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}.chips button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}.card span{font-size:.85rem;color:var(--muted)}
 footer{border-top:1px solid var(--line);margin:40px 0 0;padding:16px 0 30px;color:var(--muted);font-size:.9rem}
 .note{font-size:.9rem;color:var(--muted)}
 .spbox{margin:34px 0 0;padding:12px 14px;border:1px dashed var(--line);border-radius:6px;font-size:.92rem;color:var(--muted)}.spbox b{color:var(--ink)}
@@ -86,7 +86,7 @@ function page({ url, title, desc, body, ld, image, active }) {
 ${(Array.isArray(ld) ? ld : [ld]).filter(Boolean).map(x => `<script type="application/ld+json">${JSON.stringify(x)}</script>`).join("\n")}
 </head>
 <body><div class="wrap">
-<header><a class="logo" href="/">OneTrackMind</a><div class="motto">Recce. Ride. Report.</div><nav class="hdrlinks" aria-label="Site">${[["/","Plan a trip"],["/routes/","Routes"]].map(([h,t])=>`<a href="${h}"${active===h?' class="on" aria-current="page"':""}>${t}</a>`).join("")}<details class="navdd"><summary${["/about/","/favourites/"].includes(active)?' class="on"':""}>About</summary><div class="ddm"><a href="/about/">About OneTrackMind</a><a href="/favourites/">Founder's fav's</a><a href="/blog/">Blog</a></div></details></nav></header><script>document.addEventListener("click",function(e){document.querySelectorAll(".navdd[open]").forEach(function(d){if(!d.contains(e.target))d.open=false;});});</script>
+<header><a class="logo" href="/">OneTrackMind</a><div class="motto">Recce. Ride. Report.</div><nav class="hdrlinks" aria-label="Site">${[["/","Plan a trip"],["/routes/","Routes"]].map(([h,t])=>`<a href="${h}"${active===h?' class="on" aria-current="page"':""}>${t}</a>`).join("")}<details class="navdd"><summary${["/about/","/favourites/"].includes(active)?' class="on"':""}>About</summary><div class="ddm"><a href="/about/">About OneTrackMind</a><a href="/favourites/">Founder's fav's</a></div></details></nav></header><script>document.addEventListener("click",function(e){document.querySelectorAll(".navdd[open]").forEach(function(d){if(!d.contains(e.target))d.open=false;});});</script>
 ${body}
 <aside class="spbox"><span>OneTrackMind is free thanks to</span> <a href="https://alterego.co.za" target="_blank" rel="noopener sponsored"><b>AlterEgo</b>, made-to-order wear for petrolheads</a> · <a href="/advertise/">Your brand here ›</a></aside>
 <footer>OneTrackMind: plan road trips anywhere, on the roads less travelled, then ride them on your GPS or phone. Free for riders and drivers. · <a href="/advertise/">Advertise</a> · <a href="/terms.html">Terms and disclaimer</a> · <a href="/privacy.html">Privacy</a> · <a href="/rules.html">Rules</a> · <a href="mailto:hello@onetrackmind.online">hello@onetrackmind.online</a></footer>
@@ -197,20 +197,43 @@ ${r ? `<h2>The trip it's from</h2><div class="cards"><a class="card" href="/rout
     { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Founder's fav's", item: SITE + "/favourites/" }, { "@type": "ListItem", position: 2, name: x.name, item: `${SITE}/favourites/${x.id}/` }] }];
   return page({ active: "/favourites/", url: `/favourites/${x.id}/`, title: `${x.name}, ${x.area.split(",").pop().trim()}: how to get there and plan a trip · OneTrackMind`, desc: `${x.short} How to get there, where to stay, and a road trip planned around it.`, body, ld });
 }
+// a photo for each fav: from the blog post that tells its story (the picture nearest where it's mentioned), else a map of the spot
+const FAV_POST = { "grootberg-lodge": "namibia-2017-day-5", "stuttgart-museums": "2018-porsche-museum-gallery", "maranello": "ferrari", "motor-valley": "lamborghini", "franschhoek-motor-museum": "franschoek-motor-museum-gallery", "killarney": "wpmc-killarney", monaco: null, sutherland: null };
+const favKey = n => n.replace(/^(The|Lake) /, "").split(/,| and | to | from | \(|: /)[0].replace(/ (road|pass|Pass|loop|Loop|route)$/, "").trim();
+function favStory(x) {
+  if (x.id in FAV_POST) { const p = STORIES.find(q => q.slug === FAV_POST[x.id]); return p ? { p, img: p.cover } : null; }
+  const k = favKey(x.name), rx = new RegExp(k.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "i"); let best = null;
+  STORIES.forEach(p => { const n = (p.title.match(rx) ? 100 : 0) + (p.html.replace(/<[^>]+>/g, " ").match(new RegExp(rx.source, "gi")) || []).length; if (n && (!best || n > best.n)) best = { p, n }; });
+  if (!best) return null;
+  const h = best.p.html, at = h.search(rx), imgs = [...h.matchAll(/<img[^>]+src="([^"]+)"/g)];
+  const near = imgs.find(m => m.index >= at) || imgs[imgs.length - 1];
+  return { p: best.p, img: (best.p.title.match(rx) ? best.p.cover : near && near[1]) || best.p.cover };
+}
+const tileOf = (lat, lon, z) => { const n = 2 ** z, x = Math.floor((lon + 180) / 360 * n), r = lat * Math.PI / 180, y = Math.floor((1 - Math.log(Math.tan(r) + 1 / Math.cos(r)) / Math.PI) / 2 * n); return `https://tiles.stadiamaps.com/tiles/outdoors/${z}/${x}/${y}@2x.png`; };
+// blog posts sorted by what they're about, for the filter buttons
+const MOTOR_RX = /museum|hill ?climb|simola|motogp|eicma|goodwood|factory|ferrari|lamborghini|porsche|pagani|ducati|alfa|killarney|wpmc|speedweek|hakskeen|enduro|race|dainese|nicolis|brooklands|aston|mv agusta|world ducati week|kyalami|motoranch/i;
+const BIKE_RX = /ktm|duke|1190|690|790|390|cafe racer|flat tracker|carbon rims/i;
+const storyCat = x => MOTOR_RX.test(x.title) ? "motor" : BIKE_RX.test(x.title) ? "bikes" : "trips";
 function favIndex() {
-  const card = x => `<a class="card fav" href="/favourites/${x.id}/"><b>${esc(x.name)}</b><span class="area">${esc(x.area)}</span><span>${esc(x.short)}</span></a>`;
-  const fdr = live.filter(r => r.founder).sort((a, b) => (b.founder.year || 0) - (a.founder.year || 0));
-  const first = s => { const t = String(s || "").split(/(?<=[.!?])\s/)[0]; return t.length > 180 ? t.slice(0, 177) + "…" : t; };
-  const ride = r => `<a class="card ride" href="/routes/${r.id}/"><span class="yr">${r.founder.year || ""}</span><b>${esc(r.title)}</b><span>${esc(r.region)} · ${r.trip.days.length} day${r.trip.days.length > 1 ? "s" : ""} · ${esc(r.founder.ride)}</span>${r.founder.story ? `<span class="lead">${esc(first(r.founder.story))}</span>` : ""}<span class="go">Read it, then ride it ›</span></a>`;
+  const pic = (src, alt) => src ? `<img src="${esc(src)}" alt="${esc(alt || "")}" loading="lazy">` : "";
+  const card = x => { const st = favStory(x); return `<a class="card pcard" href="/favourites/${x.id}/" data-cat="${x.group === "petrol" ? "motor" : x.group}">${st && st.img ? pic(st.img, x.name) : `<img class="maptile" src="${tileOf(x.lat, x.lon, 9)}" alt="" loading="lazy">`}<b>${esc(x.name)}</b><span class="area">${esc(x.area)}</span><span class="lead">${esc(x.short)}</span></a>`; };
+  const M = seriesOf(), groups = [...M.entries()].sort((a, b) => b[1][0].date.localeCompare(a[1][0].date));
+  const multi = groups.filter(([, L]) => L.length > 1), single = groups.filter(([, L]) => L.length === 1).map(([, L]) => L[0]);
+  const tripCard = ([name, L]) => { const { line } = tripFacts(name, L), c = MOTOR_RX.test(name) ? "motor" : BIKE_RX.test(name) ? "bikes" : "trips"; return `<a class="card pcard" href="/blog/${tripSlug(name, L)}/" data-cat="${c}">${pic(coverOf(L), tripName(name))}<b>${esc(tripName(name))}</b><span class="area">${fmtDate(L[0].date).replace(/^\d+ /, "")} · ${esc(line)}</span></a>`; };
+  const postCard = x => `<a class="card pcard" href="/blog/${esc(x.slug)}/" data-cat="${storyCat(x)}">${pic(x.cover, x.title)}<b>${esc(x.title)}</b><span class="area">${fmtDate(x.date)}${x.gallery ? " · photos" : ""}</span></a>`;
+  const CH = [["all", "All"], ["na", "Namibia"], ["za", "South Africa"], ["eu", "Europe"], ["motor", "Motorsport"], ["trips", "Road trips"], ["bikes", "Bikes"]];
+  const sec = (id, title, note, html) => `<section class="fsec" id="${id}"><h2>${title}</h2>${note ? `<p class="note">${note}</p>` : ""}<div class="cards pcards">${html}</div></section>`;
   const body = `<main><h1>Founder's fav's</h1>
-<p class="intro">The places I'd send you to. Twenty-odd years of riding and driving through Southern Africa and Europe, boiled down to the ones I still talk about. Some are roads, some are waterfalls, some are race tracks. Each one has how to get there, where to sleep, and a button that plans the trip for you.</p>
-${GROUPS.map(([g, t]) => { const L = FAV.filter(x => x.group === g); return L.length ? `<h2 id="${g}">${t}</h2>${g === "petrol" ? `<p class="note">For people who travel for engines: race tracks, factories, museums and the roads you've seen on TV.</p>` : ""}<div class="cards">${L.map(card).join("")}</div>` : ""; }).join("\n")}
-<h2 id="blog">Blog</h2><p>The old blog, moved home: <a href="/blog/">road trips, festivals, factories and museums, grouped by trip</a>.</p>
-<h2 id="trips">The trips behind them</h2><p class="note">Where these came from. Every trip opens in the planner, so you can take it, change it and ride it yourself.</p>
-<div class="cards rides">${fdr.map(ride).join("")}</div>
-<a class="cta" href="/">Plan your own</a></main>`;
+<p class="intro">The places I'd send you to, and the trips and races behind them. Twenty-odd years of riding and driving through Southern Africa and Europe. Every place has how to get there, where to sleep, and a button that plans the trip for you.</p>
+<nav class="chips" aria-label="Show">${CH.map(([k, t], i) => `<button type="button" data-f="${k}"${i ? "" : ' class="on"'}>${t}</button>`).join("")}</nav>
+${GROUPS.map(([g, t]) => { const L = FAV.filter(x => x.group === g); return L.length ? sec(g, g === "petrol" ? "Motorsport: tracks, museums, factories" : t, "", L.map(card).join("")) : ""; }).join("\n")}
+${sec("btrips", "The trips", "Day by day, as they happened.", multi.map(tripCard).join(""))}
+${sec("bposts", "More stories", "", single.map(postCard).join(""))}
+<p class="note"><a href="/blog/">Every blog post</a> · <a href="/routes/">All routes</a></p>
+<a class="cta" href="/">Plan your own</a></main>
+<script>(function(){var b=document.querySelectorAll(".chips button");b.forEach(function(x){x.onclick=function(){var f=x.dataset.f;b.forEach(function(y){y.classList.toggle("on",y===x)});document.querySelectorAll(".pcard").forEach(function(c){c.hidden=f!=="all"&&c.dataset.cat!==f});document.querySelectorAll(".fsec").forEach(function(s){s.hidden=!s.querySelector(".pcard:not([hidden])")});try{history.replaceState(null,"",f==="all"?location.pathname:"#"+f)}catch(e){}}});var h=location.hash.slice(1);var t=[].find.call(b,function(x){return x.dataset.f===h});if(t)t.click();})();</script>`;
   const ld = { "@context": "https://schema.org", "@type": "CollectionPage", name: "Founder's fav's", url: SITE + "/favourites/", hasPart: FAV.map(x => ({ "@type": "TouristAttraction", name: x.name, url: `${SITE}/favourites/${x.id}/` })) };
-  return page({ active: "/favourites/", url: "/favourites/", title: "Founder's fav's: road trip places in Namibia, South Africa and Europe · OneTrackMind", desc: "The places the founder of OneTrackMind would send you: Namibia, South Africa, Lesotho and Europe, plus race tracks and car museums for petrolheads. How to get there and a trip planned around each.", body, ld });
+  return page({ active: "/favourites/", url: "/favourites/", title: "Founder's fav's: places, road trips and motorsport · OneTrackMind", desc: "The places the founder of OneTrackMind would send you in Namibia, South Africa, Lesotho and Europe, the road trips behind them, and the race tracks, museums and factories worth travelling for.", body, ld });
 }
 const redirectPage = to => `<!doctype html><html lang="en"><head><meta charset="utf-8"><title>Moved</title><link rel="canonical" href="${SITE}${to}"><meta http-equiv="refresh" content="0;url=${to}"><meta name="robots" content="noindex"></head><body><a href="${to}">Founder's fav's</a></body></html>`;
 
