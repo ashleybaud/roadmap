@@ -6,7 +6,8 @@ import fs from "node:fs"; import path from "node:path";
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const SITE = "https://onetrackmind.online";
 const BLOG = "https://onetrackmind.co.za";
-const STORIES = JSON.parse(fs.readFileSync(path.join(ROOT, "data/stories/stories.json"), "utf8"));
+// blog photos: served from media/blog/ once copied off the old site (scripts/fetch-blog-media.mjs); the old address until then
+const STORIES = JSON.parse(fs.readFileSync(path.join(ROOT, "data/stories/stories.json"), "utf8").replace(/https?:\/\/(?:www\.)?onetrackmind\.co\.za\/wp-content\/uploads\/([^"\s\\]+)/g, (m, r) => { try { return fs.existsSync(path.join(ROOT, "media/blog", decodeURIComponent(r))) ? "/media/blog/" + r : m; } catch { return m; } }));
 const FAV = JSON.parse(fs.readFileSync(path.join(ROOT, "data/favourites/favourites.json"), "utf8"));
 const picks = JSON.parse(fs.readFileSync(path.join(ROOT, "data/picks/picks.json"), "utf8")).routes;
 const live = picks.filter(r => !r.draft);
