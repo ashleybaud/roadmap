@@ -1,5 +1,6 @@
 /* ---------- Google Maps style trip panel: three boxes, each with its own border and heading ----------
-   1. Your trip / Your day: From, Finish and dates, then every stop in route order (move ▲▼, remove ✕), + Add a stop at the bottom
+   1. Plan (the Google-style box, same on every screen): From, Finish, dates, + Add a stop
+   1b. Your trip / Your day: every stop in route order (move ▲▼, remove ✕)
    2. Stop: what's at the selected stop, following the On the map filters (fuel, beds, food, sights)
    3. Details: the day facts, Good to know, passes, places to stay, ride files                                     */
 var selStop=null, addOpen=false; // var: renders can run before this file
@@ -36,7 +37,6 @@ function stopRows(kOnly){
       <span class="tctl">${onDay&&pd?legTools(k,j):""}${last?"":`<button type="button" class="tbtn" data-clear="night-${k}" title="Change the night stop">✕</button>`}</span></li>`;
   });
   h+=`</ol>`;
-  h+=addOpen?`<div class="rname tadd">${searchBox("addstop","","Town, pass or place to add",true)}<button type="button" class="linkbtn small" data-addclose>Cancel</button></div>`:`<button type="button" class="btn small tadd" data-addopen>+ Add a stop</button>`;
   return h;
 }
 function tripHead(kOnly){
@@ -45,7 +45,8 @@ function tripHead(kOnly){
   return `Your trip${km?` <span class="boxsub">${nDays()} day${nDays()>1?"s":""} · ${km.toLocaleString()} km · ${fmtDur(mins)}</span>`:""}`;
 }
 // the Google-style box (From, Finish, dates, Stay in, tools) is the same on every screen; the stops box follows the tab
-function planBox(kOnly){ return boxSec("planbox","Plan",`<div class="tbslot"></div>${kOnly==null&&typeof gpxBar==="function"?gpxBar():""}`); }
+function addStopCtl(){ return addOpen?`<div class="rname tadd">${searchBox("addstop","","Town, pass or place to add",true)}<button type="button" class="linkbtn small" data-addclose>Cancel</button></div>`:`<button type="button" class="btn small tadd" data-addopen>+ Add a stop</button>`; }
+function planBox(kOnly){ return boxSec("planbox","Plan",`<div class="tbslot"></div>${addStopCtl()}${kOnly==null&&typeof gpxBar==="function"?gpxBar():""}`); }
 function tripBox(kOnly){ return planBox(kOnly)+boxSec("tripbox",tripHead(kOnly),stopRows(kOnly)); }
 // what's at the selected stop (the day's night stop until you pick another)
 function stopSummary(kOnly){
