@@ -591,15 +591,17 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
     <div class="ggrid">
       <section><h3>1. Start</h3><ul>
         <li><b>New</b> starts a fresh trip (with Undo). <b>Open</b> loads a pick, a rider's route or one you saved. <b>GPX</b> plans from a file. <b>🧭 Near me</b> shows what's around you.</li>
-        <li>Set <b>From</b>, <b>Finish</b>, your dates and what you like to <b>Stay in</b>. Each day gets a tab.</li></ul></section>
+        <li>Set <b>From</b>, <b>Finish</b>, your dates and what you like to <b>Stay in</b>. Each day gets a tab.</li>
+        <li>More than one day? Your <b>night stops are picked for you</b>: the trip is split into even days, each night in a town on the way. Change any of them; yours are kept.</li>
+        <li><b>✏ Draw</b> lets you tap the map point to point, following roads or in a straight line for tracks the map doesn't show.</li></ul></section>
       <section><h3>2. Stops</h3><ul>
         <li><b>Your stops</b> have a green bar. <b>SUGGESTED</b> stops are fuel the app adds; ✕ removes one for good.</li>
         <li><b>🛏 Night</b> stops are boxed. "town" means you haven't picked a place to sleep yet.</li>
         <li>Tap a stop to see it on the map and what's there. <b>⋯</b> renames, moves or removes it.</li>
         <li>Press and hold the map (click on a computer) to add a stop, swap one, or sleep there.</li></ul></section>
       <section><h3>3. Roads</h3><ul>
-        <li>Each stretch has two icons: <b>brown</b> is your road choice from Settings, <b>blue</b> is the quickest way, gravel included.</li>
-        <li><b>Tar</b> (in Settings) avoids gravel even when it's longer. Road less travelled finds gravel, not passes: tap <b>Ride it</b> under Passes nearby.</li>
+        <li>Each stretch has two icons: <b>brown</b> is your road choice from Settings, <b>blue</b> (the freeway) is the quickest way by the main roads, the same as normal sat-nav.</li>
+        <li><b>Tar</b> (in Settings) routes like normal sat-nav: main roads, no gravel. Road less travelled finds gravel, not passes: tap <b>Ride it</b> under Passes nearby.</li>
         <li>Grades, easy to hard: <b>Race</b> · <b>Pre-jeep</b> · <b>Jeep</b> · <b>Pre-single</b> · <b>Single</b>. Read for what you ride: Jeep is fun on a bike, slow in a car.</li></ul></section>
       <section><h3>4. Fuel</h3><ul>
         <li>Set how far you go between fills ("Stop at least every"). Fuel towns are suggested at about that spacing.</li>
@@ -613,7 +615,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
       <section><h3>7. Before and on the road</h3><ul>
         <li>Each day shows km, riding time, sunset, weather and climb. Orange means look again.</li>
         <li><b>Good to know</b> lists what to sort first: borders, holidays, long gaps without fuel or a hospital.</li>
-        <li>Set <b>My bike or GPS</b> in Settings and the <b>GPX</b> file is made for it (each day, or the whole trip). No GPS? <b>Google Maps / Waze</b> opens each day on your phone, and <b>Send to my phone or the group</b> shares the links. Leading a group? <b>Group ride pack</b> zips every format, phone links included, with a read-me. Or <b>Save as PDF</b>. Sign in to save routes and open them on your phone.</li></ul></section>
+        <li>Set <b>My bike or GPS</b> in Settings and the <b>GPX</b> file is made for it (each day, or the whole trip). No GPS? <b>Google Maps / Waze</b> opens each day on your phone, and <b>Send these links</b> sends them to you or the group. <b>Share this trip</b> makes one link anyone can open, no account needed: they get the whole plan, then Google Maps, Waze or GPX. Leading a group? <b>Group ride pack</b> zips every format, phone links included, with a read-me. Or <b>Save as PDF</b>. Sign in to save routes and open them on your phone.</li></ul></section>
       <section><h3>8. Built by riders</h3><ul>
         <li><b>+ Add yours</b> shares a road or marks a place. <b>📍</b> on the map marks it in two taps on the road.</li>
         <li>Report the road, rate a route you rode. We check everything before other riders see it.</li></ul></section>
@@ -683,7 +685,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
     <div><span class="flag fwarn">≈</span> River crossings on the route, with rain forecast.</div>
     <div><span class="flag fwarn">✚</span> Parts of the day are more than 120 km from a hospital.</div>
     <div><span class="flag finfo">◷</span> The clocks change during the day.</div>
-    <div><span class="sty">STYLE_FAST</span> Get me there quickly. <span class="sty">STYLE_ROUGH</span> Road less travelled, or the style set in Settings.</div>
+    <div><span class="sty">STYLE_FAST</span> Get me there quickly: main roads, like normal sat-nav. <span class="sty">STYLE_ROUGH</span> Road less travelled, or the style set in Settings.</div>
     <div><span class="tdot" style="background:var(--warn)"></span> A dot on a day tab: something on that day needs a look.</div>
     <div><b>On the map</b> (green = shown): ⛽ fuel stations on the route · 🛏 places to stay at night stops · 🍴 food · ★ sights, viewpoints and passes · 🏥 hospitals and clinics · 📣 what riders reported on the road lately · 📍 places riders marked · 🛣 the route coloured by grade</div>
     <h3 style="margin-top:6px">Terrain grades</h3><div id="gradeKey" class="keylist" style="gap:6px"></div><p class="note">Graded from what OpenStreetMap says about each road. Roads change after rain and grading, so check locally. Riders' reports will sharpen this.</p>
@@ -726,7 +728,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
     </div>
     <ol class="wsteps">
       <li><b>From and dates:</b> where you start, when you leave and when you're back.</li>
-      <li><b>Night stops:</b> where you sleep each night. Add stops along the way if you like.</li>
+      <li><b>Night stops:</b> picked for you on trips of more than one day. Change any you like, and add stops along the way.</li>
       <li><b>Each day:</b> open its tab for fuel stops, what's open when you arrive, and anything to watch for.</li>
       <li><b>Ride it:</b> straight onto your Garmin or bike app as GPX, or open it on your phone in Google Maps or Waze. Plus a PDF to print.</li>
     </ol>
@@ -1865,7 +1867,7 @@ function stopList(k){
     const lab=isFrom?"From":isTo?(last?(trip.round?"⟲ Home":"🏁 Finish"):`🛏 Night ${k+1}`):`Stop ${j}`;
     const av=placesOk?stopAvail(p):null;
     const icons=av?AV.filter(a=>av[a[0]].length).map(a=>`<button type="button" class="avi ${open&&stopFocus.cat===a[0]?"on":""}" data-av="${k}:${j}:${a[0]}" title="${esc(a[2])}: ${av[a[0]].length}">${a[1]}</button>`).join(""):"";
-    const fq=legFast(d,j-1), way=p.straight&&!lg.track?`<span class="note gpxnote" title="A straight line to this point: a track the map doesn't show">Straight</span>`:lg.track||(L&&L.gpx)?(L&&L.gpx?`<span class="note gpxnote" title="This stretch follows your GPX file">GPX</span>`:""):`<span class="seg2 legway" role="group" aria-label="Way to this stop"><button type="button" data-legsty="${j-1}:0" class="${fq?"":"on"}" title="${esc(styleName())} to here">${STYLE_ICON.default}</button><button type="button" data-legsty="${j-1}:1" class="${fq?"on":""}" title="Get me here quickly">${STYLE_ICON.fast}</button></span>`;
+    const fq=legFast(d,j-1), way=p.straight&&!lg.track?`<span class="note gpxnote" title="A straight line to this point: a track the map doesn't show">Straight</span>`:lg.track||(L&&L.gpx)?(L&&L.gpx?`<span class="note gpxnote" title="This stretch follows your GPX file">GPX</span>`:""):`<span class="seg2 legway" role="group" aria-label="Way to this stop"><button type="button" data-legsty="${j-1}:0" class="${fq?"":"on"}" title="${esc(styleName())} to here">${STYLE_ICON.default}</button><button type="button" data-legsty="${j-1}:1" class="${fq?"on":""}" title="Get me here quickly: main roads, like normal sat-nav">${STYLE_ICON.fast}</button></span>`;
     const tools="";
     const isVia2=!isFrom&&!isTo, mtool=`${isVia2?`${p.auto?"":`<button class="btn small ghost" type="button" data-vren="${vi}">✎ Rename</button>`}<button class="btn small ghost" type="button" data-vup="${vi}" ${vi===0?"disabled":""}>↑ Move up</button><button class="btn small ghost" type="button" data-vdel="${vi}">✕ Remove this stop</button>`:""}`;
     const rtool=`${acct.ready?`<button class="linkbtn small" type="button" data-repat="${p.lat},${p.lon},${esc(p.name)}">Report the road here</button><button class="linkbtn small" type="button" data-spotat="${p.lat},${p.lon},${esc(p.name)}">Mark a place here</button>`:""}<button class="linkbtn small" type="button" data-fixat="${p.lat},${p.lon},${esc(p.name)}">Report a map mistake</button>`;
