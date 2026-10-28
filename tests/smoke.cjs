@@ -95,7 +95,7 @@ const TRIP = {
 
   await page.click('[data-day="0"]'); await page.waitForTimeout(500);
   ok(await page.$$eval("ol.tstops li", b => b.length) >= 2, "day stop list missing");
-  ok(await page.$$eval(".box.tripbox, .box.stopbox, .box.detailbox", b => b.length) === 3, "the three boxes are not all there");
+  ok(await page.$$eval(".box.planbox, .box.tripbox, .box.stopbox, .box.detailbox", b => b.length) === 4, "the boxes are not all there on the day view");
   ok(await page.$$eval(".gtk", b => b.length) === 1, "Good to know section missing on the day view");
   const gtk = await page.evaluate(() => goodToKnow(0).map(x => x.lvl + ":" + x.sec + ":" + x.text));
   ok(gtk.some(x => x.startsWith("info:dest:Arrive at") || /dest:You arrive/.test(x)), "Good to know has no arrival line");
@@ -138,7 +138,7 @@ const TRIP = {
   await page.evaluate(() => { ui.tab = 0; renderAll(); }); await page.waitForTimeout(300);
   const trio = await page.evaluate(() => ({ rows: document.querySelectorAll(".stopbox .srow2").length, on: ["fuel","stay","food","sights"].filter(c => ui.lay[c]).length }));
   ok(trio.rows === trio.on, "stop summary rows follow the filters: " + JSON.stringify(trio));
-  if (process.env.SHOT) { await page.evaluate(() => ui.lay.food = ui.lay.fuel = ui.lay.stay = true); await page.evaluate(() => renderAll()); const el = await page.$("#details"); if (el) await el.screenshot({ path: process.env.SHOT }); }
+  if (process.env.SHOT) { await page.evaluate(() => ui.lay.food = ui.lay.fuel = ui.lay.stay = true); await page.evaluate(() => renderAll()); await page.evaluate(() => { ui.tab = "ov"; renderAll(); }); const el = await page.$("#details"); if (el) await el.screenshot({ path: process.env.SHOT }); }
   await page.evaluate(() => { ui.tab = "ov"; renderAll(); });
   const ov = await page.evaluate(() => { ui.lay.stay = true; ui.lay.fuel = true; ui.tab = "ov"; renderAll(); const b = document.querySelector("[data-ovav]"); if (!b) return { btn: false }; b.click(); return { btn: true, tab: ui.tab, list: !!document.querySelector(".ovlist"), rows: document.querySelectorAll(".ovrows li").length, pins: document.querySelectorAll(".numpin").length }; });
   ok(!ov.btn || (ov.tab === "ov" && ov.list), "overview icon list: " + JSON.stringify(ov));

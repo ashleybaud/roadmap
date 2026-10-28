@@ -71,6 +71,17 @@ input[type=text],input[type=email],input[type=number],input[type=time],input[typ
 .box{border:2px solid var(--line);border-radius:10px;padding:10px 12px 12px;margin:0 0 14px;background:var(--bg)}
 .box .boxh{font:700 1.05rem/1.2 "Barlow Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.04em;margin:-2px 0 10px;padding-bottom:6px;border-bottom:1px solid var(--line)}
 .box .boxsub{font:500 .85rem "IBM Plex Mono",monospace;text-transform:none;letter-spacing:0;color:var(--muted);margin-left:6px}
+.box.planbox{border-color:var(--line);padding:8px 10px 10px}.box.planbox .boxh{display:none}
+.planbox .tripbar{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px;padding-bottom:0}
+.planbox .tripbar>.field:nth-child(4),.planbox .tripbar>.field:nth-child(5){grid-column:1/-1}
+.planbox .tripbar>.field:nth-child(4)>.lbl,.planbox .tripbar>.field:nth-child(5)>.lbl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.planbox .tripbar>.field:nth-child(4) .inbtn::before{content:"▶";align-self:center;font-size:12px;width:16px;color:#0B6E4F}
+.planbox .tripbar>.field:nth-child(5) .inbtn::before{content:"🏁";align-self:center;font-size:12px;width:16px}
+.planbox .tripbar input,.planbox .tripbar select{font-size:14px;padding:5px 8px;height:32px}
+.planbox .tripbar .lbl{font-size:.62rem}
+.planbox .tripbar .stayfield{grid-column:auto}
+.planbox .tooltb>button,.planbox .tooltb>label{height:30px;padding:0 8px;font-size:.78rem}
+@media (max-width:640px){.planbox .tooltb>button,.planbox .tooltb>label{height:42px}}
 .box.tripbox{border-color:#0B6E4F}.box.tripbox .boxh{color:#0B6E4F}
 .box.stopbox{border-color:#2F5BA8}.box.stopbox .boxh{color:#2F5BA8}
 .box.detailbox{border-color:var(--ink)}
