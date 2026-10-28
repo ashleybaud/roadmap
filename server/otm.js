@@ -30,6 +30,8 @@ const SCHEMA = [
   // share links: anyone can send a planned trip as a short link (no account); ip_day only holds a hash for the daily limit
   `CREATE TABLE IF NOT EXISTS shares (id TEXT PRIMARY KEY, title TEXT, data TEXT NOT NULL, ip_day TEXT, opens INTEGER NOT NULL DEFAULT 0, created INTEGER NOT NULL)`,
   `CREATE INDEX IF NOT EXISTS shares_ip ON shares(ip_day)`,
+  // newsletter: double opt-in (confirmed_at set when they tap the link in the email); unsub is a random key for the one-tap unsubscribe link
+  `CREATE TABLE IF NOT EXISTS subscribers (email TEXT PRIMARY KEY, source TEXT, created INTEGER NOT NULL, token_hash TEXT, unsub TEXT NOT NULL, confirmed_at INTEGER, unsub_at INTEGER)`,
   `CREATE TABLE IF NOT EXISTS spot_votes (spot_id TEXT NOT NULL, user_id TEXT NOT NULL, created INTEGER NOT NULL, PRIMARY KEY (spot_id, user_id))`,
 ];
 // columns added after tables already existed (each runs once; "duplicate column" errors are expected afterwards)

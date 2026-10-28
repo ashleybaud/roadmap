@@ -10,7 +10,10 @@ export const onRequestGet = handle(async ({ request, env }) => {
   const D = await db(env), url = new URL(request.url);
   if (url.searchParams.get("csv")) {
     const r = await D.prepare(`SELECT email, name, created, news_at FROM users WHERE news = 1 AND blocked = 0 ORDER BY created`).all();
-    const rows = [["email", "name", "signed_up", "agreed_on"], ...r.results.map(x => [x.email, x.name, day(x.created), day(x.news_at)])];
+    const s = await D.prepare(`SELECT email, created, confirmed_at, unsub FROM subscribers WHERE confirmed_at IS NOT NULL AND unsub_at IS NULL ORDER BY created`).all();
+    const seen = new Set(r.results.map(x => x.email));
+    const rows = [["email", "name", "signed_up", "agreed_on", "unsubscribe_key"], ...r.results.map(x => [x.email, x.name, day(x.created), day(x.news_at), ""]),
+      ...s.results.filter(x => !seen.has(x.email)).map(x => [x.email, "", day(x.created), day(x.confirmed_at), x.unsub])];
     return new Response(rows.map(row => row.map(csvCell).join(",")).join("\r\n") + "\r\n", { headers: {
       "Content-Type": "text/csv; charset=utf-8", "Cache-Control": "no-store",
       "Content-Disposition": `attachment; filename="onetrackmind-mailing-list-${day(now())}.csv"` } });
@@ -24,5 +27,6 @@ export const onRequestGet = handle(async ({ request, env }) => {
   ]);
   const events = {}; ev.results.forEach(r => { events[r.name] = { d30: r.d30, d7: r.d7 }; });
   const k = c.results[0] || {};
-  return json({ total: k.total || 0, news: k.news || 0, contributors: k.contributors || 0, week: k.week || 0, riders: latest.results, events });
+  const subs = await D.prepare(`SELECT COUNT(*) AS n FROM subscribers WHERE confirmed_at IS NOT NULL AND unsub_at IS NULL`).first();
+  return json({ total: k.total || 0, news: k.news || 0, subscribers: (subs && subs.n) || 0, contributors: k.contributors || 0, week: k.week || 0, riders: latest.results, events });
 });
