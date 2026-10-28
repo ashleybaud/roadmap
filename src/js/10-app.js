@@ -622,7 +622,7 @@ function dayTrio(k,big){
 }
 document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-ovav]"); if(!b) return; const [k,j,c]=b.dataset.ovav.split(":"); const same=ovFocus&&ovFocus.k===+k&&ovFocus.cat===c; ovFocus=same?null:{k:+k,j:+j,cat:c}; if(!ovFocus) window._refit=true; renderAll(); if(ovFocus&&window.innerWidth<=1000) $("map").scrollIntoView({behavior:"smooth",block:"start"}); });
 function fromCell(k){ const from=dayFrom(k); if(!from||from.lat==null) return `<span class="ep need">${k===0?"Set your start":"Pick the night before"}</span>`; return `<span class="ep">${k===0?"▶":"🛏"} ${esc(from.name)}</span>`; }
-function sumBox(k,big){
+function sumBox(k,big,noChain){
   const pd=!planStale&&plan&&plan.days[k], d=trip.days[k], r=pd?dayRisk(k):null, from=dayFrom(k), last=k===nDays()-1;
   const msg=!trip.start||trip.start.lat==null?(k===0?"Set your start above to see the route":""):!from?"Pick the night stop before this day":!dayTo(k)?"":!dayPts(k)?"Add a stop or a finish":"Working out the route…";
   const chain=stopsChain(k), arr=` <span class="arr">→</span> `, toSym=last?(trip.round?"⟲":"🏁"):"🛏";
@@ -632,9 +632,9 @@ function sumBox(k,big){
     ?`<span class="schain">${fromCell(k)}${arr}<span class="wherebox">${searchBox("whereto-0","","Where to?",true)}</span>${arr}<span class="ep">⟲ back home</span></span>`
     :`<span class="schain">${fromCell(k)}${arr}${chain?chain+arr:""}<span class="ep to ${last?"":"night"}" ${last?"":`title="Night ${k+1}: where you sleep"`}>${toSym} ${toCell(k)}</span></span>${dayTrio(k,big)}${dayWay(k)}`;
   return `<div class="sumbox ${big?"big":""}">
-    <div class="sumline">${date}<div class="sumrow">${line}</div></div>
+    <div class="sumline">${date}${noChain?"":`<div class="sumrow">${line}</div>`}</div>
     ${!pd&&!msg?"":pd?`<div class="sicons"><span class="sl">${fuelBtn(k)}</span><span class="sr">${sunSpan(k)+wxLink(k)}<span class="flags">${flagIcons(r,k)}</span></span></div>${gradeBar(dayGrade(k),big)}${elevLine(k)}${big||nDays()===1?elevProfile(k):""}${riskHtml(r,k)}${big?fuelList(k):""}${!big&&nDays()>1?gtkLine(k):""}`:`<div class="note">${msg}</div>`}
-  </div>${big?"":ovList(k)}`;
+  </div>${big||noChain?"":ovList(k)}`;
 }
 function dayHead(k){ const pd=!planStale&&plan&&plan.days[k], jl=pd?pd.pts.length-1:-1, endOpen=pd&&stopFocus&&stopFocus.k===k&&stopFocus.j===jl;
   return sumBox(k,true)+(endOpen?`<div class="stop open enddetail">${stopDetail(k,jl,stopFocus.cat)}</div>`:"")+(pd?gtkHtml(k):"")+`<h3 class="detailh">Stops</h3>`; }
@@ -736,9 +736,9 @@ function stopList(k){
   h+=`</ol><div class="rname"><span class="lbl" style="white-space:nowrap">Add a stop</span>${searchBox("addvia-"+k,"","Town, pass or place on this day",true)}</div>`;
   return h;
 }
-function dayBody(k){
+function dayBody(k,noStops){
   const pd=!planStale&&plan&&plan.days[k];
-  let h=stopList(k);
+  let h=noStops?"":stopList(k);
   if(!pd) return h;
   if(!placesOk) h+=`<div class="verdict v-warn">Fuel stations didn't load, so long stretches without fuel can't be checked. Check your connection and reload.</div>`;
   const m=dayMed(k);
@@ -791,24 +791,27 @@ function drawStopLayer(){
 }
 function clearLink(){ return `<div class="btns clearrow">${clearArm?`<span class="note">Clear this trip?</span><button class="btn small" type="button" data-newtrip>Clear</button><button class="btn small ghost" type="button" data-nocancel>Cancel</button>`:`<button class="linkbtn small" type="button" data-newtrip>Clear trip</button>`}</div>`; }
 function overviewHtml(){
-  let h=`<div class="tbslot"></div>`+gpxBar();
-  if(nDays()===1) return h+sumBox(0,false)+(typeof founderLine==="function"?founderLine():"")+(plan&&!planStale&&typeof rateLine==="function"?rateLine():"")+(!planStale&&plan&&plan.days[0]?gtkHtml(0):"")+dayBody(0)+clearLink()+footNote();
-  h+=`<div class="days">`;
-  trip.days.forEach((d,k)=>{ h+=`<div class="ovday" data-gotoday="${k}">${sumBox(k,false)}</div>`; });
-  h+=`</div>`;
+  // 1. Your trip  2. Stop  3. Details (each its own box)
+  let h=tripBox(null)+stopSummary(null), det="";
+  if(nDays()===1){ det=sumBox(0,false,true)+(typeof founderLine==="function"?founderLine():"")+(plan&&!planStale&&typeof rateLine==="function"?rateLine():"")+(!planStale&&plan&&plan.days[0]?gtkHtml(0):"")+dayBody(0,true); }
+  else { let hh=`<div class="days">`; trip.days.forEach((d,k)=>{ hh+=`<div class="ovday" data-gotoday="${k}">${sumBox(k,false,true)}</div>`; }); hh+=`</div>`;
+    det=(function(){ let h=hh;
   h+=tripTotals();
   h+=sleepList();
   if(plan&&!planStale&&settings.vehicle!=="bike"&&trip.start) h+=`<div class="btns partnerrow"><a class="btn small ghost" href="${esc(carHireUrl(trip.start.name))}" target="_blank" rel="sponsored noopener">Hire a ${settings.vehicle==="jeep"?"4x4":"car"} ↗</a><span class="note">Self-drive? Compare hire companies.</span></div>`;
   if(plan&&!planStale) h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px"><button class="btn small share" type="button" data-sharetrip title="A link anyone can open: the whole plan, then Google Maps / Waze or GPX">Share this trip ↗</button><button class="btn small wa" type="button" data-sharewa title="Send this trip on WhatsApp">WhatsApp this trip</button>${nameBtn()}${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">${esc(dayName(k))} GPX</button>`:"").join("")}<button class="btn small" type="button" data-gpx="all">Whole trip GPX</button><button class="btn small" type="button" data-navlinks title="Open each day in Google Maps or Waze on your phone">Google Maps / Waze</button><button class="btn small ghost" type="button" data-grouppack title="Every GPX format in one zip, with a read-me, for a group ride">Group ride pack ↓</button><button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}</div></div>`;
+      return h; })(); }
+  h+=boxSec("detailbox","Details",det);
   return h+clearLink()+footNote();
 }
 function footNote(){ return `<div class="note">${placesOk&&dataDate?`Map data from OpenStreetMap, as of ${esc(dataDate)}. Weather from Open-Meteo. Phone ahead on remote legs. `:""}Plan with it, check before you go: you ride at your own risk. <a href="/terms.html">Terms and disclaimer</a> · <a href="/privacy.html">Privacy</a></div>`; }
-function dayHtml(k){ return dayHead(k)+dayBody(k); }
+function dayHtml(k){ return tripBox(k)+stopSummary(k)+boxSec("detailbox","Details",sumBox(k,true,true)+(!planStale&&plan&&plan.days[k]?gtkHtml(k):"")+dayBody(k,true)); }
 function wireDetails(){
   trip.days.forEach((d,k)=>hook("night-"+k,p=>{editTo.delete(k);trip.days[k].to=p;changed();}));
   hook("whereto-0",p=>{ trip.days[0].vias.push(p); trip.days[0].legs=[]; changed(); });
   hook("finish-"+(nDays()-1),p=>{editTo.delete(nDays()-1);setFinish(p);});
   editTo.forEach(k=>{ const el=document.getElementById((k===nDays()-1?"finish-":"night-")+k); if(el&&document.activeElement!==el){ el.focus(); el.select(); el.addEventListener("blur",()=>setTimeout(()=>{ if(editTo.has(k)&&el.value.trim()===el.defaultValue.trim()){ editTo.delete(k); renderDetails(); } },400)); } });
+  hook("addstop",p=>{ const k2=curDay()!=null?curDay():dayForPoint(p); addOpen=false; if(insertVia(k2,p)!==false) changed(); else renderDetails(); });
   { const k=curDay(); if(k==null) return; const d=trip.days[k];
     d.vias.forEach((v,i)=>hook(`via-${k}-${i}`,p=>replaceVia(k,i,p)));
     hook("addvia-"+k,p=>{if(insertVia(k,p)!==false) changed(); else renderDetails();});
@@ -992,7 +995,7 @@ function drawMap(){
   try{ if(ui.lay.fav&&typeof drawFavs==="function") drawFavs(); }catch(e){} // an extra layer must never stop the route
   if(panel){ drawPanelLayer(); return; }
   if(stopFocus&&sel&&stopFocus.k===ui.tab&&drawStopLayer()) return;
-  if(ovFocus&&!sel&&drawOvLayer()) return;
+  if(ovFocus&&(!sel||ovFocus.k===ui.tab)&&drawOvLayer()) return;
   if(focusR){ const s=seg(focusR.a,focusR.b); if(s.length>1){L.polyline(s.map(g=>[g.lat,g.lon]),{color:"#B26A00",weight:7}).addTo(layer); map.fitBounds(L.latLngBounds(s.map(g=>[g.lat,g.lon])),{padding:[30,30]});} }
   const range=sel?[sel.a,sel.b]:[0,plan.total], inR=x=>x.km!=null&&x.km>=range[0]-1&&x.km<=range[1]+1;
   townPoints().forEach(p=>{ const km=plan.ptKm.get(p); if(sel&&!(km!=null&&km>=sel.a-0.5&&km<=sel.b+0.5)) return;
@@ -1040,7 +1043,7 @@ function drawPanelLayer(){
 
 /* ---------- icon bar: what to show on the map ---------- */
 const LAY=[["fuel","⛽","Fuel","Fuel stations on the route"],["stay","🛏","Places to stay","Places to stay at your night stops"],["food","🍴","Food","Places to eat"],["sights","★","Sights","Sights, viewpoints and passes"],["med","🏥","Medical","Hospitals and clinics"],["rep","📣","Rider reports","What riders reported on the road lately"],["spots","📍","Riders' places","Places riders marked: viewpoints, farm stalls, stays"],["fav","♥","Founder's fav's","Places the founder would send you, and petrolhead places"],["road","🛣","Road grade","The route coloured by terrain grade, Race to Single"]];
-ui.lay=Object.assign({fuel:true,stay:!!ui.sleep,food:!!ui.types.food,sights:true,med:false,rep:true,spots:true,fav:true},ui.lay||{}); if(ui.lay.fav===undefined) ui.lay.fav=true; if(ui.lay.rep===undefined) ui.lay.rep=true; if(ui.lay.spots===undefined) ui.lay.spots=true;
+ui.lay=Object.assign({fuel:true,stay:!!ui.sleep,food:!!ui.types.food,sights:true,med:false,rep:true,spots:true,fav:false},ui.lay||{}); if(ui.favV!==1){ ui.lay.fav=false; ui.favV=1; } // fav's off by default: a button for those who want them if(ui.lay.rep===undefined) ui.lay.rep=true; if(ui.lay.spots===undefined) ui.lay.spots=true;
 function renderLayers(){
   $("iconbar").innerHTML=`<span class="ibhead">On the map</span>`+LAY.map(([id,ic,w,t])=>{ const on=!!ui.lay[id];
     return `<button type="button" class="ib ${on?"on":""}" data-lay="${id}" title="${esc(w)}: ${esc(t)}" aria-label="${esc(w)}" aria-pressed="${on}">${ic}</button>`; }).join("")
@@ -1150,7 +1153,7 @@ function renderHist(){
 }
 $("histList").addEventListener("click",e=>{ const b=e.target.closest("[data-restore]"); if(!b) return; const h=store.get("rr4-hist")||[], x=h[+b.dataset.restore]; if(!x) return; snapTrip(true); const t=JSON.parse(x.key); Object.keys(trip).forEach(k=>delete trip[k]); Object.assign(trip,t); ui.tab="ov"; $("settings").close(); changed(); });
 const daySig=k=>[dayFrom(k),...(trip.days[k]?trip.days[k].vias.filter(v=>!v.auto):[]),dayTo(k)].map(p=>p&&p.lat!=null?p.lat.toFixed(3)+","+p.lon.toFixed(3):"-").join("|");
-function changed(){ window._refit=true; focusR=null; stopFocus=null; ovFocus=null; autoRounds=0;
+function changed(){ window._refit=true; focusR=null; stopFocus=null; ovFocus=null; selStop=null; autoRounds=0;
   syncDays(); trip.days.forEach((d,k)=>{ const s=daySig(k); if(d.sig&&d.sig!==s){ d.fresh=true; delete d.noMore; const n=d.vias.length; d.vias=d.vias.filter(v=>!v.auto); if(d.vias.length!==n) d.legs=[]; } d.sig=s; });
   snapTrip(); recalc(); }
 $("keyDlg").innerHTML=$("keyDlg").innerHTML.replace("STYLE_FAST",STYLE_ICON.fast).replace("STYLE_ROUGH",STYLE_ICON.default).replaceAll("FUEL",ICON.fuel);

@@ -94,7 +94,8 @@ const TRIP = {
   ok(await page.$$eval(".sumbox .elevline", b => b.length) >= 2, "climb line missing on the day boxes");
 
   await page.click('[data-day="0"]'); await page.waitForTimeout(500);
-  ok(await page.$$eval("ol.stops li", b => b.length) >= 2, "day stop list missing");
+  ok(await page.$$eval("ol.tstops li", b => b.length) >= 2, "day stop list missing");
+  ok(await page.$$eval(".box.tripbox, .box.stopbox, .box.detailbox", b => b.length) === 3, "the three boxes are not all there");
   ok(await page.$$eval(".gtk", b => b.length) === 1, "Good to know section missing on the day view");
   const gtk = await page.evaluate(() => goodToKnow(0).map(x => x.lvl + ":" + x.sec + ":" + x.text));
   ok(gtk.some(x => x.startsWith("info:dest:Arrive at") || /dest:You arrive/.test(x)), "Good to know has no arrival line");
@@ -110,7 +111,7 @@ const TRIP = {
   ok(await page.$eval('[data-lay="med"]', b => b.classList.contains("on")), "map button did not toggle");
 
   await page.click('[data-day="1"]'); await page.waitForTimeout(500);
-  ok(await page.$$eval("ol.stops li", b => b.length) >= 2, "second day stop list missing");
+  ok(await page.$$eval("ol.tstops li", b => b.length) >= 2, "second day stop list missing");
 
   // open a OneTrackMind pick
   await page.click('[data-day="ov"]'); await page.waitForTimeout(300);
@@ -135,9 +136,9 @@ const TRIP = {
   if (!nav.g.length || !nav.g[0].url.startsWith("https://www.google.com/maps/dir/?api=1&origin=") || !nav.btn || !nav.w.length || !nav.w[0].url.includes("waze.com/ul?ll=")) throw new Error("phone nav links: " + JSON.stringify(nav).slice(0, 400));
   if (nav.g.some(p => (p.url.match(/%7C/g) || []).length > 8)) throw new Error("too many Google waypoints");
   await page.evaluate(() => { ui.tab = 0; renderAll(); }); await page.waitForTimeout(300);
-  const trio = await page.evaluate(() => ({ rows: document.querySelectorAll("#details .stop:not(.slim)").length, trio: document.querySelectorAll("#details .stop:not(.slim) .trioset .avi").length, lay: ui.lay }));
-  ok(trio.trio === trio.rows * ["fuel","stay","food","sights"].filter(c => trio.lay[c]).length, "fuel/food/bed icons on every stop: " + JSON.stringify(trio));
-  if (process.env.SHOT) { await page.evaluate(() => ui.lay.food = ui.lay.fuel = ui.lay.stay = true); await page.evaluate(() => renderAll()); const el = await page.$("#details ol.stops"); if (el) await el.screenshot({ path: process.env.SHOT }); }
+  const trio = await page.evaluate(() => ({ rows: document.querySelectorAll(".stopbox .srow2").length, on: ["fuel","stay","food","sights"].filter(c => ui.lay[c]).length }));
+  ok(trio.rows === trio.on, "stop summary rows follow the filters: " + JSON.stringify(trio));
+  if (process.env.SHOT) { await page.evaluate(() => ui.lay.food = ui.lay.fuel = ui.lay.stay = true); await page.evaluate(() => renderAll()); const el = await page.$("#details"); if (el) await el.screenshot({ path: process.env.SHOT }); }
   await page.evaluate(() => { ui.tab = "ov"; renderAll(); });
   const ov = await page.evaluate(() => { ui.lay.stay = true; ui.lay.fuel = true; ui.tab = "ov"; renderAll(); const b = document.querySelector("[data-ovav]"); if (!b) return { btn: false }; b.click(); return { btn: true, tab: ui.tab, list: !!document.querySelector(".ovlist"), rows: document.querySelectorAll(".ovrows li").length, pins: document.querySelectorAll(".numpin").length }; });
   ok(!ov.btn || (ov.tab === "ov" && ov.list), "overview icon list: " + JSON.stringify(ov));
@@ -161,7 +162,7 @@ const TRIP = {
   await page.waitForTimeout(500);
   await page.evaluate(() => { trip.endDate = addDays(trip.startDate, 1); changed(); });
   await page.waitForFunction(() => trip.days.length === 2 && trip.days[0].to && plan && !planStale, null, { timeout: 30000 }).catch(() => {});
-  const nt2 = await page.evaluate(() => ({ night: trip.days[0].to && trip.days[0].to.name, vias: trip.days.map(d => d.vias.length) }));
+  const nt2 = await page.evaluate(() => ({ night: trip.days[0].to && trip.days[0].to.name, vias: trip.days.map(d => d.vias.filter(v => !v.auto).length) }));
   ok(nt2.night && nt2.vias.every(v => v === 0), "night after 2>1>2 days: " + JSON.stringify(nt2));
   // From box: pick twice in a row (the box is wired once)
   for (const q of ["Clanwilliam", "Calvinia"]) {
