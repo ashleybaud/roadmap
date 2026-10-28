@@ -35,7 +35,7 @@ const places = r => { const s = [r.trip.start, ...r.trip.days.flatMap(d => [...(
 const CSS = `:root{--bg:#EEF0EA;--panel:#fff;--ink:#18201C;--muted:#5C6660;--line:#D3D8CF;--accent:#0B6E4F;--chip:#E3E7DE;color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121614;--panel:#1A201D;--ink:#E7EBE5;--muted:#9AA39D;--line:#2E3631;--accent:#4CC08F;--chip:#232A26;color-scheme:dark}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.6 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
-a{color:var(--accent)}.wrap{max-width:820px;margin:0 auto;padding:0 16px}
+a{color:var(--accent)}.wrap{max-width:1400px;margin:0 auto;padding:0 16px}main p,main ul,main ol,main blockquote,main h1,main h2,main h3,main .meta,main figure,main.story>img.cover,main .gallery,main .note,.spbox{max-width:860px}main .cards p,main .cards ul{max-width:none}
 header{border-bottom:2px solid var(--ink);padding:14px 0 12px}
 .logo{display:inline-block;font:700 2.7rem/1 "Barlow Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:-.005em;color:var(--ink);text-decoration:none}
 .motto{font:700 1.2rem "Barlow Condensed","Arial Narrow",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:2px 0 0}
