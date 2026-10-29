@@ -388,7 +388,7 @@ function storiesIndex(M) {
     const yr = L[L.length - 1].date.slice(0, 4);
     const tags = TAGS.filter(([, , rx]) => rx.test(name + " " + title)).map(([k]) => k).join(" ");
     const g = goLink(name), kind = TRIP_ROUTE[name] ? "route" : g ? "place" : "story";
-    return `<div class="ctile${multi ? " big" : ""}" data-cat="${cats}" data-tags="${tags}" data-kind="${kind}"><a class="cimg" href="${href}"><img src="${esc(coverOf(L))}" alt="" loading="lazy"><span class="badges"><em class="kind k-${kind}">${KIND[kind]}</em></span><span class="cmeta"><b>${esc(title)}</b><span>${yr}${multi ? ` · ${L.length} days of posts` : ""}</span></span></a>${(g => g ? `<a class="plot" href="${esc(g.href)}">${esc(g.label)}</a>` : "")(goLink(name))}</div>`;
+    return `<div class="ctile${multi ? " big" : ""}" data-cat="${cats}" data-tags="${tags}" data-kind="${kind}"><a class="cimg" href="${href}"><img src="${esc(coverOf(L))}" alt="" loading="lazy"><span class="badges"><em class="kind k-${kind}">${KIND[kind]}</em></span><span class="cmeta"><b>${esc(title)}</b><span>${yr}${multi ? ` · ${L.length} days of posts` : ""}</span></span></a>${(g => g ? `<a class="plot" href="${esc(g.href)}" title="${esc(g.label.replace(" ›", ""))}">${TRIP_ROUTE[name] ? "Show the route ›" : "Route me there ›"}</a>` : "")(goLink(name))}</div>`;
   };
   const body = `<main class="blog"><h1>Blog</h1>
 <p class="intro">Twenty-odd years of road trips, race weekends, factories and museums. Mostly on two wheels, mostly not to plan. Tap a picture to read it. A Route opens the whole trip in the planner. A Place routes you there from wherever you are.</p>
