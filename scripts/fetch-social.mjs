@@ -28,6 +28,10 @@ for (const x of out) {
   if (!fs.existsSync(f)) { const b = Buffer.from(await (await fetch(x.pic)).arrayBuffer()); fs.writeFileSync(f, b);
     try { execFileSync("mogrify", ["-resize", "720x720>", "-quality", "80", "-strip", "-format", "jpg", f]); } catch (e) {} }
   x.img = "/" + f; delete x.pic;
+  // "📍 Place, Town" on its own line in the caption: the place riders get routed to
+  const pin = (x.text.match(/📍\s*([^\n#]{3,80})/) || [])[1];
+  if (pin) { x.place = pin.trim(); try { const g = await (await fetch("https://photon.komoot.io/api/?limit=1&q=" + encodeURIComponent(x.place), { headers: { "user-agent": "OneTrackMind social places" } })).json();
+    const c = g.features && g.features[0] && g.features[0].geometry.coordinates; if (c) { x.lat = +c[1].toFixed(5); x.lon = +c[0].toFixed(5); } } catch (e) {} }
   x.text = x.text.replace(/\s*(#[\wÀ-ɏ]+\s*)+$/u, "").trim(); // hashtags at the end drop off
 }
 fs.readdirSync(dir).forEach(f => { if (!keep.has(f)) fs.unlinkSync(path.join(dir, f)); });

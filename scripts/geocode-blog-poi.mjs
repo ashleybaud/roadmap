@@ -9,7 +9,6 @@ const Q = {
   "2019-03 MotoGP-Qatar": "Lusail International Circuit",
   "2016-06 Franschoek Motor Museum": "Franschhoek Motor Museum",
   "2023-03 WPMC @ Killarney": "Killarney Raceway",
-  "2023-02 Wijnland Motor Museum": "Wijnland Auto Museum",
   "2018-05 Simola Hill Climb": "Simola Knysna",
   "2016-06 Port Elizabeth enduros": "Gqeberha",
 };

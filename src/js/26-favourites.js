@@ -30,3 +30,15 @@ document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closes
     const t=$("toast"); t.innerHTML=`Finish set to <b>${esc(x.name)}</b> (${esc(x.start)}). Now set where you start and arrive by then.`; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,15000);
     if(!trip.start||trip.start.lat==null) $("startPlace").focus();
   },300); } }
+
+/* /?poi=lat,lon&n=<name>: route from where you are to a place from the blog or Instagram */
+{ const m=location.search.match(/[?&]poi=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/); if(m){ const nm=(location.search.match(/[?&]n=([^&]*)/)||[])[1]; history.replaceState(null,"",location.pathname);
+  setTimeout(()=>{ const lat=+m[1], lon=+m[2], name=nm?decodeURIComponent(nm.replace(/\+/g," ")).slice(0,80):"The place";
+    if(!isFinite(lat)||!isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180) return;
+    try{ localStorage.setItem("rr-welcome","1"); if($("welcome").open) $("welcome").close(); }catch(e){}
+    snapTrip(true); trip.end=pt(name,lat,lon); trip.round=false; trip.days.forEach(d=>{ d.vias=[]; d.legs=[]; d.to=null; delete d.noAutoNight; });
+    if(trip.start&&trip.start.lat!=null&&hav(trip.start,{lat,lon})<1) trip.start=pt("My location",null,null);
+    changed();
+    const t=$("toast"); t.innerHTML=`Finish set to <b>${esc(name)}</b>. Tap ⌖ to start from where you are, or type a town.`; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,15000);
+    if(!trip.start||trip.start.lat==null) $("startPlace").focus();
+  },300); } }
