@@ -29,7 +29,7 @@
 /* Layout: trip bar on top; big map left with day tabs and details right; one column on phones */
 :root{
   --bg:#EEF3F3; --panel:#FFFFFF; --ink:#11262B; --muted:#54666A; --line:#D0DBDC;
-  --accent:#1E8EB4; --back:#2F5BA8; --ok:#2E7D32; --warn:#B26A00; --bad:#B3261E; --chip:#E0EBEC; --onfill:#FFFFFF;
+  --accent:#0F7B8A; --back:#2F5BA8; --ok:#2E7D32; --warn:#B26A00; --bad:#B3261E; --chip:#E0EBEC; --onfill:#FFFFFF;
   --f-display:"Barlow Condensed","Arial Narrow",system-ui,sans-serif;
   --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
   --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
@@ -37,7 +37,7 @@
 }
 @media (prefers-color-scheme: dark){:root{
   --bg:#0C1A1D; --panel:#142529; --ink:#E4EEEE; --muted:#9AAEB1; --line:#25393D;
-  --accent:#4FB8D8; --back:#7EA3E6; --ok:#2F8A3B; --warn:#B87400; --bad:#C2392F; --chip:#1D3237; --onfill:#FFFFFF; color-scheme:dark}}
+  --accent:#3CC3D1; --back:#7EA3E6; --ok:#2F8A3B; --warn:#B87400; --bad:#C2392F; --chip:#1D3237; --onfill:#FFFFFF; color-scheme:dark}}
 *{box-sizing:border-box}
 html,body{margin:0}
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:15px;line-height:1.45;
@@ -76,7 +76,7 @@ input[type=text],input[type=email],input[type=number],input[type=time],input[typ
 .planbox .tripbar{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:6px;padding-bottom:0}
 .planbox #startField,.planbox #endField{grid-column:1/-1}
 .planbox #startField>.lbl,.planbox #endField>.lbl{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
-.planbox #startField .inbtn::before{content:"▶";align-self:center;font-size:12px;width:16px;color:#1E8EB4}
+.planbox #startField .inbtn::before{content:"▶";align-self:center;font-size:12px;width:16px;color:#0F7B8A}
 .planbox #endField .inbtn::before{content:"🏁";align-self:center;font-size:12px;width:16px}
 .planbox .tripbar input,.planbox .tripbar select{font-size:14px;padding:5px 8px;height:32px}
 .planbox .tripbar .lbl{font-size:.62rem}
@@ -103,7 +103,7 @@ input[type=text],input[type=email],input[type=number],input[type=time],input[typ
 .herotoggle:hover{border-color:var(--brand);color:var(--brand)}
 .hero.shut{padding:8px 14px}.hero.shut .herohead{font-size:1.15rem;margin:0}.hero.shut>*:not(.herohead):not(.herotoggle){display:none}.hero.shut .herotoggle{top:6px}
 .staybadge{display:inline-block;white-space:nowrap;background:#2F5BA8;color:#fff;font:600 12px/1 system-ui,sans-serif;padding:5px 7px;border-radius:12px;border:2px solid #fff;box-shadow:0 1px 3px rgba(0,0,0,.35);cursor:pointer}#map.zoomin .staybadge{display:none}
-.favmk{width:26px;height:26px;border-radius:50%;background:#E8A317;color:#11262B;border:2px solid #11262B;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.35)}
+.favmk{width:26px;height:26px;border-radius:50%;background:#F2C500;color:#11262B;border:2px solid #11262B;display:flex;align-items:center;justify-content:center;font-size:14px;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.35)}
 .btn.wa{background:#25D366;border-color:#25D366;color:#073B1E}
 .icon{border:1px solid var(--line);background:var(--panel);border-radius:4px;width:30px;height:30px;cursor:pointer;display:inline-grid;place-items:center;flex:none}
 .btns{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
@@ -258,7 +258,7 @@ dialog::backdrop{background:rgba(0,0,0,.4)}
 header h1{font-size:2.7rem;font-weight:700;letter-spacing:-.005em;text-transform:uppercase}
 @media (max-width:640px){header h1{font-size:1.7rem}header{gap:6px;padding-bottom:6px}header .note{display:none}.motto{font-size:.95rem;margin:0}header .btns .btn{padding:4px 10px;font-size:.85rem}#hdrSummary{display:none}.guide .gh{font-size:1.1rem}.guide>summary{padding:6px 0}}
 .motto{font-family:var(--f-display);font-weight:700;font-size:1.2rem;letter-spacing:.08em;text-transform:uppercase;color:var(--accent);margin:2px 0}
-.hero{position:relative;flex-basis:100%;background:#0B4A60;border:1px solid var(--line);color:#fff;border-radius:12px;padding:16px 18px;margin-top:4px}
+.hero{position:relative;flex-basis:100%;background:#0B3B45;border:1px solid var(--line);color:#fff;border-radius:12px;padding:16px 18px;margin-top:4px}
 .herohead{font-family:var(--f-display);font-weight:700;text-transform:uppercase;font-size:2.4rem;line-height:1;margin:0;letter-spacing:.01em;color:#fff}
 .herohead span{color:var(--brand)}
 .herosub{margin:8px 0 12px;font-size:1.08rem;max-width:62rem;color:#fff;opacity:.92}
@@ -269,7 +269,7 @@ header h1{font-size:2.7rem;font-weight:700;letter-spacing:-.005em;text-transform
 .herosteps span{font-size:.92rem;line-height:1.35;color:#fff;opacity:.85}
 @media (max-width:900px){.herosteps{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:640px){body.hastrip .hero:not(.uopen) .herosteps,body.hastrip .hero:not(.uopen) .herosub{display:none}.hero{padding:12px}.herohead{font-size:1.75rem}.herosub{font-size:.95rem;margin:6px 0 10px}.herosteps{gap:6px}.herosteps li{padding:8px}.herosteps b{font-size:1rem}.herosteps span{font-size:.82rem}}
-.heroband{display:block;margin-top:12px;padding:10px 14px;border-radius:8px;background:rgba(60,195,209,.16);border:1px solid #4FB8D8;color:#fff;text-decoration:none}.heroband b{color:#4FB8D8}.heroband span{opacity:.9}
+.heroband{display:block;margin-top:12px;padding:10px 14px;border-radius:8px;background:rgba(60,195,209,.16);border:1px solid #3CC3D1;color:#fff;text-decoration:none}.heroband b{color:#3CC3D1}.heroband span{opacity:.9}
 .sitefoot{margin:28px 0 10px;padding-top:14px;border-top:1px solid var(--line)}.sponsors{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:10px}
 .spons{display:flex;flex-direction:column;border:1px solid var(--line);border-radius:8px;padding:8px 14px;text-decoration:none;color:var(--ink);background:var(--panel)}.spons b{font-family:var(--f-display);text-transform:uppercase;letter-spacing:.03em;font-size:1.1rem}.spons span{font-size:.85rem;color:var(--muted)}.spons.open{border-style:dashed}.spons.open b{color:var(--accent)}
 .herocta{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin-top:12px}.herocta span{color:#fff;opacity:.8;font-size:.92rem}
@@ -305,7 +305,7 @@ a.btn{text-decoration:none;display:inline-flex;align-items:center}
   .print .ptable td.bad,.print .ptable tr.bad td:last-child{color:#B3261E;font-weight:600}
   .print .ptable td.warn,.print .ptable tr.warn td:last-child{color:#8A5200;font-weight:600}
   .print ul{margin:0 0 2mm;padding-left:5mm}
-  .print a{color:#1E8EB4}
+  .print a{color:#0F7B8A}
   .print .pnote{font-size:8.5pt;color:#444}
   .print .pfoot{margin-top:4mm}
   html,body{background:#fff!important}
@@ -378,7 +378,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .flags{margin-left:0}
 .shead .avail{margin-left:auto}
 .totals{display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 14px;border-top:2px solid var(--ink);padding-top:10px;font-size:.92rem}
-.print .via{color:#1E8EB4;font-weight:800}
+.print .via{color:#0F7B8A;font-weight:800}
 .story .sicons,.wline .sicons{flex-basis:100%;margin-left:0;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px 10px}
 .sicons .sl,.sicons .sr{display:inline-flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
 .sicons .sr{margin-left:auto;justify-content:flex-end}
@@ -423,7 +423,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .sleeplist{margin:12px 0}.sleeplist h3{margin:0 0 6px}
 .slrow{display:grid;grid-template-columns:5.5em 1fr auto;gap:8px;align-items:start;padding:6px 0;border-bottom:1px solid var(--line);font-size:.9rem}
 .slrow .sact{font-size:.82rem}.sln{font-weight:600}
-.slrow.slpick{grid-template-columns:5.5em 1fr}.slopts{list-style:none;padding:0;margin:6px 0 2px}.slopts li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 0;border-top:1px dashed var(--line)}.slopts li .sact{display:flex;gap:8px;align-items:center;white-space:nowrap}.sugtag{font:600 .7rem "IBM Plex Mono",monospace;background:#1E8EB4;color:#fff;border-radius:3px;padding:0 5px}
+.slrow.slpick{grid-template-columns:5.5em 1fr}.slopts{list-style:none;padding:0;margin:6px 0 2px}.slopts li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 0;border-top:1px dashed var(--line)}.slopts li .sact{display:flex;gap:8px;align-items:center;white-space:nowrap}.sugtag{font:600 .7rem "IBM Plex Mono",monospace;background:#0F7B8A;color:#fff;border-radius:3px;padding:0 5px}
 .stop.night{border:2px solid var(--ink);border-radius:8px;margin:6px 0;padding:0 8px;background:color-mix(in srgb,var(--ink) 7%,transparent)}
 .rlab.nightlab{background:var(--ink);color:var(--bg);border-radius:4px;padding:1px 6px;white-space:nowrap;align-self:center;flex:none;min-width:0}
 .sname .note{white-space:nowrap}
@@ -472,7 +472,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .sl1 .sright{margin-left:auto;display:flex;align-items:center;flex:none}
 .selev{font-family:var(--f-mono);font-size:.72rem;letter-spacing:.05em;color:var(--muted);white-space:nowrap}
 .autotag{font-size:.74rem;font-weight:700;color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);border-radius:4px;padding:2px 6px}
-.mapemo.dashed{border-style:dashed;border-color:#1E8EB4;opacity:.6;transform:scale(.8)}
+.mapemo.dashed{border-style:dashed;border-color:#0F7B8A;opacity:.6;transform:scale(.8)}
 .days .ovday{padding:6px 0;border-top:0}
 .wherebox{display:inline-block;min-width:220px;vertical-align:middle}
 .tripbar{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;border-bottom:0}
@@ -534,7 +534,7 @@ input.empty::placeholder{color:var(--warn);opacity:1;font-weight:600}
 .elevprof{margin-top:4px}.elevprof svg{width:100%;height:70px;display:block}
 .gpc{white-space:nowrap;font-family:var(--f-mono);font-size:.72rem}
 .gbadge{display:inline-flex;align-items:center;justify-content:center;min-width:28px;white-space:nowrap;height:20px;padding:0 5px;border-radius:4px;font:700 .72rem/1 var(--f-mono);color:#fff;background:#C9CEC5;flex:none}
-.gbadge.g0{color:#11262B}.gbadge.g1{background:#7A847D}.gbadge.g2{background:#E8A317;color:#11262B}.gbadge.g3{background:#D9702B}.gbadge.g4{background:#B3261E}.gbadge.g5{background:#2A0F0D}
+.gbadge.g0{color:#11262B}.gbadge.g1{background:#7A847D}.gbadge.g2{background:#F2C500;color:#11262B}.gbadge.g3{background:#D9702B}.gbadge.g4{background:#B3261E}.gbadge.g5{background:#2A0F0D}
 .dlgwrap{display:flex;flex-direction:column;gap:12px}
 .dlghead{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
 #fText{width:100%;font:inherit;padding:8px;border:1px solid var(--line);border-radius:6px;background:var(--bg);color:var(--ink);resize:vertical}
@@ -585,7 +585,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
 .repkinds{display:flex;flex-wrap:wrap;gap:6px}
 .repkinds button{border:1px solid var(--line);background:var(--bg);color:var(--ink);border-radius:16px;padding:5px 10px;cursor:pointer;font:inherit;font-size:.86rem}
 .repkinds button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
-.stars{display:flex;gap:4px}.stars button{font-size:1.6rem;line-height:1;background:none;border:0;cursor:pointer;color:var(--line);padding:0 2px}.stars button.on{color:#E8A317}
+.stars{display:flex;gap:4px}.stars button{font-size:1.6rem;line-height:1;background:none;border:0;cursor:pointer;color:var(--line);padding:0 2px}.stars button.on{color:#F2C500}
 .rateline{display:flex;flex-wrap:wrap;gap:6px 12px;align-items:center;font-size:.88rem;margin-top:6px}
 .repmk{width:24px;height:24px;border-radius:50%;background:#fff;border:2px solid #B26A00;display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:0 1px 3px rgba(0,0,0,.35)}
 .repmk.bad{border-color:#B3261E}.repmk.good{border-color:#2E7D32}
@@ -605,25 +605,25 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
 .wsteps{margin:0;padding-left:20px;display:flex;flex-direction:column;gap:6px;font-size:.92rem}
 #styleBanner .linkbtn{margin-left:6px}
 .pin{display:flex;align-items:center;justify-content:center;gap:2px;width:100%;height:100%;border-radius:50%;background:#fff;border:2.5px solid #11262B;font-size:13px;line-height:1;box-shadow:0 1px 3px rgba(0,0,0,.35);position:relative;color:#11262B}
-.pin.pstart{background:#1E8EB4;border-color:#fff;color:#fff;font-size:14px}
+.pin.pstart{background:#0F7B8A;border-color:#fff;color:#fff;font-size:14px}
 .pin.pend{background:#fff;font-size:15px}
 .pin.pnight{border-radius:14px;border-width:3px;font-size:14px;padding:0 4px}
 .pin.pnight b{font-size:12px}
-.pin.pstop{width:24px;height:24px;font-size:12px;background:#1E8EB4;color:#fff;border:2px solid #fff;box-shadow:0 0 0 2px #1E8EB4}
+.pin.pstop{width:24px;height:24px;font-size:12px;background:#0F7B8A;color:#fff;border:2px solid #fff;box-shadow:0 0 0 2px #0F7B8A}
 .pinday{position:absolute;top:-7px;right:-8px;min-width:14px;height:14px;border-radius:7px;color:#fff;font:700 9px/14px system-ui,sans-serif;text-align:center;font-style:normal;padding:0 2px}
 .mapemo{position:relative}
 .maplbl.mlnight{font-weight:800;border-width:2px;background:#11262B;color:#fff;border-color:#11262B}
 .pin.pnight{background:#11262B;color:#fff}
-.hdrlinks{overflow:visible!important;position:relative;z-index:1500}header,.hdr{position:relative;z-index:1500}.navdd{position:relative;display:flex}.navdd>summary{list-style:none;cursor:pointer;font:700 1.15rem var(--f-display,"Barlow Condensed","Arial Narrow",sans-serif);text-transform:uppercase;letter-spacing:.06em;color:var(--bg);padding:9px 20px;border-bottom:4px solid transparent;white-space:nowrap;width:100%}.navdd>summary::-webkit-details-marker{display:none}.navdd>summary::after{content:" ▾";font-size:.8em}.navdd>summary.on{border-bottom-color:#E8A317}.navdd>summary:hover{background:color-mix(in srgb,var(--bg) 12%,transparent)}.navdd .ddm{position:absolute;z-index:2000;top:100%;left:0;min-width:210px;background:var(--ink);border-radius:0 0 6px 6px;box-shadow:0 6px 16px rgba(0,0,0,.25);flex-direction:column;display:flex}.navdd:not([open]) .ddm{display:none}@media(hover:hover){.navdd:hover .ddm{display:flex}}.navdd .ddm a{text-align:left!important;padding:10px 18px!important}@media(max-width:700px){.hdrlinks{grid-template-columns:repeat(3,minmax(0,1fr))!important}.navdd>summary{font-size:.95rem;padding:8px 4px;text-align:center;letter-spacing:.03em}.navdd .ddm{left:auto;right:0}}:root{--brand:#E8A317;--gold:#E8A317}
-html[data-mode="motorsport"]{--bg:#0A4A63;--panel:#0F5874;--ink:#F4F8F9;--muted:#B5D3DE;--line:#2B7896;--accent:#E8A317;--chip:#13617E;--onfill:#0B1D21;--warn:#FF9A1A;--bad:#E5484D;--brand:#E8A317;--gold:#E8A317;--hero:#08405A;color-scheme:dark}
-html[data-mode="motorsport"] .hero{background:#03141A;border-color:#E8A317}
+.hdrlinks{overflow:visible!important;position:relative;z-index:1500}header,.hdr{position:relative;z-index:1500}.navdd{position:relative;display:flex}.navdd>summary{list-style:none;cursor:pointer;font:700 1.15rem var(--f-display,"Barlow Condensed","Arial Narrow",sans-serif);text-transform:uppercase;letter-spacing:.06em;color:var(--bg);padding:9px 20px;border-bottom:4px solid transparent;white-space:nowrap;width:100%}.navdd>summary::-webkit-details-marker{display:none}.navdd>summary::after{content:" ▾";font-size:.8em}.navdd>summary.on{border-bottom-color:#F2C500}.navdd>summary:hover{background:color-mix(in srgb,var(--bg) 12%,transparent)}.navdd .ddm{position:absolute;z-index:2000;top:100%;left:0;min-width:210px;background:var(--ink);border-radius:0 0 6px 6px;box-shadow:0 6px 16px rgba(0,0,0,.25);flex-direction:column;display:flex}.navdd:not([open]) .ddm{display:none}@media(hover:hover){.navdd:hover .ddm{display:flex}}.navdd .ddm a{text-align:left!important;padding:10px 18px!important}@media(max-width:700px){.hdrlinks{grid-template-columns:repeat(3,minmax(0,1fr))!important}.navdd>summary{font-size:.95rem;padding:8px 4px;text-align:center;letter-spacing:.03em}.navdd .ddm{left:auto;right:0}}:root{--brand:#F2C500;--gold:#F2C500}
+html[data-mode="motorsport"]{--bg:#06181C;--panel:#0E2A30;--ink:#F1F1EE;--muted:#9FB6BA;--line:#1D4048;--accent:#F2C500;--chip:#123740;--onfill:#0B1D21;--warn:#FF9A1A;--bad:#E5484D;--brand:#F2C500;--gold:#F2C500;--hero:#03141A;color-scheme:dark}
+html[data-mode="motorsport"] .hero{background:#03141A;border-color:#F2C500}
 
 html[data-mode="motorsport"] .btn.share,html[data-mode="motorsport"] .ib.on{color:#111}
 .hdrlinks{grid-template-columns:repeat(4,auto) 1fr!important}
 .modesw{justify-self:end;align-self:center;margin-right:8px;display:flex;border:1px solid color-mix(in srgb,var(--bg) 40%,transparent);border-radius:999px;overflow:hidden}
 .modesw button{font:700 .95rem "Barlow Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.06em;background:none;border:0;color:var(--bg);padding:5px 12px;cursor:pointer;opacity:.7}
-.modesw button.on{background:#E8A317;color:#11262B;opacity:1}
-html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
+.modesw button.on{background:#F2C500;color:#11262B;opacity:1}
+html[data-mode="motorsport"] .modesw button.on{background:#F2C500;color:#111}
 @media(max-width:640px){.hdrlinks{grid-template-columns:repeat(4,auto)!important}.modesw{grid-column:1/-1;justify-self:start;margin:4px 0 6px 8px}}
 .spstrip{display:flex;align-items:center;gap:8px;margin:6px 0 0;padding:3px 10px 3px 3px;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:6px;background:var(--panel);color:var(--ink);text-decoration:none;font-size:.95rem;order:9}.spstrip img{width:26px;height:26px;object-fit:cover;border-radius:4px}.spstrip{font-size:.85rem}.spstrip em{font-style:normal;color:var(--muted);font-size:.6rem;border:1px solid var(--line);border-radius:3px;padding:0 3px;margin-left:4px;text-transform:uppercase}
 .packbox{display:flex;align-items:center;gap:12px;margin:16px 0;padding:8px 12px 8px 8px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);text-decoration:none}.packbox img{width:72px;height:72px;object-fit:cover;border-radius:6px}.packbox span{display:block;color:var(--muted);font-size:.9rem}
@@ -632,49 +632,28 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
 .hdrlinks{display:flex!important;flex-wrap:wrap;align-items:center}.hdrlinks .modesw{margin-left:auto}.navtoggle{display:none}
 @media(max-width:640px){.navtoggle{display:block;font:700 1.15rem "Barlow Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.06em;background:none;border:0;color:var(--bg);padding:9px 14px;cursor:pointer}.hdrlinks{justify-content:space-between}.hdrlinks>a{display:none!important;width:100%}.hdrlinks.open>a{display:block!important}.hdrlinks .modesw{margin:4px 8px}}
 .latest{margin:28px 0 0}.latest h2{font:700 1.5rem var(--f-display);text-transform:uppercase;margin:0 0 10px}.lcards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.lcards a{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}.lcards img{width:100%;aspect-ratio:3/2;object-fit:cover}.lcards b{padding:0 10px}.lcards span{padding:0 10px 10px;color:var(--muted);font-size:.9rem}.lstory{max-width:760px;margin:0 0 14px;line-height:1.5}.lmore{display:inline-block;margin-top:10px;font-weight:600}@media(max-width:640px){.lcards{grid-template-columns:1fr}}
-.hero.pick{background:none!important;border:0!important;padding:0;color:var(--ink)}
-.pickq{font:700 2rem var(--f-display);text-transform:uppercase;margin:4px 0 12px;color:var(--ink)}.pickq span{color:var(--gold)}
-.pickboxes{display:grid;grid-template-columns:1fr 1fr;gap:14px}
-.pbox{position:relative;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;min-height:0;padding:14px 18px 18px;border:3px solid transparent;border-radius:12px;text-align:left;cursor:pointer;color:#fff;font:inherit;
-  background:linear-gradient(180deg,rgba(3,20,26,.05) 25%,rgba(3,20,26,.92) 100%),var(--img) center/cover no-repeat;transition:transform .15s,border-color .15s}
-.pbox:hover{transform:translateY(-2px);border-color:var(--gold)}.pbox.on{border-color:var(--gold);box-shadow:0 0 0 3px rgba(232,163,23,.25)}
-.pbox .pk{align-self:flex-start;background:var(--gold);color:#0B1D21;font:700 .85rem var(--f-display);letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:3px}
-.pbox .pt{font:700 1.5rem/1 var(--f-display);text-transform:uppercase;color:#fff}
-.pbox .pp{font-size:1rem;line-height:1.45;max-width:46ch;color:#E9F1F1}
-.pbox .pgo{font-weight:700;color:var(--gold);margin-top:4px}
-.hero.pick .herocta{margin-top:12px;display:flex;justify-content:center}
-@media(max-width:700px){.pickboxes{grid-template-columns:1fr}.pbox{min-height:0}.pbox .pt{font-size:1.7rem}.pickq{font-size:1.5rem}}
-.evmk{width:26px;height:26px;border-radius:50%;background:#fff;border:2px solid #11262B;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 1px 3px rgba(0,0,0,.35)}
-.pbox .pp{text-shadow:0 1px 2px rgba(0,0,0,.6)}.pickq{font-size:1.5rem!important}
-.tex-gravel{background:linear-gradient(90deg,rgba(20,14,8,.78),rgba(20,14,8,.35)),url(/img/tex-gravel.jpg) center/cover!important}
-.tex-tar{background:linear-gradient(90deg,rgba(0,0,0,.55),rgba(0,0,0,.15)),url(/img/tex-tarmac.jpg) center bottom/cover!important}
-.pbox .pp{font-size:.92rem;max-width:58ch}.pbox .pgo{color:#fff}
-.spstrip{display:none!important}
-.adrow{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:10px 0 4px;order:9;flex-basis:100%;width:100%}.adcard{display:flex;gap:14px;align-items:center;background:var(--panel);border:1px solid var(--line);border-left:5px solid var(--gold);border-radius:10px;padding:10px 14px 10px 10px;color:var(--ink);text-decoration:none;transition:border-color .15s}.adcard:hover{border-color:var(--gold)}.adcard img{width:92px;height:92px;object-fit:cover;border-radius:8px;flex:none;background:#fff}.adt{display:flex;flex-direction:column;gap:2px}.adt em{font:600 .7rem var(--f-body,sans-serif);font-style:normal;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.adt b{font:700 1.45rem/1.05 var(--f-display,"Barlow Condensed",sans-serif);text-transform:uppercase;color:var(--gold)}.adt span{font-size:.92rem}.adt i{font-style:normal;font-weight:700;margin-top:2px}
-@media(max-width:640px){.adrow{grid-template-columns:1fr}.adcard img{width:72px;height:72px}.adt b{font-size:1.2rem}}
-.pickq{text-align:center}
+.social .lcards a{position:relative}.social .src{position:absolute;top:8px;left:8px;background:var(--gold);color:#0B1D21;font:700 .7rem var(--f-body);padding:2px 6px;border-radius:3px;text-transform:uppercase}.social .lcards span.t{padding:0 10px 10px;color:var(--ink);font-size:.92rem}.social .lcards span.d{padding:10px 10px 0;color:var(--muted);font-size:.8rem}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <div><h1><a class="homelink" href="/" title="Home">OneTrackMind</a> <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><a class="byme" href="/about/"><img src="/img/ashley.jpg" alt="" width="40" height="40"><span><b>Built by Ashley.</b> 25 years at Ducati and KTM, now Alfas on a farm. Add your favourite routes, mark the places worth stopping.</span></a></div>
+    <div><h1><a class="homelink" href="/" title="Home">OneTrackMind</a> <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><a class="byme" href="/about/"><img src="/img/ashley.jpg" alt="" width="40" height="40"><span><b>Built by Ashley.</b> 25 years at Ducati and KTM, now Alfas on a farm. Add your favourite routes, mark the places worth stopping.</span></a></div>
     <div class="btns"><span class="lbl mono" id="hdrSummary"></span><button class="btn ghost" id="feedback" type="button">Send feedback</button><button class="btn" id="addBtn" type="button" hidden>+ Add yours</button><button class="btn ghost" id="reviewBtn" type="button" hidden>Review</button><button class="btn ghost" id="acctBtn" type="button" hidden>Sign in</button><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
-    <nav class="hdrlinks" id="sitenav" style="order:9" aria-label="Site"><button type="button" class="navtoggle" aria-expanded="false" aria-controls="sitenav">Menu ▾</button><a href="/" class="on" aria-current="page">Plan a trip</a><a href="/routes/">Routes</a><a href="/events/">Events</a><a href="/how-to/">How to</a><a href="/blog/">Blog</a><a href="/about/">About</a></nav><script>document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".navtoggle");if(!b)return;var n=b.closest(".hdrlinks"),o=n.classList.toggle("open");b.setAttribute("aria-expanded",String(o))});document.addEventListener("click",function(e){document.querySelectorAll(".navdd[open]").forEach(function(d){if(!d.contains(e.target))d.open=false;});});</script>
-    <div class="adrow"><a class="adcard" href="https://alterego.online/products/build-race-repeat-hoodie?utm_source=onetrackmind&utm_medium=sponsor&utm_content=hoodie" target="_blank" rel="noopener sponsored"><img src="https://alterego.online/cdn/shop/files/3158941636033974733_2048.jpg?v=1792398701&width=360" alt="AlterEgo Build Race Repeat hoodie" loading="lazy"><span class="adt"><em>AlterEgo · Ad</em><b>Build. Race. Repeat.</b><span>The hoodie, made to order for petrolheads. From $65.</span><i>Shop the hoodie ›</i></span></a><a class="adcard" href="https://alterego.online/products/racing-is-life?utm_source=onetrackmind&utm_medium=sponsor&utm_content=racing-is-life" target="_blank" rel="noopener sponsored"><img src="/img/ashley.jpg" alt="Ashley in the AlterEgo Racing is Life tee" loading="lazy" style="object-position:50% 40%"><span class="adt"><em>AlterEgo · Ad</em><b>Racing is life.</b><span>Everything else is preparation. The tee I wear in the garage.</span><i>Shop the tee ›</i></span></a></div>
-    <section class="hero pick" style="order:10" aria-label="What it does">
-      <h2 class="pickq">Two ways to go. <span>Which one's yours?</span></h2>
-      <div class="pickboxes">
-        <button type="button" class="pbox tex-gravel" data-pick="adventure" aria-pressed="false">
-          <span class="pk">Gravel · Adventure</span><b class="pt">Recce. Ride. Report.</b>
-          <span class="pp">For years I planned trips on and off road without really knowing what was around me, and rode straight past great places right under my nose. Plan the back roads with every pass, viewpoint and farm stall on the way, so you miss nothing.</span>
-          <span class="pgo">Plan an adventure ›</span></button>
-        <button type="button" class="pbox tex-tar" data-pick="motorsport" aria-pressed="false">
-          <span class="pk">Tar · Motorsport</span><b class="pt">Plan it. Book it. Ride it.</b>
-          <span class="pp">Same story at race weekends: a museum, a factory or a famous corner ten minutes away that I only heard about afterwards. Plan the trip around the race with every petrolhead stop near it, so you miss nothing.</span>
-          <span class="pgo">Plan a motorsport trip ›</span></button>
-      </div>
-      <div class="herocta"><button class="btn herobtn" type="button" data-tryroute id="tryBtn">Or try a finished trip: Swartberg Pass in 2 days ›</button></div>
+    <nav class="hdrlinks" id="sitenav" style="order:9" aria-label="Site"><button type="button" class="navtoggle" aria-expanded="false" aria-controls="sitenav">Menu ▾</button><a href="/" class="on" aria-current="page">Plan a trip</a><a href="/routes/">Routes</a><a href="/events/">Events</a><a href="/how-to/">How to</a><a href="/favourites/">Founder's fav's</a><a href="/about/">About</a></nav><script>document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".navtoggle");if(!b)return;var n=b.closest(".hdrlinks"),o=n.classList.toggle("open");b.setAttribute("aria-expanded",String(o))});document.addEventListener("click",function(e){document.querySelectorAll(".navdd[open]").forEach(function(d){if(!d.contains(e.target))d.open=false;});});</script>
+    <a class="spstrip" href="https://alterego.online/products/build-race-repeat-hoodie?utm_source=onetrackmind&utm_medium=sponsor" target="_blank" rel="noopener sponsored"><img src="https://alterego.online/cdn/shop/files/3158941636033974733_2048.jpg?v=1792398701&width=240" alt="" loading="lazy"><span><b>AlterEgo</b> Build Race Repeat hoodie, from $65 › <em>Ad</em></span></a>
+    <section class="hero" style="order:10" aria-label="What it does">
+      <button type="button" class="herotoggle" id="heroToggle" aria-expanded="true" title="Hide this">Hide ▴</button>
+      <h2 class="herohead">Plan it. Book it. <span>Ride it.</span></h2>
+      <p class="herosub">Forget BaseCamp and five different apps. Route a multi-day trip in minutes, sort your beds, then send it straight to your GPS, your bike's app or your phone and navigate from there.</p>
+      <ol class="herosteps">
+        <li><b>Route it in minutes</b><span>Real roads, graded for your bike, 4x4 or car. Fuel gaps, sunset and weather checked for every day.</span></li>
+        <li><b>Book your beds</b><span>Places to stay at every night stop. Pick one, book it, tick it off.</span></li>
+        <li><b>Load your GPS</b><span>One tap: the right GPX for Garmin, BMW, KTM, Ducati or Harley.</span></li>
+        <li><b>Or just ride with your phone</b><span>Each day opens in Google Maps or Waze. No GPS? No problem.</span></li>
+      </ol>
+      <a class="heroband" id="heroBand" href="/favourites/" hidden><b>Coming to Southern Africa?</b> <span>The trips I'd take you on: Namibia's Skeleton Coast and Epupa Falls, the Orange River, the Cape passes. Each one opens in the planner ›</span></a>
+      <div class="herocta"><button class="btn herobtn" type="button" data-tryroute id="tryBtn">Try a route: Swartberg Pass in 2 days ›</button><span>Opens a finished trip. Change anything, or tap New to plan your own.</span></div>
     </section>
   </header>
 
@@ -735,7 +714,8 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
       <div class="details" id="details"></div>
     </div>
   </div>
-  <section id="latest" class="latest" hidden><h2>How it started</h2><p class="lstory">Ducati taught me to ride the road. KTM taught me to live off it. In 2004 I took a KTM 950 Adventure, a paper map and a planning committee that mostly drank beer into Namibia, and I've been going back ever since. Then the Alfas arrived: a Stepnose first, then the hill climbs, then a racecar that wouldn't drive. Adventure and motorsport have had me ever since. OneTrackMind is where both live: the planner I wish I'd had, and the stories behind it. <a href="/about/">More about me ›</a></p><div class="lcards"></div><a class="lmore" href="/favourites/">All of Ashley's stories ›</a></section>
+  <section id="latest" class="latest" hidden><h2>How it started</h2><p class="lstory">My first trip into Namibia was in 2003 and I've been going back ever since. The trips got longer, the bikes got better and the breakdowns got more educational. A lap of the Nürburgring on a public Sunday, a desert rescue that turned into a lesson, Namibia again from the air conditioning of a car. OneTrackMind is where I put what I learnt, so you can plan the trip I wish I'd had. <a href="/about/">More about me ›</a></p><div class="lcards"></div><a class="lmore" href="/favourites/">All of Ashley's stories ›</a></section>
+<section id="social" class="latest social" hidden><h2>Lately</h2><div class="lcards"></div><span class="lmore"><a href="https://www.instagram.com/ashleybaud/" target="_blank" rel="noopener">Instagram ›</a></span></section>
 <aside class="nlbox"><b>Get the newsletter</b><span>New trips, events and how-to guides, about once a month. No spam.</span><form class="nlf" novalidate><input type="email" name="email" placeholder="Your email" autocomplete="email" aria-label="Your email" required><input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px"><button type="submit">Sign me up</button></form><span class="nlm" aria-live="polite"></span></aside>
   <script>(function(){document.querySelectorAll(".nlf").forEach(function(f){f.addEventListener("submit",function(e){e.preventDefault();var m=f.parentNode.querySelector(".nlm"),em=f.email.value.trim();if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)){m.textContent="That email doesn't look right.";return}m.textContent="Sending…";fetch("/api/subscribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:em,website:f.website.value,source:location.pathname})}).then(function(r){return r.json().then(function(j){return[r.ok,j]})}).then(function(x){if(x[0]){f.hidden=true;m.textContent=x[1].already?"You're already on the list.":"Almost done: tap the link in the email we just sent."}else m.textContent=x[1].error||"Something went wrong. Try again."}).catch(function(){m.textContent="No connection. Try again."})})})})();</script>
   <footer class="sitefoot">
@@ -979,7 +959,7 @@ const TYPES=[
   {id:"pass",n:"Mountain passes",c:"#6B4E9B",on:true},
   {id:"sight",n:"Sights & history",c:"#9A6A33",on:true},
   {id:"food",n:"Food & coffee",c:"#B3261E",on:false},
-  {id:"camp",n:"Campsites",c:"#1E8EB4",on:false}
+  {id:"camp",n:"Campsites",c:"#0F7B8A",on:false}
 ];
 const $=id=>document.getElementById(id);
 const esc=s=>String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
@@ -1296,7 +1276,7 @@ function contactHtml(t,place,town){
 
 /* ================= v4: plan by dates ================= */
 const TABS={fuel:"Fuel",stay:"Stay",food:"Food",sight:"Sights"};
-const DAYCOL=["#1E8EB4","#2F5BA8","#9A6A33","#6B4E9B","#B3261E","#00838F","#5D4037"];
+const DAYCOL=["#0F7B8A","#2F5BA8","#9A6A33","#6B4E9B","#B3261E","#00838F","#5D4037"];
 function ymd(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0");}
 function addDays(s,n){const d=new Date(s+"T12:00:00");d.setDate(d.getDate()+n);return ymd(d);}
 const dayName=k=>dayDate(k).toLocaleDateString("en-GB",{weekday:"short",day:"numeric",month:"short"});
@@ -2081,7 +2061,7 @@ function dayBody(k,noStops){
   return h;
 }
 // one category at a stop on the map: plain numbered dots matching the list; the name shows on hover or tap
-const CATCOL={fuel:"#1E8EB4",food:"#B3261E",stay:"#2F5BA8",sights:"#9A6A33",shop:"#6B4E9B",toilets:"#00838F",cash:"#2F5BA8",repair:"#5D4037"};
+const CATCOL={fuel:"#0F7B8A",food:"#B3261E",stay:"#2F5BA8",sights:"#9A6A33",shop:"#6B4E9B",toilets:"#00838F",cash:"#2F5BA8",repair:"#5D4037"};
 function catPins(list,c,k,j){
   const night=c==="stay"&&j===plan.days[k].pts.length-1&&k<nDays()-1;
   list.forEach((p,i)=>{ const nm=p.name||AV.find(a=>a[0]===c)[2];
@@ -2112,7 +2092,7 @@ function drawStopLayer(){
   const s=sc.jj>0&&!cat?seg(sc.a,sc.b):[];
   if(s.length>1) L.polyline(s.map(g=>[g.lat,g.lon]),{color:"#B26A00",weight:7}).addTo(layer);
   L.marker([sc.p.lat,sc.p.lon],{icon:dotIcon("#11262B",16)}).bindTooltip(sc.p.name,{permanent:true,direction:"right",offset:[10,0],className:"maplbl"}).addTo(layer);
-  const av=stopAvail(sc.p), col={fuel:"#1E8EB4",food:"#B3261E",stay:"#2F5BA8",sights:"#9A6A33",shop:"#6B4E9B",toilets:"#00838F",cash:"#2F5BA8",repair:"#5D4037"};
+  const av=stopAvail(sc.p), col={fuel:"#0F7B8A",food:"#B3261E",stay:"#2F5BA8",sights:"#9A6A33",shop:"#6B4E9B",toilets:"#00838F",cash:"#2F5BA8",repair:"#5D4037"};
   const shown=[]; AV.forEach(([c,ic])=>{ if(cat&&c!==cat) return; if(cat){ shown.push(...catPins(av[c],c,k,j)); return; } av[c].forEach(p=>{ shown.push(p); L.marker([p.lat,p.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:${col[c]}">${ic}</div>`,iconSize:[22,22],iconAnchor:[11,11]})}).bindTooltip(p.name||AV.find(a=>a[0]===c)[2]).addTo(layer); }); });
   const pts=[...s,...shown,sc.p].map(p=>[p.lat,p.lon]);
   if(!cat) map.setView([sc.p.lat,sc.p.lon],14); // the stop and what's around it
@@ -2316,7 +2296,7 @@ let startSeen="";
 function drawMap(){
   if(!window.L) return; ensureMap();
   if(!plan){ const s0=trip.start; if(s0&&s0.lat!=null){ L.marker([s0.lat,s0.lon],{icon:L.divIcon({className:"",html:`<div class="pin pstart">▶</div>`,iconSize:[28,28],iconAnchor:[14,14]})}).bindTooltip("Start: "+s0.name,{permanent:true,direction:"right",offset:[14,0],className:"maplbl"}).addTo(layer);
-      const key=s0.lat+","+s0.lon; if(startSeen!==key){ startSeen=key; map.setView([s0.lat,s0.lon],9,{animate:false}); } } try{ if(ui.lay.fav&&typeof drawFavs==="function") drawFavs(); }catch(e){} try{ if(typeof drawEvents==="function") drawEvents(); }catch(e){} return; }
+      const key=s0.lat+","+s0.lon; if(startSeen!==key){ startSeen=key; map.setView([s0.lat,s0.lon],9,{animate:false}); } } try{ if(ui.lay.fav&&typeof drawFavs==="function") drawFavs(); }catch(e){} return; }
   townLabels();
   const sel=ui.tab==="ov"?null:plan.days[ui.tab];
   const hl=sel?null:ovHi;
@@ -2327,7 +2307,6 @@ function drawMap(){
   if(ui.lay.rep&&typeof drawReports==="function") drawReports(sel);
   if(ui.lay.spots&&typeof drawSpots==="function") drawSpots();
   try{ if(ui.lay.fav&&typeof drawFavs==="function") drawFavs(); }catch(e){} // an extra layer must never stop the route
-  try{ if(typeof drawEvents==="function") drawEvents(); }catch(e){}
   if(panel){ drawPanelLayer(); return; }
   if(stopFocus&&sel&&stopFocus.k===ui.tab&&drawStopLayer()) return;
   if(ovFocus&&(!sel||ovFocus.k===ui.tab)&&drawOvLayer()) return;
@@ -2348,11 +2327,11 @@ function drawMap(){
     m.on("click",()=>{ const k=trip.days.findIndex((d,i)=>plan.days[i]&&plan.days[i].pts.includes(p)&&(sel?i===ui.tab:true)); if(k<0) return; const j=plan.days[k].pts.indexOf(p); ui.tab=k; stopFocus={k,j}; saveUi(); renderAll(); });
   });
   if(fp&&ui.lay.fuel){
-    fuelStations.filter(f=>inR(f)&&f.off<=2).forEach(f=>L.marker([f.lat,f.lon],{icon:dotIcon("#1E8EB4",10,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
+    fuelStations.filter(f=>inR(f)&&f.off<=2).forEach(f=>L.marker([f.lat,f.lon],{icon:dotIcon("#0F7B8A",10,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
     const stopsHere=townPoints(), gapsOn=(fp.days||[]).flatMap(d=>d?d.probs:[]);
     const ftowns=stopTowns().filter(t=>t.fuel&&t.off>2&&inR(t)&&!stopsHere.some(p=>hav(p,t)<3)&&gapsOn.some(g=>t.km>=g.from-5&&t.km<=g.to+5)), lbl=sel&&ftowns.length<=8;
     if(sel||plan.days.filter(Boolean).length===1) ftowns.forEach(t=>{ const k=plan.days.findIndex(d=>d&&t.km>=d.a-1&&t.km<=d.b+1); if(k<0) return;
-      L.marker([t.lat,t.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:#1E8EB4">⛽</div>`,iconSize:[22,22],iconAnchor:[11,11]})})
+      L.marker([t.lat,t.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:#0F7B8A">⛽</div>`,iconSize:[22,22],iconAnchor:[11,11]})})
         .bindTooltip(t.name,lbl?{permanent:true,direction:"right",offset:[12,0],className:"maplbl"}:{})
         .bindPopup(`<b>${esc(t.name)}</b><br>${Math.round(t.off)} km off the route${t.food?" · food":""}<br><button class="btn small" type="button" data-addtown="${k}|${esc(t.name)}|${t.lat}|${t.lon}">Add as a stop</button>`).addTo(layer); });
   }
@@ -2362,7 +2341,7 @@ function drawMap(){
   if(ui.lay.stay) stays.forEach(s=>{ const k=trip.days.findIndex((d,i)=>d.to===s.night&&i<nDays()-1); if(k<0) return; const n=s.places.filter(p=>stayMatch(p,stayTypeOf(k))).length; if(!n||(trip.days[k].to&&trip.days[k].to.stay)) return;
     L.marker([s.night.lat,s.night.lon],{icon:L.divIcon({className:"",html:`<div class="staybadge" title="${n} places to stay. Tap to see them">🛏 ${n}</div>`,iconSize:[54,24],iconAnchor:[-14,30]}),zIndexOffset:900}).on("click",()=>map.setView([s.night.lat,s.night.lon],14)).addTo(layer); });
   if(ui.lay.stay) stays.forEach(s=>{ const k=trip.days.findIndex((d,i)=>d.to===s.night&&i<nDays()-1); if(k<0) return; s.places.filter(p=>stayMatch(p,stayTypeOf(k))).forEach(p=>{ const on=trip.days[k].to&&trip.days[k].to.stay&&trip.days[k].to.name===p.name&&hav(p,trip.days[k].to)<0.1;
-    L.marker([p.lat,p.lon],{icon:dotIcon(on?"#1E8EB4":"#2F5BA8",on?13:9)}).bindTooltip(p.name).bindPopup(`<b>${esc(p.name)}</b><br><span class="note">${esc((p.tags.tourism||"").replace(/_/g," "))}</span><br>${on?`<span class="okt">✓ Your stay, ${esc(dayName(k))}</span>`:`<button class="btn small" type="button" data-staynight="${k}:${esc(p.id)}">Stay here, ${esc(dayName(k))}</button>`}`).addTo(layer); }); });
+    L.marker([p.lat,p.lon],{icon:dotIcon(on?"#0F7B8A":"#2F5BA8",on?13:9)}).bindTooltip(p.name).bindPopup(`<b>${esc(p.name)}</b><br><span class="note">${esc((p.tags.tourism||"").replace(/_/g," "))}</span><br>${on?`<span class="okt">✓ Your stay, ${esc(dayName(k))}</span>`:`<button class="btn small" type="button" data-staynight="${k}:${esc(p.id)}">Stay here, ${esc(dayName(k))}</button>`}`).addTo(layer); }); });
   if(!focusR){ const g=sel?seg(sel.a,sel.b):plan.geom; if(g.length>1&&(window._refit||sel||lastSel!==ui.tab)){map.fitBounds(L.latLngBounds(g.map(x=>[x.lat,x.lon])),{padding:[24,24]});} if(!planStale) window._refit=false; lastSel=ui.tab; }
 }
 function drawPanelLayer(){
@@ -2370,7 +2349,7 @@ function drawPanelLayer(){
   const s=sc.jj>0?seg(sc.a,sc.b):[];
   if(s.length>1) L.polyline(s.map(g=>[g.lat,g.lon]),{color:"#B26A00",weight:7}).addTo(layer);
   L.marker([sc.p.lat,sc.p.lon],{icon:dotIcon("#11262B",16)}).bindTooltip(sc.p.name).addTo(layer);
-  const col={fuel:"#1E8EB4",stay:"#2F5BA8",food:"#B3261E",sight:"#9A6A33"}[tab], items=panelItems(k,j,tab);
+  const col={fuel:"#0F7B8A",stay:"#2F5BA8",food:"#B3261E",sight:"#9A6A33"}[tab], items=panelItems(k,j,tab);
   items.forEach(p=>L.marker([p.lat,p.lon],{icon:dotIcon(tab==="sight"?(TYPES.find(t=>t.id===p.kind)?.c||col):col,11,tab==="fuel")}).bindTooltip(p.name||"Fuel").addTo(layer));
   const pts=[...s,...items,sc.p].map(p=>[p.lat,p.lon]);
   if(tab==="stay"||sc.jj===0) map.setView([sc.p.lat,sc.p.lon],12); else if(pts.length>1) map.fitBounds(L.latLngBounds(pts),{padding:[30,30]});
@@ -2892,7 +2871,7 @@ document.addEventListener("change",async e=>{ const c=e.target.closest&&e.target
 const GRADES=[
   {g:0,short:"?",name:"Surface unknown",text:"The map doesn't say what this road is. Often gravel in the countryside.",col:"#C9CEC5"},
   {g:1,short:"Race",name:"Race",text:"Tar and smooth roads. Any car, any bike.",col:"#7A847D"},
-  {g:2,short:"Pre-jeep",name:"Pre-jeep",text:"Graded gravel and good dirt roads. Fine in any car, cruising on a bike.",col:"#E8A317"},
+  {g:2,short:"Pre-jeep",name:"Pre-jeep",text:"Graded gravel and good dirt roads. Fine in any car, cruising on a bike.",col:"#F2C500"},
   {g:3,short:"Jeep",name:"Jeep",text:"Rough tracks: corrugations, loose stones, ruts. Slow in a car, clearance helps; fun on a bike.",col:"#D9702B"},
   {g:4,short:"Pre-single",name:"Pre-single",text:"Rocks, steep climbs, sand, river crossings. 4x4 (low range at times) or an adventure bike. Not for cars.",col:"#B3261E"},
   {g:5,short:"Single",name:"Single",text:"Bike-only single track or serious 4x4 terrain. Experienced riders and drivers only.",col:"#2A0F0D"},
@@ -3469,7 +3448,7 @@ let near=null; // {lat,lon,name}
 const nearRad=()=>+$("nearRad").value||100;
 try{ const r=localStorage.getItem("otm-nearrad"); if(r) $("nearRad").value=r; }catch(e){}
 function nearCountries(c,km){ const d=km/111; return Object.entries(COUNTRY_BOX).filter(([,b])=>!(b[0]>c.lat+d||b[2]<c.lat-d||b[1]>c.lon+d*1.3||b[3]<c.lon-d*1.3)).map(([cc])=>cc); }
-const NK={fuel:["fuel","⛽","#1E8EB4"],sleep:["stay","🛏","#2F5BA8"],camp:["stay","⛺","#2F5BA8"],food:["food","🍴","#B3261E"],pass:["sights","⛰","#5D4037"],view:["sights","👁","#6B4E9B"],sight:["sights","★","#6B4E9B"],med:["med","🏥","#B3261E"]};
+const NK={fuel:["fuel","⛽","#0F7B8A"],sleep:["stay","🛏","#2F5BA8"],camp:["stay","⛺","#2F5BA8"],food:["food","🍴","#B3261E"],pass:["sights","⛰","#5D4037"],view:["sights","👁","#6B4E9B"],sight:["sights","★","#6B4E9B"],med:["med","🏥","#B3261E"]};
 let nearData=null, nearKey="";
 async function loadNear(){
   const c=near, R=nearRad(), key=[c.lat,c.lon,R].join(); if(key===nearKey&&nearData) return nearData; nearKey=key;
@@ -3500,7 +3479,7 @@ async function drawNear(){
   const list=d.places.filter(p=>ui.lay[NK[p.ico][0]]&&(p.ico==="pass"||z>=9)&&b.contains([p.lat,p.lon])).sort((a,b2)=>a.d-b2.d).slice(0,p0(lim));
   list.forEach(p=>{ const [,ic,col]=NK[p.ico];
     L.marker([p.lat,p.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:${col}">${ic}</div>`,iconSize:[22,22],iconAnchor:[11,11]})}).bindTooltip(p.name||KIND_NAME[p.kind]||"Place").on("click",()=>openInfoFor(p,{dist:`${Math.round(p.d)} km from ${c.name}`,town:"",actions:nearActions(p)})).addTo(nearLayer); });
-  d.routes.forEach(({r,at,d:dd})=>{ L.marker([at.lat,at.lon],{icon:L.divIcon({className:"",html:`<div class="pin pstart" style="background:#E8A317;color:#11262B">↝</div>`,iconSize:[26,26],iconAnchor:[13,13]}),zIndexOffset:1500}).bindTooltip(r.title)
+  d.routes.forEach(({r,at,d:dd})=>{ L.marker([at.lat,at.lon],{icon:L.divIcon({className:"",html:`<div class="pin pstart" style="background:#F2C500;color:#11262B">↝</div>`,iconSize:[26,26],iconAnchor:[13,13]}),zIndexOffset:1500}).bindTooltip(r.title)
     .on("click",()=>openInfoFor({lat:at.lat,lon:at.lon,name:r.title,kind:"route",tags:{}},{dist:`${r.region} · ${r.trip.days.length} day${r.trip.days.length>1?"s":""}${r.founder?" · ridden by the founder":""} · ${Math.round(dd)} km away`,actions:[{label:"Open this route",fn:()=>{ nearOff(); openPick(r); }}]})).addTo(nearLayer); });
   const nP=d.places.filter(p=>p.ico==="pass").length;
   $("nsCount").textContent=`${d.routes.length} route${d.routes.length===1?"":"s"} · ${nP} pass${nP===1?"":"es"}${d.ccs.length?"":" · passes and places for South Africa and Namibia so far"}${z<9?" · zoom in for more":""}`;
@@ -3695,6 +3674,11 @@ document.addEventListener("click",e=>{ if(e.target.closest&&e.target.closest("[d
 /* "Stories from the road": the three newest blog posts with photos, built into data/latest.json at deploy time */
 fetch("/data/latest.json").then(r=>r.ok?r.json():[]).then(L=>{ const s=$("latest"); if(!s||!L.length) return;
   s.querySelector(".lcards").innerHTML=L.map(x=>`<a href="${esc(x.url)}"><img src="${esc(x.cover)}" alt="" loading="lazy"><b>${esc(x.title)}</b><span>${esc(x.hook||"")}</span></a>`).join(""); s.hidden=false; }).catch(()=>{});
+
+/* "Lately": the newest Instagram and Facebook posts, pulled daily into data/social.json */
+fetch("/data/social.json").then(r=>r.ok?r.json():[]).then(L=>{ const s=$("social"); if(!s||!L.length) return;
+  const cut=t=>{ const f=t.split(/\n+/)[0]; return f.length>140?f.slice(0,137).replace(/\s+\S*$/,"")+"…":f; };
+  s.querySelector(".lcards").innerHTML=L.slice(0,3).map(x=>`<a href="${esc(x.url)}" target="_blank" rel="noopener"><img src="${esc(x.img)}" alt="" loading="lazy"><em class="src">${x.src==="ig"?"Instagram":"Facebook"}</em><span class="d">${esc(new Date(x.date).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}))}</span><span class="t">${esc(cut(x.text))}</span></a>`).join(""); s.hidden=false; }).catch(()=>{});
 
 /* ---------- Draw: technical riders build the day point to point on the map ----------
    Each tap adds the next point at the end of the day (before its night stop or finish), in the order tapped.
@@ -3962,35 +3946,5 @@ document.addEventListener("click",e=>{
   const sr=t.closest("[data-selstop]"); if(sr&&!t.closest("button,a,input,select,details,label")){ const [k,j]=sr.dataset.selstop.split(":").map(Number); selStop={k,j}; ovFocus=null;
     renderAll(); const p=plan&&plan.days[k]&&plan.days[k].pts[j]; if(p&&map) map.setView([p.lat,p.lon],Math.max(11,Math.min(map.getZoom(),13))); return; }
 });
-
-/* ---------- Adventure or Motorsport: the two boxes at the top ----------
-   Adventure: the road less travelled. Motorsport: the quick way, with tracks, museums, factories and upcoming events on the map.
-   The rider's own route style in Settings always wins. The choice is remembered on this device. */
-var pickMode=null, evList=null;
-function loadEvents(){ return evList?Promise.resolve(evList):fetch("/data/events/events.json").then(r=>r.ok?r.json():[]).then(j=>{ const t=new Date().toISOString().slice(0,10), y=new Date(Date.now()+365*864e5).toISOString().slice(0,10); return evList=j.filter(e=>e.end>=t&&e.start<=y); }).catch(()=>evList=[]); }
-function drawEvents(){
-  if(pickMode!=="motorsport") return;
-  if(!evList){ setTimeout(()=>loadEvents().then(()=>{ if(evList.length) drawMap(); }),0); return; }
-  const g=plan&&plan.geom, near=x=>{ if(!g) return true; for(let i=0;i<g.length;i+=Math.max(1,Math.floor(g.length/1500))) if(Math.abs(g[i].lat-x.lat)<1.2&&hav(g[i],x)<=100) return true; return false; };
-  const seen=new Set();
-  evList.filter(near).forEach(x=>{ const k=x.lat.toFixed(2)+","+x.lon.toFixed(2); if(seen.has(k)) return; seen.add(k);
-    const html=`<b>${esc(x.name)}</b><br><span class="note">${esc(x.start)}${x.end!==x.start?" to "+esc(x.end):""} · ${esc(x.venue||x.city||"")}</span><br><a href="/events/">All events</a> · <button type="button" class="linkbtn" data-evgo="${esc(x.id)}">Go here</button>`;
-    L.marker([x.lat,x.lon],{icon:L.divIcon({className:"",html:`<div class="evmk" title="${esc(x.name)}">🏁</div>`,iconSize:[26,26],iconAnchor:[13,13]}),zIndexOffset:650}).bindTooltip(x.name).bindPopup(html).addTo(layer); });
-}
-document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-evgo]"); if(!b) return; const x=(evList||[]).find(f=>f.id===b.dataset.evgo); if(!x) return; map.closePopup(); setFinish(pt(x.venue||x.name,x.lat,x.lon)); });
-function setPick(md,user){
-  pickMode=md==="motorsport"?"motorsport":"adventure"; try{ localStorage.setItem("otm-pick",pickMode); }catch(e){}
-  document.documentElement.setAttribute("data-pick",pickMode);
-  document.querySelectorAll(".pbox").forEach(b=>{ const on=b.dataset.pick===pickMode; b.classList.toggle("on",on); b.setAttribute("aria-pressed",String(on)); });
-  if(!user) return;
-  let reroute=false;
-  if(!settings.styleSet){ const want=pickMode==="motorsport"?"tar":"rough"; if(settings.style!==want){ settings.style=want; if($("style")) $("style").value=want; store.set("rr2-settings",settings); showStyle(); reroute=true; } }
-  if(pickMode==="motorsport"){ ui.lay.fav=true; }
-  try{ reroute&&trip.start&&trip.start.lat!=null?recalc():drawMap(); }catch(e){}
-  const t=$("toast"); if(t){ t.innerHTML=pickMode==="motorsport"?"<b>Motorsport:</b> the quick way, with tracks, museums, factories and upcoming events on the map. Set where you start and where you're going.":"<b>Adventure:</b> the road less travelled, graded for what you ride. Set where you start and where you're going."; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,9000); }
-  const mp=$("map"); if(mp) mp.scrollIntoView({behavior:"smooth",block:"start"});
-}
-document.querySelectorAll(".pbox").forEach(b=>b.addEventListener("click",()=>setPick(b.dataset.pick,true)));
-{ let s=null; try{ s=localStorage.getItem("otm-pick"); }catch(e){} if(s) setPick(s,false); }
 
 </script></body></html>

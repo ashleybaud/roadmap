@@ -50,3 +50,8 @@ document.addEventListener("click",e=>{ if(e.target.closest&&e.target.closest("[d
 /* "Stories from the road": the three newest blog posts with photos, built into data/latest.json at deploy time */
 fetch("/data/latest.json").then(r=>r.ok?r.json():[]).then(L=>{ const s=$("latest"); if(!s||!L.length) return;
   s.querySelector(".lcards").innerHTML=L.map(x=>`<a href="${esc(x.url)}"><img src="${esc(x.cover)}" alt="" loading="lazy"><b>${esc(x.title)}</b><span>${esc(x.hook||"")}</span></a>`).join(""); s.hidden=false; }).catch(()=>{});
+
+/* "Lately": the newest Instagram and Facebook posts, pulled daily into data/social.json */
+fetch("/data/social.json").then(r=>r.ok?r.json():[]).then(L=>{ const s=$("social"); if(!s||!L.length) return;
+  const cut=t=>{ const f=t.split(/\n+/)[0]; return f.length>140?f.slice(0,137).replace(/\s+\S*$/,"")+"…":f; };
+  s.querySelector(".lcards").innerHTML=L.slice(0,3).map(x=>`<a href="${esc(x.url)}" target="_blank" rel="noopener"><img src="${esc(x.img)}" alt="" loading="lazy"><em class="src">${x.src==="ig"?"Instagram":"Facebook"}</em><span class="d">${esc(new Date(x.date).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"}))}</span><span class="t">${esc(cut(x.text))}</span></a>`).join(""); s.hidden=false; }).catch(()=>{});
