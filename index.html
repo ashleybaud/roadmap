@@ -4017,13 +4017,15 @@ document.addEventListener("click",e=>{
    Adventure: the road less travelled. Motorsport: the quick way, with tracks, museums, factories and upcoming events on the map.
    The rider's own route style in Settings always wins. The choice is remembered on this device. */
 var pickMode=null, evList=null;
+const mySeries=()=>{ try{ return JSON.parse(localStorage.getItem("otm-series")||"[]"); }catch(e){ return []; } };
 function loadEvents(){ return evList?Promise.resolve(evList):fetch("/data/events/events.json").then(r=>r.ok?r.json():[]).then(j=>{ const t=new Date().toISOString().slice(0,10), y=new Date(Date.now()+365*864e5).toISOString().slice(0,10); return evList=j.filter(e=>e.end>=t&&e.start<=y); }).catch(()=>evList=[]); }
 function drawEvents(){
   if(pickMode!=="motorsport") return;
   if(!evList){ setTimeout(()=>loadEvents().then(()=>{ if(evList.length) drawMap(); }),0); return; }
   const g=plan&&plan.geom, near=x=>{ if(!g) return true; for(let i=0;i<g.length;i+=Math.max(1,Math.floor(g.length/1500))) if(Math.abs(g[i].lat-x.lat)<1.2&&hav(g[i],x)<=100) return true; return false; };
   const seen=new Set();
-  evList.filter(near).forEach(x=>{ const k=x.lat.toFixed(2)+","+x.lon.toFixed(2); if(seen.has(k)) return; seen.add(k);
+  const my=mySeries();
+  evList.filter(near).filter(x=>!my.length||my.includes(x.series)).forEach(x=>{ const k=x.lat.toFixed(2)+","+x.lon.toFixed(2); if(seen.has(k)) return; seen.add(k);
     const html=`<b>${esc(x.name)}</b><br><span class="note">${esc(x.start)}${x.end!==x.start?" to "+esc(x.end):""} · ${esc(x.venue||x.city||"")}</span><br><a href="/events/">All events</a> · <button type="button" class="linkbtn" data-evgo="${esc(x.id)}">Go here</button>`;
     L.marker([x.lat,x.lon],{icon:L.divIcon({className:"",html:`<div class="evmk" title="${esc(x.name)}">🏁</div>`,iconSize:[26,26],iconAnchor:[13,13]}),zIndexOffset:650}).bindTooltip(x.name).bindPopup(html).addTo(layer); });
 }
@@ -4052,7 +4054,7 @@ document.querySelectorAll(".pbox").forEach(b=>b.addEventListener("click",()=>set
 
 /* Next races in the top banner */
 loadEvents().then(L=>{ const u=$("evNext"); if(!u) return; const t=new Date().toISOString().slice(0,10), fmt=d=>new Date(d+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short"});
-  u.innerHTML=L.filter(e=>e.start>=t).slice(0,4).map(e=>`<li><a href="/?ev=${esc(e.id)}"><b>${esc(e.name)}</b><span>${fmt(e.start)}${e.end!==e.start?"–"+fmt(e.end):""} · ${esc(e.country||"")}</span></a></li>`).join(""); });
+  const my=mySeries(); u.innerHTML=L.filter(e=>e.start>=t).sort((a,b)=>(my.includes(b.series)-my.includes(a.series))||a.start.localeCompare(b.start)).slice(0,4).map(e=>`<li><a href="/events/${esc(e.id)}/"><b>${esc(e.name)}</b><span>${fmt(e.start)}${e.end!==e.start?"–"+fmt(e.end):""} · ${esc(e.country||"")}</span></a></li>`).join(""); });
 
 /* On your dates: races and festivals near the route while you're travelling (Motorsport looks further afield) */
 var evDatesAsked=false;

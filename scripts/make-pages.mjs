@@ -119,6 +119,8 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
 .aboutlink{display:inline-flex;align-items:center;gap:6px;margin-left:auto;font-weight:700;text-decoration:none;color:var(--gold)}.aboutlink img{width:28px;height:28px;border-radius:50%;object-fit:cover;object-position:50% 12%;border:2px solid var(--gold)}
 
 body.blogdark{--bg:#06303F;--panel:#0B3E50;--line:#1E5A70;--chip:#0E4A60;background:#06303F}
+
+.evc b a{color:inherit;text-decoration:none}.evc b a:hover{color:var(--gold)}.follow{align-self:flex-start;background:none;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:.75rem;padding:1px 8px;cursor:pointer}.follow.on{border-color:var(--gold);color:var(--gold)}.chips .mine{border-color:var(--gold)}.evpage .evwhen{font-size:1.1rem}.evpage .evcta{margin:10px 0 14px;gap:8px;display:flex;flex-wrap:wrap}.evsec{margin:22px 0}.evsec h3{font:700 1.05rem var(--f-display,"Barlow Condensed",sans-serif);text-transform:uppercase;margin:12px 0 4px}
 `;
 
 function page({ url, title, desc, body, ld, image, active, ads = true, dark = false }) {
@@ -545,21 +547,62 @@ list();})();</script>`;
 }
 
 const EVENTS = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data/events/events.json"), "utf8")); } catch (e) { return []; } })();
+
+const WATCH = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data/events/watch.json"), "utf8")); } catch (e) { return {}; } })();
+const RESULTS = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data/events/results.json"), "utf8")); } catch (e) { return {}; } })();
+const hav2 = (a, b) => { const R = 6371, dLa = (b.lat - a.lat) * Math.PI / 180, dLo = (b.lon - a.lon) * Math.PI / 180, x = Math.sin(dLa / 2) ** 2 + Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) * Math.sin(dLo / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(x)); };
+const MON3 = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const dRange = e => { const a = new Date(e.start + "T12:00:00Z"), b = new Date(e.end + "T12:00:00Z"), f = (d, y) => `${d.getUTCDate()} ${MON3[d.getUTCMonth()]}${y ? " " + d.getUTCFullYear() : ""}`; return e.start === e.end ? f(a, 1) : `${f(a)} – ${f(b, 1)}`; };
+function eventPage(e) {
+  const w = WATCH[e.series] || {}, res = RESULTS[e.id];
+  const near = FAV.filter(f => hav2(e, f) <= 150).map(f => ({ f, d: hav2(e, f) })).sort((a, b) => a.d - b.d).slice(0, 6);
+  const sameTime = EVENTS.filter(x => x.id !== e.id && x.end >= e.start && x.start <= e.end && hav2(e, x) <= 400).slice(0, 5);
+  const routes = live.filter(r => r.trip && r.trip.start && hav2(e, r.trip.start) <= 250).slice(0, 3);
+  const city = e.city || e.venue || e.name;
+  const map = `<div id="evmap" class="tripmap" style="height:300px" role="img" aria-label="Map: ${esc(e.venue || city)}"></div>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>(function(){var m=L.map("evmap",{scrollWheelZoom:false}).setView([${e.lat},${e.lon}],11);L.tileLayer("https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png",{maxZoom:18,attribution:'&copy; Stadia Maps &copy; OpenMapTiles &copy; OpenStreetMap'}).addTo(m);L.circleMarker([${e.lat},${e.lon}],{radius:10,color:"#11262B",weight:3,fillColor:"#E8A317",fillOpacity:1}).bindTooltip(${JSON.stringify(e.venue || city).replace(/</g, "\\u003c")},{permanent:true,direction:"right"}).addTo(m);})();</script>`;
+  const body = `<main class="evpage">
+<p class="note"><a href="/events/">Events</a> · ${esc(e.series || "")}</p>
+<h1>${esc(e.name)}</h1>
+<p class="evwhen"><b>${dRange(e)}</b>${e.confirmed ? "" : ' <em class="unc">dates unconfirmed</em>'} · ${esc(e.venue || "")}${e.city ? ", " + esc(e.city) : ""}${e.country ? ", " + esc(e.country) : ""} <span class="evcount" data-start="${e.start}" data-end="${e.end}"></span></p>
+<div class="btns evcta"><a class="cta" href="/?ev=${esc(e.id)}">Plan the road trip there ›</a>${e.tickets ? ` <a class="cta ghost" href="${esc(e.tickets)}" target="_blank" rel="noopener sponsored">Tickets ›</a>` : ""} <a class="cta ghost" href="${esc(e.url || e.source)}" target="_blank" rel="noopener">Official site ›</a></div>
+${map}
+<section class="evsec"><h2>How to watch</h2>${w.watch && w.watch.length ? `<ul>${w.watch.map(x => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.label)} ›</a></li>`).join("")}</ul>${w.note ? `<p class="note">${esc(w.note)}</p>` : ""}` : `<p class="note">Check the <a href="${esc(e.url || e.source)}" target="_blank" rel="noopener">official site</a> for live streams and TV.</p>`}</section>
+<section class="evsec"><h2>Results</h2>${res && res.podium ? `<ol>${res.podium.map(p => `<li>${esc(p)}</li>`).join("")}</ol><p class="note">From <a href="${esc(res.source)}" target="_blank" rel="noopener">the official results</a>.</p>` : res && res.link ? `<p><a href="${esc(res.link)}" target="_blank" rel="noopener">Results are in ›</a></p>` : `<p class="note">${w.results ? `Results go up <a href="${esc(w.results)}" target="_blank" rel="noopener">here</a> once it has run.` : "Results appear here once it has run."}</p>`}</section>
+<section class="evsec"><h2>Getting there</h2><ul>
+<li><a href="https://www.google.com/travel/flights?q=${encodeURIComponent("Flights to " + city)}" target="_blank" rel="noopener">Flights to ${esc(city)} ›</a></li>
+<li><a href="https://www.discovercars.com/?a_aid=onetrackmind" target="_blank" rel="noopener sponsored">Hire a car near ${esc(city)} ›</a></li>
+<li><a href="https://www.booking.com/searchresults.html?latitude=${e.lat}&longitude=${e.lon}&radius=30&checkin=${addDays(e.start, -1)}&checkout=${addDays(e.end, 1)}" target="_blank" rel="noopener sponsored">Beds near the venue for those dates ›</a></li>
+</ul><p class="note">Beds near big events go early. Book first, then plan the road trip around them.</p></section>
+${near.length || sameTime.length || routes.length ? `<section class="evsec"><h2>Make a trip of it</h2>
+${sameTime.length ? `<h3>Also on that week</h3><ul>${sameTime.map(x => `<li><a href="/events/${esc(x.id)}/">${esc(x.name)}</a> · ${dRange(x)} · ${Math.round(hav2(e, x))} km away</li>`).join("")}</ul>` : ""}
+${near.length ? `<h3>Worth a stop nearby</h3><ul>${near.map(({ f, d }) => `<li><a href="/favourites/${esc(f.id)}/">${esc(f.name)}</a> · ${Math.round(d)} km</li>`).join("")}</ul>` : ""}
+${routes.length ? `<h3>Ride or drive it</h3><ul>${routes.map(r => `<li><a href="/routes/${esc(r.id)}/">${esc(r.title)}</a></li>`).join("")}</ul>` : ""}
+<p class="note">In the planner, turn on 🏁 Petrolhead and tap Near me for every museum, track and car place around the venue.</p></section>` : ""}
+<p class="note">Dates and details come from the organiser and are checked every week. Always confirm on the <a href="${esc(e.url || e.source)}" target="_blank" rel="noopener">official site</a> before you book.</p>
+</main>
+<script>(function(){var s=document.querySelector(".evcount");if(!s)return;var t=new Date();t.setHours(12,0,0,0);var a=new Date(s.dataset.start+"T12:00:00"),b=new Date(s.dataset.end+"T12:00:00"),d=Math.round((a-t)/864e5);s.textContent=t>b?"· finished":t>=a?"· on now":d===1?"· tomorrow":"· in "+d+" days";})();</script>`;
+  const ld = { "@context": "https://schema.org", "@type": "SportsEvent", name: e.name, startDate: e.start, endDate: e.end, url: `${SITE}/events/${e.id}/`, location: { "@type": "Place", name: e.venue || city, geo: { "@type": "GeoCoordinates", latitude: e.lat, longitude: e.lon }, address: { "@type": "PostalAddress", addressLocality: e.city, addressCountry: e.country } } };
+  return page({ active: "/events/", url: `/events/${e.id}/`, title: `${e.name} ${e.start.slice(0, 4)}: dates, how to watch, tickets and road trip · OneTrackMind`, desc: `${e.name}, ${dRange(e)}${e.venue ? " at " + e.venue : ""}. How to watch live, tickets, beds near the venue and the road trip there.`, body, ld });
+}
+function addDays(s, n) { const d = new Date(s + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); }
 function eventsPage() {
   const today = new Date().toISOString().slice(0, 10);
   const L = EVENTS.filter(e => e.end >= today);
   const CAT = [["all", "All"], ["f1", "F1"], ["bikes", "Bikes"], ["us", "NASCAR, IndyCar, AMA"], ["endurance", "Endurance and 24 hours"], ["rally", "Rally and Dakar"], ["festival", "Festivals and classics"], ["sa", "South Africa"], ["offroad", "Off-road"]].filter(([k]) => k === "all" || L.some(e => e.category === k));
   const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
   const rng = e => { const a = new Date(e.start + "T12:00:00Z"), b = new Date(e.end + "T12:00:00Z"); const f = (d, y) => `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()].slice(0, 3)}${y ? " " + d.getUTCFullYear() : ""}`; return e.start === e.end ? f(a, 1) : a.getUTCMonth() === b.getUTCMonth() ? `${a.getUTCDate()}–${f(b, 1)}` : `${f(a)} – ${f(b, 1)}`; };
-  const card = e => `<div class="card evc" data-cat="${esc(e.category)}"><b>${esc(e.name)}</b><span class="evd">${rng(e)}${e.confirmed ? "" : ' <em class="unc">dates unconfirmed</em>'}</span><span class="area">${esc(e.venue || "")}${e.city ? ", " + esc(e.city) : ""}${e.country ? " · " + esc(e.country) : ""}</span><span class="evl"><a href="${esc(e.url || e.source)}" target="_blank" rel="noopener">Official site ›</a>${e.tickets ? ` <a href="${esc(e.tickets)}" target="_blank" rel="noopener sponsored">Tickets ›</a>` : ""} <a href="/?ev=${esc(e.id)}">Plan the road trip ›</a></span></div>`;
+  const card = e => `<div class="card evc" data-cat="${esc(e.category)}" data-series="${esc(e.series || "")}"><b><a href="/events/${esc(e.id)}/">${esc(e.name)}</a></b><button type="button" class="follow" data-series="${esc(e.series || "")}" title="Follow ${esc(e.series || "")}">☆ ${esc(e.series || "")}</button><span class="evd">${rng(e)}${e.confirmed ? "" : ' <em class="unc">dates unconfirmed</em>'}</span><span class="area">${esc(e.venue || "")}${e.city ? ", " + esc(e.city) : ""}${e.country ? " · " + esc(e.country) : ""}</span><span class="evl"><a href="${esc(e.url || e.source)}" target="_blank" rel="noopener">Official site ›</a>${e.tickets ? ` <a href="${esc(e.tickets)}" target="_blank" rel="noopener sponsored">Tickets ›</a>` : ""} <a href="/?ev=${esc(e.id)}">Plan the road trip ›</a> <a href="/events/${esc(e.id)}/">Watch, tickets, beds ›</a></span></div>`;
   const months = [...new Set(L.map(e => e.start.slice(0, 7)))];
   const sec = ym => { const [y, mo] = ym.split("-"); return `<section class="fsec evm"><h2>${MONTHS[+mo - 1]} ${y}</h2><div class="cards pcards">${L.filter(e => e.start.slice(0, 7) === ym).map(card).join("")}</div></section>`; };
   const body = `<main><h1>Motorsport and motoring events</h1>
 <p class="intro">Races, rallies, festivals and classics worth travelling for. Every date comes from the organiser's own page and is checked every week. Tap Plan the road trip and the planner sets the venue as your finish.</p>
-<nav class="chips" aria-label="Show">${CAT.map(([k, t], i) => `<button type="button" data-f="${k}"${i ? "" : ' class="on"'}>${t}</button>`).join("")}</nav>
+<nav class="chips" aria-label="Show"><button type="button" data-f="mine" class="mine">★ My racing</button>${CAT.map(([k, t], i) => `<button type="button" data-f="${k}"${i ? "" : ' class="on"'}>${t}</button>`).join("")}</nav>
+<p class="note">Tap ☆ next to any series to follow it. ★ My racing then shows just yours, here and on the planner map.</p>
 ${months.length ? months.map(sec).join("\n") : "<p class=\"note\">Events are being added.</p>"}
 <p class="note">Dates change. Always check the organiser's page before you book flights and beds. Ticket links may pay OneTrackMind a small fee, at no cost to you. Missing an event? <a href="mailto:hello@onetrackmind.online?subject=Event%20for%20OneTrackMind">Tell us</a>.</p></main>
-<script>(function(){var b=document.querySelectorAll(".chips button");b.forEach(function(x){x.onclick=function(){var f=x.dataset.f;b.forEach(function(y){y.classList.toggle("on",y===x)});document.querySelectorAll(".evc").forEach(function(c){c.hidden=f!=="all"&&c.dataset.cat!==f});document.querySelectorAll(".evm").forEach(function(s){s.hidden=!s.querySelector(".evc:not([hidden])")})}})})();</script>`;
+<script>(function(){var b=document.querySelectorAll(".chips button");b.forEach(function(x){x.onclick=function(){var f=x.dataset.f;b.forEach(function(y){y.classList.toggle("on",y===x)});var my=[];try{my=JSON.parse(localStorage.getItem("otm-series")||"[]")}catch(e){}document.querySelectorAll(".evc").forEach(function(c){c.hidden=f==="mine"?my.indexOf(c.dataset.series)<0:(f!=="all"&&c.dataset.cat!==f)});document.querySelectorAll(".evm").forEach(function(s){s.hidden=!s.querySelector(".evc:not([hidden])")})}})});function stars(){var my=[];try{my=JSON.parse(localStorage.getItem("otm-series")||"[]")}catch(e){}document.querySelectorAll(".follow").forEach(function(s){var on=my.indexOf(s.dataset.series)>=0;s.classList.toggle("on",on);s.textContent=(on?"★ ":"☆ ")+s.dataset.series})}stars();document.addEventListener("click",function(e){var s=e.target.closest&&e.target.closest(".follow");if(!s)return;var my=[];try{my=JSON.parse(localStorage.getItem("otm-series")||"[]")}catch(x){}var i=my.indexOf(s.dataset.series);if(i>=0)my.splice(i,1);else my.push(s.dataset.series);try{localStorage.setItem("otm-series",JSON.stringify(my))}catch(x){}stars()});})();</script>`;
   const ld = { "@context": "https://schema.org", "@graph": L.slice(0, 80).map(e => ({ "@type": "SportsEvent", name: e.name, startDate: e.start, endDate: e.end, url: e.url || e.source, location: { "@type": "Place", name: e.venue || e.city, address: { "@type": "PostalAddress", addressLocality: e.city, addressCountry: e.country } } })) };
   return page({ active: "/events/", url: "/events/", title: "Motorsport events and festivals: dates, tickets and road trips · OneTrackMind", desc: "F1, MotoGP, WorldSBK, NASCAR, WEC, the 24 hour races, Dakar and the big festivals: confirmed dates, tickets and a road trip planner for each.", body, ld });
 }
@@ -588,6 +631,7 @@ fs.rmSync(path.join(ROOT, "how-to"), { recursive: true, force: true });
 write("how-to/index.html", howtoIndex());
 write("record/index.html", recordPage());
 write("events/index.html", eventsPage());
+{ const cut = new Date(Date.now() - 30 * 864e5).toISOString().slice(0, 10); EVENTS.filter(e => e.end >= cut).forEach(e => write(`events/${e.id}/index.html`, eventPage(e))); }
 { const S = s => STORIES.find(x => x.slug === s), tort = [...seriesOf().entries()].find(([n]) => /Tortoise/.test(n));
   const pick = [
     ["A lap of the Nürburgring, on a public Sunday", "On motorcycles, first time ever. Here's how you do it too.", "/how-to/nurburgring/", S("euroadtrip2018-belgium")],
@@ -595,7 +639,7 @@ write("events/index.html", eventsPage());
     ["Namibia by Tortoise", "Nine days up the Skeleton Coast and Epupa, with the air conditioning on.", tort ? `/blog/${tripSlug(tort[0], tort[1])}/` : "", tort ? { cover: coverOf(tort[1]) } : null]];
   fs.writeFileSync(path.join(ROOT, "data/latest.json"), JSON.stringify(pick.filter(x => x[3] && x[3].cover && x[2]).map(([title, hook, url, s]) => ({ title, hook, url, cover: s.cover })))); }
 HOWTO.forEach(g => write(`how-to/${g.id}/index.html`, howtoPage(g)));
-const urls = ["/", "/routes/", "/favourites/", "/about/", "/advertise/", "/how-to/", "/record/", "/events/", ...HOWTO.map(g => `/how-to/${g.id}/`), ...live.map(r => `/routes/${r.id}/`), ...FAV.map(x => `/favourites/${x.id}/`), "/blog/", ...STORIES.map(x => `/blog/${x.slug}/`), ...[...seriesOf().entries()].filter(([, L]) => L.length > 1).map(([n, L]) => `/blog/${tripSlug(n, L)}/`), "/terms.html", "/privacy.html", "/rules.html"];
+const urls = ["/", "/routes/", "/favourites/", "/about/", "/advertise/", "/how-to/", "/record/", "/events/", ...EVENTS.filter(e => e.end >= new Date().toISOString().slice(0, 10)).map(e => `/events/${e.id}/`), ...HOWTO.map(g => `/how-to/${g.id}/`), ...live.map(r => `/routes/${r.id}/`), ...FAV.map(x => `/favourites/${x.id}/`), "/blog/", ...STORIES.map(x => `/blog/${x.slug}/`), ...[...seriesOf().entries()].filter(([, L]) => L.length > 1).map(([n, L]) => `/blog/${tripSlug(n, L)}/`), "/terms.html", "/privacy.html", "/rules.html"];
 write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${today}</lastmod></url>`).join("\n")}\n</urlset>\n`);
 write("robots.txt", `# Everyone welcome, search engines and AI assistants included.\nUser-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${SITE}/sitemap.xml\n`);
 write("llms.txt", `# OneTrackMind
