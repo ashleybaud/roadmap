@@ -25,6 +25,11 @@ const cut = (s, n) => { s = String(s || "").trim(); if (s.length <= n) return s;
 const EV = J("data/events/events.json", []), WATCH = J("data/events/watch.json", {});
 const FAV = J("data/favourites/favourites.json", []), PICKS = (J("data/picks/picks.json", {}).routes || []).filter(r => !r.draft);
 const STORIES = J("data/stories/stories.json", []);
+const FPH = (J("data/founder-photos.json", {}).photos || []).filter(x => fs.existsSync(path.join(ROOT, x.file)));
+// a founder photo post: his own line if he gave one, otherwise the kit asks him for it
+const photoPost = (x, base) => Object.assign(base, { photo: path.join(ROOT, x.file), needsLine: !x.line,
+  title: x.line ? x.line.replace(/\.$/, "") : base.title, sub: base.sub,
+  link: x.link ? SITE + x.link : SITE, ig: [x.line || "[Where and when, in your words]", "", x.line ? "" : "[One or two lines: what happened]", "", x.link ? "Link in bio." : "", "", x.place ? `📍 ${x.place}` : "", "", base.tags] });
 const OUT = path.join(ROOT, "kits", from), INBOX = path.join(ROOT, "kits", "inbox", from);
 const USED_F = path.join(ROOT, "kits", "used.json"), USED = J("kits/used.json", {});
 fs.mkdirSync(OUT, { recursive: true });
@@ -86,8 +91,11 @@ const sun = add(from, 6);
     title: r.title, sub: [r.region, facts.join(" · ")].filter(Boolean).join("\n"), cta: ["Ride it", SHORT], link: `${SITE}/?pick=${r.id}`,
     ig: [cut(r.blurb, 400), "", facts.join(" · "), "", "The whole route, ready for your GPS, link in bio.", "", startName ? `📍 ${startName}` : "", "", "#advrider #roadtrip #onetrackmind"] }); }
 
-// Thursday: Throwback (a story from around this time of year)
-{ const doy = s => { const d = new Date(s + "T12:00:00Z"); return (d - Date.UTC(d.getUTCFullYear(), 0, 1)) / 864e5; };
+// Thursday: Throwback: on even weeks one of the founder's own photos (captioned ones first), otherwise a story from around this time of year
+const fAll = FPH.filter(x => x.use === "throwback"), fThrow = fAll.some(x => x.line) ? fAll.filter(x => x.line) : fAll;  // captioned ones only, while there are any
+if (W % 2 === 0 && fThrow.length) { const x = pickFresh(fThrow, y => y.id, "throwbackPhoto", 40); used.throwbackPhoto = x.id;
+  days.push(photoPost(x, { day: "Thursday", theme: "Throwback", slug: "4-throwback", tex: "gravel", title: "From the archive", sub: "", cta: ["Plan yours", SHORT], tags: "#throwbackthursday #tbt #onetrackmind" })); }
+else { const doy = s => { const d = new Date(s + "T12:00:00Z"); return (d - Date.UTC(d.getUTCFullYear(), 0, 1)) / 864e5; };
   const target = doy(add(from, 3)), dist = s => { const x = Math.abs(doy(s.date) - target); return Math.min(x, 365 - x); };
   const pool = STORIES.filter(s => s.date && s.date < add(from, -300) && storyPhotos(s).length).sort((a, b) => dist(a) - dist(b));
   const st = pickFresh(pool.slice(0, 12), x => x.slug, "throwback", 52); used.throwback = st.slug;
@@ -203,7 +211,7 @@ h1{font-size:1.5rem;margin:0 0 4px}.note{color:#B5D3DE;font-size:.92rem}.day{bac
 .ghost{background:#13617E;color:#fff}.warn{color:#E8A317;font-weight:700}</style>
 <main><h1>Posts for ${fd(from)} – ${fd(sun)}</h1><p class="note">Tap a picture to open it full size, then save it. Copy the caption, post. Stories: add a link sticker with the link shown.</p>
 ${days.map((d, i) => `<section class="day"><h2><span>${d.day} ${fd(dates[i])}</span> · ${esc(d.theme)}</h2>
-${d.needs ? `<p class="warn">Needs your photos. Send them to Claude with the place, town and what you drove.</p>` : d.archive ? `<p class="note">No garage photo this week, so this one is from the archive. Send a photo to use your own.</p>` : ""}
+${d.needsLine ? `<p class="warn">Your photo: fill in the lines in [brackets] before you post. Or send Claude a line and it goes in for you.</p>` : ""}${d.needs ? `<p class="warn">Needs your photos. Send them to Claude with the place, town and what you drove.</p>` : d.archive ? `<p class="note">No garage photo this week, so this one is from the archive. Send a photo to use your own.</p>` : ""}
 <div class="pics">${d.files.map(f => `<a href="${d.slug}/${f}" target="_blank"><img src="${d.slug}/${f}" alt="${esc(d.theme)} ${f}"></a>`).join("")}</div>
 <div class="cap" id="ig${i}">${esc(d.capIg)}</div><button class="btn" data-copy="ig${i}">Copy Instagram caption</button>
 <div class="cap" id="fb${i}" hidden>${esc(d.capFb)}</div><button class="btn ghost" data-copy="fb${i}">Copy Facebook caption</button>

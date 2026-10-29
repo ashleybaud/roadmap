@@ -1,0 +1,157 @@
+{
+ "_note": "The founder's own photos for the daily posts. 'line' is in the founder's words; empty means the post asks for one. 'place' becomes the 📍 line.",
+ "photos": [
+  {
+   "id": "porsche-cayman-portimao-pitlane",
+   "file": "media/founder/porsche-cayman-portimao-pitlane.jpg",
+   "use": "throwback",
+   "line": "Porsche at Portimão.",
+   "place": "Algarve International Circuit, Portimão",
+   "link": "/events/"
+  },
+  {
+   "id": "790-duke-karussell-nurburgring",
+   "file": "media/founder/790-duke-karussell-nurburgring.jpg",
+   "use": "throwback",
+   "line": "The Karussell at the Nürburgring.",
+   "place": "Nürburgring Nordschleife, Nürburg",
+   "link": "/how-to/nurburgring/"
+  },
+  {
+   "id": "790-adventure-morocco-camel",
+   "file": "media/founder/790-adventure-morocco-camel.jpg",
+   "use": "throwback",
+   "line": "Morocco.",
+   "place": "",
+   "link": ""
+  },
+  {
+   "id": "motogp-assen-2015-passes",
+   "file": "media/founder/motogp-assen-2015-passes.jpg",
+   "use": "throwback",
+   "line": "MotoGP VIP Village passes, TT Assen 2015.",
+   "place": "TT Circuit Assen, Assen",
+   "link": "/events/"
+  },
+  {
+   "id": "790-adventure-morocco-desert",
+   "file": "media/founder/790-adventure-morocco-desert.jpg",
+   "use": "throwback",
+   "line": "",
+   "place": "",
+   "link": ""
+  },
+  {
+   "id": "namib-pool-oryx",
+   "file": "media/founder/namib-pool-oryx.jpg",
+   "use": "throwback",
+   "line": "",
+   "place": "",
+   "link": ""
+  },
+  {
+   "id": "enduro-rock-climb",
+   "file": "media/founder/enduro-rock-climb.jpg",
+   "use": "throwback",
+   "line": "",
+   "place": "",
+   "link": ""
+  },
+  {
+   "id": "sand-track-two-bikes-down",
+   "file": "media/founder/sand-track-two-bikes-down.jpg",
+   "use": "throwback",
+   "line": "",
+   "place": "",
+   "link": ""
+  },
+  {
+   "id": "990-adventure-gravel-view",
+   "file": "media/founder/990-adventure-gravel-view.jpg",
+   "use": "throwback",
+   "line": "",
+   "place": "",
+   "link": ""
+  },
+  {
+   "id": "990-adventure-tortoise",
+   "file": "media/founder/990-adventure-tortoise.jpg",
+   "use": "throwback",
+   "line": "",
+   "place": "",
+   "link": ""
+  },
+  {
+   "id": "1190-adventure-roadside",
+   "file": "media/founder/1190-adventure-roadside.jpg",
+   "use": "throwback",
+   "line": "",
+   "place": "",
+   "link": ""
+  },
+  {
+   "id": "1190-adventure-dust-mountains",
+   "file": "media/founder/1190-adventure-dust-mountains.jpg",
+   "use": "throwback",
+   "line": "",
+   "place": "",
+   "link": ""
+  },
+  {
+   "id": "wild-coast-cow-river",
+   "file": "media/founder/wild-coast-cow-river.jpg",
+   "use": "throwback",
+   "line": "",
+   "place": "",
+   "link": ""
+  },
+  {
+   "id": "water-crossing-splash",
+   "file": "media/founder/water-crossing-splash.jpg",
+   "use": "throwback",
+   "line": "",
+   "place": "",
+   "link": ""
+  },
+  {
+   "id": "track-day-supermoto",
+   "file": "media/founder/track-day-supermoto.jpg",
+   "use": "throwback",
+   "line": "",
+   "place": "",
+   "link": ""
+  },
+  {
+   "id": "4x4-desert-red-mountains",
+   "file": "media/founder/4x4-desert-red-mountains.jpg",
+   "use": "throwback",
+   "line": "",
+   "place": "",
+   "link": ""
+  },
+  {
+   "id": "790-duke-dainese-ktm-van",
+   "file": "media/founder/790-duke-dainese-ktm-van.jpg",
+   "use": "garage",
+   "line": "",
+   "place": "",
+   "link": ""
+  },
+  {
+   "id": "ktm-socks-brake-gear",
+   "file": "media/founder/ktm-socks-brake-gear.jpg",
+   "use": "garage",
+   "line": "",
+   "place": "",
+   "link": ""
+  },
+  {
+   "id": "cat-ktm-beanie",
+   "file": "media/founder/cat-ktm-beanie.jpg",
+   "use": "garage",
+   "line": "",
+   "place": "",
+   "link": ""
+  }
+ ]
+}
