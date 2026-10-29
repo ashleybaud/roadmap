@@ -1,0 +1,53 @@
+[
+ {
+  "id": "pebble-beach-concours-2027",
+  "name": "Pebble Beach Concours d'Elegance",
+  "series": "Monterey Car Week",
+  "category": "us",
+  "start": "2027-08-15",
+  "end": "2027-08-15",
+  "venue": "Pebble Beach Golf Links (18th fairway)",
+  "city": "Pebble Beach, CA",
+  "country": "United States",
+  "lat": 36.5686,
+  "lon": -121.9497,
+  "url": "https://www.pebblebeachconcours.net/",
+  "tickets": "https://theconcoursstore.com/collections/tickets",
+  "source": "https://www.pebblebeachconcours.net/media-press/pebble-beach-concours-delegance-to-shift-dates-beginning-in-2028/",
+  "confirmed": true
+ },
+ {
+  "id": "le-mans-classic-heritage-2027",
+  "name": "Le Mans Classic Heritage",
+  "series": "Le Mans Classic",
+  "category": "festival",
+  "start": "2027-07-01",
+  "end": "2027-07-04",
+  "venue": "Circuit de la Sarthe",
+  "city": "Le Mans",
+  "country": "France",
+  "lat": 47.956,
+  "lon": 0.2075,
+  "url": "https://www.lemansclassic.com/en/",
+  "tickets": "https://www.lemansclassic.com/en/ticketing/",
+  "source": "https://www.lemansclassic.com/en/information/faq/",
+  "confirmed": true
+ },
+ {
+  "id": "simola-hillclimb-2027",
+  "name": "Simola Hillclimb (17th edition)",
+  "series": "Simola Hillclimb",
+  "category": "sa",
+  "start": "2027-04-29",
+  "end": "2027-05-02",
+  "venue": "Simola Golf & Country Estate",
+  "city": "Knysna",
+  "country": "South Africa",
+  "lat": -34.0197,
+  "lon": 23.0283,
+  "url": "https://www.knysnaplettherald.com/News/Article/Business/simola-hillclimb-wins-best-of-knysna-plett-202608240354",
+  "tickets": "",
+  "source": "https://www.knysnaplettherald.com/News/Article/Business/simola-hillclimb-wins-best-of-knysna-plett-202608240354",
+  "confirmed": false
+ }
+]
