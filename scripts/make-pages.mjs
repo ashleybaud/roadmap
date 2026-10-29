@@ -390,7 +390,7 @@ function storiesIndex(M) {
     return `<div class="ctile${multi ? " big" : ""}" data-cat="${cats}" data-tags="${tags}" data-kind="${kind}"><a class="cimg" href="${href}"><img src="${esc(coverOf(L))}" alt="" loading="lazy"><span class="badges"><em class="kind k-${kind}">${KIND[kind]}</em></span><span class="cmeta"><b>${esc(title)}</b><span>${yr}${multi ? ` · ${L.length} days of posts` : ""}</span></span></a>${(g => g ? `<a class="plot" href="${esc(g.href)}">${esc(g.label)}</a>` : "")(goLink(name))}</div>`;
   };
   const body = `<main class="blog"><h1>Blog</h1>
-<p class="intro">Twenty-odd years of road trips, race weekends, factories and museums. Mostly on two wheels, mostly not to plan. Tap a picture to read it. Show the route rides the trip; Route me there takes you to the place from wherever you are.</p>
+<p class="intro">Twenty-odd years of road trips, race weekends, factories and museums. Mostly on two wheels, mostly not to plan. Tap a picture to read it. A Route opens the whole trip in the planner. A Place routes you there from wherever you are.</p>
 <nav class="bpick" aria-label="Show">
 <button type="button" class="bbox on" data-f="all"><b>Everything</b></button>
 <button type="button" class="bbox tex-gravel" data-f="adventure"><b>Adventure</b><span>Recce. Ride. Report.</span></button>
