@@ -657,6 +657,12 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
 .oneliner{order:9;flex-basis:100%;display:flex;align-items:center;justify-content:center;gap:12px;margin:12px 0 2px;color:var(--ink);text-decoration:none;font-size:1.05rem;text-align:left}.oneliner img{width:44px;height:44px;border-radius:50%;object-fit:cover;object-position:50% 12%;border:2px solid var(--gold);flex:none}.oneliner b{color:var(--gold);white-space:nowrap}
 .adrow{order:initial;margin:28px 0 0}
 .hdrlinks{background:none!important;border-bottom:1px solid var(--line);border-radius:0!important}.hdrlinks>a{color:var(--ink)!important;text-transform:none!important;letter-spacing:.01em!important;font-size:1.3rem!important;padding:8px 16px 6px!important}.hdrlinks>a:hover{background:none!important;color:var(--gold)!important}.hdrlinks>a.on{border-bottom-color:var(--gold)!important}.navtoggle{color:var(--ink)!important;text-transform:none!important}
+.atev{color:var(--gold);font-weight:700}.evtdlg{width:min(640px,calc(100vw - 32px));max-width:640px;max-height:92vh;overflow:auto}.evtpow{display:inline-flex;align-items:center;gap:8px;margin-top:8px;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-decoration:none}.evtpow img{height:34px;width:auto}
+.evtdates{display:grid;grid-template-columns:1fr 1fr;gap:10px}.evtdates label{display:flex;flex-direction:column;gap:4px;font-size:.85rem;color:var(--muted)}
+.evtreg{display:flex;flex-wrap:wrap;gap:6px}.evtreg .chip{border:1px solid var(--line);background:var(--chip);color:var(--ink);border-radius:999px;padding:6px 12px;font-weight:600;font-size:.85rem;cursor:pointer}.evtreg .chip.on{background:var(--gold);color:#06303F;border-color:var(--gold)}
+.evtlist{max-height:36vh;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:4px 10px}.evtwk{font:700 .78rem/1 var(--f-display);letter-spacing:.08em;text-transform:uppercase;color:var(--gold);padding:12px 0 4px}
+.evtrow{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer}.evtrow input{width:20px;height:20px;margin-top:2px;accent-color:var(--gold)}.evtrow.on b{color:var(--gold)}.evtmy{color:var(--gold)}
+.evtw{margin:0 0 6px;padding:8px 10px;border-left:4px solid var(--gold);background:rgba(232,163,23,.12);border-radius:6px;font-size:.9rem}.evtgo{width:100%;font-size:1rem;padding:12px}.evtgo:disabled{opacity:.55}
 .pcol{position:relative;display:flex}.pcol .pbox{flex:1;padding-bottom:58px!important}.palt{position:absolute;right:14px;bottom:14px;background:var(--gold);color:#0B1D21;font-weight:700;font-size:.9rem;padding:8px 14px;border-radius:6px;text-decoration:none;box-shadow:0 2px 6px rgba(0,0,0,.35)}.palt:hover{filter:brightness(1.08)}
 .pickextra{margin:14px 0 0}.pickextra h3{font:700 1.2rem var(--f-display);text-transform:uppercase;margin:0 0 8px;text-align:center}.pxcards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.pxcards a{display:flex;flex-direction:column;gap:3px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:8px;padding:10px 12px;color:var(--ink);text-decoration:none}.pxcards a:hover{border-color:var(--gold)}.pxcards b{font:700 1.1rem/1.15 var(--f-display);text-transform:uppercase}.pxcards span{color:var(--muted);font-size:.85rem}.pxcards i{font-style:normal;font-weight:700;color:var(--gold);font-size:.9rem}
 @media(max-width:700px){.pxcards{grid-template-columns:1fr}}
@@ -666,6 +672,16 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
 .evnext .lbl{display:block;margin-bottom:4px}.evnext ul{list-style:none;margin:0 0 6px;padding:0;display:flex;flex-direction:column;gap:4px}.evnext li a{display:flex;justify-content:space-between;gap:10px;color:var(--ink);text-decoration:none;padding:4px 0;border-bottom:1px dashed var(--line)}.evnext li a:hover b{color:var(--gold)}.evnext li span{color:var(--muted);font-size:.85rem;white-space:nowrap}.evnext>a{font-weight:700;color:var(--gold)}
 .ondates{margin:12px 0;padding:12px;border:1px solid var(--line);border-left:5px solid var(--gold);border-radius:8px;background:var(--panel)}.ondates h3{margin:0 0 6px;font:700 1.15rem var(--f-display);text-transform:uppercase}.ondates ul{list-style:none;margin:0;padding:0}.ondates li{padding:6px 0;border-top:1px dashed var(--line);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.ondates li:first-child{border-top:0}.ondates .note{margin:0}
 @media(max-width:700px){.evband{grid-template-columns:1fr}}
+.evband{grid-template-columns:minmax(220px,.75fr) 2fr!important;align-items:start!important}
+.evtripbtn{margin-top:12px;display:block;background:var(--gold)!important;color:#06303F!important;border-color:var(--gold)!important;font-weight:700}.evhead{display:flex;flex-wrap:wrap;gap:8px;align-items:center;justify-content:space-between;margin-bottom:8px}
+.evregs{display:flex;flex-wrap:wrap;gap:6px}.evregs button{border:1px solid var(--line);background:var(--chip);color:var(--ink);border-radius:999px;padding:4px 10px;font-weight:600;font-size:.8rem;cursor:pointer}.evregs button.on{background:var(--gold);color:#06303F;border-color:var(--gold)}
+.evgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:8px}
+.evcard{display:grid;grid-template-columns:52px 1fr;gap:10px;align-items:start;padding:8px;border-radius:8px;background:var(--chip);border:1px solid var(--line);color:var(--ink);text-decoration:none}.evcard:hover{border-color:var(--gold)}
+.evdate{background:var(--hero);border-radius:6px;text-align:center;padding:4px 0;line-height:1.05}.evdate b{display:block;font:700 1.35rem var(--f-display);color:var(--gold)}.evdate i{font-style:normal;font-size:.72rem;text-transform:uppercase;letter-spacing:.06em;color:var(--muted)}
+.evcard .en{font-weight:700;font-size:.92rem;line-height:1.25}.evcard .ew{display:block;color:var(--muted);font-size:.8rem;margin-top:2px}.evcard .ef{font-size:.8rem;color:var(--gold);font-weight:700}
+.evall{display:inline-block;margin-top:8px;font-weight:700}
+@media(max-width:700px){.evband{grid-template-columns:1fr!important}.evgrid{grid-template-columns:1fr 1fr}.evcard{grid-template-columns:44px 1fr}.evcard:nth-child(n+9){display:none}}
+
 </style>
 </head>
 <body>
@@ -685,11 +701,14 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
         <div class="pcol"><button type="button" class="pbox tex-tar" data-pick="motorsport" aria-pressed="false">
           <span class="pk">Tar · Motorsport</span><b class="pt">Plan it. Book it. Ride it.</b>
           <span class="pp">Same story at race weekends: a museum, a factory or a famous corner ten minutes away that I only heard about afterwards. Plan the trip around the race with every petrolhead stop near it, so you miss nothing.</span>
-          <span class="pgo">Plan a motorsport trip ›</span></button><a class="palt" href="/events/">Pick an event ›</a></div>
+          <span class="pgo">Plan a motorsport trip ›</span></button><a class="palt" href="/events/" data-evtrip>Pick your races ›</a></div>
       </div>
       <section class="evband" aria-label="Races and festivals">
-        <div class="evstory"><b>Plan the year around the races.</b><span>I was in Monterey a week before Car Week and didn't know it was on. I'd broken down and spent the weekend there, never realising it's the car capital of the world. With this calendar I'd have timed it right.</span></div>
-        <div class="evnext"><span class="lbl">Next up</span><ul id="evNext"></ul><a href="/events/">Every race and festival ›</a></div>
+        <div class="evstory"><b>Plan the year around the races.</b><span>I was in Monterey a week before Car Week and didn't know it was on. I'd broken down and spent the weekend there, never realising it's the car capital of the world. With this calendar I'd have timed it right.</span>
+          <button type="button" class="btn evtripbtn" data-evtrip>Build a trip around the races ›</button></div>
+        <div class="evcoming"><div class="evhead"><span class="lbl">Coming up</span><div class="evregs" id="evRegs" aria-label="Where"></div></div>
+          <div class="evgrid" id="evNext"></div>
+          <a class="evall" href="/events/">Every race and festival ›</a></div>
       </section>
       <section id="pickextra" class="pickextra" hidden><h3></h3><div class="pxcards"></div></section>
       <div class="herocta"><button class="btn herobtn" type="button" data-tryroute id="tryBtn">Or try a finished trip: Swartberg Pass in 2 days ›</button></div>
@@ -878,6 +897,17 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
     <label class="chk"><input type="checkbox" id="fTrip" checked> Include this trip so we can see what you saw</label>
     <div class="btns" style="justify-content:flex-end"><span class="note" id="fMsg"></span><button class="btn" type="submit" id="fSend">Send</button></div>
   </form>
+</dialog>
+<dialog id="evtDlg" class="welcome evtdlg" aria-labelledby="evtTitle">
+  <div class="dlgwrap">
+    <div class="dlghead"><div><h2 id="evtTitle">Build a trip around the races</h2><div class="note">Pick your dates and where. Tick the races. I'll route you to each one and back.</div><a class="evtpow" href="https://alterego.online/?utm_source=onetrackmind&utm_medium=sponsor&utm_content=racetrip" target="_blank" rel="noopener sponsored">Powered by <img src="/img/alterego-logo-white.png" alt="AlterEgo" width="46" height="40"></a></div><button class="icon" type="button" data-evtclose aria-label="Close">✕</button></div>
+    <div class="evtdates"><label>First day<input type="date" id="evtFrom"></label><label>Last day<input type="date" id="evtTo"></label></div>
+    <div class="evtreg" id="evtReg" aria-label="Where"></div>
+    <div class="evtlist" id="evtList"></div>
+    <div id="evtWarn"></div>
+    <label class="chk"><input type="checkbox" id="evtHome" checked> Back to <span id="evtStart">where you are now</span> at the end</label>
+    <button type="button" class="btn evtgo" id="evtGo" disabled>Tick the races you want</button>
+  </div>
 </dialog>
 <dialog id="picksDlg" class="welcome" aria-labelledby="pkTitle">
   <div class="dlgwrap">

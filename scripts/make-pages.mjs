@@ -596,6 +596,7 @@ function eventsPage() {
   const body = `<main><h1>Motorsport and motoring events</h1>
 <p class="intro">Races, rallies, festivals and classics worth travelling for. Every date comes from the organiser's own page and is checked every week. Tap Plan the road trip and the planner sets the venue as your finish.</p>
 <nav class="chips" aria-label="Show"><button type="button" data-f="mine" class="mine">★ My racing</button>${CAT.map(([k, t], i) => `<button type="button" data-f="${k}"${i ? "" : ' class="on"'}>${t}</button>`).join("")}</nav>
+<p class="btns"><a class="cta" href="/?evtrip=1">Build a trip around several races ›</a></p>
 <p class="note">Tap ☆ next to any series to follow it. ★ My racing then shows just yours, here and on the planner map.</p>
 ${months.length ? months.map(sec).join("\n") : "<p class=\"note\">Events are being added.</p>"}
 <p class="note">Dates change. Always check the organiser's page before you book flights and beds. Ticket links may pay OneTrackMind a small fee, at no cost to you. Missing an event? <a href="mailto:hello@onetrackmind.online?subject=Event%20for%20OneTrackMind">Tell us</a>.</p></main>

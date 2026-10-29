@@ -19,8 +19,7 @@ const ADV_PICKS=["swartberg-loop","die-hel","namibia-2020-tortoise"];
 function pickExtra(){ const s=$("pickextra"); if(!s||!pickMode) return;
   if(pickMode==="adventure"){ fetch("/data/picks/picks.json").then(r=>r.json()).then(j=>{ const L=ADV_PICKS.map(id=>j.routes.find(r=>r.id===id)).filter(Boolean); if(!L.length) return;
       s.querySelector("h3").textContent="Ready to ride"; s.querySelector(".pxcards").innerHTML=L.map(r=>`<a href="/routes/${esc(r.id)}/"><b>${esc(r.title)}</b><span>${esc(r.region||"")}</span><i>See the route ›</i></a>`).join(""); s.hidden=false; }).catch(()=>{}); }
-  else loadEvents().then(L=>{ const t=new Date().toISOString().slice(0,10), nx=L.filter(e=>e.start>=t).slice(0,3); if(!nx.length) return;
-      s.querySelector("h3").textContent="Coming up"; s.querySelector(".pxcards").innerHTML=nx.map(e=>`<a href="/?ev=${esc(e.id)}"><b>${esc(e.name)}</b><span>${esc(new Date(e.start+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short"}))}${e.end!==e.start?" – "+esc(new Date(e.end+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})):""} · ${esc(e.city||e.venue||"")}, ${esc(e.country||"")}</span><i>Plan the trip there ›</i></a>`).join(""); s.hidden=false; }); }
+  else s.hidden=true; } // Motorsport: the next races are in Coming up
 function setPick(md,user){
   pickMode=md==="motorsport"?"motorsport":"adventure"; try{ localStorage.setItem("otm-pick",pickMode); }catch(e){}
   document.documentElement.setAttribute("data-pick",pickMode);
@@ -37,9 +36,18 @@ function setPick(md,user){
 document.querySelectorAll(".pbox").forEach(b=>b.addEventListener("click",()=>setPick(b.dataset.pick,true)));
 { let s=null; try{ s=localStorage.getItem("otm-pick"); }catch(e){} if(s) setPick(s,false); }
 
-/* Next races in the top banner */
-loadEvents().then(L=>{ const u=$("evNext"); if(!u) return; const t=new Date().toISOString().slice(0,10), fmt=d=>new Date(d+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short"});
-  const my=mySeries(); u.innerHTML=L.filter(e=>e.start>=t).sort((a,b)=>(my.includes(b.series)-my.includes(a.series))||a.start.localeCompare(b.start)).slice(0,4).map(e=>`<li><a href="/events/${esc(e.id)}/"><b>${esc(e.name)}</b><span>${fmt(e.start)}${e.end!==e.start?"–"+fmt(e.end):""} · ${esc(e.country||"")}</span></a></li>`).join(""); });
+/* Coming up on the landing page: the next races and festivals, filtered by where (remembered), followed series first */
+var evRegSel=null;
+function drawComing(){ const u=$("evNext"), r=$("evRegs"); if(!u||!evList) return;
+  if(evRegSel===null){ try{ evRegSel=localStorage.getItem("otm-evcome")||""; }catch(e){ evRegSel=""; } }
+  const t=ymd(new Date()), my=mySeries(), M=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const reg=typeof EVT_REG!=="undefined"?EVT_REG:[];
+  r.innerHTML=[["","Everywhere"],...reg.map(x=>[x[0],x[1].replace(" and the UK","").replace(", Canada and Mexico","").replace(" and Australia","")])].map(([k,n])=>`<button type="button" data-evcome="${k}" class="${k===evRegSel?"on":""}">${esc(n)}</button>`).join("");
+  const L=evList.filter(e=>e.end>=t&&(!evRegSel||evtRegion(e.country)===evRegSel)).sort((a,b)=>a.start.localeCompare(b.start)||(my.includes(b.series)-my.includes(a.series))).slice(0,12);
+  u.innerHTML=L.length?L.map(e=>{ const d=new Date(e.start+"T12:00:00"), live=e.start<=t;
+    return `<a class="evcard" href="/events/${esc(e.id)}/"><span class="evdate"><b>${d.getDate()}</b><i>${M[d.getMonth()]}</i></span><span><span class="en">${esc(e.name.replace(/\s*\(.*?\)/g,"").replace(/\s+20\d\d$/,""))}${my.includes(e.series)?" ★":""}</span><span class="ew">${esc(e.city||e.venue||"")}, ${esc(e.country||"")}${e.confirmed?"":" · to confirm"}</span>${live?`<span class="ef">On now</span>`:""}</span></a>`; }).join(""):`<p class="note">Nothing coming up there yet.</p>`; }
+loadEvents().then(drawComing);
+document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-evcome]"); if(!b) return; evRegSel=b.dataset.evcome; try{ localStorage.setItem("otm-evcome",evRegSel); }catch(x){} drawComing(); });
 
 /* On your dates: races and festivals near the route while you're travelling (Motorsport looks further afield) */
 var evDatesAsked=false;
