@@ -397,7 +397,7 @@ function storiesIndex(M) {
     // Instagram and Facebook posts sit in the collage by date, between the blog posts
     const soc = SOCIAL.filter(x => x.img).map(x => ({ date: x.date.slice(0, 10), html: (() => {
       const txt = x.text || "", cats = [ADV.test(txt) ? "adventure" : "", (MOTOR_RX.test(txt) || MOT.test(txt)) ? "motorsport" : ""].filter(Boolean).join(" ");
-      const tags = TAGS.filter(([, , rx]) => rx.test(txt)).map(([k]) => k).join(" "), first = txt.split(/\n/)[0].slice(0, 90);
+      const tags = TAGS.filter(([, , rx]) => rx.test(txt)).map(([k]) => k).join(" "), first = txt.split(/\n/)[0].replace(/#\S+/g, "").trim().slice(0, 90);
       const go = x.lat != null ? `<a class="plot" href="/?poi=${x.lat},${x.lon}&n=${encodeURIComponent(x.place || "")}">Route me there ›</a>` : "";
       return `<div class="ctile soc" data-cat="${cats}" data-tags="${tags}"><a class="cimg" href="${esc(x.url)}" target="_blank" rel="noopener"><img src="${esc(x.img)}" alt="" loading="lazy"><em class="srcb">${x.src === "ig" ? "Instagram" : "Facebook"}</em><span class="cmeta"><b>${esc(first)}</b><span>${x.date.slice(0, 4)}${x.place ? " · 📍 " + esc(x.place) : ""}</span></span></a>${go}</div>`; })() }));
     const blog = groups.map(g => ({ date: g[1][g[1].length - 1].date, html: tile(g) }));
