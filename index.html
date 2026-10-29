@@ -663,6 +663,22 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
 .evtlist{max-height:36vh;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:4px 10px}.evtwk{font:700 .78rem/1 var(--f-display);letter-spacing:.08em;text-transform:uppercase;color:var(--gold);padding:12px 0 4px}
 .evtrow{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer}.evtrow input{width:20px;height:20px;margin-top:2px;accent-color:var(--gold)}.evtrow.on b{color:var(--gold)}.evtmy{color:var(--gold)}
 .evtw{margin:0 0 6px;padding:8px 10px;border-left:4px solid var(--gold);background:rgba(232,163,23,.12);border-radius:6px;font-size:.9rem}.evtgo{width:100%;font-size:1rem;padding:12px}.evtgo:disabled{opacity:.55}
+/* one light section: the events band reads like a printed race programme */
+.evband{background:#F4EFE6!important;color:#0E3A4A!important;border-color:#E2D8C6!important}
+.evband .evstory b{color:#0A4A63!important}.evband .evstory span{color:#24414C}
+.evband .lbl{color:#5C7480!important}
+.evband .evregs button{background:transparent;border-color:rgba(10,74,99,.35);color:#0A4A63}.evband .evregs button.on{background:#0A4A63;border-color:#0A4A63;color:#fff}
+.evband .evgrid{gap:0 22px}
+.evband .evcard{background:transparent;border:0;border-bottom:1px solid rgba(10,74,99,.16);border-radius:0;padding:10px 2px;color:#0E3A4A}.evband .evcard:hover{border-color:rgba(10,74,99,.16);background:rgba(232,163,23,.10)}
+.evband .evdate{background:var(--gold)}.evband .evdate b{color:#06303F}.evband .evdate i{color:#06303F;opacity:.8}
+.evband .evcard .ew{color:#5C7480}.evband .evcard .ef{color:#C2410C}
+.evband .evall{color:#0A4A63}
+.evband .evalert{border-top-color:rgba(10,74,99,.25)}.evband .evalert b{color:#0A4A63}.evband .evalert>span{color:#4A6670}
+.evband .evalert input[type=email]{background:#fff;color:#0E3A4A;border-color:rgba(10,74,99,.3)}
+.evband .evalert button{background:transparent;color:#0A4A63;border:2px solid #0A4A63}.evband .evalert .nlm{color:#0A4A63}
+/* gold fill means "do this": one per section; the rest are outlines */
+.pcol:first-child .palt{background:rgba(6,48,63,.55);color:var(--gold);border:2px solid var(--gold);box-shadow:none}
+.herobtn{background:transparent!important;color:var(--gold)!important;border:2px solid var(--gold)!important}
 .pcol{position:relative;display:flex}.pcol .pbox{flex:1;padding-bottom:58px!important}.palt{position:absolute;right:14px;bottom:14px;background:var(--gold);color:#0B1D21;font-weight:700;font-size:.9rem;padding:8px 14px;border-radius:6px;text-decoration:none;box-shadow:0 2px 6px rgba(0,0,0,.35)}.palt:hover{filter:brightness(1.08)}
 .pickextra{margin:14px 0 0}.pickextra h3{font:700 1.2rem var(--f-display);text-transform:uppercase;margin:0 0 8px;text-align:center}.pxcards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.pxcards a{display:flex;flex-direction:column;gap:3px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:8px;padding:10px 12px;color:var(--ink);text-decoration:none}.pxcards a:hover{border-color:var(--gold)}.pxcards b{font:700 1.1rem/1.15 var(--f-display);text-transform:uppercase}.pxcards span{color:var(--muted);font-size:.85rem}.pxcards i{font-style:normal;font-weight:700;color:var(--gold);font-size:.9rem}
 @media(max-width:700px){.pxcards{grid-template-columns:1fr}}
