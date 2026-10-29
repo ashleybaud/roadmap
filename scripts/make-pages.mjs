@@ -111,7 +111,9 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
 
 .gocta{margin:6px 0 14px}
 
-.srcb{position:absolute;top:8px;left:8px;z-index:2;background:#fff;color:#0B1D21;font:700 .7rem var(--f-body,sans-serif);font-style:normal;text-transform:uppercase;padding:2px 6px;border-radius:3px}.ctile.soc .cmeta b{font-family:var(--f-body,sans-serif);text-transform:none;font-size:.95rem;font-weight:600}
+.srcb{background:#fff;color:#0B1D21;font:700 .7rem var(--f-body,sans-serif);font-style:normal;text-transform:uppercase;padding:2px 6px;border-radius:3px}.ctile.soc .cmeta b{font-family:var(--f-body,sans-serif);text-transform:none;font-size:.95rem;font-weight:600}
+
+.badges{position:absolute;top:8px;left:8px;z-index:2;display:flex;gap:4px}.kind,.srcb{font:700 .7rem var(--f-body,sans-serif);font-style:normal;text-transform:uppercase;letter-spacing:.04em;padding:2px 7px;border-radius:3px;color:#0B1D21}.k-story{background:#fff}.k-route,.k-place{background:var(--gold)}.chipsep{width:1px;background:var(--line);margin:0 4px}.tagchips .kchip{font-weight:700}
 `;
 
 function page({ url, title, desc, body, ld, image, active }) {
@@ -373,6 +375,7 @@ const BLOG_POI = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT
 const goLink = name => { const rid = TRIP_ROUTE[name], p = BLOG_POI[name];
   return rid ? { href: `/?pick=${rid}`, label: "Show the route ›" } : p ? { href: `/?poi=${p.lat},${p.lon}&n=${encodeURIComponent(p.name)}`, label: `Route me to ${p.name} ›` } : null; };
 const SOCIAL = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data/social.json"), "utf8")); } catch (e) { return []; } })();
+const KIND = { story: "Story", route: "Route", place: "Place" };
 function storiesIndex(M) {
   const ADV = /namibia|lesotho|wild coast|cdba|enduro|africa twin|790 adventure|eu road trip|tortoise|introduction|cycle tour/i;
   const MOT = /eu road trip|motor valley|eicma|motogp/i;
@@ -383,7 +386,8 @@ function storiesIndex(M) {
     const rid = TRIP_ROUTE[name], title = multi ? tripName(name) : L[0].title;
     const yr = L[L.length - 1].date.slice(0, 4);
     const tags = TAGS.filter(([, , rx]) => rx.test(name + " " + title)).map(([k]) => k).join(" ");
-    return `<div class="ctile${multi ? " big" : ""}" data-cat="${cats}" data-tags="${tags}"><a class="cimg" href="${href}"><img src="${esc(coverOf(L))}" alt="" loading="lazy"><span class="cmeta"><b>${esc(title)}</b><span>${yr}${multi ? ` · ${L.length} days of posts` : ""}</span></span></a>${(g => g ? `<a class="plot" href="${esc(g.href)}">${esc(g.label)}</a>` : "")(goLink(name))}</div>`;
+    const g = goLink(name), kind = TRIP_ROUTE[name] ? "route" : g ? "place" : "story";
+    return `<div class="ctile${multi ? " big" : ""}" data-cat="${cats}" data-tags="${tags}" data-kind="${kind}"><a class="cimg" href="${href}"><img src="${esc(coverOf(L))}" alt="" loading="lazy"><span class="badges"><em class="kind k-${kind}">${KIND[kind]}</em></span><span class="cmeta"><b>${esc(title)}</b><span>${yr}${multi ? ` · ${L.length} days of posts` : ""}</span></span></a>${(g => g ? `<a class="plot" href="${esc(g.href)}">${esc(g.label)}</a>` : "")(goLink(name))}</div>`;
   };
   const body = `<main class="blog"><h1>Blog</h1>
 <p class="intro">Twenty-odd years of road trips, race weekends, factories and museums. Mostly on two wheels, mostly not to plan. Tap a picture to read it. Show the route rides the trip; Route me there takes you to the place from wherever you are.</p>
@@ -392,24 +396,24 @@ function storiesIndex(M) {
 <button type="button" class="bbox tex-gravel" data-f="adventure"><b>Adventure</b><span>Recce. Ride. Report.</span></button>
 <button type="button" class="bbox tex-tar" data-f="motorsport"><b>Motorsport</b><span>Plan it. Book it. Ride it.</span></button>
 </nav>
-<nav class="tagchips" aria-label="Tags">${TAGS.map(([k, t]) => `<button type="button" data-tag="${k}">${t}</button>`).join("")}</nav>
+<nav class="tagchips" aria-label="Tags">${Object.entries({ route: "Routes", place: "Places", story: "Stories" }).map(([k, t]) => `<button type="button" class="kchip" data-kind="${k}">${t}</button>`).join("")}<span class="chipsep"></span>${TAGS.map(([k, t]) => `<button type="button" data-tag="${k}">${t}</button>`).join("")}</nav>
 <div class="collage">${(() => {
     // Instagram and Facebook posts sit in the collage by date, between the blog posts
     const soc = SOCIAL.filter(x => x.img).map(x => ({ date: x.date.slice(0, 10), html: (() => {
       const txt = x.text || "", cats = [ADV.test(txt) ? "adventure" : "", (MOTOR_RX.test(txt) || MOT.test(txt)) ? "motorsport" : ""].filter(Boolean).join(" ");
       const tags = TAGS.filter(([, , rx]) => rx.test(txt)).map(([k]) => k).join(" "), first = txt.split(/\n/)[0].replace(/#\S+/g, "").trim().slice(0, 90);
       const go = x.lat != null ? `<a class="plot" href="/?poi=${x.lat},${x.lon}&n=${encodeURIComponent(x.place || "")}">Route me there ›</a>` : "";
-      return `<div class="ctile soc" data-cat="${cats}" data-tags="${tags}"><a class="cimg" href="${esc(x.url)}" target="_blank" rel="noopener"><img src="${esc(x.img)}" alt="" loading="lazy"><em class="srcb">${x.src === "ig" ? "Instagram" : "Facebook"}</em><span class="cmeta"><b>${esc(first)}</b><span>${x.date.slice(0, 4)}${x.place ? " · 📍 " + esc(x.place) : ""}</span></span></a>${go}</div>`; })() }));
+      const kind = x.lat != null ? "place" : "story"; return `<div class="ctile soc" data-cat="${cats}" data-tags="${tags}" data-kind="${kind}"><a class="cimg" href="${esc(x.url)}" target="_blank" rel="noopener"><img src="${esc(x.img)}" alt="" loading="lazy"><span class="badges"><em class="kind k-${kind}">${KIND[kind]}</em><em class="srcb">${x.src === "ig" ? "Instagram" : "Facebook"}</em></span><span class="cmeta"><b>${esc(first)}</b><span>${x.date.slice(0, 4)}${x.place ? " · 📍 " + esc(x.place) : ""}</span></span></a>${go}</div>`; })() }));
     const blog = groups.map(g => ({ date: g[1][g[1].length - 1].date, html: tile(g) }));
     return [...soc, ...blog].sort((a, b) => b.date.localeCompare(a.date)).map(x => x.html).join("");
   })()}</div>
 <p class="note"><a href="/favourites/">The places I'd send you: Founder's fav's ›</a></p>
 <a class="cta" href="/">Plan your own</a></main>
-<script>(function(){var b=document.querySelectorAll(".bbox"),tg=document.querySelectorAll(".tagchips button"),cat="all",tag="";
-function run(){b.forEach(function(y){y.classList.toggle("on",y.dataset.f===cat)});tg.forEach(function(y){y.classList.toggle("on",y.dataset.tag===tag)});
-document.querySelectorAll(".ctile").forEach(function(c){var okc=cat==="all"||(" "+c.dataset.cat+" ").indexOf(" "+cat+" ")>=0,okt=!tag||(" "+c.dataset.tags+" ").indexOf(" "+tag+" ")>=0;c.hidden=!(okc&&okt)});
+<script>(function(){var b=document.querySelectorAll(".bbox"),tg=document.querySelectorAll(".tagchips button[data-tag]"),kc=document.querySelectorAll(".tagchips button[data-kind]"),cat="all",tag="",kind="";
+function run(){b.forEach(function(y){y.classList.toggle("on",y.dataset.f===cat)});tg.forEach(function(y){y.classList.toggle("on",y.dataset.tag===tag)});kc.forEach(function(y){y.classList.toggle("on",y.dataset.kind===kind)});
+document.querySelectorAll(".ctile").forEach(function(c){var okc=cat==="all"||(" "+c.dataset.cat+" ").indexOf(" "+cat+" ")>=0,okt=!tag||(" "+c.dataset.tags+" ").indexOf(" "+tag+" ")>=0,okk=!kind||c.dataset.kind===kind;c.hidden=!(okc&&okt&&okk)});
 try{history.replaceState(null,"",cat==="all"&&!tag?location.pathname:"#"+[cat!=="all"?cat:"",tag].filter(Boolean).join("+"))}catch(e){}}
-b.forEach(function(x){x.onclick=function(){cat=x.dataset.f;run()}});tg.forEach(function(x){x.onclick=function(){tag=tag===x.dataset.tag?"":x.dataset.tag;run()}});
+b.forEach(function(x){x.onclick=function(){cat=x.dataset.f;run()}});tg.forEach(function(x){x.onclick=function(){tag=tag===x.dataset.tag?"":x.dataset.tag;run()}});kc.forEach(function(x){x.onclick=function(){kind=kind===x.dataset.kind?"":x.dataset.kind;run()}});
 var h=location.hash.slice(1).split("+");h.forEach(function(p){if(p==="adventure"||p==="motorsport")cat=p;else if(p)tag=p});
 if(!location.hash){try{var p=localStorage.getItem("otm-pick");if(p)cat=p}catch(e){}}run()})();</script>`;
   const ld = { "@context": "https://schema.org", "@type": "Blog", name: "OneTrackMind blog", url: SITE + "/blog/", author: FOUNDER };
