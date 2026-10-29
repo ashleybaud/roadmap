@@ -176,7 +176,6 @@ ${S.fuelGapKm ? `<div class="stat"><b>${km(S.fuelGapKm)} km</b><span>longest gap
 <div class="meta">${esc(r.region)} · ${n} day${n > 1 ? "s" : ""} · ${esc(veh)} · ${esc(STYLE[r.style] || "")}</div>
 ${f ? `<p class="fdr">Ridden by the founder${f.year ? " in " + f.year : ""} · ${esc(f.ride)}</p>` : ""}
 <p>${esc(r.blurb)}</p>
-<a class="packbox" href="https://alterego.online/products/build-race-repeat-hoodie?utm_source=onetrackmind&utm_medium=sponsor" target="_blank" rel="noopener sponsored"><img src="https://alterego.online/cdn/shop/files/3158941636033974733_2048.jpg?v=1792398701&width=240" alt="" loading="lazy"><div><b>Pack for it</b><span>AlterEgo, our sponsor: made-to-order wear for petrolheads. Hoodie from $65.</span></div></a>
 <a class="cta" href="/?pick=${esc(r.id)}">Open in the planner</a>
 <p class="note">Change the dates, stops and your vehicle. The planner works out fuel, night stops, sunset, weather and the grade of every road. Then ride it: GPX straight to your Garmin or bike app, or Google Maps and Waze on your phone.</p>
 ${statBox}${S ? `<p class="note">Distances and grades from the planner's route on OpenStreetMap roads. Your plan may differ.</p>` : ""}
@@ -370,12 +369,11 @@ ${x.cover && !x.html.includes(x.cover) ? `<img class="cover" src="${esc(x.cover)
 ${x.gallery ? `<p class="tocome">Photos first, story to come.</p>` : ""}
 ${x.html}
 ${L.length > 1 ? `<nav class="snav">${prev ? `<a href="/blog/${esc(prev.slug)}/">‹ ${esc(prev.title)}</a>` : "<span></span>"}${next ? `<a href="/blog/${esc(next.slug)}/">${esc(next.title)} ›</a>` : ""}</nav>` : ""}
-<a class="packbox" href="https://alterego.online/products/build-race-repeat-hoodie?utm_source=onetrackmind&utm_medium=sponsor" target="_blank" rel="noopener sponsored"><img src="https://alterego.online/cdn/shop/files/3158941636033974733_2048.jpg?v=1792398701&width=240" alt="" loading="lazy"><div><b>Pack for it</b><span>AlterEgo, our sponsor: made-to-order wear for petrolheads. Hoodie from $65.</span></div></a>
 ${(g => g ? `<a class="cta" href="${esc(g.href)}">${esc(g.label)}</a>` : `<a class="cta" href="/">Plan a trip like this</a>`)(goLink(x.series))}
 <p class="note">First published on onetrackmind.co.za. Places change: check before you go.</p>
 </main>`;
   const ld = { "@context": "https://schema.org", "@type": "BlogPosting", headline: x.title, datePublished: x.date, author: FOUNDER, publisher: ORG, url: `${SITE}/blog/${x.slug}/`, ...(x.cover ? { image: x.cover } : {}) };
-  return page({ ads: false, dark: true, active: "/blog/", url: `/blog/${x.slug}/`, title: `${x.title} · OneTrackMind blog`, desc: (x.lead || x.title).slice(0, 155), body, ld });
+  return page({ dark: true, active: "/blog/", url: `/blog/${x.slug}/`, title: `${x.title} · OneTrackMind blog`, desc: (x.lead || x.title).slice(0, 155), body, ld });
 }
 const TAGS = [["namibia", "Namibia", /namibia|tortoise|epupa/i], ["southafrica", "South Africa", /wild coast|cdba|killarney|simola|kalahari|speedweek|franschoek|wijnland|port elizabeth|redbull cape town|cape town/i], ["lesotho", "Lesotho", /lesotho/i], ["europe", "Europe", /eu road trip|motor valley|eicma|goodwood|nurburg|porsche museum/i], ["racing", "Racing", /simola|hill ?climb|killarney|wpmc|motogp|speedweek|race|redbull/i], ["museums", "Museums & factories", /museum|factory|motor valley|eicma|webb/i], ["bikes", "Bikes", /ktm|duke|gsxr|africa twin|bmw|scalpel|cafe racer|enduro|ducati|tyrenoise/i], ["usa", "USA", /monterey|laguna seca|pebble beach|daytona|sebring|indianapolis|\busa\b/i], ["cars", "Cars", /alfa|giulia|porsche|aston|mclaren|audi|fuorilegge|universal products/i]];
 const BLOG_POI = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data/blog-poi.json"), "utf8")); } catch (e) { return {}; } })();
@@ -487,7 +485,6 @@ ${st && st.img ? `<img class="cover" src="${esc(st.img)}" alt="${esc(g.title)}">
 <p class="intro">${esc(g.short)}</p>
 ${g.hook.map(t => `<p>${esc(t)}</p>`).join("\n")}
 ${g.sections.map(x => `<h2>${esc(x.h)}</h2><ul>${x.items.map(t => `<li>${t}</li>`).join("")}</ul>`).join("\n")}
-<a class="packbox" href="https://alterego.online/products/build-race-repeat-hoodie?utm_source=onetrackmind&utm_medium=sponsor" target="_blank" rel="noopener sponsored"><img src="https://alterego.online/cdn/shop/files/3158941636033974733_2048.jpg?v=1792398701&width=240" alt="" loading="lazy"><div><b>Wear it on the day</b><span>AlterEgo, our sponsor: made-to-order wear for petrolheads. Hoodie from $65.</span></div></a>
 <section class="gethere"><h2>Book it</h2><ul>${g.links.map(([t, u, d]) => `<li><a href="${esc(u)}" target="_blank" rel="noopener sponsored">${esc(t)} ›<span>${esc(d)}</span></a></li>`).join("")}<li><a href="${esc(g.official[1])}" target="_blank" rel="noopener">${esc(g.official[0])} ›<span>Check the day before you go</span></a></li></ul>
 <p class="note">Some of these links pay OneTrackMind a small fee if you book, at no cost to you. It's what keeps the planner free.</p></section>
 ${f ? `<a class="cta" href="/?fav=${esc(f.id)}">Plan the road trip there</a> <a class="cta ghost" href="/favourites/${esc(f.id)}/">More about the place</a>` : ""}

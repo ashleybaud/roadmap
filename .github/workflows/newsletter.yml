@@ -1,5 +1,5 @@
 name: newsletter
-# Monday 03:30 UTC (05:30 in SA): check race results, build the issues due this week, publish them, and open a note for the founder.
+# Monday 03:30 UTC (05:30 in SA): check race results, build the newsletter issues due and this week's post kits, publish them, and open a note for the founder.
 # Nothing is emailed here. The founder reads it and presses Send in the Review panel.
 on:
   schedule: [{ cron: "30 3 * * 1" }]
@@ -18,12 +18,16 @@ jobs:
           set -- $(node scripts/newsletter-due.mjs "$(date -u +%F)")
           day=$1; shift
           for p in "$@"; do node scripts/newsletter.mjs --from "$day" --period "$p"; done
+      - name: Post kits for the week
+        run: |
+          npm i --no-save playwright@1.63.0 && npx playwright install --with-deps chromium
+          node scripts/post-kits.mjs --from "$(date -u +%F)"
       - run: ./build.sh --no-test
       - name: Commit
         run: |
           git config user.name "otm-bot"; git config user.email "bot@onetrackmind.online"
-          git add data/events/results.json reports newsletter sitemap.xml events blog index.html || true
+          git add data/events/results.json reports newsletter kits sitemap.xml events blog index.html || true
           git diff --cached --quiet || { git commit -m "Newsletter and results $(date -u +%F)"; git push; }
       - name: Tell the founder
         env: { GH_TOKEN: "${{ github.token }}" }
-        run: gh issue create --title "Newsletter ready $(date -u +%F)" --body "Read it, send yourself a test, then press Send it in the Review panel on onetrackmind.online."$'\n\n'"$(cat reports/results-sniff.md)"
+        run: gh issue create --title "Newsletter ready $(date -u +%F)" --body "Newsletter: read it, send yourself a test, then press Send it in the Review panel on onetrackmind.online. This week's posts: https://onetrackmind.online/kits/$(date -u +%F)/"$'\n\n'"$(cat reports/results-sniff.md)"
