@@ -33,7 +33,7 @@ function stops(r) {
 }
 const places = r => { const s = [r.trip.start, ...r.trip.days.flatMap(d => [...(d.vias || []), ...(d.to ? [d.to] : [])])]; if (r.trip.end) s.push(r.trip.end); const seen = new Set(); return s.filter(p => p && !seen.has(p.name) && seen.add(p.name)); };
 
-const CSS = `:root{--bg:#EEF3F3;--panel:#fff;--ink:#11262B;--muted:#54666A;--line:#D0DBDC;--accent:#0F7B8A;--chip:#E0EBEC;color-scheme:light}
+const CSS = `:root{--bg:#EEF3F3;--panel:#fff;--ink:#11262B;--muted:#54666A;--line:#D0DBDC;--accent:#1E8EB4;--chip:#E0EBEC;color-scheme:light}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121614;--panel:#1A201D;--ink:#E7EBE5;--muted:#9AA39D;--line:#2E3631;--accent:#4CC08F;--chip:#232A26;color-scheme:dark}}
 *{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.6 "IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif}
 a{color:var(--accent)}.wrap{max-width:1400px;margin:0 auto;padding:0 16px}@media(min-width:1440px){.wrap{padding:0}}main p,main ul,main ol,main blockquote,main h1,main h2,main h3,main .meta,main figure,main.story>img.cover,main .gallery,main .note,.spbox{max-width:860px}main .cards p,main .cards ul{max-width:none}
@@ -65,7 +65,7 @@ footer{border-top:1px solid var(--line);margin:40px 0 0;padding:16px 0 30px;colo
 .card.story img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:4px;margin:-4px 0 8px}
 .photos{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px;margin:18px 0}.photos img{width:100%;aspect-ratio:3/2;object-fit:cover;border-radius:6px}
 :root{--brand:#E8A317;--gold:#E8A317}
-html[data-mode="motorsport"]{--bg:#06181C;--panel:#0E2A30;--ink:#F1F1EE;--muted:#9FB6BA;--line:#1D4048;--accent:#E8A317;--chip:#123740;--onfill:#0B1D21;--warn:#FF9A1A;--bad:#E5484D;--brand:#E8A317;--gold:#E8A317;--hero:#03141A;color-scheme:dark}
+html[data-mode="motorsport"]{--bg:#0A4A63;--panel:#0F5874;--ink:#F4F8F9;--muted:#B5D3DE;--line:#2B7896;--accent:#E8A317;--chip:#13617E;--onfill:#0B1D21;--warn:#FF9A1A;--bad:#E5484D;--brand:#E8A317;--gold:#E8A317;--hero:#08405A;color-scheme:dark}
 html[data-mode="motorsport"] .hero{background:#03141A;border-color:#E8A317}
 
 html[data-mode="motorsport"] .btn.share,html[data-mode="motorsport"] .ib.on{color:#111}
@@ -92,12 +92,16 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
 .hdrlinks{display:flex!important;flex-wrap:wrap;align-items:center}.hdrlinks .modesw{margin-left:auto}.navtoggle{display:none}
 @media(max-width:640px){.navtoggle{display:block;font:700 1.15rem "Barlow Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.06em;background:none;border:0;color:var(--bg);padding:9px 14px;cursor:pointer}.hdrlinks{justify-content:space-between}.hdrlinks>a{display:none!important;width:100%}.hdrlinks.open>a{display:block!important}.hdrlinks .modesw{margin:4px 8px}}
 
-.blog .bpick{display:grid;grid-template-columns:.6fr 1fr 1fr;gap:10px;margin:14px 0 16px}.bbox{min-height:90px;border:3px solid transparent;border-radius:10px;padding:12px;text-align:left;cursor:pointer;color:#fff;font:inherit;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(180deg,rgba(3,20,26,.1),rgba(3,20,26,.88)),var(--img,linear-gradient(135deg,#0F7B8A,#0B3B45)) center/cover}.bbox b{font:700 1.4rem var(--f-display,"Barlow Condensed",sans-serif);text-transform:uppercase}.bbox span{color:var(--gold);font-size:.85rem;font-weight:600}.bbox.on{border-color:var(--gold)}
+.blog .bpick{display:grid;grid-template-columns:.6fr 1fr 1fr;gap:10px;margin:14px 0 16px}.bbox{min-height:90px;border:3px solid transparent;border-radius:10px;padding:12px;text-align:left;cursor:pointer;color:#fff;font:inherit;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(180deg,rgba(3,20,26,.1),rgba(3,20,26,.88)),var(--img,linear-gradient(135deg,#1E8EB4,#0B4A60)) center/cover}.bbox b{font:700 1.4rem var(--f-display,"Barlow Condensed",sans-serif);text-transform:uppercase}.bbox span{color:var(--gold);font-size:.85rem;font-weight:600}.bbox.on{border-color:var(--gold)}
 .collage{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));grid-auto-rows:200px;grid-auto-flow:dense;gap:8px}.ctile{position:relative;border-radius:8px;overflow:hidden;background:var(--panel)}.ctile.big{grid-column:span 2;grid-row:span 2}.ctile .cimg{position:absolute;inset:0;display:block;color:#fff;text-decoration:none}.ctile img{position:absolute;inset:0;display:block;width:100%!important;height:100%!important;max-height:none!important;max-width:none!important;aspect-ratio:auto!important;object-fit:cover;margin:0!important;border:0!important;border-radius:0!important;transition:transform .3s}.cmeta{z-index:1}.ctile:hover img{transform:scale(1.04)}.cmeta{position:absolute;left:0;right:0;bottom:0;padding:30px 12px 10px;background:linear-gradient(180deg,transparent,rgba(3,20,26,.92));display:flex;flex-direction:column}.cmeta b{font:700 1.15rem/1.1 var(--f-display,"Barlow Condensed",sans-serif);text-transform:uppercase}.ctile.big .cmeta b{font-size:1.7rem}.cmeta span{font-size:.8rem;color:#C9D6D8}.plot{position:absolute;top:8px;right:8px;background:var(--gold);color:#0B1D21;font-weight:700;font-size:.8rem;padding:4px 8px;border-radius:4px;text-decoration:none;z-index:2}
 @media(max-width:640px){.blog .bpick{grid-template-columns:1fr 1fr}.blog .bpick .bbox[data-f=all]{grid-column:1/-1;min-height:44px}.collage{grid-template-columns:1fr 1fr;grid-auto-rows:150px}.ctile.big{grid-column:span 2;grid-row:span 2}}
 
-.tex-gravel{background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.18) 0 1.5px,transparent 2px) 0 0/13px 11px,radial-gradient(circle at 70% 60%,rgba(60,40,20,.35) 0 2px,transparent 2.5px) 0 0/17px 15px,radial-gradient(circle at 40% 80%,rgba(255,240,210,.15) 0 1px,transparent 1.5px) 0 0/7px 9px,linear-gradient(135deg,#8A6A45,#6E5233)!important}
-.tex-tar{background:repeating-linear-gradient(90deg,#E8A317 0 34px,transparent 34px 60px) 0 calc(100% - 14px)/100% 5px no-repeat,radial-gradient(circle at 30% 40%,rgba(255,255,255,.07) 0 1px,transparent 1.5px) 0 0/6px 6px,radial-gradient(circle at 60% 70%,rgba(0,0,0,.35) 0 1.5px,transparent 2px) 0 0/9px 8px,linear-gradient(180deg,#2B2F31,#1E2224)!important}
+
+.tex-gravel{background:linear-gradient(90deg,rgba(20,14,8,.78),rgba(20,14,8,.35)),url(/img/tex-gravel.jpg) center/cover!important}
+.tex-tar{background:linear-gradient(90deg,rgba(0,0,0,.55),rgba(0,0,0,.15)),url(/img/tex-tarmac.jpg) center bottom/cover!important}
+
+.cabout{grid-column:-3/-1;grid-row:1/span 2;background:var(--panel);border:2px solid var(--gold);border-radius:10px;padding:14px;display:flex;gap:14px;align-items:flex-start;overflow:hidden}.cabout img{width:110px;height:146px;object-fit:cover;object-position:50% 15%;border-radius:8px;flex:none}.cabout b{font:700 1.5rem var(--f-display,"Barlow Condensed",sans-serif);text-transform:uppercase;color:var(--gold)}.cabout p{margin:6px 0 10px;font-size:.95rem;line-height:1.45}.cabout a{font-weight:700}
+@media(max-width:640px){.cabout{grid-column:1/-1;grid-row:auto}}
 `;
 
 function page({ url, title, desc, body, ld, image, active }) {
@@ -297,7 +301,7 @@ function routeSvg(r, w, h, big) {
   const line = pts.map(xy).map(a => a.join(",")).join(" ");
   const lab = (p, txt) => { const [x, y] = xy(p); return `<text x="${(+x + 8).toFixed(1)}" y="${(+y + 4).toFixed(1)}" font-size="${big ? 13 : 10}" font-family="IBM Plex Sans,system-ui,sans-serif" fill="#11262B" stroke="#EEF3F3" stroke-width="3" paint-order="stroke">${esc(txt)}</text>`; };
   return `<svg class="routemap" viewBox="0 0 ${w} ${h}" role="img" aria-label="Route: ${esc(pts.map(p => p.name).join(", "))}"><rect width="${w}" height="${h}" rx="8" fill="#E4E9DF"/>
-<polyline points="${line}" fill="none" stroke="#0F7B8A" stroke-width="${big ? 4 : 3}" stroke-linejoin="round" stroke-linecap="round"/>
+<polyline points="${line}" fill="none" stroke="#1E8EB4" stroke-width="${big ? 4 : 3}" stroke-linejoin="round" stroke-linecap="round"/>
 ${nights.map((p, i) => { const [x, y] = xy(p); return `<circle cx="${x}" cy="${y}" r="${big ? 6 : 4}" fill="#11262B"/>${big ? lab(p, p.name.replace(/,.*$/, "")) : ""}`; }).join("")}
 ${(() => { const [x, y] = xy(t.start); return `<circle cx="${x}" cy="${y}" r="${big ? 8 : 5}" fill="#E8A317" stroke="#11262B" stroke-width="2"/>${lab(t.start, t.start.name)}`; })()}</svg>`;
 }
@@ -314,7 +318,7 @@ function tripMap(r) {
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>(function(){var d=${data};var m=L.map("tripmap",{scrollWheelZoom:false,zoomSnap:0.25});
 L.tileLayer("https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png",{maxZoom:18,attribution:'&copy; <a href="https://stadiamaps.com/">Stadia Maps</a> &copy; <a href="https://openmaptiles.org/">OpenMapTiles</a> &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'}).addTo(m);
-L.polyline(d.line,{color:"#fff",weight:8,opacity:.9}).addTo(m);var pl=L.polyline(d.line,{color:"#0F7B8A",weight:4.5}).addTo(m);
+L.polyline(d.line,{color:"#fff",weight:8,opacity:.9}).addTo(m);var pl=L.polyline(d.line,{color:"#1E8EB4",weight:4.5}).addTo(m);
 d.nights.forEach(function(p){L.circleMarker([p[0],p[1]],{radius:6,color:"#fff",weight:2,fillColor:"#11262B",fillOpacity:1}).bindTooltip(p[2],{permanent:true,direction:"right",className:"tmlab"}).addTo(m);});
 L.circleMarker([d.start[0],d.start[1]],{radius:8,color:"#11262B",weight:2,fillColor:"#E8A317",fillOpacity:1}).bindTooltip(d.start[2],{permanent:true,direction:"right",className:"tmlab"}).addTo(m);
 m.fitBounds(pl.getBounds(),{padding:[28,28]});})();</script>`;
@@ -370,7 +374,7 @@ function storiesIndex(M) {
 <button type="button" class="bbox tex-gravel" data-f="adventure"><b>Adventure</b><span>Recce. Ride. Report.</span></button>
 <button type="button" class="bbox tex-tar" data-f="motorsport"><b>Motorsport</b><span>Plan it. Book it. Ride it.</span></button>
 </nav>
-<div class="collage">${groups.map(tile).join("")}</div>
+<div class="collage"><div class="cabout"><img src="/img/ashley.jpg" alt="Ashley in his garage" loading="lazy"><div><b>Hi, I'm Ashley.</b><p>Ducati taught me to ride the road, KTM taught me to live off it, and the Alfas got me racing. Twenty-odd years of trips and race weekends live here. Tap a picture to read it, or Plot this route to ride it yourself.</p><a href="/about/">More about me ›</a></div></div>${groups.map(tile).join("")}</div>
 <p class="note"><a href="/favourites/">The places I'd send you: Founder's fav's ›</a></p>
 <a class="cta" href="/">Plan your own</a></main>
 <script>(function(){var b=document.querySelectorAll(".bbox");function f(k){b.forEach(function(y){y.classList.toggle("on",y.dataset.f===k)});document.querySelectorAll(".ctile").forEach(function(c){c.hidden=k!=="all"&&(" "+c.dataset.cat+" ").indexOf(" "+k+" ")<0});try{history.replaceState(null,"",k==="all"?location.pathname:"#"+k)}catch(e){}}b.forEach(function(x){x.onclick=function(){f(x.dataset.f)}});var h=location.hash.slice(1);if(h==="adventure"||h==="motorsport")f(h);else{try{var p=localStorage.getItem("otm-pick");if(p)f(p)}catch(e){}}})();</script>`;

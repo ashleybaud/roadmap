@@ -8,7 +8,7 @@ let near=null; // {lat,lon,name}
 const nearRad=()=>+$("nearRad").value||100;
 try{ const r=localStorage.getItem("otm-nearrad"); if(r) $("nearRad").value=r; }catch(e){}
 function nearCountries(c,km){ const d=km/111; return Object.entries(COUNTRY_BOX).filter(([,b])=>!(b[0]>c.lat+d||b[2]<c.lat-d||b[1]>c.lon+d*1.3||b[3]<c.lon-d*1.3)).map(([cc])=>cc); }
-const NK={fuel:["fuel","⛽","#0F7B8A"],sleep:["stay","🛏","#2F5BA8"],camp:["stay","⛺","#2F5BA8"],food:["food","🍴","#B3261E"],pass:["sights","⛰","#5D4037"],view:["sights","👁","#6B4E9B"],sight:["sights","★","#6B4E9B"],med:["med","🏥","#B3261E"]};
+const NK={fuel:["fuel","⛽","#1E8EB4"],sleep:["stay","🛏","#2F5BA8"],camp:["stay","⛺","#2F5BA8"],food:["food","🍴","#B3261E"],pass:["sights","⛰","#5D4037"],view:["sights","👁","#6B4E9B"],sight:["sights","★","#6B4E9B"],med:["med","🏥","#B3261E"]};
 let nearData=null, nearKey="";
 async function loadNear(){
   const c=near, R=nearRad(), key=[c.lat,c.lon,R].join(); if(key===nearKey&&nearData) return nearData; nearKey=key;
