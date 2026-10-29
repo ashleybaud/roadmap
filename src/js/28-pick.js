@@ -27,7 +27,7 @@ function setPick(md,user){
   if(!user) return;
   let reroute=false;
   if(!settings.styleSet){ const want=pickMode==="motorsport"?"tar":"rough"; if(settings.style!==want){ settings.style=want; if($("style")) $("style").value=want; store.set("rr2-settings",settings); showStyle(); reroute=true; } }
-  if(pickMode==="motorsport"){ ui.lay.fav=true; }
+  ui.lay.moto=pickMode==="motorsport"; if(pickMode==="motorsport"){ ui.lay.fav=true; } try{ renderLayers(); }catch(e){}
   try{ reroute&&trip.start&&trip.start.lat!=null?recalc():drawMap(); }catch(e){}
   const t=$("toast"); if(t){ t.innerHTML=pickMode==="motorsport"?"<b>Motorsport:</b> the quick way, with tracks, museums, factories and upcoming events on the map. Set where you start and where you're going.":"<b>Adventure:</b> the road less travelled, graded for what you ride. Set where you start and where you're going."; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,9000); }
   const mp=$("map"); if(mp) mp.scrollIntoView({behavior:"smooth",block:"start"});
@@ -52,4 +52,13 @@ function onDatesHtml(){
   if(!L.length) return "";
   const fmt=d=>new Date(d+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short"});
   return `<div class="ondates"><h3>🏁 On your dates</h3><ul>${L.map(e=>`<li><span><b>${esc(e.name)}</b> · ${fmt(e.start)}${e.end!==e.start?"–"+fmt(e.end):""}${e.confirmed?"":" (dates unconfirmed)"}<br><span class="note">${esc(e.venue||e.city||"")} · ${e.km<5?"on your route":Math.round(e.km)+" km off your route"}</span></span><span><button type="button" class="linkbtn" data-evgo="${esc(e.id)}">Make it the finish</button> · <a href="${esc(e.tickets||e.url||"/events/")}" target="_blank" rel="noopener">Tickets ›</a></span></li>`).join("")}</ul></div>`;
+}
+
+/* Fly part of it: when the start and finish are far apart (or across the sea), offer flights and a car at the far end */
+function flightHtml(){
+  const s=trip.start, e=trip.end; if(!s||!e||s.lat==null||e.lat==null) return "";
+  const km=hav(s,e), noRoad=!plan||(plan&&plan.error);
+  if(km<1500&&!(noRoad&&km>300)) return "";
+  const when=trip.startDate||"", q=`Flights from ${s.name==="My location"?"my nearest airport":s.name} to ${e.name}${when?" on "+when:""}`;
+  return `<div class="ondates flycard"><h3>✈ Fly part of it</h3><p class="note">${e.name} is about ${Math.round(km).toLocaleString("en-ZA")} km away${noRoad?" and there may be no road all the way":""}. Fly the long bit, then ride or drive the good part.</p><div class="btns"><a class="btn small" href="https://www.google.com/travel/flights?q=${encodeURIComponent(q)}" target="_blank" rel="noopener">Find flights ↗</a><a class="btn small ghost" href="${esc(carHireUrl(e.name))}" target="_blank" rel="sponsored noopener">Hire a car at ${esc(e.name)} ↗</a></div></div>`;
 }

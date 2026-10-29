@@ -8,7 +8,7 @@ let near=null; // {lat,lon,name}
 const nearRad=()=>+$("nearRad").value||100;
 try{ const r=localStorage.getItem("otm-nearrad"); if(r) $("nearRad").value=r; }catch(e){}
 function nearCountries(c,km){ const d=km/111; return Object.entries(COUNTRY_BOX).filter(([,b])=>!(b[0]>c.lat+d||b[2]<c.lat-d||b[1]>c.lon+d*1.3||b[3]<c.lon-d*1.3)).map(([cc])=>cc); }
-const NK={fuel:["fuel","⛽","#1E8EB4"],sleep:["stay","🛏","#2F5BA8"],camp:["stay","⛺","#2F5BA8"],food:["food","🍴","#B3261E"],pass:["sights","⛰","#5D4037"],view:["sights","👁","#6B4E9B"],sight:["sights","★","#6B4E9B"],med:["med","🏥","#B3261E"]};
+const NK={fuel:["fuel","⛽","#1E8EB4"],sleep:["stay","🛏","#2F5BA8"],camp:["stay","⛺","#2F5BA8"],food:["food","🍴","#B3261E"],pass:["sights","⛰","#5D4037"],view:["sights","👁","#6B4E9B"],sight:["sights","★","#6B4E9B"],med:["med","🏥","#B3261E"],moto:["moto","🏁","#E8A317"]};
 let nearData=null, nearKey="";
 async function loadNear(){
   const c=near, R=nearRad(), key=[c.lat,c.lon,R].join(); if(key===nearKey&&nearData) return nearData; nearKey=key;
@@ -17,6 +17,7 @@ async function loadNear(){
     (rows||[]).forEach(r=>{ const [lat,lon,name,type,phone,web,email,hours,extra]=r, p={lat,lon}; if(hav(c,p)>R) return; if(kind==="pass"&&(!name||seen.has(name))) return; if(name) seen.add(name);
       out.push({lat,lon,name:name||"",kind:kind==="camp"?"sleep":kind,ico:kind,tags:{tourism:type||(kind==="camp"?"camp_site":""),phone,website:web,email,hours,extra},d:hav(c,p)}); }); }
   let routes=[]; try{ picks=picks||await loadPicks(); routes=picks.filter(r=>r.kind==="pick"&&r.trip&&r.trip.start).map(r=>{ const pts=[r.trip.start,r.trip.end,...r.trip.days.flatMap(x=>[x.to,...(x.vias||[])])].filter(x=>x&&x.lat!=null); const best=pts.map(q=>({q,d:hav(c,q)})).sort((a,b)=>a.d-b.d)[0]; return {r,at:best.q,d:best.d}; }).filter(x=>x.d<=R); }catch(e){}
+  try{ (await nearMoto(c,R)).forEach(p=>out.push(p)); }catch(e){}
   return nearData={places:out,routes,ccs};
 }
 // what to do with a place: go there, stop there, or ride there and back
@@ -46,6 +47,18 @@ async function drawNear(){
   if(!nearFit){ nearFit=true; const dy=R/111, dx=R/(111*Math.cos(c.lat*Math.PI/180)); map.fitBounds([[c.lat-dy,c.lon-dx],[c.lat+dy,c.lon+dx]],{padding:[10,10]}); }
 }
 const p0=n=>n||0;
+/* Petrolhead places near you: motor museums, tracks and karting from OpenStreetMap, plus the founder's motorsport places and upcoming events */
+async function nearMoto(c,R){
+  const out=[], seen=new Set(), add=(lat,lon,name,extra)=>{ if(lat==null||!name) return; const k=name.toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,24); if(seen.has(k)) return; seen.add(k); const d=hav(c,{lat,lon}); if(d>R) return; out.push({lat,lon,name,kind:"moto",ico:"moto",tags:{extra:extra||""},d}); };
+  try{ const fl=await loadFavs(); fl.filter(f=>f.group==="petrol").forEach(f=>add(f.lat,f.lon,f.name,"Founder's fav")); }catch(e){}
+  try{ const ev=await loadEvents(); const t=new Date().toISOString().slice(0,10); ev.filter(e=>e.end>=t).forEach(e=>add(e.lat,e.lon,`${e.name} (${e.start})`,"Event")); }catch(e){}
+  const r=Math.round(Math.min(R,200)*1000), A=`(around:${r},${c.lat},${c.lon})`;
+  const q=`[out:json][timeout:20];(nwr["tourism"="museum"]["name"~"motor|auto|car|vehicle|transport|racing|motorcycle|moto|vintage|classic|wheels|speed",i]${A};nwr["highway"="raceway"]["name"]${A};nwr["sport"~"motor|karting|motocross|speedway"]["name"]${A};nwr["leisure"="track"]["sport"~"motor|karting"]["name"]${A};);out center 150;`;
+  try{ const ctl=new AbortController(); setTimeout(()=>ctl.abort(),25000);
+    const res=await fetch(OVERPASS,{method:"POST",signal:ctl.signal,body:"data="+encodeURIComponent(q),headers:{"Content-Type":"application/x-www-form-urlencoded"}}); const j=await res.json();
+    (j.elements||[]).forEach(e=>{ const lat=e.lat??(e.center&&e.center.lat), lon=e.lon??(e.center&&e.center.lon), t=e.tags||{}; add(lat,lon,t.name,t.tourism==="museum"?"Motor museum":(t.sport||"Track")); }); }catch(e){}
+  return out;
+}
 function nearOn(at){ near=at; nearFit=false; nearKey=""; $("nsWhere").textContent=at.name; $("nearStrip").hidden=false; $("tbNear").classList.add("on"); drawNear(); if(window.innerWidth<=1000) $("map").scrollIntoView({behavior:"smooth",block:"start"}); }
 function nearOff(){ if(!near) return; near=null; if(nearLayer){ nearLayer.remove(); nearLayer=null; } $("nearStrip").hidden=true; $("tbNear").classList.remove("on"); window._refit=true; drawMap(); }
 function nearLocate(fallback){ if(!navigator.geolocation){ if(fallback) fallback(); return; } $("status").textContent="Finding you…";
