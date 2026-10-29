@@ -676,6 +676,13 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
 .evband .evalert{border-top-color:#2A353A}.evband .evalert b{color:#fff}.evband .evalert>span{color:#9AA9B0}
 .evband .evalert input[type=email]{background:#1C262B;color:#fff;border-color:#3A474D}
 .evband .evalert button{background:transparent;color:var(--gold);border:2px solid var(--gold)}.evband .evalert .nlm{color:var(--gold)}
+/* the story and sign-up sit on a pit board: black board, brushed aluminium frame, handle on top */
+.evband .evstory{position:relative;background:linear-gradient(180deg,#0B0D0E,#16191B);border-radius:6px;padding:20px 18px 18px;margin-top:12px;
+  border:9px solid #A9B2B7;border-image:linear-gradient(135deg,#E3E8EA 0%,#8D979C 22%,#D2D8DB 45%,#7E888D 70%,#C9D0D3 100%) 1;
+  box-shadow:inset 0 0 0 2px #050606,0 6px 16px rgba(0,0,0,.45)}
+.evband .evstory::before{content:"";position:absolute;left:50%;top:-24px;width:46%;height:16px;transform:translateX(-50%);border:6px solid #9AA4A9;border-bottom:0;border-radius:10px 10px 0 0}
+.evband .evstory b:first-child{font-size:1.6rem;line-height:1.05;margin-bottom:10px;letter-spacing:.02em;color:#FFD23F!important;text-shadow:0 0 1px rgba(255,210,63,.4)}
+.evband .evstory>span{color:#F2F2F2}
 /* gold fill means "do this": one per section; the rest are outlines */
 .pcol:first-child .palt{background:rgba(6,48,63,.55);color:var(--gold);border:2px solid var(--gold);box-shadow:none}
 .herobtn{background:transparent!important;color:var(--gold)!important;border:2px solid var(--gold)!important}
@@ -721,7 +728,7 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
           <span class="pgo">Plan a motorsport trip ›</span></button><a class="palt" href="/events/" data-evtrip>Pick your races ›</a></div>
       </div>
       <section class="evband" aria-label="Races and festivals">
-        <div class="evstory"><b>Plan the year around the races.</b><span>I was in Monterey a week before Car Week and didn't know it was on. I'd broken down and spent the weekend there, never realising it's the car capital of the world. With this calendar I'd have timed it right.</span>
+        <div class="evstory"><b>Plan your year around the races.</b><span>I was in Monterey a week before Car Week and didn't know it was on. I'd broken down and spent the weekend there, never realising it's the car capital of the world. With this calendar I'd have timed it right.</span>
           <button type="button" class="btn evtripbtn" data-evtrip>Build a trip around the races ›</button>
           <div class="evalert"><b>Never miss lights out.</b><span>Every Monday: who's racing that week, where, and how to watch.</span><form class="nlf" data-source="race-alerts" novalidate><input type="email" name="email" placeholder="Your email" autocomplete="email" aria-label="Your email" required><input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px"><button type="submit">Count me in</button></form><span class="nlm" aria-live="polite"></span></div></div>
         <div class="evcoming"><div class="evhead"><span class="lbl">Coming up</span><div class="evregs" id="evRegs" aria-label="Where"></div></div>
