@@ -8,7 +8,7 @@ const Q = {
   "2019-06 RedBull Cape Town Circuit": "Green Point Cape Town",
   "2019-03 MotoGP-Qatar": "Lusail International Circuit",
   "2016-06 Franschoek Motor Museum": "Franschhoek Motor Museum",
-  "2023-03 WPMC @ Killarney": "Killarney International Raceway",
+  "2023-03 WPMC @ Killarney": "Killarney Raceway",
   "2023-02 Wijnland Motor Museum": "Wijnland Auto Museum",
   "2018-05 Simola Hill Climb": "Simola Knysna",
   "2016-06 Port Elizabeth enduros": "Gqeberha",
@@ -16,7 +16,7 @@ const Q = {
 const out = (() => { try { return JSON.parse(fs.readFileSync("data/blog-poi.json", "utf8")); } catch (e) { return {}; } })();
 for (const [series, q] of Object.entries(Q)) {
   if (out[series]) continue;
-  const r = await fetch("https://photon.komoot.io/api/?limit=1&q=" + encodeURIComponent(q), { headers: { "user-agent": "OneTrackMind blog places" } });
+  const r = await fetch("https://photon.komoot.io/api/?limit=1&lat=-33.9&lon=18.6&location_bias_scale=0.5&q=" + encodeURIComponent(q), { headers: { "user-agent": "OneTrackMind blog places" } });
   const j = await r.json(); const f = j.features && j.features[0];
   if (!f) { console.log("not found:", q); continue; }
   const [lon, lat] = f.geometry.coordinates, p = f.properties;
