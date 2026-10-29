@@ -1032,6 +1032,7 @@ function drawMap(){
   if(ui.lay.rep&&typeof drawReports==="function") drawReports(sel);
   if(ui.lay.spots&&typeof drawSpots==="function") drawSpots();
   try{ if(ui.lay.fav&&typeof drawFavs==="function") drawFavs(); }catch(e){} // an extra layer must never stop the route
+  try{ if(typeof drawEvents==="function") drawEvents(); }catch(e){}
   if(panel){ drawPanelLayer(); return; }
   if(stopFocus&&sel&&stopFocus.k===ui.tab&&drawStopLayer()) return;
   if(ovFocus&&(!sel||ovFocus.k===ui.tab)&&drawOvLayer()) return;

@@ -632,6 +632,19 @@ html[data-mode="motorsport"] .modesw button.on{background:#F2C500;color:#111}
 .hdrlinks{display:flex!important;flex-wrap:wrap;align-items:center}.hdrlinks .modesw{margin-left:auto}.navtoggle{display:none}
 @media(max-width:640px){.navtoggle{display:block;font:700 1.15rem "Barlow Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.06em;background:none;border:0;color:var(--bg);padding:9px 14px;cursor:pointer}.hdrlinks{justify-content:space-between}.hdrlinks>a{display:none!important;width:100%}.hdrlinks.open>a{display:block!important}.hdrlinks .modesw{margin:4px 8px}}
 .latest{margin:28px 0 0}.latest h2{font:700 1.5rem var(--f-display);text-transform:uppercase;margin:0 0 10px}.lcards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.lcards a{display:flex;flex-direction:column;gap:6px;text-decoration:none;color:var(--ink);background:var(--panel);border:1px solid var(--line);border-radius:8px;overflow:hidden}.lcards img{width:100%;aspect-ratio:3/2;object-fit:cover}.lcards b{padding:0 10px}.lcards span{padding:0 10px 10px;color:var(--muted);font-size:.9rem}.lstory{max-width:760px;margin:0 0 14px;line-height:1.5}.lmore{display:inline-block;margin-top:10px;font-weight:600}@media(max-width:640px){.lcards{grid-template-columns:1fr}}
+.hero.pick{background:none;border:0;padding:0;color:var(--ink)}
+.pickq{font:700 2rem var(--f-display);text-transform:uppercase;margin:4px 0 12px;color:var(--ink)}.pickq span{color:var(--gold)}
+.pickboxes{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.pbox{position:relative;display:flex;flex-direction:column;justify-content:flex-end;gap:6px;min-height:340px;padding:20px;border:3px solid transparent;border-radius:12px;text-align:left;cursor:pointer;color:#fff;font:inherit;
+  background:linear-gradient(180deg,rgba(3,20,26,.05) 25%,rgba(3,20,26,.92) 100%),var(--img) center/cover no-repeat;transition:transform .15s,border-color .15s}
+.pbox:hover{transform:translateY(-2px);border-color:var(--gold)}.pbox.on{border-color:var(--gold);box-shadow:0 0 0 3px rgba(242,197,0,.25)}
+.pbox .pk{align-self:flex-start;background:var(--gold);color:#0B1D21;font:700 .85rem var(--f-display);letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:3px}
+.pbox .pt{font:700 2.1rem/1 var(--f-display);text-transform:uppercase;color:#fff}
+.pbox .pp{font-size:1rem;line-height:1.45;max-width:46ch;color:#E9F1F1}
+.pbox .pgo{font-weight:700;color:var(--gold);margin-top:4px}
+.hero.pick .herocta{margin-top:12px;display:flex;justify-content:center}
+@media(max-width:700px){.pickboxes{grid-template-columns:1fr}.pbox{min-height:260px}.pbox .pt{font-size:1.7rem}.pickq{font-size:1.5rem}}
+.evmk{width:26px;height:26px;border-radius:50%;background:#fff;border:2px solid #11262B;display:flex;align-items:center;justify-content:center;font-size:14px;box-shadow:0 1px 3px rgba(0,0,0,.35)}
 </style>
 </head>
 <body>
@@ -639,20 +652,21 @@ html[data-mode="motorsport"] .modesw button.on{background:#F2C500;color:#111}
   <header>
     <div><h1><a class="homelink" href="/" title="Home">OneTrackMind</a> <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1><div class="motto">Recce. Ride. Report.</div><a class="byme" href="/about/"><img src="/img/ashley.jpg" alt="" width="40" height="40"><span><b>Built by Ashley.</b> 25 years at Ducati and KTM, now Alfas on a farm. Add your favourite routes, mark the places worth stopping.</span></a></div>
     <div class="btns"><span class="lbl mono" id="hdrSummary"></span><button class="btn ghost" id="feedback" type="button">Send feedback</button><button class="btn" id="addBtn" type="button" hidden>+ Add yours</button><button class="btn ghost" id="reviewBtn" type="button" hidden>Review</button><button class="btn ghost" id="acctBtn" type="button" hidden>Sign in</button><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
-    <nav class="hdrlinks" id="sitenav" style="order:9" aria-label="Site"><button type="button" class="navtoggle" aria-expanded="false" aria-controls="sitenav">Menu ▾</button><a href="/" class="on" aria-current="page">Plan a trip</a><a href="/routes/">Routes</a><a href="/events/">Events</a><a href="/how-to/">How to</a><a href="/favourites/">Founder's fav's</a><a href="/about/">About</a></nav><script>document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".navtoggle");if(!b)return;var n=b.closest(".hdrlinks"),o=n.classList.toggle("open");b.setAttribute("aria-expanded",String(o))});document.addEventListener("click",function(e){document.querySelectorAll(".navdd[open]").forEach(function(d){if(!d.contains(e.target))d.open=false;});});</script>
+    <nav class="hdrlinks" id="sitenav" style="order:9" aria-label="Site"><button type="button" class="navtoggle" aria-expanded="false" aria-controls="sitenav">Menu ▾</button><a href="/" class="on" aria-current="page">Plan a trip</a><a href="/routes/">Routes</a><a href="/events/">Events</a><a href="/how-to/">How to</a><a href="/blog/">Blog</a><a href="/about/">About</a></nav><script>document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".navtoggle");if(!b)return;var n=b.closest(".hdrlinks"),o=n.classList.toggle("open");b.setAttribute("aria-expanded",String(o))});document.addEventListener("click",function(e){document.querySelectorAll(".navdd[open]").forEach(function(d){if(!d.contains(e.target))d.open=false;});});</script>
     <a class="spstrip" href="https://alterego.online/products/build-race-repeat-hoodie?utm_source=onetrackmind&utm_medium=sponsor" target="_blank" rel="noopener sponsored"><img src="https://alterego.online/cdn/shop/files/3158941636033974733_2048.jpg?v=1792398701&width=240" alt="" loading="lazy"><span><b>AlterEgo</b> Build Race Repeat hoodie, from $65 › <em>Ad</em></span></a>
-    <section class="hero" style="order:10" aria-label="What it does">
-      <button type="button" class="herotoggle" id="heroToggle" aria-expanded="true" title="Hide this">Hide ▴</button>
-      <h2 class="herohead">Plan it. Book it. <span>Ride it.</span></h2>
-      <p class="herosub">Forget BaseCamp and five different apps. Route a multi-day trip in minutes, sort your beds, then send it straight to your GPS, your bike's app or your phone and navigate from there.</p>
-      <ol class="herosteps">
-        <li><b>Route it in minutes</b><span>Real roads, graded for your bike, 4x4 or car. Fuel gaps, sunset and weather checked for every day.</span></li>
-        <li><b>Book your beds</b><span>Places to stay at every night stop. Pick one, book it, tick it off.</span></li>
-        <li><b>Load your GPS</b><span>One tap: the right GPX for Garmin, BMW, KTM, Ducati or Harley.</span></li>
-        <li><b>Or just ride with your phone</b><span>Each day opens in Google Maps or Waze. No GPS? No problem.</span></li>
-      </ol>
-      <a class="heroband" id="heroBand" href="/favourites/" hidden><b>Coming to Southern Africa?</b> <span>The trips I'd take you on: Namibia's Skeleton Coast and Epupa Falls, the Orange River, the Cape passes. Each one opens in the planner ›</span></a>
-      <div class="herocta"><button class="btn herobtn" type="button" data-tryroute id="tryBtn">Try a route: Swartberg Pass in 2 days ›</button><span>Opens a finished trip. Change anything, or tap New to plan your own.</span></div>
+    <section class="hero pick" style="order:10" aria-label="What it does">
+      <h2 class="pickq">Two ways to go. <span>Which one's yours?</span></h2>
+      <div class="pickboxes">
+        <button type="button" class="pbox" data-pick="adventure" style="--img:url(/img/hero-adventure.jpg)" aria-pressed="false">
+          <span class="pk">Adventure</span><b class="pt">Recce. Ride. Report.</b>
+          <span class="pp">Back roads and gravel, graded for what you ride. Fuel gaps, night stops and beds sorted before you leave. Ride it, then tell the next rider what you found.</span>
+          <span class="pgo">Plan an adventure ›</span></button>
+        <button type="button" class="pbox" data-pick="motorsport" style="--img:url(/img/hero-motorsport.jpg)" aria-pressed="false">
+          <span class="pk">Motorsport</span><b class="pt">Plan it. Book it. Ride it.</b>
+          <span class="pp">Race weekends, tracks, museums and factories on the map. The quick way there, a bed near the circuit, tickets sorted. Drive or ride it home the long way.</span>
+          <span class="pgo">Plan a motorsport trip ›</span></button>
+      </div>
+      <div class="herocta"><button class="btn herobtn" type="button" data-tryroute id="tryBtn">Or try a finished trip: Swartberg Pass in 2 days ›</button></div>
     </section>
   </header>
 
@@ -713,7 +727,7 @@ html[data-mode="motorsport"] .modesw button.on{background:#F2C500;color:#111}
       <div class="details" id="details"></div>
     </div>
   </div>
-  <section id="latest" class="latest" hidden><h2>How it started</h2><p class="lstory">My first trip into Namibia was in 2003 and I've been going back ever since. The trips got longer, the bikes got better and the breakdowns got more educational. A lap of the Nürburgring on a public Sunday, a desert rescue that turned into a lesson, Namibia again from the air conditioning of a car. OneTrackMind is where I put what I learnt, so you can plan the trip I wish I'd had. <a href="/about/">More about me ›</a></p><div class="lcards"></div><a class="lmore" href="/favourites/">All of Ashley's stories ›</a></section>
+  <section id="latest" class="latest" hidden><h2>How it started</h2><p class="lstory">Ducati taught me to ride the road. KTM taught me to live off it. In 2004 I took a KTM 950 Adventure, a paper map and a planning committee that mostly drank beer into Namibia, and I've been going back ever since. Then the Alfas arrived: a Stepnose first, then the hill climbs, then a racecar that wouldn't drive. Adventure and motorsport have had me ever since. OneTrackMind is where both live: the planner I wish I'd had, and the stories behind it. <a href="/about/">More about me ›</a></p><div class="lcards"></div><a class="lmore" href="/favourites/">All of Ashley's stories ›</a></section>
 <aside class="nlbox"><b>Get the newsletter</b><span>New trips, events and how-to guides, about once a month. No spam.</span><form class="nlf" novalidate><input type="email" name="email" placeholder="Your email" autocomplete="email" aria-label="Your email" required><input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px"><button type="submit">Sign me up</button></form><span class="nlm" aria-live="polite"></span></aside>
   <script>(function(){document.querySelectorAll(".nlf").forEach(function(f){f.addEventListener("submit",function(e){e.preventDefault();var m=f.parentNode.querySelector(".nlm"),em=f.email.value.trim();if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)){m.textContent="That email doesn't look right.";return}m.textContent="Sending…";fetch("/api/subscribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:em,website:f.website.value,source:location.pathname})}).then(function(r){return r.json().then(function(j){return[r.ok,j]})}).then(function(x){if(x[0]){f.hidden=true;m.textContent=x[1].already?"You're already on the list.":"Almost done: tap the link in the email we just sent."}else m.textContent=x[1].error||"Something went wrong. Try again."}).catch(function(){m.textContent="No connection. Try again."})})})})();</script>
   <footer class="sitefoot">
@@ -2305,6 +2319,7 @@ function drawMap(){
   if(ui.lay.rep&&typeof drawReports==="function") drawReports(sel);
   if(ui.lay.spots&&typeof drawSpots==="function") drawSpots();
   try{ if(ui.lay.fav&&typeof drawFavs==="function") drawFavs(); }catch(e){} // an extra layer must never stop the route
+  try{ if(typeof drawEvents==="function") drawEvents(); }catch(e){}
   if(panel){ drawPanelLayer(); return; }
   if(stopFocus&&sel&&stopFocus.k===ui.tab&&drawStopLayer()) return;
   if(ovFocus&&(!sel||ovFocus.k===ui.tab)&&drawOvLayer()) return;
@@ -3939,5 +3954,35 @@ document.addEventListener("click",e=>{
   const sr=t.closest("[data-selstop]"); if(sr&&!t.closest("button,a,input,select,details,label")){ const [k,j]=sr.dataset.selstop.split(":").map(Number); selStop={k,j}; ovFocus=null;
     renderAll(); const p=plan&&plan.days[k]&&plan.days[k].pts[j]; if(p&&map) map.setView([p.lat,p.lon],Math.max(11,Math.min(map.getZoom(),13))); return; }
 });
+
+/* ---------- Adventure or Motorsport: the two boxes at the top ----------
+   Adventure: the road less travelled. Motorsport: the quick way, with tracks, museums, factories and upcoming events on the map.
+   The rider's own route style in Settings always wins. The choice is remembered on this device. */
+var pickMode=null, evList=null;
+function loadEvents(){ return evList?Promise.resolve(evList):fetch("/data/events/events.json").then(r=>r.ok?r.json():[]).then(j=>{ const t=new Date().toISOString().slice(0,10), y=new Date(Date.now()+365*864e5).toISOString().slice(0,10); return evList=j.filter(e=>e.end>=t&&e.start<=y); }).catch(()=>evList=[]); }
+function drawEvents(){
+  if(pickMode!=="motorsport") return;
+  if(!evList){ setTimeout(()=>loadEvents().then(()=>{ if(evList.length) drawMap(); }),0); return; }
+  const g=plan&&plan.geom, near=x=>{ if(!g) return true; for(let i=0;i<g.length;i+=Math.max(1,Math.floor(g.length/1500))) if(Math.abs(g[i].lat-x.lat)<1.2&&hav(g[i],x)<=100) return true; return false; };
+  const seen=new Set();
+  evList.filter(near).forEach(x=>{ const k=x.lat.toFixed(2)+","+x.lon.toFixed(2); if(seen.has(k)) return; seen.add(k);
+    const html=`<b>${esc(x.name)}</b><br><span class="note">${esc(x.start)}${x.end!==x.start?" to "+esc(x.end):""} · ${esc(x.venue||x.city||"")}</span><br><a href="/events/">All events</a> · <button type="button" class="linkbtn" data-evgo="${esc(x.id)}">Go here</button>`;
+    L.marker([x.lat,x.lon],{icon:L.divIcon({className:"",html:`<div class="evmk" title="${esc(x.name)}">🏁</div>`,iconSize:[26,26],iconAnchor:[13,13]}),zIndexOffset:650}).bindTooltip(x.name).bindPopup(html).addTo(layer); });
+}
+document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-evgo]"); if(!b) return; const x=(evList||[]).find(f=>f.id===b.dataset.evgo); if(!x) return; map.closePopup(); setFinish(pt(x.venue||x.name,x.lat,x.lon)); });
+function setPick(md,user){
+  pickMode=md==="motorsport"?"motorsport":"adventure"; try{ localStorage.setItem("otm-pick",pickMode); }catch(e){}
+  document.documentElement.setAttribute("data-pick",pickMode);
+  document.querySelectorAll(".pbox").forEach(b=>{ const on=b.dataset.pick===pickMode; b.classList.toggle("on",on); b.setAttribute("aria-pressed",String(on)); });
+  if(!user) return;
+  let reroute=false;
+  if(!settings.styleSet){ const want=pickMode==="motorsport"?"tar":"rough"; if(settings.style!==want){ settings.style=want; if($("style")) $("style").value=want; store.set("rr2-settings",settings); showStyle(); reroute=true; } }
+  if(pickMode==="motorsport"){ ui.lay.fav=true; }
+  try{ reroute&&trip.start&&trip.start.lat!=null?recalc():drawMap(); }catch(e){}
+  const t=$("toast"); if(t){ t.innerHTML=pickMode==="motorsport"?"<b>Motorsport:</b> the quick way, with tracks, museums, factories and upcoming events on the map. Set where you start and where you're going.":"<b>Adventure:</b> the road less travelled, graded for what you ride. Set where you start and where you're going."; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,9000); }
+  const mp=$("map"); if(mp) mp.scrollIntoView({behavior:"smooth",block:"start"});
+}
+document.querySelectorAll(".pbox").forEach(b=>b.addEventListener("click",()=>setPick(b.dataset.pick,true)));
+{ let s=null; try{ s=localStorage.getItem("otm-pick"); }catch(e){} if(s) setPick(s,false); }
 
 </script></body></html>

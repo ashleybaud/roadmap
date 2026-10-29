@@ -91,6 +91,10 @@ html[data-mode="motorsport"] .modesw button.on{background:#F2C500;color:#111}
 
 .hdrlinks{display:flex!important;flex-wrap:wrap;align-items:center}.hdrlinks .modesw{margin-left:auto}.navtoggle{display:none}
 @media(max-width:640px){.navtoggle{display:block;font:700 1.15rem "Barlow Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.06em;background:none;border:0;color:var(--bg);padding:9px 14px;cursor:pointer}.hdrlinks{justify-content:space-between}.hdrlinks>a{display:none!important;width:100%}.hdrlinks.open>a{display:block!important}.hdrlinks .modesw{margin:4px 8px}}
+
+.blog .bpick{display:grid;grid-template-columns:.6fr 1fr 1fr;gap:10px;margin:14px 0 16px}.bbox{min-height:90px;border:3px solid transparent;border-radius:10px;padding:12px;text-align:left;cursor:pointer;color:#fff;font:inherit;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(180deg,rgba(3,20,26,.1),rgba(3,20,26,.88)),var(--img,linear-gradient(135deg,#0F7B8A,#0B3B45)) center/cover}.bbox b{font:700 1.4rem var(--f-display,"Barlow Condensed",sans-serif);text-transform:uppercase}.bbox span{color:var(--gold);font-size:.85rem;font-weight:600}.bbox.on{border-color:var(--gold)}
+.collage{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));grid-auto-rows:200px;grid-auto-flow:dense;gap:8px}.ctile{position:relative;border-radius:8px;overflow:hidden;background:var(--panel)}.ctile.big{grid-column:span 2;grid-row:span 2}.ctile .cimg{position:absolute;inset:0;display:block;color:#fff;text-decoration:none}.ctile img{width:100%;height:100%;object-fit:cover;transition:transform .3s}.ctile:hover img{transform:scale(1.04)}.cmeta{position:absolute;left:0;right:0;bottom:0;padding:30px 12px 10px;background:linear-gradient(180deg,transparent,rgba(3,20,26,.92));display:flex;flex-direction:column}.cmeta b{font:700 1.15rem/1.1 var(--f-display,"Barlow Condensed",sans-serif);text-transform:uppercase}.ctile.big .cmeta b{font-size:1.7rem}.cmeta span{font-size:.8rem;color:#C9D6D8}.plot{position:absolute;top:8px;right:8px;background:var(--gold);color:#0B1D21;font-weight:700;font-size:.8rem;padding:4px 8px;border-radius:4px;text-decoration:none;z-index:2}
+@media(max-width:640px){.blog .bpick{grid-template-columns:1fr 1fr}.blog .bpick .bbox[data-f=all]{grid-column:1/-1;min-height:44px}.collage{grid-template-columns:1fr 1fr;grid-auto-rows:150px}.ctile.big{grid-column:span 2;grid-row:span 2}}
 `;
 
 function page({ url, title, desc, body, ld, image, active }) {
@@ -116,7 +120,7 @@ function page({ url, title, desc, body, ld, image, active }) {
 ${(Array.isArray(ld) ? ld : [ld]).filter(Boolean).map(x => `<script type="application/ld+json">${JSON.stringify(x)}</script>`).join("\n")}
 </head>
 <body><div class="wrap">
-<header><a class="logo" href="/">OneTrackMind</a><div class="motto">Recce. Ride. Report.</div><nav class="hdrlinks" id="sitenav" aria-label="Site"><button type="button" class="navtoggle" aria-expanded="false" aria-controls="sitenav">Menu ▾</button>${[["/","Plan a trip"],["/routes/","Routes"],["/events/","Events"],["/how-to/","How to"],["/favourites/","Founder's fav's"],["/about/","About"]].map(([h,t])=>`<a href="${h}"${active===h?' class="on" aria-current="page"':""}>${t}</a>`).join("")}</nav><a class="spstrip" href="https://alterego.online/products/build-race-repeat-hoodie?utm_source=onetrackmind&utm_medium=sponsor" target="_blank" rel="noopener sponsored"><img src="https://alterego.online/cdn/shop/files/3158941636033974733_2048.jpg?v=1792398701&width=240" alt="" loading="lazy"><span><b>AlterEgo</b> Build Race Repeat hoodie, from $65 › <em>Ad</em></span></a></header><script>document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".navtoggle");if(!b)return;var n=b.closest(".hdrlinks"),o=n.classList.toggle("open");b.setAttribute("aria-expanded",String(o))});document.addEventListener("click",function(e){document.querySelectorAll(".navdd[open]").forEach(function(d){if(!d.contains(e.target))d.open=false;});});</script>
+<header><a class="logo" href="/">OneTrackMind</a><div class="motto">Recce. Ride. Report.</div><nav class="hdrlinks" id="sitenav" aria-label="Site"><button type="button" class="navtoggle" aria-expanded="false" aria-controls="sitenav">Menu ▾</button>${[["/","Plan a trip"],["/routes/","Routes"],["/events/","Events"],["/how-to/","How to"],["/blog/","Blog"],["/about/","About"]].map(([h,t])=>`<a href="${h}"${active===h?' class="on" aria-current="page"':""}>${t}</a>`).join("")}</nav><a class="spstrip" href="https://alterego.online/products/build-race-repeat-hoodie?utm_source=onetrackmind&utm_medium=sponsor" target="_blank" rel="noopener sponsored"><img src="https://alterego.online/cdn/shop/files/3158941636033974733_2048.jpg?v=1792398701&width=240" alt="" loading="lazy"><span><b>AlterEgo</b> Build Race Repeat hoodie, from $65 › <em>Ad</em></span></a></header><script>document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".navtoggle");if(!b)return;var n=b.closest(".hdrlinks"),o=n.classList.toggle("open");b.setAttribute("aria-expanded",String(o))});document.addEventListener("click",function(e){document.querySelectorAll(".navdd[open]").forEach(function(d){if(!d.contains(e.target))d.open=false;});});</script>
 ${body}
 <aside class="nlbox"><b>Get the newsletter</b><span>New trips, events and how-to guides, about once a month. No spam.</span><form class="nlf" novalidate><input type="email" name="email" placeholder="Your email" autocomplete="email" aria-label="Your email" required><input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px"><button type="submit">Sign me up</button></form><span class="nlm" aria-live="polite"></span></aside>
 <aside class="spbox"><span>OneTrackMind is free thanks to</span> <a href="https://alterego.online/?utm_source=onetrackmind&utm_medium=sponsor" target="_blank" rel="noopener sponsored"><b>AlterEgo</b>, made-to-order wear for petrolheads</a> · <a href="/advertise/">Your brand here ›</a></aside>
@@ -346,16 +350,29 @@ ${L.length > 1 ? `<nav class="snav">${prev ? `<a href="/blog/${esc(prev.slug)}/"
   return page({ active: "/favourites/", url: `/blog/${x.slug}/`, title: `${x.title} · OneTrackMind blog`, desc: (x.lead || x.title).slice(0, 155), body, ld });
 }
 function storiesIndex(M) {
-  const groups = [...M.entries()].sort((a, b) => b[1][0].date.localeCompare(a[1][0].date));
-  const card = x => `<a class="card story" href="/blog/${esc(x.slug)}/">${x.cover ? `<img src="${esc(x.cover)}" alt="" loading="lazy">` : ""}<b>${esc(x.title)}</b><span>${fmtDate(x.date)}${x.gallery ? " · photos" : ""}</span></a>`;
-  const multi = groups.filter(([, L]) => L.length > 1), single = groups.filter(([, L]) => L.length === 1).map(([, L]) => L[0]);
-  const body = `<main><h1>Blog</h1>
-<p class="intro">Twenty years of road trips, festivals, factories and museums, mostly on two wheels and mostly not to plan. Trips first, newest first.</p>
-<h2>Trips</h2><div class="cards trips">${multi.map(([name, L]) => { const { r, line } = tripFacts(name, L); return `<a class="card trip" href="/blog/${tripSlug(name, L)}/">${coverOf(L) ? `<img src="${esc(coverOf(L))}" alt="" loading="lazy">` : r ? routeSvg(r, 300, 170, false) : ""}<b>${esc(tripName(name))}</b><span>${fmtDate(L[0].date).replace(/^\d+ /, "")} · ${esc(line)}</span></a>`; }).join("")}</div>
-<section><h2>More posts</h2><div class="cards">${single.map(card).join("")}</div></section>
-<a class="cta" href="/">Plan your own</a></main>`;
+  const ADV = /namibia|lesotho|wild coast|cdba|enduro|africa twin|790 adventure|eu road trip|tortoise|introduction|cycle tour/i;
+  const MOT = /eu road trip|motor valley|eicma|motogp/i;
+  const groups = [...M.entries()].sort((a, b) => b[1][b[1].length - 1].date.localeCompare(a[1][a[1].length - 1].date)).filter(([, L]) => coverOf(L));
+  const tile = ([name, L]) => {
+    const multi = L.length > 1, href = multi ? `/blog/${tripSlug(name, L)}/` : `/blog/${esc(L[0].slug)}/`;
+    const cats = [ADV.test(name) ? "adventure" : "", (MOTOR_RX.test(name) || MOT.test(name)) ? "motorsport" : ""].filter(Boolean).join(" ");
+    const rid = TRIP_ROUTE[name], title = multi ? tripName(name) : L[0].title;
+    const yr = L[L.length - 1].date.slice(0, 4);
+    return `<div class="ctile${multi ? " big" : ""}" data-cat="${cats}"><a class="cimg" href="${href}"><img src="${esc(coverOf(L))}" alt="" loading="lazy"><span class="cmeta"><b>${esc(title)}</b><span>${yr}${multi ? ` · ${L.length} days of posts` : ""}</span></span></a>${rid ? `<a class="plot" href="/?pick=${esc(rid)}">Plot this route ›</a>` : ""}</div>`;
+  };
+  const body = `<main class="blog"><h1>Blog</h1>
+<p class="intro">Twenty-odd years of road trips, race weekends, factories and museums. Mostly on two wheels, mostly not to plan. Tap a picture to read it, or Plot this route to ride it yourself.</p>
+<nav class="bpick" aria-label="Show">
+<button type="button" class="bbox on" data-f="all"><b>Everything</b></button>
+<button type="button" class="bbox" data-f="adventure" style="--img:url(/img/hero-adventure.jpg)"><b>Adventure</b><span>Recce. Ride. Report.</span></button>
+<button type="button" class="bbox" data-f="motorsport" style="--img:url(/img/hero-motorsport.jpg)"><b>Motorsport</b><span>Plan it. Book it. Ride it.</span></button>
+</nav>
+<div class="collage">${groups.map(tile).join("")}</div>
+<p class="note"><a href="/favourites/">The places I'd send you: Founder's fav's ›</a></p>
+<a class="cta" href="/">Plan your own</a></main>
+<script>(function(){var b=document.querySelectorAll(".bbox");function f(k){b.forEach(function(y){y.classList.toggle("on",y.dataset.f===k)});document.querySelectorAll(".ctile").forEach(function(c){c.hidden=k!=="all"&&(" "+c.dataset.cat+" ").indexOf(" "+k+" ")<0});try{history.replaceState(null,"",k==="all"?location.pathname:"#"+k)}catch(e){}}b.forEach(function(x){x.onclick=function(){f(x.dataset.f)}});var h=location.hash.slice(1);if(h==="adventure"||h==="motorsport")f(h);else{try{var p=localStorage.getItem("otm-pick");if(p)f(p)}catch(e){}}})();</script>`;
   const ld = { "@context": "https://schema.org", "@type": "Blog", name: "OneTrackMind blog", url: SITE + "/blog/", author: FOUNDER };
-  return page({ active: "/favourites/", url: "/blog/", title: "Blog: road trips, festivals and factories · OneTrackMind", desc: "Road trip stories from Southern Africa and Europe by the founder of OneTrackMind: Namibia, Lesotho, the Wild Coast, Motor Valley, EICMA and more.", body, ld });
+  return page({ active: "/blog/", url: "/blog/", title: "Blog: road trips, race weekends and factories · OneTrackMind", desc: "Twenty years of road trips and race weekends by the founder of OneTrackMind: Namibia, Lesotho, the Wild Coast, Motor Valley, the Nürburgring and Goodwood. Plot any trip and ride it yourself.", body, ld });
 }
 
 function advertisePage() {
