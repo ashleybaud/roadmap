@@ -1,0 +1,155 @@
+{
+  "Formula 1": {
+    "watch": [{"label": "F1 TV Pro", "url": "https://www.formula1.com/en/page/what-is-f1-tv-pro"}],
+    "results": "https://www.formula1.com/en/results/2026/races",
+    "note": "Live on F1 TV Pro where available, otherwise the local TV rights holder."
+  },
+  "MotoGP": {
+    "watch": [{"label": "MotoGP VideoPass", "url": "https://www.motogp.com/en/videopass/about"}],
+    "results": "https://www.motogp.com/en/world-standing/2026/motogp/championship-standings",
+    "note": "Live on MotoGP VideoPass or the local TV rights holder."
+  },
+  "WorldSBK": {
+    "watch": [
+      {"label": "WorldSBK VideoPass", "url": "https://secure.worldsbk.com/en/subscribe"},
+      {"label": "WorldSBK YouTube", "url": "https://www.youtube.com/@worldsbk"}
+    ],
+    "note": "Live on WorldSBK VideoPass; highlights on the WorldSBK YouTube channel."
+  },
+  "NASCAR Cup Series": {
+    "watch": [{"label": "NASCAR: ways to follow live", "url": "https://www.nascar.com/followlive/"}],
+    "results": "https://www.nascar.com/gallery/2026-nascar-cup-series-winners/",
+    "note": "US TV split across FOX, Prime Video, TNT Sports and NBC/Peacock by race."
+  },
+  "IndyCar": {
+    "watch": [
+      {"label": "IndyCar: ways to watch", "url": "https://www.indycar.com/ways-to-watch"},
+      {"label": "International broadcasters", "url": "https://www.indycar.com/how-to-follow/international"}
+    ],
+    "results": "https://www.indycar.com/Schedule",
+    "note": "US on FOX; outside the US see the international broadcaster list."
+  },
+  "FIA WEC": {
+    "watch": [
+      {"label": "Where to watch WEC", "url": "https://www.fiawec.com/en/page/ou-regarder-1"},
+      {"label": "FIA WEC YouTube", "url": "https://www.youtube.com/@FIAWEC"}
+    ],
+    "results": "https://www.fiawec.com/en/page/resultats-1",
+    "note": "Live on the FIAWEC+ app or local TV, Le Mans included; highlights on YouTube."
+  },
+  "IMSA WeatherTech": {
+    "watch": [
+      {"label": "IMSA: US coverage", "url": "https://www.imsa.com/weathertech/discover/howtowatch/domestic-coverage/"},
+      {"label": "IMSA: international coverage", "url": "https://www.imsa.com/weathertech/discover/howtowatch/internationalcoverage/"}
+    ],
+    "results": "https://www.imsa.com/weathertech/results/",
+    "note": "US on NBC and Peacock; outside the US see IMSA's international coverage page."
+  },
+  "IMSA WeatherTech SportsCar Championship": {
+    "watch": [
+      {"label": "IMSA: US coverage", "url": "https://www.imsa.com/weathertech/discover/howtowatch/domestic-coverage/"},
+      {"label": "IMSA: international coverage", "url": "https://www.imsa.com/weathertech/discover/howtowatch/internationalcoverage/"}
+    ],
+    "results": "https://www.imsa.com/weathertech/results/",
+    "note": "US on NBC and Peacock; outside the US see IMSA's international coverage page."
+  },
+  "WRC": {
+    "watch": [
+      {"label": "WRC+", "url": "https://plus.wrc.com/en/"},
+      {"label": "WRC broadcast guide", "url": "https://www.wrc.com/en/misc/broadcast-guide"}
+    ],
+    "results": "https://www.wrc.com/en/results-and-standings",
+    "note": "Every stage live on WRC+; TV channels listed in the broadcast guide."
+  },
+  "Dakar": {
+    "watch": [],
+    "note": "No official watch or results link verified yet; check dakar.com closer to the start."
+  },
+  "AMA Supercross": {
+    "watch": [
+      {"label": "SMX Video Pass (international)", "url": "https://www.supermotocross.com/2026-smx-video-pass-now-available-to-international-customers/"},
+      {"label": "SMX FAQ: how to watch", "url": "https://www.supermotocross.com/faqs/"}
+    ],
+    "results": "https://www.supercrosslive.com/results/",
+    "note": "US on NBC and Peacock; outside the US on the SMX Video Pass."
+  },
+  "AMA Pro Motocross": {
+    "watch": [
+      {"label": "SMX Video Pass (international)", "url": "https://www.supermotocross.com/2026-smx-video-pass-now-available-to-international-customers/"},
+      {"label": "Pro Motocross FAQ", "url": "https://promotocross.com/faq"}
+    ],
+    "results": "https://promotocross.com/",
+    "note": "US on NBC and Peacock; outside the US on the SMX Video Pass."
+  },
+  "MXGP": {
+    "watch": [
+      {"label": "MXGP-TV", "url": "https://www.mxgp-tv.com/"},
+      {"label": "MXGP YouTube", "url": "https://www.youtube.com/user/mxgptv"}
+    ],
+    "results": "https://results.mxgp.com/reslists.aspx",
+    "note": "Live on MXGP-TV (subscription) or the local TV rights holder."
+  },
+  "FIM EWC": {
+    "watch": [{"label": "Where to watch EWC", "url": "https://www.fimewc.com/news/where-to-watch-the-2026-fim-ewc-season"}],
+    "results": "https://www.fimewc.com/standings",
+    "note": "Live through the broadcasters and streams listed by the EWC each season."
+  },
+  "24H Series Europe": {
+    "watch": [{"label": "Where to watch the 24H Series", "url": "https://www.24hseries.com/where-to-watch-the-24h-series"}],
+    "note": "Stream details on the series' where-to-watch page."
+  },
+  "24H Series (Creventic)": {
+    "watch": [{"label": "Where to watch the 24H Series", "url": "https://www.24hseries.com/where-to-watch-the-24h-series"}],
+    "note": "Stream details on the series' where-to-watch page."
+  },
+  "24H Series Middle East Trophy": {
+    "watch": [{"label": "Where to watch the 24H Series", "url": "https://www.24hseries.com/where-to-watch-the-24h-series"}],
+    "note": "Stream details on the series' where-to-watch page."
+  },
+  "ADAC 24h Nürburgring Series": {
+    "watch": [{"label": "24h Nürburgring online", "url": "https://www.24h-rennen.de/en/experience-online/"}],
+    "note": "Full race streamed live; links on the official race site."
+  },
+  "GT World Challenge Europe": {
+    "watch": [
+      {"label": "GTWC Europe live stream", "url": "https://www.gt-world-challenge-europe.com/watch-live"},
+      {"label": "GT World YouTube", "url": "https://www.youtube.com/@GTWorld"}
+    ],
+    "results": "https://www.gt-world-challenge-europe.com/results",
+    "note": "Spa 24 Hours streamed live on the GT World YouTube channel."
+  },
+  "Intercontinental GT Challenge": {
+    "watch": [
+      {"label": "IGTC live stream", "url": "https://www.intercontinentalgtchallenge.com/watch-live"},
+      {"label": "GT World YouTube", "url": "https://www.youtube.com/@GTWorld"}
+    ],
+    "results": "https://www.intercontinentalgtchallenge.com/results",
+    "note": "Bathurst 12 Hour streamed live on the GT World YouTube channel."
+  },
+  "Isle of Man TT": {
+    "watch": [{"label": "The TT on TV", "url": "https://www.iomtt.com/tt-info/the-tt-on-tv"}],
+    "results": "https://www.iomtt.com/tt-database",
+    "note": "Every race live on TT+ (subscription)."
+  },
+  "Pikes Peak": {
+    "watch": [{"label": "RACER Network & RACER+", "url": "https://ppihc.org/how-to-catch-the-action-on-racer-network-racer/"}],
+    "results": "https://ppihc.org/race-results/",
+    "note": "Live on RACER Network and RACER+."
+  },
+  "Goodwood": {
+    "watch": [{"label": "How to watch Goodwood", "url": "https://www.goodwood.com/grr/event-coverage/festival-of-speed/how-to-watch-the-goodwood-festival-of-speed/"}],
+    "note": "Free live stream on the Goodwood site and YouTube; race results posted on goodwood.com after each event."
+  },
+  "Macau GP": {
+    "watch": [],
+    "note": "No official watch or results link verified yet."
+  },
+  "Global Time Attack": {
+    "watch": [],
+    "note": "No official watch or results link verified yet; check globaltimeattack.com."
+  },
+  "SA Endurance Series (Round 6, finale)": {
+    "watch": [],
+    "note": "No official stream or results link verified yet; check saeseries.com."
+  }
+}
