@@ -660,6 +660,12 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
 .pcol{position:relative;display:flex}.pcol .pbox{flex:1;padding-bottom:58px!important}.palt{position:absolute;right:14px;bottom:14px;background:var(--gold);color:#0B1D21;font-weight:700;font-size:.9rem;padding:8px 14px;border-radius:6px;text-decoration:none;box-shadow:0 2px 6px rgba(0,0,0,.35)}.palt:hover{filter:brightness(1.08)}
 .pickextra{margin:14px 0 0}.pickextra h3{font:700 1.2rem var(--f-display);text-transform:uppercase;margin:0 0 8px;text-align:center}.pxcards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.pxcards a{display:flex;flex-direction:column;gap:3px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:8px;padding:10px 12px;color:var(--ink);text-decoration:none}.pxcards a:hover{border-color:var(--gold)}.pxcards b{font:700 1.1rem/1.15 var(--f-display);text-transform:uppercase}.pxcards span{color:var(--muted);font-size:.85rem}.pxcards i{font-style:normal;font-weight:700;color:var(--gold);font-size:.9rem}
 @media(max-width:700px){.pxcards{grid-template-columns:1fr}}
+.evband{display:grid;grid-template-columns:1.1fr 1fr;gap:16px;align-items:center;margin:14px 0 0;padding:14px 16px 14px 28px;border-radius:10px;background:var(--panel);border:1px solid var(--line);position:relative;overflow:hidden}
+.evband::before{content:"";position:absolute;left:0;top:0;bottom:0;width:14px;background:repeating-conic-gradient(#111 0 25%,#fff 0 50%) 0 0/14px 14px}
+.evstory b{display:block;font:700 1.35rem var(--f-display);text-transform:uppercase;color:var(--gold);margin-bottom:4px}.evstory span{font-size:.95rem;line-height:1.45}
+.evnext .lbl{display:block;margin-bottom:4px}.evnext ul{list-style:none;margin:0 0 6px;padding:0;display:flex;flex-direction:column;gap:4px}.evnext li a{display:flex;justify-content:space-between;gap:10px;color:var(--ink);text-decoration:none;padding:4px 0;border-bottom:1px dashed var(--line)}.evnext li a:hover b{color:var(--gold)}.evnext li span{color:var(--muted);font-size:.85rem;white-space:nowrap}.evnext>a{font-weight:700;color:var(--gold)}
+.ondates{margin:12px 0;padding:12px;border:1px solid var(--line);border-left:5px solid var(--gold);border-radius:8px;background:var(--panel)}.ondates h3{margin:0 0 6px;font:700 1.15rem var(--f-display);text-transform:uppercase}.ondates ul{list-style:none;margin:0;padding:0}.ondates li{padding:6px 0;border-top:1px dashed var(--line);display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}.ondates li:first-child{border-top:0}.ondates .note{margin:0}
+@media(max-width:700px){.evband{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -681,6 +687,10 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
           <span class="pp">Same story at race weekends: a museum, a factory or a famous corner ten minutes away that I only heard about afterwards. Plan the trip around the race with every petrolhead stop near it, so you miss nothing.</span>
           <span class="pgo">Plan a motorsport trip ›</span></button><a class="palt" href="/events/">Pick an event ›</a></div>
       </div>
+      <section class="evband" aria-label="Races and festivals">
+        <div class="evstory"><b>Plan the year around the races.</b><span>I was in Monterey a week before Car Week and didn't know it was on. I'd broken down and spent the weekend there, never realising it's the car capital of the world. With this calendar I'd have timed it right.</span></div>
+        <div class="evnext"><span class="lbl">Next up</span><ul id="evNext"></ul><a href="/events/">Every race and festival ›</a></div>
+      </section>
       <section id="pickextra" class="pickextra" hidden><h3></h3><div class="pxcards"></div></section>
       <div class="herocta"><button class="btn herobtn" type="button" data-tryroute id="tryBtn">Or try a finished trip: Swartberg Pass in 2 days ›</button></div>
     </section>
@@ -2142,7 +2152,7 @@ function overviewHtml(){
   if(plan&&!planStale) h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px"><button class="btn small share" type="button" data-sharetrip title="A link anyone can open: the whole plan, then Google Maps / Waze or GPX">Share this trip ↗</button><button class="btn small wa" type="button" data-sharewa title="Send this trip on WhatsApp">WhatsApp this trip</button>${nameBtn()}${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">${esc(dayName(k))} GPX</button>`:"").join("")}<button class="btn small" type="button" data-gpx="all">Whole trip GPX</button><button class="btn small" type="button" data-navlinks title="Open each day in Google Maps or Waze on your phone">Google Maps / Waze</button><button class="btn small ghost" type="button" data-grouppack title="Every GPX format in one zip, with a read-me, for a group ride">Group ride pack ↓</button><button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}</div></div>`;
       return h; })(); }
   h+=boxSec("detailbox","Details",det);
-  return h+clearLink()+footNote();
+  return h+(typeof onDatesHtml==="function"?onDatesHtml():"")+clearLink()+footNote();
 }
 function footNote(){ return `<div class="note">${placesOk&&dataDate?`Map data from OpenStreetMap, as of ${esc(dataDate)}. Weather from Open-Meteo. Phone ahead on remote legs. `:""}Plan with it, check before you go: you ride at your own risk. <a href="/terms.html">Terms and disclaimer</a> · <a href="/privacy.html">Privacy</a></div>`; }
 function dayHtml(k){ return tripBox(k)+stopSummary(k)+boxSec("detailbox","Details",sumBox(k,true,true)+(!planStale&&plan&&plan.days[k]?gtkHtml(k):"")+dayBody(k,true)); }
@@ -4026,5 +4036,24 @@ function setPick(md,user){
 }
 document.querySelectorAll(".pbox").forEach(b=>b.addEventListener("click",()=>setPick(b.dataset.pick,true)));
 { let s=null; try{ s=localStorage.getItem("otm-pick"); }catch(e){} if(s) setPick(s,false); }
+
+/* Next races in the top banner */
+loadEvents().then(L=>{ const u=$("evNext"); if(!u) return; const t=new Date().toISOString().slice(0,10), fmt=d=>new Date(d+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+  u.innerHTML=L.filter(e=>e.start>=t).slice(0,4).map(e=>`<li><a href="/?ev=${esc(e.id)}"><b>${esc(e.name)}</b><span>${fmt(e.start)}${e.end!==e.start?"–"+fmt(e.end):""} · ${esc(e.country||"")}</span></a></li>`).join(""); });
+
+/* On your dates: races and festivals near the route while you're travelling (Motorsport looks further afield) */
+var evDatesAsked=false;
+function onDatesHtml(){
+  if(!trip.startDate||!trip.start||trip.start.lat==null) return "";
+  if(!evList){ if(!evDatesAsked){ evDatesAsked=true; loadEvents().then(()=>{ if(ui.tab==="ov") renderDetails(); }); } return ""; }
+  const a=addDays(trip.startDate,-3), b=addDays(trip.endDate||trip.startDate,3), far=pickMode==="motorsport"?300:120;
+  const pts=[]; if(plan&&plan.geom){ const g=plan.geom, st=Math.max(1,Math.floor(g.length/400)); for(let i=0;i<g.length;i+=st) pts.push(g[i]); }
+  else { [trip.start,trip.end,...trip.days.flatMap(d=>[d.to,...(d.vias||[])])].forEach(p=>{ if(p&&p.lat!=null) pts.push(p); }); }
+  const near=e=>{ let m=1e9; for(const p of pts){ if(Math.abs(p.lat-e.lat)>4) continue; const d=hav(p,e); if(d<m) m=d; } return m; };
+  const L=evList.filter(e=>e.end>=a&&e.start<=b).map(e=>Object.assign({},e,{km:near(e)})).filter(e=>e.km<=far).sort((x,y)=>x.start.localeCompare(y.start)).slice(0,5);
+  if(!L.length) return "";
+  const fmt=d=>new Date(d+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+  return `<div class="ondates"><h3>🏁 On your dates</h3><ul>${L.map(e=>`<li><span><b>${esc(e.name)}</b> · ${fmt(e.start)}${e.end!==e.start?"–"+fmt(e.end):""}${e.confirmed?"":" (dates unconfirmed)"}<br><span class="note">${esc(e.venue||e.city||"")} · ${e.km<5?"on your route":Math.round(e.km)+" km off your route"}</span></span><span><button type="button" class="linkbtn" data-evgo="${esc(e.id)}">Make it the finish</button> · <a href="${esc(e.tickets||e.url||"/events/")}" target="_blank" rel="noopener">Tickets ›</a></span></li>`).join("")}</ul></div>`;
+}
 
 </script></body></html>

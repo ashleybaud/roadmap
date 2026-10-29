@@ -34,3 +34,22 @@ function setPick(md,user){
 }
 document.querySelectorAll(".pbox").forEach(b=>b.addEventListener("click",()=>setPick(b.dataset.pick,true)));
 { let s=null; try{ s=localStorage.getItem("otm-pick"); }catch(e){} if(s) setPick(s,false); }
+
+/* Next races in the top banner */
+loadEvents().then(L=>{ const u=$("evNext"); if(!u) return; const t=new Date().toISOString().slice(0,10), fmt=d=>new Date(d+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+  u.innerHTML=L.filter(e=>e.start>=t).slice(0,4).map(e=>`<li><a href="/?ev=${esc(e.id)}"><b>${esc(e.name)}</b><span>${fmt(e.start)}${e.end!==e.start?"–"+fmt(e.end):""} · ${esc(e.country||"")}</span></a></li>`).join(""); });
+
+/* On your dates: races and festivals near the route while you're travelling (Motorsport looks further afield) */
+var evDatesAsked=false;
+function onDatesHtml(){
+  if(!trip.startDate||!trip.start||trip.start.lat==null) return "";
+  if(!evList){ if(!evDatesAsked){ evDatesAsked=true; loadEvents().then(()=>{ if(ui.tab==="ov") renderDetails(); }); } return ""; }
+  const a=addDays(trip.startDate,-3), b=addDays(trip.endDate||trip.startDate,3), far=pickMode==="motorsport"?300:120;
+  const pts=[]; if(plan&&plan.geom){ const g=plan.geom, st=Math.max(1,Math.floor(g.length/400)); for(let i=0;i<g.length;i+=st) pts.push(g[i]); }
+  else { [trip.start,trip.end,...trip.days.flatMap(d=>[d.to,...(d.vias||[])])].forEach(p=>{ if(p&&p.lat!=null) pts.push(p); }); }
+  const near=e=>{ let m=1e9; for(const p of pts){ if(Math.abs(p.lat-e.lat)>4) continue; const d=hav(p,e); if(d<m) m=d; } return m; };
+  const L=evList.filter(e=>e.end>=a&&e.start<=b).map(e=>Object.assign({},e,{km:near(e)})).filter(e=>e.km<=far).sort((x,y)=>x.start.localeCompare(y.start)).slice(0,5);
+  if(!L.length) return "";
+  const fmt=d=>new Date(d+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short"});
+  return `<div class="ondates"><h3>🏁 On your dates</h3><ul>${L.map(e=>`<li><span><b>${esc(e.name)}</b> · ${fmt(e.start)}${e.end!==e.start?"–"+fmt(e.end):""}${e.confirmed?"":" (dates unconfirmed)"}<br><span class="note">${esc(e.venue||e.city||"")} · ${e.km<5?"on your route":Math.round(e.km)+" km off your route"}</span></span><span><button type="button" class="linkbtn" data-evgo="${esc(e.id)}">Make it the finish</button> · <a href="${esc(e.tickets||e.url||"/events/")}" target="_blank" rel="noopener">Tickets ›</a></span></li>`).join("")}</ul></div>`;
+}
