@@ -27,7 +27,7 @@
   "name": "Lusail International Circuit",
   "lat": 25.49113,
   "lon": 51.45208,
-  "found": "Lusail International Circuit, لوسيل, قطر"
+  "found": "Lusail International Circuit, \u0644\u0648\u0633\u064a\u0644, \u0642\u0637\u0631"
  },
  "2016-06 Franschoek Motor Museum": {
   "name": "Franschhoek Motor Museum",
@@ -52,5 +52,11 @@
   "lat": -33.82415,
   "lon": 18.52771,
   "found": "Killarney Raceway, Cape Town, South Africa"
+ },
+ "2026-10 Monterey": {
+  "name": "Laguna Seca",
+  "lat": 36.5843,
+  "lon": -121.7535,
+  "found": "WeatherTech Raceway Laguna Seca (set by hand)"
  }
 }

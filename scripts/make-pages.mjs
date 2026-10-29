@@ -375,7 +375,7 @@ ${(g => g ? `<a class="cta" href="${esc(g.href)}">${esc(g.label)}</a>` : `<a cla
   const ld = { "@context": "https://schema.org", "@type": "BlogPosting", headline: x.title, datePublished: x.date, author: FOUNDER, publisher: ORG, url: `${SITE}/blog/${x.slug}/`, ...(x.cover ? { image: x.cover } : {}) };
   return page({ ads: false, dark: true, active: "/blog/", url: `/blog/${x.slug}/`, title: `${x.title} · OneTrackMind blog`, desc: (x.lead || x.title).slice(0, 155), body, ld });
 }
-const TAGS = [["namibia", "Namibia", /namibia|tortoise|epupa/i], ["southafrica", "South Africa", /wild coast|cdba|killarney|simola|kalahari|speedweek|franschoek|wijnland|port elizabeth|redbull cape town|cape town/i], ["lesotho", "Lesotho", /lesotho/i], ["europe", "Europe", /eu road trip|motor valley|eicma|goodwood|nurburg|porsche museum/i], ["racing", "Racing", /simola|hill ?climb|killarney|wpmc|motogp|speedweek|race|redbull/i], ["museums", "Museums & factories", /museum|factory|motor valley|eicma|webb/i], ["bikes", "Bikes", /ktm|duke|gsxr|africa twin|bmw|scalpel|cafe racer|enduro|ducati|tyrenoise/i], ["cars", "Cars", /alfa|giulia|porsche|aston|mclaren|audi|fuorilegge|universal products/i]];
+const TAGS = [["namibia", "Namibia", /namibia|tortoise|epupa/i], ["southafrica", "South Africa", /wild coast|cdba|killarney|simola|kalahari|speedweek|franschoek|wijnland|port elizabeth|redbull cape town|cape town/i], ["lesotho", "Lesotho", /lesotho/i], ["europe", "Europe", /eu road trip|motor valley|eicma|goodwood|nurburg|porsche museum/i], ["racing", "Racing", /simola|hill ?climb|killarney|wpmc|motogp|speedweek|race|redbull/i], ["museums", "Museums & factories", /museum|factory|motor valley|eicma|webb/i], ["bikes", "Bikes", /ktm|duke|gsxr|africa twin|bmw|scalpel|cafe racer|enduro|ducati|tyrenoise/i], ["usa", "USA", /monterey|laguna seca|pebble beach|daytona|sebring|indianapolis|\busa\b/i], ["cars", "Cars", /alfa|giulia|porsche|aston|mclaren|audi|fuorilegge|universal products/i]];
 const BLOG_POI = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data/blog-poi.json"), "utf8")); } catch (e) { return {}; } })();
 // the one button a post gets: the trip's route when there is one, otherwise "route me there" to the place it's about
 const goLink = name => { const rid = TRIP_ROUTE[name], p = BLOG_POI[name];
@@ -384,7 +384,7 @@ const SOCIAL = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, 
 const KIND = { story: "Story", route: "Route", place: "Place" };
 function storiesIndex(M) {
   const ADV = /namibia|lesotho|wild coast|cdba|enduro|africa twin|790 adventure|eu road trip|tortoise|introduction|cycle tour/i;
-  const MOT = /eu road trip|motor valley|eicma|motogp/i;
+  const MOT = /eu road trip|motor valley|eicma|motogp|monterey|laguna seca|pebble beach/i;
   const groups = [...M.entries()].sort((a, b) => b[1][b[1].length - 1].date.localeCompare(a[1][a[1].length - 1].date)).filter(([, L]) => coverOf(L));
   const tile = ([name, L]) => {
     const multi = L.length > 1, href = multi ? `/blog/${tripSlug(name, L)}/` : `/blog/${esc(L[0].slug)}/`;
