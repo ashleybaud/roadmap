@@ -1,0 +1,20 @@
+[
+ {
+  "id": "2026-11-02-weekly",
+  "subject": "SEMA Show 2026, and 4 more on this week",
+  "from": "2026-11-02",
+  "to": "2026-11-08",
+  "period": "weekly",
+  "events": 5,
+  "last": 2
+ },
+ {
+  "id": "2026-11-02-monthly",
+  "subject": "SEMA Show 2026, and 15 more on the calendar",
+  "from": "2026-11-02",
+  "to": "2026-11-29",
+  "period": "monthly",
+  "events": 16,
+  "last": 2
+ }
+]

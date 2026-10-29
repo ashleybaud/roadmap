@@ -1,0 +1,29 @@
+name: newsletter
+# Monday 03:30 UTC (05:30 in SA): check race results, build the issues due this week, publish them, and open a note for the founder.
+# Nothing is emailed here. The founder reads it and presses Send in the Review panel.
+on:
+  schedule: [{ cron: "30 3 * * 1" }]
+  workflow_dispatch:
+permissions: { contents: write, issues: write }
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node scripts/sniff-results.mjs
+      - name: Build the issues due
+        run: |
+          set -- $(node scripts/newsletter-due.mjs "$(date -u +%F)")
+          day=$1; shift
+          for p in "$@"; do node scripts/newsletter.mjs --from "$day" --period "$p"; done
+      - run: ./build.sh --no-test
+      - name: Commit
+        run: |
+          git config user.name "otm-bot"; git config user.email "bot@onetrackmind.online"
+          git add data/events/results.json reports newsletter sitemap.xml events blog index.html || true
+          git diff --cached --quiet || { git commit -m "Newsletter and results $(date -u +%F)"; git push; }
+      - name: Tell the founder
+        env: { GH_TOKEN: "${{ github.token }}" }
+        run: gh issue create --title "Newsletter ready $(date -u +%F)" --body "Read it, send yourself a test, then press Send it in the Review panel on onetrackmind.online."$'\n\n'"$(cat reports/results-sniff.md)"

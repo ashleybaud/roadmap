@@ -56,7 +56,14 @@ let revQ=null;
 async function refreshReview(){ const b=$("reviewBtn"); if(!acct.admin){ b.hidden=true; return; }
   try{ revQ=await api("/api/admin/queue"); const n=revQ.routes.length+revQ.spots.length+revQ.reports.length+revQ.feedback.length+(revQ.rides||[]).length; b.hidden=false; b.textContent=n?`Review (${n})`:"Review"; }catch(e){ b.hidden=true; } }
 let riders=null;
-async function loadRiders(){ try{ riders=await api("/api/admin/riders"); }catch(e){ riders={err:e.message}; } if($("revDlg").open) renderReview(); }
+async function loadRiders(){ try{ riders=await api("/api/admin/riders"); }catch(e){ riders={err:e.message}; } if($("revDlg").open) renderReview(); loadIssues(); }
+// newsletter: built issues waiting for the founder's Send
+let issues=null;
+async function loadIssues(){ try{ issues=(await api("/api/admin/newsletter")).issues; }catch(e){ issues={err:e.message}; } if($("revDlg").open) renderReview(); }
+function issuesHtml(){ const I=issues, P={weekly:"Weekly",fortnightly:"Every two weeks",monthly:"Monthly"};
+  if(!I) return `<div class="note">Loading…</div>`; if(I.err) return `<div class="note">${esc(I.err)}</div>`; if(!I.length) return `<div class="note">No issues built yet.</div>`;
+  return I.map(i=>`<div class="rrow"><div><div class="rt">${esc(i.subject)}</div><div class="note">${P[i.period]||i.period} · ${esc(i.from)} to ${esc(i.to)} · ${i.events} events${i.sent?` · <b>sent</b> to ${i.sent.count} on ${new Date(i.sent.sent_at).toLocaleDateString("en-GB",{day:"numeric",month:"short"})}`:` · would go to <b>${i.reach}</b>`}</div></div>
+    <div class="ract"><a class="btn small ghost" href="/newsletter/${esc(i.id)}/" target="_blank" rel="noopener">Read it</a><button class="btn small ghost" type="button" data-nl="${esc(i.id)}:test">Send me a test</button>${i.sent?"":`<button class="btn small" type="button" data-nl="${esc(i.id)}:send"${i.reach?"":" disabled"}>Send it</button>`}</div></div>`).join(""); }
 $("reviewBtn").addEventListener("click",async()=>{ await refreshReview(); riders=null; renderReview(); $("revDlg").showModal(); loadRiders(); });
 function renderReview(){
   const q=revQ||{routes:[],spots:[],reports:[],feedback:[]}, when=t=>new Date(t).toLocaleDateString("en-GB",{day:"numeric",month:"short"});
@@ -70,6 +77,7 @@ function renderReview(){
     ${(()=>{ const E=R.events||{}, L=[["visit","Visits"],["try","Tapped Try a route"],["plan","Planned a trip"],["pick","Opened a pick"],["gpx","Downloaded a GPX"],["gpx_all","Whole-trip GPX"],["group","Group ride pack"],["gmaps","Opened Google Maps"],["waze","Opened Waze"],["pdf","Saved a PDF"],["share","Shared a trip link"],["shared_open","Opened a shared link"],["save","Saved a route"],["near","Used Near me"],["book","Clicked a booking link"],["report","Sent a ride report"]];
       return `<div class="rvh">What riders did</div><table class="evt"><tr><th></th><th>7 days</th><th>30 days</th></tr>${L.map(([k,t])=>`<tr><td>${t}</td><td>${(E[k]||{}).d7||0}</td><td>${(E[k]||{}).d30||0}</td></tr>`).join("")}</table><div class="note">Counted once per visit, no personal data. Started 28 Oct 2026.</div>`; })()}
     <details><summary class="note">Latest ${R.riders.length}</summary>${R.riders.map(x=>`<div class="note">${esc(x.email)}${x.name?" · "+esc(x.name):""} · joined ${when(x.created)}${x.news?" · ✉ yes":""}${x.contributor?" · contributor":""}</div>`).join("")}</details>`);
+  h+=`<div class="rvh">Newsletter</div>`+issuesHtml();
   h+=`<div class="rvh">Ride reports (${(q.rides||[]).length})</div>`+(q.rides||[]).map(r=>`<div class="rrow"><div><div class="rt">${esc(r.route_id.replace(/^pick:/,""))} · ${"★".repeat(r.stars)}</div><div class="note">${who(r)} · rode ${esc(r.rode_on)}</div>${r.line?`<div class="pkb">${esc(r.line)}</div>`:""}${r.photos.length?`<div class="rph">${r.photos.map(k=>`<img src="/api/media/${esc(k)}" alt="" style="height:64px;border-radius:6px">`).join(" ")}</div>`:""}</div>${act("ride",r.id)}</div>`).join("");
   h+=`<div class="rvh">Routes to share (${q.routes.length})</div>`+q.routes.map(r=>`<div class="rrow"><div><div class="rt">${esc(r.title)}</div><div class="note">${who(r)} · ${r.km||"?"} km · ${r.days} day${r.days>1?"s":""} · ${when(r.updated)}</div>${r.summary?`<div class="pkb">${esc(r.summary)}</div>`:""}<button class="linkbtn small" type="button" data-rvopen="${r.id}">Open it in the planner</button></div>${act("route",r.id)}</div>`).join("");
   h+=`<div class="rvh">Places (${q.spots.length})</div>`+q.spots.map(p=>`<div class="rrow"><div><div class="rt">${SPOT_ICON[p.kind]||""} ${esc(p.name)}</div><div class="note">${esc(p.label)} · ${who(p)} · ${when(p.created)}</div>${p.note?`<div class="pkb">${esc(p.note)}</div>`:""}<button class="linkbtn small" type="button" data-rvmap="${p.lat},${p.lon}">Show on the map</button></div>${act("spot",p.id)}</div>`).join("");
@@ -80,6 +88,10 @@ function renderReview(){
 $("revDlg").addEventListener("click",async e=>{
   if(e.target===$("revDlg")||e.target.closest("[data-rvclose]")){ $("revDlg").close(); return; }
   const a=e.target.closest("[data-rv]"); if(a){ const [type,id,action]=a.dataset.rv.split(":"); a.disabled=true; try{ await api("/api/admin/queue",{method:"POST",body:{type,id,action}}); await refreshReview(); renderReview(); spots.key=""; reps.key=""; picks=null; renderAll(); }catch(err){ a.disabled=false; $("status").textContent=err.message; } return; }
+  const nl=e.target.closest("[data-nl]"); if(nl){ const [issue,how]=nl.dataset.nl.split(":");
+    if(how==="send"&&nl.dataset.arm!=="1"){ nl.dataset.arm="1"; nl.textContent="Send to everyone? Tap again"; return; }
+    nl.disabled=true; try{ const r=await api("/api/admin/newsletter",{method:"POST",body:how==="test"?{issue,test:true}:{issue}}); $("status").textContent=how==="test"?"Test sent to you. Check your inbox.":`Sent to ${r.sent}.`; }catch(err){ $("status").textContent=err.message; }
+    loadIssues(); return; }
   const us=e.target.closest("[data-rvuser]"); if(us){ const [id,action]=us.dataset.rvuser.split(":"); if(us.dataset.arm!=="1"){ us.dataset.arm="1"; us.textContent=action==="block"?"Block? Tap again":"Trust? Tap again"; return; }
     try{ await api("/api/admin/queue",{method:"POST",body:{type:"user",id,action}}); await refreshReview(); renderReview(); $("status").textContent=action==="block"?"Blocked. Their waiting items were rejected.":"Trusted. Their marks now go live straight away."; }catch(err){ $("status").textContent=err.message; } return; }
   const m=e.target.closest("[data-rvmap]"); if(m){ const [la,lo]=m.dataset.rvmap.split(",").map(Number); $("revDlg").close(); map.setView([la,lo],14); L.marker([la,lo]).addTo(layer); return; }

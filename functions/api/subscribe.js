@@ -17,8 +17,12 @@ export const onRequestPost = handle(async ({ request, env }) => {
   await D.prepare(`INSERT INTO subscribers (email, source, created, token_hash, unsub) VALUES (?,?,?,?,?)
     ON CONFLICT(email) DO UPDATE SET created = excluded.created, token_hash = excluded.token_hash, confirmed_at = NULL, unsub_at = NULL`).bind(email, src, t, await sha256(raw), unsub).run();
   const link = `${origin}/api/subscribe/confirm?t=${raw}`;
-  await sendEmail(env, { to: email, subject: "Confirm your OneTrackMind newsletter sign-up",
-    text: `Tap this link to confirm you want the OneTrackMind newsletter (new trips, events and how-to guides, about once a month):\n\n${link}\n\nIf you didn't ask for it, ignore this email and nothing will be sent.`,
-    html: `<div style="font-family:system-ui,sans-serif;font-size:16px;line-height:1.5;color:#11262B"><p>Tap the button to confirm the OneTrackMind newsletter: new trips, events and how-to guides, about once a month.</p><p><a href="${escHtml(link)}" style="display:inline-block;background:#0F7B8A;color:#fff;text-decoration:none;padding:12px 20px;border-radius:6px;font-weight:600">Yes, send it</a></p><p style="color:#54666A;font-size:14px">If you didn't ask for it, ignore this email and nothing will be sent.</p></div>` });
+  await sendEmail(env, { to: email, subject: "Confirm: The OneTrackMind Week",
+    text: `Tap this link to confirm you want The OneTrackMind Week (what's on, last week's results and a road worth riding, Monday mornings; change it to every two weeks or monthly any time):\n\n${link}\n\nIf you didn't ask for it, ignore this email and nothing will be sent.`,
+    html: `<div style="background:#06303F;padding:24px 12px"><div style="max-width:520px;margin:0 auto;background:#0F5874;border-radius:14px;border-top:4px solid #E8A317;padding:26px 24px;font:16px/1.5 Arial,Helvetica,sans-serif;color:#fff">
+<div style="font-weight:800;letter-spacing:.06em;color:#E8A317;font-size:13px;margin-bottom:10px">ONETRACKMIND</div>
+<p style="margin:0 0 14px">One tap and you're on the list for <b>The OneTrackMind Week</b>: what's on, last week's results and a road worth riding, every Monday morning. You can change it to every two weeks or monthly from any email.</p>
+<p style="margin:0 0 16px"><a href="${escHtml(link)}" style="display:inline-block;background:#E8A317;color:#06303F;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:700">Yes, send it</a></p>
+<p style="margin:0;color:#B5D3DE;font-size:14px">If you didn't ask for it, ignore this email and nothing will be sent.</p></div></div>` });
   return json({ ok: true });
 });

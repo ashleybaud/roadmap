@@ -23,7 +23,10 @@ const week = Math.floor(new Date(from + "T12:00:00Z") / 6048e5);
 const on = EV.filter(e => e.start <= to && e.end >= from).sort((a, b) => a.start.localeCompare(b.start));
 const last = EV.filter(e => e.end >= lastFrom && e.end < from).sort((a, b) => a.end.localeCompare(b.end));
 const RANK = { f1: 0, endurance: 1, festival: 2, bikes: 3, rally: 4, us: 5, sa: 6, offroad: 7 };
-const head = [...on].sort((a, b) => (RANK[a.category] ?? 9) - (RANK[b.category] ?? 9) || (b.confirmed - a.confirmed))[0];
+// the names everyone knows go first, whatever their series
+const BIG = /SEMA|EICMA|Goodwood|Le Mans|Daytona|Indianapolis 500|Indy 500|Pikes Peak|Isle of Man|TT Races|Dakar|Monaco|Pebble Beach|Car Week|Essen Motor|N(ü|u)rburgring 24|Bathurst|Macau|Spa 24|Rennsport|Luftgek|Sebring|Baja 1000|North West 200|Laguna Seca/i;
+const rank = e => (BIG.test(e.name) ? -1 : (RANK[e.category] ?? 9));
+const head = [...on].sort((a, b) => rank(a) - rank(b) || (b.confirmed - a.confirmed))[0];
 const nearHead = head ? FAV.map(f => ({ f, d: hav(head, f) })).filter(x => x.d <= 200).sort((a, b) => a.d - b.d).slice(0, 3) : [];
 const routeNear = head && PICKS.map(r => ({ r, d: r.trip && r.trip.start ? hav(head, r.trip.start) : 1e9 })).filter(x => x.d <= 400).sort((a, b) => a.d - b.d)[0];
 const curve = routeNear ? routeNear.r : PICKS[week % PICKS.length];
@@ -46,7 +49,7 @@ const BTN = (u, t) => `<a href="${esc(u)}" style="display:inline-block;backgroun
 const evRow = e => { const w = (WATCH[e.series] || {}).watch || [];
   return `<tr><td style="padding:10px 24px;border-top:1px solid #2B7896;font:15px/1.45 Arial,Helvetica,sans-serif;color:${C.ink}"><b style="font-size:16px">${esc(e.name)}</b>${e.confirmed ? "" : ` <span style="color:${C.muted};font-size:12px">(dates unconfirmed)</span>`}<br><span style="color:${C.muted}">${rng(e)} · ${esc(e.venue || e.city || "")}${e.country ? ", " + esc(e.country) : ""}</span><br>${A(`${SITE}/events/${e.id}/`, "Plan the trip ›")}${w[0] ? ` &nbsp; ${A(w[0].url, "Watch: " + esc(w[0].label) + " ›")}` : ""}${e.tickets ? ` &nbsp; ${A(e.tickets, "Tickets ›")}` : ""}</td></tr>`; };
 const resRow = e => { const r = RES[e.id], w = WATCH[e.series] || {};
-  const body = r && r.podium ? `1. ${esc(r.podium[0])}${r.podium[1] ? ` · 2. ${esc(r.podium[1])}` : ""}${r.podium[2] ? ` · 3. ${esc(r.podium[2])}` : ""}` : (r && r.link) || w.results ? A((r && r.link) || w.results, "Results ›") : `<span style="color:${C.muted}">Results on the ${A(e.url || e.source, "official site")}</span>`;
+  const body = r && r.podium ? `1. ${esc(r.podium[0])}${r.podium[1] ? ` · 2. ${esc(r.podium[1])}` : ""}${r.podium[2] ? ` · 3. ${esc(r.podium[2])}` : ""}` : (r && r.link) || w.results ? A((r && r.link) || w.results, r && r.fresh ? "Results are in ›" : "Official results ›") : `<span style="color:${C.muted}">Results on the ${A(e.url || e.source, "official site")}</span>`;
   return `<tr><td style="padding:8px 24px;border-top:1px solid #2B7896;font:15px/1.45 Arial,Helvetica,sans-serif;color:${C.ink}"><b>${esc(e.name)}</b> <span style="color:${C.muted}">· ${rng(e)}</span><br>${body}</td></tr>`; };
 
 const title = `The OneTrackMind ${period === "weekly" ? "Week" : period === "fortnightly" ? "Fortnight" : "Month"}`;
@@ -84,4 +87,9 @@ fs.writeFileSync(path.join(dir, "index.html"), html.replace(/\{\{(UNSUB|PREFS)\}
 fs.writeFileSync(path.join(dir, "email.html"), html);
 fs.writeFileSync(path.join(dir, "email.txt"), text);
 fs.writeFileSync(path.join(dir, "meta.json"), JSON.stringify({ subject, from, to, period, events: on.length, last: last.length }, null, 1));
+// the list the admin panel reads: newest first, with what each issue is
+const idx = fs.readdirSync(path.join(ROOT, "newsletter")).filter(d => /^\d{4}-\d\d-\d\d-(weekly|fortnightly|monthly)$/.test(d))
+  .map(d => { try { return { id: d, ...JSON.parse(fs.readFileSync(path.join(ROOT, "newsletter", d, "meta.json"), "utf8")) }; } catch (e) { return null; } })
+  .filter(Boolean).sort((a, b) => b.id.localeCompare(a.id)).slice(0, 30);
+fs.writeFileSync(path.join(ROOT, "newsletter", "index.json"), JSON.stringify(idx, null, 1));
 console.log(`${subject} | ${on.length} on, ${last.length} last | ${path.relative(ROOT, dir)}`);

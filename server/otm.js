@@ -57,6 +57,10 @@ const MIGRATIONS = [
   `ALTER TABLE route_ratings ADD COLUMN photos TEXT`,
   `ALTER TABLE route_ratings ADD COLUMN model TEXT`,
   `ALTER TABLE route_ratings ADD COLUMN status TEXT NOT NULL DEFAULT 'ok'`,
+  // newsletter: how often each subscriber wants it, and when they last got one
+  `ALTER TABLE subscribers ADD COLUMN freq TEXT NOT NULL DEFAULT 'weekly'`,
+  `ALTER TABLE subscribers ADD COLUMN last_sent INTEGER`,
+  `CREATE TABLE IF NOT EXISTS newsletter_sends (issue TEXT PRIMARY KEY, sent_at INTEGER NOT NULL, sent_by TEXT, count INTEGER NOT NULL DEFAULT 0)`,
 ];
 let schemaReady = null;
 export async function db(env) {
@@ -142,6 +146,27 @@ export async function sendEmail(env, { to, subject, text, html, replyTo }) {
   });
   if (!r.ok) { console.log("resend", r.status, await r.text()); throw new HttpError(502, "The email couldn't be sent. Try again in a minute."); }
 }
+// many emails in one go (Resend takes up to 100 per call); each item {to, subject, text, html, headers}
+export async function sendBatch(env, items) {
+  if (!env.RESEND_API_KEY) throw new HttpError(503, "Email isn't set up yet.");
+  let sent = 0;
+  for (let i = 0; i < items.length; i += 100) {
+    const chunk = items.slice(i, i + 100).map(m => ({ from: FROM, to: [m.to], subject: m.subject, text: m.text, html: m.html, headers: m.headers, reply_to: "hello@onetrackmind.online" }));
+    if (env.EMAIL_LOG) { chunk.forEach(m => console.log("EMAIL to", m.to[0], "|", m.subject)); sent += chunk.length; continue; }
+    const r = await fetch("https://api.resend.com/emails/batch", { method: "POST",
+      headers: { "Authorization": `Bearer ${env.RESEND_API_KEY}`, "Content-Type": "application/json" }, body: JSON.stringify(chunk) });
+    if (!r.ok) { console.log("resend batch", r.status, await r.text()); throw new HttpError(502, `Sent ${sent}, then the email service refused. Try again in a minute; nobody gets it twice.`); }
+    sent += chunk.length;
+  }
+  return sent;
+}
+// the small pages behind email links (confirm, unsubscribe, how often): teal and gold like the site
+export const brandPage = (title, inner = "") => new Response(`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>OneTrackMind</title>
+<body style="margin:0;background:#06303F;color:#fff;font:17px/1.5 system-ui,-apple-system,Segoe UI,Arial,sans-serif"><div style="max-width:480px;margin:12vh auto;padding:0 16px">
+<div style="background:#0F5874;border-radius:14px;padding:26px 24px;border-top:4px solid #E8A317"><div style="font-weight:800;letter-spacing:.06em;color:#E8A317;font-size:.85rem;margin-bottom:10px">ONETRACKMIND</div>
+<h1 style="font-size:1.35rem;margin:0 0 10px">${title}</h1>${inner}<p style="margin:18px 0 0"><a href="/" style="color:#E8A317;font-weight:700;text-decoration:none">Back to OneTrackMind ›</a></p></div></div></body></html>`,
+  { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
+export const FREQS = { weekly: "Every week", fortnightly: "Every two weeks", monthly: "Once a month" };
 export const validEmail = e => typeof e === "string" && e.length <= 200 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
 export const clean = (s, n) => String(s == null ? "" : s).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, "").trim().slice(0, n);
 export const escHtml = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));

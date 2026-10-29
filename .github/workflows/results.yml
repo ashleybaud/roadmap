@@ -1,0 +1,18 @@
+name: results
+# Tuesday and Thursday: late-posted results get picked up. Friday: each results page is saved before the weekend, so a change after the race means the results are up.
+on:
+  schedule: [{ cron: "0 4 * * 2,4,5" }]
+  workflow_dispatch:
+permissions: { contents: write }
+jobs:
+  sniff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node scripts/sniff-results.mjs && ./build.sh --no-test
+      - run: |
+          git config user.name "otm-bot"; git config user.email "bot@onetrackmind.online"
+          git add data/events/results.json reports events || true
+          git diff --cached --quiet || { git commit -m "Results $(date -u +%F)"; git push; }

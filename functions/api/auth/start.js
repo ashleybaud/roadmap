@@ -19,13 +19,13 @@ export const onRequestPost = handle(async ({ request, env }) => {
     to: email,
     subject: "Your OneTrackMind sign-in link",
     text: `Tap this link to sign in to OneTrackMind:\n\n${link}\n\nOr type this code on the screen that's waiting: ${code}\n\nOpening the link on your phone also signs in the computer you asked from. It works once and expires in 20 minutes. If you didn't ask for it, ignore this email.\n\nOneTrackMind · Recce. Ride. Report.`,
-    html: `<div style="font-family:system-ui,sans-serif;font-size:16px;line-height:1.5;color:#18201C">
-      <p>Tap the button to sign in to OneTrackMind.</p>
-      <p><a href="${escHtml(link)}" style="display:inline-block;background:#0B6E4F;color:#fff;text-decoration:none;padding:12px 20px;border-radius:6px;font-weight:600">Sign in</a></p>
-      <p>Or type this code on the screen that's waiting:</p>
-      <p style="font-size:28px;font-weight:700;letter-spacing:6px;font-family:monospace">${code}</p>
-      <p style="color:#5C6660;font-size:14px">Opening the link on your phone also signs in the computer you asked from. It works once and expires in 20 minutes. If you didn't ask for it, ignore this email.</p>
-      <p style="color:#5C6660;font-size:13px">OneTrackMind · Recce. Ride. Report.</p></div>`,
+    html: `<div style="background:#06303F;padding:24px 12px"><div style="max-width:520px;margin:0 auto;background:#0F5874;border-radius:14px;border-top:4px solid #E8A317;padding:26px 24px;font:16px/1.5 Arial,Helvetica,sans-serif;color:#fff">
+      <div style="font-weight:800;letter-spacing:.06em;color:#E8A317;font-size:13px;margin-bottom:10px">ONETRACKMIND</div>
+      <p style="margin:0 0 14px">Tap the button to sign in to OneTrackMind.</p>
+      <p style="margin:0 0 16px"><a href="${escHtml(link)}" style="display:inline-block;background:#E8A317;color:#06303F;text-decoration:none;padding:12px 22px;border-radius:8px;font-weight:700">Sign in</a></p>
+      <p style="margin:0">Or type this code on the screen that's waiting:</p>
+      <p style="font-size:28px;font-weight:700;letter-spacing:6px;font-family:monospace;margin:6px 0 14px">${code}</p>
+      <p style="color:#B5D3DE;font-size:14px;margin:0">Opening the link on your phone also signs in the computer you asked from. It works once and expires in 20 minutes. If you didn't ask for it, ignore this email.</p></div></div>`,
   });
   return json({ ok: true, poll });
 });
