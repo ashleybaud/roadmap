@@ -149,8 +149,8 @@ for (const d of days) {
 /* ---------- pictures ---------- */
 const FONT = f => "file://" + path.join(ROOT, "scripts/fonts", f);
 const fileUrl = p => "file://" + p.split(path.sep).map(encodeURIComponent).join("/");
-const CSS = `@font-face{font-family:B;src:url(${FONT("barlow-condensed-latin-700-normal.woff2")});font-weight:700}
-@font-face{font-family:B;src:url(${FONT("barlow-condensed-latin-600-normal.woff2")});font-weight:600}
+const CSS = `@font-face{font-family:B;src:url(${FONT("saira-condensed-latin-800-normal.woff2")});font-weight:700}
+@font-face{font-family:B;src:url(${FONT("saira-condensed-latin-700-normal.woff2")});font-weight:600}
 @font-face{font-family:P;src:url(${FONT("ibm-plex-sans-latin-400-normal.woff2")});font-weight:400}
 @font-face{font-family:P;src:url(${FONT("ibm-plex-sans-latin-600-normal.woff2")});font-weight:600}
 *{box-sizing:border-box;margin:0}body{width:1080px;overflow:hidden;background:#06303F;font-family:P}
