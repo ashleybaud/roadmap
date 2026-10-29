@@ -1,0 +1,62 @@
+{
+ "2014-09 Kalahari SpeedWeek": {
+  "name": "Hakskeenpan",
+  "lat": -26.8194,
+  "lon": 20.22501,
+  "found": "Hakskeenpan, Mier Local Municipality, South Africa"
+ },
+ "2018-05 Speedweek": {
+  "name": "Hakskeenpan",
+  "lat": -26.8194,
+  "lon": 20.22501,
+  "found": "Hakskeenpan, Mier Local Municipality, South Africa"
+ },
+ "Lesotho 2016": {
+  "name": "Maseru",
+  "lat": -29.31005,
+  "lon": 27.47822,
+  "found": "Maseru, Maseru, Lesotho"
+ },
+ "2019-06 RedBull Cape Town Circuit": {
+  "name": "Green Point",
+  "lat": -33.90426,
+  "lon": 18.40597,
+  "found": "Green Point, Cape Town, South Africa"
+ },
+ "2019-03 MotoGP-Qatar": {
+  "name": "Lusail International Circuit",
+  "lat": 25.49113,
+  "lon": 51.45208,
+  "found": "Lusail International Circuit, لوسيل, قطر"
+ },
+ "2016-06 Franschoek Motor Museum": {
+  "name": "Franschhoek Motor Museum",
+  "lat": -33.87983,
+  "lon": 19.00301,
+  "found": "Franschhoek Motor Museum, Franschhoek, South Africa"
+ },
+ "2023-03 WPMC @ Killarney": {
+  "name": "Killarney International Raceway",
+  "lat": 27.45349,
+  "lon": -81.3531,
+  "found": "Sebring International Raceway, Highlands, United States"
+ },
+ "2023-02 Wijnland Motor Museum": {
+  "name": "Wijnland Auto Museum",
+  "lat": 31.28053,
+  "lon": 121.16577,
+  "found": "上海汽车博物馆, 嘉定区, 中国"
+ },
+ "2018-05 Simola Hill Climb": {
+  "name": "Simola",
+  "lat": -34.0044,
+  "lon": 23.02985,
+  "found": "Simola, George, South Africa"
+ },
+ "2016-06 Port Elizabeth enduros": {
+  "name": "Gqeberha",
+  "lat": -33.96186,
+  "lon": 25.61867,
+  "found": "Gqeberha, Nelson Mandela Bay Metropolitan Municipality, South Africa"
+ }
+}
