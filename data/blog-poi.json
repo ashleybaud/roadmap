@@ -27,7 +27,7 @@
   "name": "Lusail International Circuit",
   "lat": 25.49113,
   "lon": 51.45208,
-  "found": "Lusail International Circuit, \u0644\u0648\u0633\u064a\u0644, \u0642\u0637\u0631"
+  "found": "Lusail International Circuit, لوسيل, قطر"
  },
  "2016-06 Franschoek Motor Museum": {
   "name": "Franschhoek Motor Museum",
@@ -46,5 +46,17 @@
   "lat": -33.96186,
   "lon": 25.61867,
   "found": "Gqeberha, Nelson Mandela Bay Metropolitan Municipality, South Africa"
+ },
+ "2023-03 WPMC @ Killarney": {
+  "name": "Killarney Raceway",
+  "lat": -33.82415,
+  "lon": 18.52771,
+  "found": "Killarney Raceway, Cape Town, South Africa"
+ },
+ "2023-02 Wijnland Motor Museum": {
+  "name": "Wijnland Auto Museum",
+  "lat": 31.28053,
+  "lon": 121.16577,
+  "found": "上海汽车博物馆, 嘉定区, 中国"
  }
 }
