@@ -98,7 +98,7 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
 
 
 .tex-gravel{background:linear-gradient(90deg,rgba(20,14,8,.78),rgba(20,14,8,.35)),url(/img/tex-gravel.jpg) center/cover!important}
-.tex-tar{background:linear-gradient(90deg,rgba(0,0,0,.55),rgba(0,0,0,.15)),url(/img/tex-tarmac.jpg) center bottom/cover!important}
+.tex-tar{background:linear-gradient(90deg,rgba(0,0,0,.55),rgba(0,0,0,.15)),url(/img/tex-tar2.jpg) center bottom/cover!important}
 
 .cabout{grid-column:-3/-1;grid-row:1/span 2;background:var(--panel);border:2px solid var(--gold);border-radius:10px;padding:14px;display:flex;gap:14px;align-items:flex-start;overflow:hidden}.cabout img{width:110px;height:146px;object-fit:cover;object-position:50% 15%;border-radius:8px;flex:none}.cabout b{font:700 1.5rem var(--f-display,"Barlow Condensed",sans-serif);text-transform:uppercase;color:var(--gold)}.cabout p{margin:6px 0 10px;font-size:.95rem;line-height:1.45}.cabout a{font-weight:700}
 @media(max-width:640px){.cabout{grid-column:1/-1;grid-row:auto}}
