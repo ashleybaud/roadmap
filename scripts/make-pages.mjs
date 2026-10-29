@@ -102,6 +102,8 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
 
 .cabout{grid-column:-3/-1;grid-row:1/span 2;background:var(--panel);border:2px solid var(--gold);border-radius:10px;padding:14px;display:flex;gap:14px;align-items:flex-start;overflow:hidden}.cabout img{width:110px;height:146px;object-fit:cover;object-position:50% 15%;border-radius:8px;flex:none}.cabout b{font:700 1.5rem var(--f-display,"Barlow Condensed",sans-serif);text-transform:uppercase;color:var(--gold)}.cabout p{margin:6px 0 10px;font-size:.95rem;line-height:1.45}.cabout a{font-weight:700}
 @media(max-width:640px){.cabout{grid-column:1/-1;grid-row:auto}}
+
+.tagchips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px}.tagchips button{border:1px solid var(--line);background:var(--chip);color:var(--ink);border-radius:999px;padding:6px 14px;font:600 .9rem var(--f-body,sans-serif);cursor:pointer}.tagchips button.on{background:var(--gold);border-color:var(--gold);color:#0B1D21}
 `;
 
 function page({ url, title, desc, body, ld, image, active }) {
@@ -356,6 +358,7 @@ ${L.length > 1 ? `<nav class="snav">${prev ? `<a href="/blog/${esc(prev.slug)}/"
   const ld = { "@context": "https://schema.org", "@type": "BlogPosting", headline: x.title, datePublished: x.date, author: FOUNDER, publisher: ORG, url: `${SITE}/blog/${x.slug}/`, ...(x.cover ? { image: x.cover } : {}) };
   return page({ active: "/favourites/", url: `/blog/${x.slug}/`, title: `${x.title} · OneTrackMind blog`, desc: (x.lead || x.title).slice(0, 155), body, ld });
 }
+const TAGS = [["namibia", "Namibia", /namibia|tortoise|epupa/i], ["southafrica", "South Africa", /wild coast|cdba|killarney|simola|kalahari|speedweek|franschoek|wijnland|port elizabeth|redbull cape town|cape town/i], ["lesotho", "Lesotho", /lesotho/i], ["europe", "Europe", /eu road trip|motor valley|eicma|goodwood|nurburg|porsche museum/i], ["racing", "Racing", /simola|hill ?climb|killarney|wpmc|motogp|speedweek|race|redbull/i], ["museums", "Museums & factories", /museum|factory|motor valley|eicma|webb/i], ["bikes", "Bikes", /ktm|duke|gsxr|africa twin|bmw|scalpel|cafe racer|enduro|ducati|tyrenoise/i], ["cars", "Cars", /alfa|giulia|porsche|aston|mclaren|audi|fuorilegge|universal products/i]];
 function storiesIndex(M) {
   const ADV = /namibia|lesotho|wild coast|cdba|enduro|africa twin|790 adventure|eu road trip|tortoise|introduction|cycle tour/i;
   const MOT = /eu road trip|motor valley|eicma|motogp/i;
@@ -365,7 +368,8 @@ function storiesIndex(M) {
     const cats = [ADV.test(name) ? "adventure" : "", (MOTOR_RX.test(name) || MOT.test(name)) ? "motorsport" : ""].filter(Boolean).join(" ");
     const rid = TRIP_ROUTE[name], title = multi ? tripName(name) : L[0].title;
     const yr = L[L.length - 1].date.slice(0, 4);
-    return `<div class="ctile${multi ? " big" : ""}" data-cat="${cats}"><a class="cimg" href="${href}"><img src="${esc(coverOf(L))}" alt="" loading="lazy"><span class="cmeta"><b>${esc(title)}</b><span>${yr}${multi ? ` · ${L.length} days of posts` : ""}</span></span></a>${rid ? `<a class="plot" href="/?pick=${esc(rid)}">Plot this route ›</a>` : ""}</div>`;
+    const tags = TAGS.filter(([, , rx]) => rx.test(name + " " + title)).map(([k]) => k).join(" ");
+    return `<div class="ctile${multi ? " big" : ""}" data-cat="${cats}" data-tags="${tags}"><a class="cimg" href="${href}"><img src="${esc(coverOf(L))}" alt="" loading="lazy"><span class="cmeta"><b>${esc(title)}</b><span>${yr}${multi ? ` · ${L.length} days of posts` : ""}</span></span></a>${rid ? `<a class="plot" href="/?pick=${esc(rid)}">Plot this route ›</a>` : ""}</div>`;
   };
   const body = `<main class="blog"><h1>Blog</h1>
 <p class="intro">Twenty-odd years of road trips, race weekends, factories and museums. Mostly on two wheels, mostly not to plan. Tap a picture to read it, or Plot this route to ride it yourself.</p>
@@ -374,10 +378,17 @@ function storiesIndex(M) {
 <button type="button" class="bbox tex-gravel" data-f="adventure"><b>Adventure</b><span>Recce. Ride. Report.</span></button>
 <button type="button" class="bbox tex-tar" data-f="motorsport"><b>Motorsport</b><span>Plan it. Book it. Ride it.</span></button>
 </nav>
+<nav class="tagchips" aria-label="Tags">${TAGS.map(([k, t]) => `<button type="button" data-tag="${k}">${t}</button>`).join("")}</nav>
 <div class="collage"><div class="cabout"><img src="/img/ashley.jpg" alt="Ashley in his garage" loading="lazy"><div><b>Hi, I'm Ashley.</b><p>Ducati taught me to ride the road, KTM taught me to live off it, and the Alfas got me racing. Twenty-odd years of trips and race weekends live here. Tap a picture to read it, or Plot this route to ride it yourself.</p><a href="/about/">More about me ›</a></div></div>${groups.map(tile).join("")}</div>
 <p class="note"><a href="/favourites/">The places I'd send you: Founder's fav's ›</a></p>
 <a class="cta" href="/">Plan your own</a></main>
-<script>(function(){var b=document.querySelectorAll(".bbox");function f(k){b.forEach(function(y){y.classList.toggle("on",y.dataset.f===k)});document.querySelectorAll(".ctile").forEach(function(c){c.hidden=k!=="all"&&(" "+c.dataset.cat+" ").indexOf(" "+k+" ")<0});try{history.replaceState(null,"",k==="all"?location.pathname:"#"+k)}catch(e){}}b.forEach(function(x){x.onclick=function(){f(x.dataset.f)}});var h=location.hash.slice(1);if(h==="adventure"||h==="motorsport")f(h);else{try{var p=localStorage.getItem("otm-pick");if(p)f(p)}catch(e){}}})();</script>`;
+<script>(function(){var b=document.querySelectorAll(".bbox"),tg=document.querySelectorAll(".tagchips button"),cat="all",tag="";
+function run(){b.forEach(function(y){y.classList.toggle("on",y.dataset.f===cat)});tg.forEach(function(y){y.classList.toggle("on",y.dataset.tag===tag)});
+document.querySelectorAll(".ctile").forEach(function(c){var okc=cat==="all"||(" "+c.dataset.cat+" ").indexOf(" "+cat+" ")>=0,okt=!tag||(" "+c.dataset.tags+" ").indexOf(" "+tag+" ")>=0;c.hidden=!(okc&&okt)});
+try{history.replaceState(null,"",cat==="all"&&!tag?location.pathname:"#"+[cat!=="all"?cat:"",tag].filter(Boolean).join("+"))}catch(e){}}
+b.forEach(function(x){x.onclick=function(){cat=x.dataset.f;run()}});tg.forEach(function(x){x.onclick=function(){tag=tag===x.dataset.tag?"":x.dataset.tag;run()}});
+var h=location.hash.slice(1).split("+");h.forEach(function(p){if(p==="adventure"||p==="motorsport")cat=p;else if(p)tag=p});
+if(!location.hash){try{var p=localStorage.getItem("otm-pick");if(p)cat=p}catch(e){}}run()})();</script>`;
   const ld = { "@context": "https://schema.org", "@type": "Blog", name: "OneTrackMind blog", url: SITE + "/blog/", author: FOUNDER };
   return page({ active: "/blog/", url: "/blog/", title: "Blog: road trips, race weekends and factories · OneTrackMind", desc: "Twenty years of road trips and race weekends by the founder of OneTrackMind: Namibia, Lesotho, the Wild Coast, Motor Valley, the Nürburgring and Goodwood. Plot any trip and ride it yourself.", body, ld });
 }
