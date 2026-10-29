@@ -117,9 +117,11 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
 
 .hdrlinks{background:none!important;border-bottom:1px solid var(--line);border-radius:0!important}.hdrlinks>a{color:var(--ink)!important;text-transform:none!important;letter-spacing:.01em!important;font-size:1.3rem!important;padding:8px 16px 6px!important}.hdrlinks>a:hover{background:none!important;color:var(--gold)!important}.hdrlinks>a.on{border-bottom-color:var(--gold)!important}.navtoggle{color:var(--ink)!important;text-transform:none!important}
 .aboutlink{display:inline-flex;align-items:center;gap:6px;margin-left:auto;font-weight:700;text-decoration:none;color:var(--gold)}.aboutlink img{width:28px;height:28px;border-radius:50%;object-fit:cover;object-position:50% 12%;border:2px solid var(--gold)}
+
+body.blogdark{--bg:#06303F;--panel:#0B3E50;--line:#1E5A70;--chip:#0E4A60;background:#06303F}
 `;
 
-function page({ url, title, desc, body, ld, image, active, ads = true }) {
+function page({ url, title, desc, body, ld, image, active, ads = true, dark = false }) {
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -141,7 +143,7 @@ function page({ url, title, desc, body, ld, image, active, ads = true }) {
 <style>${CSS}</style>
 ${(Array.isArray(ld) ? ld : [ld]).filter(Boolean).map(x => `<script type="application/ld+json">${JSON.stringify(x)}</script>`).join("\n")}
 </head>
-<body><div class="wrap">
+<body${dark ? ' class="blogdark"' : ""}><div class="wrap">
 <header><a class="logo" href="/">OneTrackMind</a><nav class="hdrlinks" id="sitenav" aria-label="Site"><button type="button" class="navtoggle" aria-expanded="false" aria-controls="sitenav">Menu ▾</button>${[["/","Plan a trip"],["/routes/","Routes"],["/events/","Events"],["/blog/","Blog"],["/about/","About"]].map(([h,t])=>`<a href="${h}"${active===h?' class="on" aria-current="page"':""}>${t}</a>`).join("")}</nav></header><script>document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".navtoggle");if(!b)return;var n=b.closest(".hdrlinks"),o=n.classList.toggle("open");b.setAttribute("aria-expanded",String(o))});document.addEventListener("click",function(e){document.querySelectorAll(".navdd[open]").forEach(function(d){if(!d.contains(e.target))d.open=false;});});</script>
 ${body}
 ${ads ? `<div class="adrow"><a class="adcard" href="https://alterego.online/products/build-race-repeat-hoodie?utm_source=onetrackmind&utm_medium=sponsor&utm_content=hoodie" target="_blank" rel="noopener sponsored"><img src="https://alterego.online/cdn/shop/files/3158941636033974733_2048.jpg?v=1792398701&width=360" alt="AlterEgo Build Race Repeat hoodie" loading="lazy"><span class="adt"><em>AlterEgo · Ad</em><b>Build. Race. Repeat.</b><span>The hoodie, made to order for petrolheads. From $65.</span><i>Shop the hoodie ›</i></span></a><a class="adcard" href="https://alterego.online/products/racing-is-life?utm_source=onetrackmind&utm_medium=sponsor&utm_content=racing-is-life" target="_blank" rel="noopener sponsored"><img src="/img/ashley.jpg" alt="Ashley in the AlterEgo Racing is Life tee" loading="lazy" style="object-position:50% 40%"><span class="adt"><em>AlterEgo · Ad</em><b>Racing is life.</b><span>Everything else is preparation. The tee I wear in the garage.</span><i>Shop the tee ›</i></span></a></div>` : ""}
@@ -371,7 +373,7 @@ ${(g => g ? `<a class="cta" href="${esc(g.href)}">${esc(g.label)}</a>` : `<a cla
 <p class="note">First published on onetrackmind.co.za. Places change: check before you go.</p>
 </main>`;
   const ld = { "@context": "https://schema.org", "@type": "BlogPosting", headline: x.title, datePublished: x.date, author: FOUNDER, publisher: ORG, url: `${SITE}/blog/${x.slug}/`, ...(x.cover ? { image: x.cover } : {}) };
-  return page({ ads: false, active: "/blog/", url: `/blog/${x.slug}/`, title: `${x.title} · OneTrackMind blog`, desc: (x.lead || x.title).slice(0, 155), body, ld });
+  return page({ ads: false, dark: true, active: "/blog/", url: `/blog/${x.slug}/`, title: `${x.title} · OneTrackMind blog`, desc: (x.lead || x.title).slice(0, 155), body, ld });
 }
 const TAGS = [["namibia", "Namibia", /namibia|tortoise|epupa/i], ["southafrica", "South Africa", /wild coast|cdba|killarney|simola|kalahari|speedweek|franschoek|wijnland|port elizabeth|redbull cape town|cape town/i], ["lesotho", "Lesotho", /lesotho/i], ["europe", "Europe", /eu road trip|motor valley|eicma|goodwood|nurburg|porsche museum/i], ["racing", "Racing", /simola|hill ?climb|killarney|wpmc|motogp|speedweek|race|redbull/i], ["museums", "Museums & factories", /museum|factory|motor valley|eicma|webb/i], ["bikes", "Bikes", /ktm|duke|gsxr|africa twin|bmw|scalpel|cafe racer|enduro|ducati|tyrenoise/i], ["cars", "Cars", /alfa|giulia|porsche|aston|mclaren|audi|fuorilegge|universal products/i]];
 const BLOG_POI = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data/blog-poi.json"), "utf8")); } catch (e) { return {}; } })();
@@ -425,7 +427,7 @@ b.forEach(function(x){x.onclick=function(){cat=x.dataset.f;run()}});tg.forEach(f
 var h=location.hash.slice(1).split("+");h.forEach(function(p){if(p==="adventure"||p==="motorsport")cat=p;else if(p)tag=p});
 if(!location.hash){try{var p=localStorage.getItem("otm-pick");if(p)cat=p}catch(e){}}run()})();</script>`;
   const ld = { "@context": "https://schema.org", "@type": "Blog", name: "OneTrackMind blog", url: SITE + "/blog/", author: FOUNDER };
-  return page({ ads: false, active: "/blog/", url: "/blog/", title: "Blog: road trips, race weekends and factories · OneTrackMind", desc: "Twenty years of road trips and race weekends by the founder of OneTrackMind: Namibia, Lesotho, the Wild Coast, Motor Valley, the Nürburgring and Goodwood. Plot any trip and ride it yourself.", body, ld });
+  return page({ ads: false, dark: true, active: "/blog/", url: "/blog/", title: "Blog: road trips, race weekends and factories · OneTrackMind", desc: "Twenty years of road trips and race weekends by the founder of OneTrackMind: Namibia, Lesotho, the Wild Coast, Motor Valley, the Nürburgring and Goodwood. Plot any trip and ride it yourself.", body, ld });
 }
 
 function advertisePage() {

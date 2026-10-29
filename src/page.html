@@ -657,7 +657,7 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
 .oneliner{order:9;flex-basis:100%;display:flex;align-items:center;justify-content:center;gap:12px;margin:12px 0 2px;color:var(--ink);text-decoration:none;font-size:1.05rem;text-align:left}.oneliner img{width:44px;height:44px;border-radius:50%;object-fit:cover;object-position:50% 12%;border:2px solid var(--gold);flex:none}.oneliner b{color:var(--gold);white-space:nowrap}
 .adrow{order:initial;margin:28px 0 0}
 .hdrlinks{background:none!important;border-bottom:1px solid var(--line);border-radius:0!important}.hdrlinks>a{color:var(--ink)!important;text-transform:none!important;letter-spacing:.01em!important;font-size:1.3rem!important;padding:8px 16px 6px!important}.hdrlinks>a:hover{background:none!important;color:var(--gold)!important}.hdrlinks>a.on{border-bottom-color:var(--gold)!important}.navtoggle{color:var(--ink)!important;text-transform:none!important}
-.pcol{display:flex;flex-direction:column;gap:6px}.pcol .pbox{flex:1}.palt{align-self:center;font-weight:700;color:var(--gold);text-decoration:none}.palt:hover{text-decoration:underline}
+.pcol{position:relative;display:flex}.pcol .pbox{flex:1;padding-bottom:58px!important}.palt{position:absolute;right:14px;bottom:14px;background:var(--gold);color:#0B1D21;font-weight:700;font-size:.9rem;padding:8px 14px;border-radius:6px;text-decoration:none;box-shadow:0 2px 6px rgba(0,0,0,.35)}.palt:hover{filter:brightness(1.08)}
 .pickextra{margin:14px 0 0}.pickextra h3{font:700 1.2rem var(--f-display);text-transform:uppercase;margin:0 0 8px;text-align:center}.pxcards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.pxcards a{display:flex;flex-direction:column;gap:3px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:8px;padding:10px 12px;color:var(--ink);text-decoration:none}.pxcards a:hover{border-color:var(--gold)}.pxcards b{font:700 1.1rem/1.15 var(--f-display);text-transform:uppercase}.pxcards span{color:var(--muted);font-size:.85rem}.pxcards i{font-style:normal;font-weight:700;color:var(--gold);font-size:.9rem}
 @media(max-width:700px){.pxcards{grid-template-columns:1fr}}
 </style>
@@ -675,11 +675,11 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
         <div class="pcol"><button type="button" class="pbox tex-gravel" data-pick="adventure" aria-pressed="false">
           <span class="pk">Gravel · Adventure</span><b class="pt">Recce. Ride. Report.</b>
           <span class="pp">For years I planned trips on and off road without really knowing what was around me, and rode straight past great places right under my nose. Plan the back roads with every pass, viewpoint and farm stall on the way, so you miss nothing.</span>
-          <span class="pgo">Plan an adventure ›</span></button><a class="palt" href="/routes/">or ride one of my routes ›</a></div>
+          <span class="pgo">Plan an adventure ›</span></button><a class="palt" href="/routes/">Ride one of my routes ›</a></div>
         <div class="pcol"><button type="button" class="pbox tex-tar" data-pick="motorsport" aria-pressed="false">
           <span class="pk">Tar · Motorsport</span><b class="pt">Plan it. Book it. Ride it.</b>
           <span class="pp">Same story at race weekends: a museum, a factory or a famous corner ten minutes away that I only heard about afterwards. Plan the trip around the race with every petrolhead stop near it, so you miss nothing.</span>
-          <span class="pgo">Plan a motorsport trip ›</span></button><a class="palt" href="/events/">or pick an event ›</a></div>
+          <span class="pgo">Plan a motorsport trip ›</span></button><a class="palt" href="/events/">Pick an event ›</a></div>
       </div>
       <section id="pickextra" class="pickextra" hidden><h3></h3><div class="pxcards"></div></section>
       <div class="herocta"><button class="btn herobtn" type="button" data-tryroute id="tryBtn">Or try a finished trip: Swartberg Pass in 2 days ›</button></div>
