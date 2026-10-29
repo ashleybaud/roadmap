@@ -615,7 +615,7 @@ dialog.wide{max-width:760px;width:calc(100vw - 32px)}
 .maplbl.mlnight{font-weight:800;border-width:2px;background:#11262B;color:#fff;border-color:#11262B}
 .pin.pnight{background:#11262B;color:#fff}
 .hdrlinks{overflow:visible!important;position:relative;z-index:1500}header,.hdr{position:relative;z-index:1500}.navdd{position:relative;display:flex}.navdd>summary{list-style:none;cursor:pointer;font:700 1.15rem var(--f-display,"Saira Condensed","Arial Narrow",sans-serif);text-transform:uppercase;letter-spacing:.06em;color:var(--bg);padding:9px 20px;border-bottom:4px solid transparent;white-space:nowrap;width:100%}.navdd>summary::-webkit-details-marker{display:none}.navdd>summary::after{content:" ▾";font-size:.8em}.navdd>summary.on{border-bottom-color:#E8A317}.navdd>summary:hover{background:color-mix(in srgb,var(--bg) 12%,transparent)}.navdd .ddm{position:absolute;z-index:2000;top:100%;left:0;min-width:210px;background:var(--ink);border-radius:0 0 6px 6px;box-shadow:0 6px 16px rgba(0,0,0,.25);flex-direction:column;display:flex}.navdd:not([open]) .ddm{display:none}@media(hover:hover){.navdd:hover .ddm{display:flex}}.navdd .ddm a{text-align:left!important;padding:10px 18px!important}@media(max-width:700px){.hdrlinks{grid-template-columns:repeat(3,minmax(0,1fr))!important}.navdd>summary{font-size:.95rem;padding:8px 4px;text-align:center;letter-spacing:.03em}.navdd .ddm{left:auto;right:0}}:root{--brand:#E8A317;--gold:#E8A317}
-html[data-mode="motorsport"]{--bg:#0A4A63;--panel:#0F5874;--ink:#F4F8F9;--muted:#B5D3DE;--line:#2B7896;--accent:#E8A317;--chip:#13617E;--onfill:#0B1D21;--warn:#FF9A1A;--bad:#E5484D;--brand:#E8A317;--gold:#E8A317;--hero:#08405A;color-scheme:dark}
+html[data-mode="motorsport"]{--bg:#121A1E;--panel:#0F5874;--ink:#F4F8F9;--muted:#B5D3DE;--line:#2B7896;--accent:#E8A317;--chip:#13617E;--onfill:#0B1D21;--warn:#FF9A1A;--bad:#E5484D;--brand:#E8A317;--gold:#E8A317;--hero:#0A4A63;color-scheme:dark}
 html[data-mode="motorsport"] .hero{background:#03141A;border-color:#E8A317}
 
 html[data-mode="motorsport"] .btn.share,html[data-mode="motorsport"] .ib.on{color:#111}
@@ -663,17 +663,17 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
 .evtlist{max-height:36vh;overflow:auto;border:1px solid var(--line);border-radius:10px;padding:4px 10px}.evtwk{font:700 .78rem/1 var(--f-display);letter-spacing:.08em;text-transform:uppercase;color:var(--gold);padding:12px 0 4px}
 .evtrow{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start;padding:8px 0;border-bottom:1px solid var(--line);cursor:pointer}.evtrow input{width:20px;height:20px;margin-top:2px;accent-color:var(--gold)}.evtrow.on b{color:var(--gold)}.evtmy{color:var(--gold)}
 .evtw{margin:0 0 6px;padding:8px 10px;border-left:4px solid var(--gold);background:rgba(232,163,23,.12);border-radius:6px;font-size:.9rem}.evtgo{width:100%;font-size:1rem;padding:12px}.evtgo:disabled{opacity:.55}
-/* one dark section: the events band is the pit wall, charcoal like tarmac, so the races stand out from the teal */
-.evband{background:#121A1E!important;color:#fff!important;border-color:#2A353A!important}
-.evband .evstory b{color:var(--gold)!important}.evband .evstory span{color:#D5DEE2}
-.evband .lbl{color:#9AA9B0!important}
-.evband .evregs button{background:transparent;border-color:#3A474D;color:#D5DEE2}.evband .evregs button.on{background:var(--gold);border-color:var(--gold);color:#121A1E}
+/* the events band is a teal block on the dark page */
+.evband{background:var(--panel)!important;color:#fff!important;border-color:var(--line)!important}
+.evband .evstory b{color:var(--gold)!important}.evband .evstory span{color:#E4EEF2}
+.evband .lbl{color:#B5D3DE!important}
+.evband .evregs button{background:transparent;border-color:var(--line);color:#E4EEF2}.evband .evregs button.on{background:var(--gold);border-color:var(--gold);color:#121A1E}
 .evband .evgrid{gap:0 22px}
-.evband .evcard{background:transparent;border:0;border-bottom:1px solid #2A353A;border-radius:0;padding:10px 2px;color:#fff}.evband .evcard:hover{background:rgba(232,163,23,.08)}
+.evband .evcard{background:transparent;border:0;border-bottom:1px solid rgba(255,255,255,.14);border-radius:0;padding:10px 2px;color:#fff}.evband .evcard:hover{background:rgba(232,163,23,.10)}
 .evband .evdate{background:var(--gold)}.evband .evdate b{color:#121A1E}.evband .evdate i{color:#121A1E;opacity:.8}
-.evband .evcard .ew{color:#9AA9B0}.evband .evcard .ef{color:#4FB8D8}
+.evband .evcard .ew{color:#B5D3DE}.evband .evcard .ef{color:#FFD23F}
 .evband .evall{color:var(--gold)}
-.evband .evalert{border-top-color:#2A353A}.evband .evalert b{color:#fff}.evband .evalert>span{color:#9AA9B0}
+.evband .evalert{border-top-color:#2A353A}.evband .evalert b{color:#fff}.evband .evalert>span{color:#B9C3C7}
 .evband .evalert input[type=email]{background:#1C262B;color:#fff;border-color:#3A474D}
 .evband .evalert button{background:transparent;color:var(--gold);border:2px solid var(--gold)}.evband .evalert .nlm{color:var(--gold)}
 /* the story and sign-up sit on a pit board: black board, brushed aluminium frame, handle on top */
