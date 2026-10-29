@@ -13,10 +13,17 @@ function drawEvents(){
     L.marker([x.lat,x.lon],{icon:L.divIcon({className:"",html:`<div class="evmk" title="${esc(x.name)}">🏁</div>`,iconSize:[26,26],iconAnchor:[13,13]}),zIndexOffset:650}).bindTooltip(x.name).bindPopup(html).addTo(layer); });
 }
 document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-evgo]"); if(!b) return; const x=(evList||[]).find(f=>f.id===b.dataset.evgo); if(!x) return; map.closePopup(); setFinish(pt(x.venue||x.name,x.lat,x.lon)); });
+const ADV_PICKS=["swartberg-loop","die-hel","namibia-2020-tortoise"];
+function pickExtra(){ const s=$("pickextra"); if(!s||!pickMode) return;
+  if(pickMode==="adventure"){ fetch("/data/picks/picks.json").then(r=>r.json()).then(j=>{ const L=ADV_PICKS.map(id=>j.routes.find(r=>r.id===id)).filter(Boolean); if(!L.length) return;
+      s.querySelector("h3").textContent="Ready to ride"; s.querySelector(".pxcards").innerHTML=L.map(r=>`<a href="/routes/${esc(r.id)}/"><b>${esc(r.title)}</b><span>${esc(r.region||"")}</span><i>See the route ›</i></a>`).join(""); s.hidden=false; }).catch(()=>{}); }
+  else loadEvents().then(L=>{ const t=new Date().toISOString().slice(0,10), nx=L.filter(e=>e.start>=t).slice(0,3); if(!nx.length) return;
+      s.querySelector("h3").textContent="Coming up"; s.querySelector(".pxcards").innerHTML=nx.map(e=>`<a href="/?ev=${esc(e.id)}"><b>${esc(e.name)}</b><span>${esc(new Date(e.start+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short"}))}${e.end!==e.start?" – "+esc(new Date(e.end+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})):""} · ${esc(e.city||e.venue||"")}, ${esc(e.country||"")}</span><i>Plan the trip there ›</i></a>`).join(""); s.hidden=false; }); }
 function setPick(md,user){
   pickMode=md==="motorsport"?"motorsport":"adventure"; try{ localStorage.setItem("otm-pick",pickMode); }catch(e){}
   document.documentElement.setAttribute("data-pick",pickMode);
   document.querySelectorAll(".pbox").forEach(b=>{ const on=b.dataset.pick===pickMode; b.classList.toggle("on",on); b.setAttribute("aria-pressed",String(on)); });
+  pickExtra();
   if(!user) return;
   let reroute=false;
   if(!settings.styleSet){ const want=pickMode==="motorsport"?"tar":"rough"; if(settings.style!==want){ settings.style=want; if($("style")) $("style").value=want; store.set("rr2-settings",settings); showStyle(); reroute=true; } }

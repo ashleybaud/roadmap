@@ -656,6 +656,10 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
 .social .lcards a{position:relative}.social .src{position:absolute;top:8px;left:8px;background:var(--gold);color:#0B1D21;font:700 .7rem var(--f-body);padding:2px 6px;border-radius:3px;text-transform:uppercase}.social .lcards span.t{padding:0 10px 10px;color:var(--ink);font-size:.92rem}.social .lcards span.d{padding:10px 10px 0;color:var(--muted);font-size:.8rem}
 .oneliner{order:9;flex-basis:100%;display:flex;align-items:center;justify-content:center;gap:12px;margin:12px 0 2px;color:var(--ink);text-decoration:none;font-size:1.05rem;text-align:left}.oneliner img{width:44px;height:44px;border-radius:50%;object-fit:cover;object-position:50% 12%;border:2px solid var(--gold);flex:none}.oneliner b{color:var(--gold);white-space:nowrap}
 .adrow{order:initial;margin:28px 0 0}
+.hdrlinks{background:none!important;border-bottom:1px solid var(--line);border-radius:0!important}.hdrlinks>a{color:var(--ink)!important;text-transform:none!important;letter-spacing:.01em!important;font-size:1.3rem!important;padding:8px 16px 6px!important}.hdrlinks>a:hover{background:none!important;color:var(--gold)!important}.hdrlinks>a.on{border-bottom-color:var(--gold)!important}.navtoggle{color:var(--ink)!important;text-transform:none!important}
+.pcol{display:flex;flex-direction:column;gap:6px}.pcol .pbox{flex:1}.palt{align-self:center;font-weight:700;color:var(--gold);text-decoration:none}.palt:hover{text-decoration:underline}
+.pickextra{margin:14px 0 0}.pickextra h3{font:700 1.2rem var(--f-display);text-transform:uppercase;margin:0 0 8px;text-align:center}.pxcards{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.pxcards a{display:flex;flex-direction:column;gap:3px;background:var(--panel);border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:8px;padding:10px 12px;color:var(--ink);text-decoration:none}.pxcards a:hover{border-color:var(--gold)}.pxcards b{font:700 1.1rem/1.15 var(--f-display);text-transform:uppercase}.pxcards span{color:var(--muted);font-size:.85rem}.pxcards i{font-style:normal;font-weight:700;color:var(--gold);font-size:.9rem}
+@media(max-width:700px){.pxcards{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -663,20 +667,21 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
   <header>
     <div><h1><a class="homelink" href="/" title="Home">OneTrackMind</a> <span class="testtag" title="Trips are saved on this device only. Fuel and place data can be wrong.">Test version</span></h1></div>
     <div class="btns"><span class="lbl mono" id="hdrSummary"></span><button class="btn ghost" id="feedback" type="button">Send feedback</button><button class="btn" id="addBtn" type="button" hidden>+ Add yours</button><button class="btn ghost" id="reviewBtn" type="button" hidden>Review</button><button class="btn ghost" id="acctBtn" type="button" hidden>Sign in</button><button class="btn ghost" id="openSettings" type="button">Settings</button></div>
-    <nav class="hdrlinks" id="sitenav" style="order:9" aria-label="Site"><button type="button" class="navtoggle" aria-expanded="false" aria-controls="sitenav">Menu ▾</button><a href="/" class="on" aria-current="page">Plan a trip</a><a href="/routes/">Routes</a><a href="/events/">Events</a><a href="/how-to/">How to</a><a href="/blog/">Blog</a><a href="/about/">About</a></nav><script>document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".navtoggle");if(!b)return;var n=b.closest(".hdrlinks"),o=n.classList.toggle("open");b.setAttribute("aria-expanded",String(o))});document.addEventListener("click",function(e){document.querySelectorAll(".navdd[open]").forEach(function(d){if(!d.contains(e.target))d.open=false;});});</script>
+    <nav class="hdrlinks" id="sitenav" style="order:9" aria-label="Site"><button type="button" class="navtoggle" aria-expanded="false" aria-controls="sitenav">Menu ▾</button><a href="/" class="on" aria-current="page">Plan a trip</a><a href="/routes/">Routes</a><a href="/events/">Events</a><a href="/blog/">Blog</a><a href="/about/">About</a></nav><script>document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".navtoggle");if(!b)return;var n=b.closest(".hdrlinks"),o=n.classList.toggle("open");b.setAttribute("aria-expanded",String(o))});document.addEventListener("click",function(e){document.querySelectorAll(".navdd[open]").forEach(function(d){if(!d.contains(e.target))d.open=false;});});</script>
     <a class="oneliner" href="/about/"><img src="/img/ashley.jpg" alt="" width="44" height="44"><span>Ducati taught me the road, KTM taught me to live off it. This is the planner I wish I'd had. <b>More about me ›</b></span></a>
     <section class="hero pick" style="order:10" aria-label="What it does">
       <h2 class="pickq">Two ways to go. <span>Which one's yours?</span></h2>
       <div class="pickboxes">
-        <button type="button" class="pbox tex-gravel" data-pick="adventure" aria-pressed="false">
+        <div class="pcol"><button type="button" class="pbox tex-gravel" data-pick="adventure" aria-pressed="false">
           <span class="pk">Gravel · Adventure</span><b class="pt">Recce. Ride. Report.</b>
           <span class="pp">For years I planned trips on and off road without really knowing what was around me, and rode straight past great places right under my nose. Plan the back roads with every pass, viewpoint and farm stall on the way, so you miss nothing.</span>
-          <span class="pgo">Plan an adventure ›</span></button>
-        <button type="button" class="pbox tex-tar" data-pick="motorsport" aria-pressed="false">
+          <span class="pgo">Plan an adventure ›</span></button><a class="palt" href="/routes/">or ride one of my routes ›</a></div>
+        <div class="pcol"><button type="button" class="pbox tex-tar" data-pick="motorsport" aria-pressed="false">
           <span class="pk">Tar · Motorsport</span><b class="pt">Plan it. Book it. Ride it.</b>
           <span class="pp">Same story at race weekends: a museum, a factory or a famous corner ten minutes away that I only heard about afterwards. Plan the trip around the race with every petrolhead stop near it, so you miss nothing.</span>
-          <span class="pgo">Plan a motorsport trip ›</span></button>
+          <span class="pgo">Plan a motorsport trip ›</span></button><a class="palt" href="/events/">or pick an event ›</a></div>
       </div>
+      <section id="pickextra" class="pickextra" hidden><h3></h3><div class="pxcards"></div></section>
       <div class="herocta"><button class="btn herobtn" type="button" data-tryroute id="tryBtn">Or try a finished trip: Swartberg Pass in 2 days ›</button></div>
     </section>
   </header>
@@ -747,7 +752,7 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
     <div class="sponsors"><span class="lbl">OneTrackMind is free thanks to</span>
       <a class="spons" href="https://alterego.online/?utm_source=onetrackmind&utm_medium=sponsor" target="_blank" rel="noopener sponsored"><b>AlterEgo</b><span>Made-to-order wear for petrolheads</span></a>
       <a class="spons open" href="/advertise/"><b>Your brand here</b><span>Sponsor or advertise ›</span></a></div>
-    <div class="note">OneTrackMind: plan road trips anywhere, on the roads less travelled, then ride them on your GPS or phone. · <a href="/record/">Record a ride</a> · <a href="/advertise/">Advertise</a> · <a href="/about/">About</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> · <a href="mailto:hello@onetrackmind.online">hello@onetrackmind.online</a></div>
+    <div class="note">OneTrackMind: plan road trips anywhere, on the roads less travelled, then ride them on your GPS or phone. · <a href="/how-to/">How to</a> · <a href="/record/">Record a ride</a> · <a href="/advertise/">Advertise</a> · <a href="/about/">About</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> · <a href="mailto:hello@onetrackmind.online">hello@onetrackmind.online</a></div>
   </footer>
 </div>
 
@@ -4000,10 +4005,17 @@ function drawEvents(){
     L.marker([x.lat,x.lon],{icon:L.divIcon({className:"",html:`<div class="evmk" title="${esc(x.name)}">🏁</div>`,iconSize:[26,26],iconAnchor:[13,13]}),zIndexOffset:650}).bindTooltip(x.name).bindPopup(html).addTo(layer); });
 }
 document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-evgo]"); if(!b) return; const x=(evList||[]).find(f=>f.id===b.dataset.evgo); if(!x) return; map.closePopup(); setFinish(pt(x.venue||x.name,x.lat,x.lon)); });
+const ADV_PICKS=["swartberg-loop","die-hel","namibia-2020-tortoise"];
+function pickExtra(){ const s=$("pickextra"); if(!s||!pickMode) return;
+  if(pickMode==="adventure"){ fetch("/data/picks/picks.json").then(r=>r.json()).then(j=>{ const L=ADV_PICKS.map(id=>j.routes.find(r=>r.id===id)).filter(Boolean); if(!L.length) return;
+      s.querySelector("h3").textContent="Ready to ride"; s.querySelector(".pxcards").innerHTML=L.map(r=>`<a href="/routes/${esc(r.id)}/"><b>${esc(r.title)}</b><span>${esc(r.region||"")}</span><i>See the route ›</i></a>`).join(""); s.hidden=false; }).catch(()=>{}); }
+  else loadEvents().then(L=>{ const t=new Date().toISOString().slice(0,10), nx=L.filter(e=>e.start>=t).slice(0,3); if(!nx.length) return;
+      s.querySelector("h3").textContent="Coming up"; s.querySelector(".pxcards").innerHTML=nx.map(e=>`<a href="/?ev=${esc(e.id)}"><b>${esc(e.name)}</b><span>${esc(new Date(e.start+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short"}))}${e.end!==e.start?" – "+esc(new Date(e.end+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})):""} · ${esc(e.city||e.venue||"")}, ${esc(e.country||"")}</span><i>Plan the trip there ›</i></a>`).join(""); s.hidden=false; }); }
 function setPick(md,user){
   pickMode=md==="motorsport"?"motorsport":"adventure"; try{ localStorage.setItem("otm-pick",pickMode); }catch(e){}
   document.documentElement.setAttribute("data-pick",pickMode);
   document.querySelectorAll(".pbox").forEach(b=>{ const on=b.dataset.pick===pickMode; b.classList.toggle("on",on); b.setAttribute("aria-pressed",String(on)); });
+  pickExtra();
   if(!user) return;
   let reroute=false;
   if(!settings.styleSet){ const want=pickMode==="motorsport"?"tar":"rough"; if(settings.style!==want){ settings.style=want; if($("style")) $("style").value=want; store.set("rr2-settings",settings); showStyle(); reroute=true; } }
