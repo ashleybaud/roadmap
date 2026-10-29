@@ -39,7 +39,7 @@ async function drawNear(){
   const list=d.places.filter(p=>ui.lay[NK[p.ico][0]]&&(p.ico==="pass"||z>=9)&&b.contains([p.lat,p.lon])).sort((a,b2)=>a.d-b2.d).slice(0,p0(lim));
   list.forEach(p=>{ const [,ic,col]=NK[p.ico];
     L.marker([p.lat,p.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:${col}">${ic}</div>`,iconSize:[22,22],iconAnchor:[11,11]})}).bindTooltip(p.name||KIND_NAME[p.kind]||"Place").on("click",()=>openInfoFor(p,{dist:`${Math.round(p.d)} km from ${c.name}`,town:"",actions:nearActions(p)})).addTo(nearLayer); });
-  d.routes.forEach(({r,at,d:dd})=>{ L.marker([at.lat,at.lon],{icon:L.divIcon({className:"",html:`<div class="pin pstart" style="background:#F2C500;color:#11262B">↝</div>`,iconSize:[26,26],iconAnchor:[13,13]}),zIndexOffset:1500}).bindTooltip(r.title)
+  d.routes.forEach(({r,at,d:dd})=>{ L.marker([at.lat,at.lon],{icon:L.divIcon({className:"",html:`<div class="pin pstart" style="background:#E8A317;color:#11262B">↝</div>`,iconSize:[26,26],iconAnchor:[13,13]}),zIndexOffset:1500}).bindTooltip(r.title)
     .on("click",()=>openInfoFor({lat:at.lat,lon:at.lon,name:r.title,kind:"route",tags:{}},{dist:`${r.region} · ${r.trip.days.length} day${r.trip.days.length>1?"s":""}${r.founder?" · ridden by the founder":""} · ${Math.round(dd)} km away`,actions:[{label:"Open this route",fn:()=>{ nearOff(); openPick(r); }}]})).addTo(nearLayer); });
   const nP=d.places.filter(p=>p.ico==="pass").length;
   $("nsCount").textContent=`${d.routes.length} route${d.routes.length===1?"":"s"} · ${nP} pass${nP===1?"":"es"}${d.ccs.length?"":" · passes and places for South Africa and Namibia so far"}${z<9?" · zoom in for more":""}`;
