@@ -1,0 +1,9 @@
+Breakfast Run: [Restaurant], [Town].
+
+Took the [What I drove or rode].
+Ordered: [what you ate].
+[One line: would you go back, and why.]
+
+Route there from wherever you are: https://onetrackmind.online
+
+📍 [Restaurant], [Town]

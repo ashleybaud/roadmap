@@ -37,7 +37,7 @@
    "id": "790-adventure-morocco-desert",
    "file": "media/founder/790-adventure-morocco-desert.jpg",
    "use": "throwback",
-   "line": "",
+   "line": "Morocco.",
    "place": "",
    "link": ""
   },
@@ -45,47 +45,47 @@
    "id": "namib-pool-oryx",
    "file": "media/founder/namib-pool-oryx.jpg",
    "use": "throwback",
-   "line": "",
-   "place": "",
+   "line": "Sossusvlei.",
+   "place": "Sossusvlei",
    "link": ""
   },
   {
    "id": "enduro-rock-climb",
    "file": "media/founder/enduro-rock-climb.jpg",
    "use": "throwback",
-   "line": "",
-   "place": "",
+   "line": "Transkei.",
+   "place": "Transkei",
    "link": ""
   },
   {
    "id": "sand-track-two-bikes-down",
    "file": "media/founder/sand-track-two-bikes-down.jpg",
    "use": "throwback",
-   "line": "",
-   "place": "",
+   "line": "Hondeklipbaai.",
+   "place": "Hondeklipbaai",
    "link": ""
   },
   {
    "id": "990-adventure-gravel-view",
    "file": "media/founder/990-adventure-gravel-view.jpg",
    "use": "throwback",
-   "line": "",
-   "place": "",
+   "line": "Kamieskroon.",
+   "place": "Kamieskroon",
    "link": ""
   },
   {
    "id": "990-adventure-tortoise",
    "file": "media/founder/990-adventure-tortoise.jpg",
    "use": "throwback",
-   "line": "",
-   "place": "",
+   "line": "Camdeboo.",
+   "place": "Camdeboo National Park",
    "link": ""
   },
   {
    "id": "1190-adventure-roadside",
    "file": "media/founder/1190-adventure-roadside.jpg",
    "use": "throwback",
-   "line": "",
+   "line": "Morocco.",
    "place": "",
    "link": ""
   },
@@ -93,39 +93,39 @@
    "id": "1190-adventure-dust-mountains",
    "file": "media/founder/1190-adventure-dust-mountains.jpg",
    "use": "throwback",
-   "line": "",
-   "place": "",
+   "line": "Swellendam.",
+   "place": "Swellendam",
    "link": ""
   },
   {
    "id": "wild-coast-cow-river",
    "file": "media/founder/wild-coast-cow-river.jpg",
    "use": "throwback",
-   "line": "",
-   "place": "",
+   "line": "Transkei.",
+   "place": "Transkei",
    "link": ""
   },
   {
    "id": "water-crossing-splash",
    "file": "media/founder/water-crossing-splash.jpg",
    "use": "throwback",
-   "line": "",
-   "place": "",
-   "link": ""
+   "line": "Baviaanskloof.",
+   "place": "Baviaanskloof",
+   "link": "/routes/baviaanskloof/"
   },
   {
    "id": "track-day-supermoto",
    "file": "media/founder/track-day-supermoto.jpg",
    "use": "throwback",
-   "line": "",
-   "place": "",
+   "line": "Killarney.",
+   "place": "Killarney Raceway, Cape Town",
    "link": ""
   },
   {
    "id": "4x4-desert-red-mountains",
    "file": "media/founder/4x4-desert-red-mountains.jpg",
    "use": "throwback",
-   "line": "",
+   "line": "Namibia.",
    "place": "",
    "link": ""
   },
@@ -133,7 +133,7 @@
    "id": "790-duke-dainese-ktm-van",
    "file": "media/founder/790-duke-dainese-ktm-van.jpg",
    "use": "garage",
-   "line": "",
+   "line": "Home. Safety first.",
    "place": "",
    "link": ""
   },
@@ -141,7 +141,7 @@
    "id": "ktm-socks-brake-gear",
    "file": "media/founder/ktm-socks-brake-gear.jpg",
    "use": "garage",
-   "line": "",
+   "line": "Before the Namibia adventure.",
    "place": "",
    "link": ""
   },
@@ -149,7 +149,7 @@
    "id": "cat-ktm-beanie",
    "file": "media/founder/cat-ktm-beanie.jpg",
    "use": "garage",
-   "line": "",
+   "line": "Maxwell, in the KTM Cape Town beanie.",
    "place": "",
    "link": ""
   }

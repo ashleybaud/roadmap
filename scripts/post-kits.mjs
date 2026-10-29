@@ -27,6 +27,7 @@ const FAV = J("data/favourites/favourites.json", []), PICKS = (J("data/picks/pic
 const STORIES = J("data/stories/stories.json", []);
 const FPH = (J("data/founder-photos.json", {}).photos || []).filter(x => fs.existsSync(path.join(ROOT, x.file)));
 // a founder photo post: his own line if he gave one, otherwise the kit asks him for it
+const fMatch = (...texts) => { const t = texts.join(" ").toLowerCase(); const x = FPH.find(p => p.line && p.use === "throwback" && (() => { const w = p.line.replace(/\.$/, "").toLowerCase(); return w.length > 4 && !/^(morocco|namibia)$/.test(w) && t.includes(w); })()); return x ? path.join(ROOT, x.file) : null; };
 const photoPost = (x, base) => Object.assign(base, { photo: path.join(ROOT, x.file), needsLine: !x.line,
   title: x.line ? x.line.replace(/\.$/, "") : base.title, sub: base.sub,
   link: x.link ? SITE + x.link : SITE, ig: [x.line || "[Where and when, in your words]", "", x.line ? "" : "[One or two lines: what happened]", "", x.link ? "Link in bio." : "", "", x.place ? `📍 ${x.place}` : "", "", base.tags] });
@@ -77,7 +78,7 @@ const sun = add(from, 6);
   const hit = s => s && words.some(w => new RegExp(`\\b${w}`, "i").test(s.title));
   const pk = f.trip && PICKS.find(r => r.id === f.trip);
   const st = ((pk && pk.founder && pk.founder.posts) || []).map(x => storyByOld(x.u)).find(hit) || STORIES.find(hit);
-  const photo = storyPhotos(st)[0] || null;
+  const photo = fMatch(f.name, f.area) || storyPhotos(st)[0] || null;
   const town = (f.area || "").split(",")[0];
   days.push({ day: "Tuesday", theme: "Places", slug: "2-places", tex: f.group === "petrol" ? "tar" : "gravel", photo,
     title: f.name, sub: f.area, cta: ["Visit it", SHORT], link: `${SITE}/?poi=${f.lat},${f.lon}&n=${encodeURIComponent(f.name)}`,
@@ -87,7 +88,7 @@ const sun = add(from, 6);
 { const r = pickFresh(PICKS, x => x.id, "road", 20); used.road = r.id; const s = r.stats || {};
   const facts = [s.km && `${s.km} km`, s.gravelPct != null && (s.gravelPct ? `${s.gravelPct}% gravel` : "all tar"), r.trip && r.trip.days && `${r.trip.days.length} day${r.trip.days.length > 1 ? "s" : ""}`, s.highM && `highest point ${s.highM} m`].filter(Boolean);
   const startName = r.trip && r.trip.start && r.trip.start.name;
-  days.push({ day: "Wednesday", theme: "Roads", slug: "3-roads", tex: r.style === "rough" ? "gravel" : "tar", photo: pickPhoto(r),
+  days.push({ day: "Wednesday", theme: "Roads", slug: "3-roads", tex: r.style === "rough" ? "gravel" : "tar", photo: fMatch(r.title, r.region || "") || pickPhoto(r),
     title: r.title, sub: [r.region, facts.join(" · ")].filter(Boolean).join("\n"), cta: ["Ride it", SHORT], link: `${SITE}/?pick=${r.id}`,
     ig: [cut(r.blurb, 400), "", facts.join(" · "), "", "The whole route, ready for your GPS, link in bio.", "", startName ? `📍 ${startName}` : "", "", "#advrider #roadtrip #onetrackmind"] }); }
 
@@ -109,6 +110,8 @@ else { const doy = s => { const d = new Date(s + "T12:00:00Z"); return (d - Date
   if (ph.length) days.push({ day: "Friday", theme: "The Garage", slug: "5-garage", tex: "tar", photo: ph[0], extra: ph.slice(1),
     title: n.vehicle || "In the garage", sub: n.line || "", cta: ["More builds", SHORT], link: `${SITE}/about/`,
     ig: [n.vehicle ? `${n.vehicle}.` : "", n.line || "", n.more || "", "", "#thegarage #projectcar #onetrackmind"] });
+  else if (W % 2 === 1 && FPH.some(x => x.use === "garage" && x.line)) { const x = pickFresh(FPH.filter(y => y.use === "garage" && y.line), y => y.id, "garagePhoto", 10); used.garagePhoto = x.id;
+    days.push(photoPost(x, { day: "Friday", theme: "The Garage", slug: "5-garage", tex: "tar", title: "In the garage", sub: "", cta: ["Plan a ride", SHORT], tags: "#thegarage #onetrackmind" })); }
   else { const BUILD = /KTM \d|690|790|390|1290|Porsche|McLaren|Aston|GSXR|Suzuki|Africa Twin|1250|Audi|Giulia|Cafe Racer|Duke|Scalpel|Fuorilegge|996|356|Stepnose|Bedford|Widebody/i, TRIP = /trip|tour|day \d|factory|museum|gallery|road|launch|conference|eicma|archivo/i;
     const pool = STORIES.filter(s => BUILD.test(s.title) && !TRIP.test(s.title) && storyPhotos(s).length);
     const st = pickFresh(pool, x => x.slug, "garage", 30); used.garage = st.slug; const lead = plainText(st) || st.lead;
