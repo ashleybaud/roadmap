@@ -638,7 +638,15 @@ function eventPage(e) {
   const city = e.city || e.venue || e.name;
   const map = `<div id="evmap" class="tripmap" style="height:300px" role="img" aria-label="Map: ${esc(e.venue || city)}"></div>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>(function(){var m=L.map("evmap",{scrollWheelZoom:false}).setView([${e.lat},${e.lon}],11);L.tileLayer("https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png",{maxZoom:18,attribution:'&copy; Stadia Maps &copy; OpenMapTiles &copy; OpenStreetMap'}).addTo(m);L.circleMarker([${e.lat},${e.lon}],{radius:10,color:"#11262B",weight:3,fillColor:"${HOUSE.colour(e.genre)}",fillOpacity:1}).bindTooltip(${JSON.stringify(e.venue || city).replace(/</g, "\\u003c")},{permanent:true,direction:"right"}).addTo(m);})();</script>`;
+<script>(function(){var m=L.map("evmap",{scrollWheelZoom:false}).setView([${e.lat},${e.lon}],11);L.tileLayer("https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png",{maxZoom:18,attribution:'&copy; Stadia Maps &copy; OpenMapTiles &copy; OpenStreetMap'}).addTo(m);L.circleMarker([${e.lat},${e.lon}],{radius:10,color:"#11262B",weight:3,fillColor:"${HOUSE.colour(e.genre)}",fillOpacity:1}).bindTooltip(${JSON.stringify(e.venue || city).replace(/</g, "\\u003c")},{permanent:true,direction:"right"}).addTo(m);var A=${JSON.stringify((a => a && a.km <= 300 ? a : null)(TRIP.airport(e.lat, e.lon))).replace(/</g, "\\u003c")};if(!A)return;
+L.circleMarker([A.lat,A.lon],{radius:8,color:"#11262B",weight:3,fillColor:"#fff",fillOpacity:1}).bindTooltip(A.name+" airport ("+A.iata+")",{permanent:true,direction:"left"}).addTo(m);
+m.fitBounds([[${e.lat},${e.lon}],[A.lat,A.lon]],{padding:[50,50],maxZoom:12});
+var say=function(t){document.querySelectorAll(".airdrive").forEach(function(x){x.textContent=t;x.hidden=false})};
+say("From "+A.name+" airport ("+A.iata+"): about "+A.km+" km as the crow flies.");
+function dec(s){var i=0,la=0,lo=0,o=[];while(i<s.length){var b,sh=0,r=0;do{b=s.charCodeAt(i++)-63;r|=(b&31)<<sh;sh+=5}while(b>=32);la+=r&1?~(r>>1):r>>1;sh=0;r=0;do{b=s.charCodeAt(i++)-63;r|=(b&31)<<sh;sh+=5}while(b>=32);lo+=r&1?~(r>>1):r>>1;o.push([la/1e6,lo/1e6])}return o}
+fetch("https://api.stadiamaps.com/route/v1",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({locations:[{lat:A.lat,lon:A.lon},{lat:${e.lat},lon:${e.lon}}],costing:"auto",units:"kilometers"})}).then(function(r){return r.json()}).then(function(j){if(!j.trip)return;var t=j.trip.summary,mn=Math.round(t.time/60);
+L.polyline(dec(j.trip.legs[0].shape),{color:"#E8A317",weight:5,opacity:.9}).addTo(m);say("From "+A.name+" airport ("+A.iata+") to the venue: "+Math.round(t.length)+" km, about "+(mn<60?mn+" min":Math.floor(mn/60)+" h "+(mn%60?mn%60+" min":""))+" by car. Beds near either end save you the drive.")}).catch(function(){});})();</script>
+<p class="airdrive note" hidden></p>`;
   const body = `<main class="evpage">
 <p class="note"><a href="/events/">Events</a> · ${esc(e.series || "")}</p>
 <span class="evtag" data-grp="${HOUSE.group(e.genre)}">${esc(HOUSE.GROUPS[HOUSE.group(e.genre)][0])}</span>
