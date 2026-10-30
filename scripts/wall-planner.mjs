@@ -27,8 +27,8 @@ const html = `<!doctype html><meta charset="utf-8"><style>
 @font-face{font-family:P;src:url(${fileUrl(path.join(ROOT, "scripts/fonts/ibm-plex-sans-latin-600-normal.woff2"))});font-weight:600}
 @page{size:A3 landscape;margin:0}*{box-sizing:border-box;margin:0;padding:0}
 body{width:420mm;height:297mm;font-family:P;color:#121A1E;background:#fff;padding:10mm 12mm 7mm;display:flex;flex-direction:column}
-header{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3mm solid #E8A317;padding-bottom:3mm;margin-bottom:4mm}
-h1{font:800 22mm/0.9 B;text-transform:uppercase;letter-spacing:-.3mm}h1 span{color:#0A4A63}
+header{display:flex;gap:6mm;justify-content:space-between;align-items:flex-end;border-bottom:3mm solid #E8A317;padding-bottom:3mm;margin-bottom:4mm}
+.hos{height:26mm;transform:rotate(-4deg);box-shadow:0 1mm 2mm rgba(0,0,0,.3)}h1{flex:1;font:800 22mm/0.9 B;text-transform:uppercase;letter-spacing:-.3mm}h1 span{color:#0A4A63}
 .sub{font:700 6mm/1.1 B;text-transform:uppercase;color:#0A4A63;text-align:right}.sub small{display:block;font:400 3.4mm/1.3 P;text-transform:none;color:#444;margin-top:1.5mm}
 main{flex:1;min-height:0;display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(3,1fr);gap:3mm}
 section{border:.5mm solid #0A4A63;border-radius:2mm;padding:2.2mm 2.8mm;overflow:hidden}
@@ -42,7 +42,7 @@ footer img.qr{width:22mm;height:22mm}footer .t{flex:1;font-size:3.4mm;line-heigh
 footer .ae{display:flex;align-items:center;gap:3mm;font:700 4mm B;text-transform:uppercase}footer .ae img{height:18mm}
 .key{font-size:2.9mm;color:#444;margin-top:1mm}.t .key b{font:600 2.9mm P;display:inline;text-transform:none;color:#B5740A}
 </style><body>
-<header><h1>The ${Y} <span>Wall Planner</span></h1><div class="sub">FOMO: races, shows and festivals<br>you'll kick yourself for missing<small>Book early: nobody decides on Friday to go to a Grand Prix on Sunday.</small></div></header>
+<header><img class="hos" src="${fileUrl(path.join(ROOT, "img/high-octane.png"))}"><h1>The ${Y} <span>Wall Planner</span></h1><div class="sub">FOMO: races, shows and festivals<br>you'll kick yourself for missing<small>Book early: nobody decides on Friday to go to a Grand Prix on Sunday.</small></div></header>
 <main>${M.map((_, i) => month(i)).join("")}</main>
 <footer><img class="qr" src="${fileUrl(path.join(ROOT, "img/qr-events.svg"))}"><div class="t"><b>onetrackmind.online/events</b>Every date checked weekly, tickets, how to watch, and a trip planner to get you there. Dates change: check before you book.<div class="key"><b>Gold</b> = the big ones · ★ = in South Africa · <i style="color:#8a2d1c">red</i> = public holidays and gift days · * = date to be confirmed. Printed ${new Date().toISOString().slice(0, 10)}.</div></div><div class="ae">Fuelled by <img src="${fileUrl(path.join(ROOT, "img/alterego-logo-black.png"))}"></div></footer>
 </body>`;

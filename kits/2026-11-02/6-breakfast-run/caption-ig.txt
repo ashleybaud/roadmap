@@ -1,4 +1,4 @@
-Breakfast Run: [Restaurant], [Town].
+Local is lekker. Breakfast Run: [Restaurant], [Town].
 
 Took the [What I drove or rode].
 Ordered: [what you ate].
@@ -8,4 +8,4 @@ Route there from wherever you are, link in bio.
 
 📍 [Restaurant], [Town]
 
-#breakfastrun #saturdayride #onetrackmind
+#localislekker #breakfastrun #onetrackmind

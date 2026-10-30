@@ -65,9 +65,9 @@ const sun = add(from, 6);
   const head = on[0];
   days.push({ day: "Monday", theme: "Race Week", slug: "1-race-week", tex: "tar",
     title: head ? short(head.name) : "Quiet week", sub: on.length > 1 ? `and ${on.length - 1} more this week` : "",
-    rows: on.map(e => [rng(e), short(e.name), e.city || e.country || ""]),
+    rows: [...on].sort((a, b) => a.start.localeCompare(b.start)).map(e => [rng(e), short(e.name), e.city || e.country || ""]),
     cta: ["Plan it", `${SHORT}/events`], link: `${SITE}/events/`,
-    ig: [on.length ? `What's on this week:` : `Nothing big on this week. Good time to ride.`, "", ...on.map(e => `${rng(e)} · ${short(e.name)}${e.city ? `, ${e.city}` : ""}${e.confirmed ? "" : " (dates to confirm)"}`), "",
+    ig: [on.length ? `What's on this week:` : `Nothing big on this week. Good time to ride.`, "", ...[...on].sort((a, b) => a.start.localeCompare(b.start)).map(e => `${rng(e)} · ${short(e.name)}${e.city ? `, ${e.city}` : ""}${e.confirmed ? "" : " (dates to confirm)"}`), "",
       head ? `Going to ${short(head.name)}? The event page has how to watch, getting there and what's worth a detour nearby.` : "", "",
       "Full calendar, link in bio.", "", "#motorsport #raceweek #onetrackmind"] }); }
 
@@ -186,7 +186,7 @@ const card = (d, h, photo) => {
   const bg = photo ? `<img class="bg" src="${fileUrl(photo)}">` : `<img class="bg tex" src="${fileUrl(TEX[d.tex])}">`;
   const rows = d.rows ? `<div class="rows">${d.rows.slice(0, h > 1400 ? 6 : 5).map(r => `<div class="row"><div class="d">${esc(r[0])}</div><div><div class="n">${esc(r[1])}</div>${r[2] ? `<div class="w">${esc(r[2])}</div>` : ""}</div></div>`).join("")}</div>` : "";
   return `<!doctype html><meta charset="utf-8"><style>${CSS}</style><div class="c ${photo ? "" : "flat"}" style="height:${h}px">${bg}<div class="shade"></div>
-<div class="top"><div class="pill">${esc(d.day)} · ${esc(d.theme)}</div><div class="brand">ONETRACKMIND</div></div>
+<div class="top"><div class="pill">${esc(d.day)} · ${esc(d.theme)}</div><div class="brand">ONETRACKMIND</div></div><img src="${fileUrl(path.join(ROOT, "img/high-octane.png"))}" style="position:absolute;right:56px;top:140px;width:120px;transform:rotate(6deg);box-shadow:0 6px 18px rgba(0,0,0,.5)">
 ${d.needs && !photo ? `<div class="need">Your photo goes here</div>` : ""}
 <div class="bot"><h1 style="${d.title.length > 28 ? "font-size:84px" : ""}">${esc(d.title)}</h1>${d.sub ? `<div class="sub">${esc(d.sub)}</div>` : ""}${rows}
 <div class="foot"><div class="cta">${esc(d.cta[0])} ›</div><div class="url">${esc(d.cta[1])}</div></div></div></div>`;
