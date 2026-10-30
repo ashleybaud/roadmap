@@ -711,7 +711,7 @@ function petrolheadPage() {
 <section class="hub"><div class="hubh"><h2>FOMO</h2><span class="hubsub">Races, shows and festivals you'll kick yourself for missing</span></div>${FOMO_BOX}<div class="btnrow"><a class="btnline" href="/events/">The whole diary ›</a><a class="btnline" href="/events/wall-planner-2027.pdf" download>Get the Wall Planner (PDF) ›</a></div></section>
 <section class="hub"><div class="hubh"><h2>Museums, tracks and factories</h2></div>${cardGrid(`${placeCards(places, 4)}`)}<div class="btnrow"><a class="btnline" href="/favourites/">All my places ›</a></div></section>
 <section class="hub"><div class="hubh"><h2>Race weekends and garages</h2></div>${cardGrid(`${storyCards(new RegExp(MOTOR_RX.source + "|" + MOT_STORY_RX.source, "i"), 8)}`)}<div class="btnrow"><a class="btnline" href="/blog/">All the stories ›</a></div></section>
-<section class="hub"><div class="hubh"><h2>How to</h2></div>${cardGrid(HOWTO.map(g => `<a class="card pcard hubcard" href="/how-to/${g.id}/">${g.cover ? `<img src="${esc(g.cover)}" alt="" loading="lazy">` : ""}<b>${esc(g.title)}</b><span>${esc(g.short || "")}</span></a>`).join(""))}<div class="btnrow"><a class="btnline" href="/how-to/">All the guides ›</a></div></section>
+<section class="hub"><div class="hubh"><h2>How to</h2></div>${HOWTO.map(g => `<div class="lilpanel">${g.cover ? `<img src="${esc(g.cover)}" alt="" loading="lazy">` : ""}<div><b>${esc(g.title)}</b><p>${esc(g.short || "")}</p><div class="btnrow"><a class="btn" href="/how-to/${g.id}/">Read the guide ›</a><a class="btnline" href="/how-to/">All the guides ›</a></div></div></div>`).join("")}</section>
 </main>
 <script src="/js/hub.js" defer></script>`;
   return page({ active: "/petrolhead/", url: "/petrolhead/", title: "Petrolhead: races, shows, museums and road trips to them · OneTrackMind", desc: "What's on in motorsport and car culture, what to book early, and the museums, tracks and factories worth the trip. With a planner that gets you there.", body });
@@ -720,7 +720,7 @@ function petrolheadPage() {
 function lilPage() {
   const body = `<main class="hubpage">
 <div class="hubhero tex-tar"><span class="pk">A OneTrackMind campaign</span><h1>Local is lekker</h1><p>Saturdays: one of my cars or bikes, somewhere new for breakfast, and the road there. No reviews, no stars. If I'd go back, it's here. Every place has a button that routes you there from wherever you are.</p></div>
-${LIL.length ? `${cardGrid(`${LIL.slice().reverse().map(lilCard).join("")}`)}` : `<p class="lede">The first run is this Saturday. Follow along on <a href="https://www.instagram.com/ashleybaud/" target="_blank" rel="noopener">Instagram</a> or get The OneTrackMind Week below.</p>`}
+${LIL.length ? `${cardGrid(`${LIL.slice().reverse().map(lilCard).join("")}`)}` : `<div class="lilpanel"><img src="/media/founder/porsche-cayman-portimao-pitlane.jpg" alt="" loading="lazy"><div><b>First run: this Saturday</b><p>Every run goes up here: the place, the town, what I drove and a button that routes you there. Until then, follow along on Instagram, or get The OneTrackMind Week below.</p><a class="btnline" href="https://www.instagram.com/ashleybaud/" target="_blank" rel="noopener">Follow along on Instagram ›</a></div></div>`}
 </main>`;
   return page({ active: "/local-is-lekker/", url: "/local-is-lekker/", title: "Local is lekker: Saturday breakfast runs · OneTrackMind", desc: "Saturday breakfast runs in the Western Cape: a car or a bike, somewhere new to eat, and the road there.", body });
 }
