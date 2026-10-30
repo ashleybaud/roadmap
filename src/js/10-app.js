@@ -833,10 +833,10 @@ function overviewHtml(){
     det=(function(){ let h=hh;
   h+=tripTotals();
   h+=sleepList();
-  if(plan&&!planStale&&settings.vehicle!=="bike"&&trip.start) h+=`<div class="btns partnerrow"><a class="btn small ghost" href="${esc(carHireUrl(trip.start.name))}" target="_blank" rel="sponsored noopener">Hire a ${settings.vehicle==="jeep"?"4x4":"car"} ↗</a><span class="note">Self-drive? Compare hire companies.</span></div>`;
   if(plan&&!planStale) h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px"><button class="btn small share" type="button" data-sharetrip title="A link anyone can open: the whole plan, then Google Maps / Waze or GPX">Share this trip ↗</button><button class="btn small wa" type="button" data-sharewa title="Send this trip on WhatsApp">WhatsApp this trip</button>${nameBtn()}${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">${esc(dayName(k))} GPX</button>`:"").join("")}<button class="btn small" type="button" data-gpx="all">Whole trip GPX</button><button class="btn small" type="button" data-navlinks title="Open each day in Google Maps or Waze on your phone">Google Maps / Waze</button><button class="btn small ghost" type="button" data-grouppack title="Every GPX format in one zip, with a read-me, for a group ride">Group ride pack ↓</button><button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}</div></div>`;
       return h; })(); }
   h+=boxSec("detailbox","Details",det);
+  h+=tripBlockHtml();
   return h+(typeof flightHtml==="function"?flightHtml():"")+(typeof onDatesHtml==="function"?onDatesHtml():"")+clearLink()+footNote();
 }
 function footNote(){ return `<div class="note">${placesOk&&dataDate?`Map data from OpenStreetMap, as of ${esc(dataDate)}. Weather from Open-Meteo. Phone ahead on remote legs. `:""}Plan with it, check before you go: you ride at your own risk. <a href="/terms.html">Terms and disclaimer</a> · <a href="/privacy.html">Privacy</a></div>`; }
@@ -1209,3 +1209,12 @@ $("map").addEventListener("click",e=>{ const sn=e.target.closest&&e.target.close
   const [k2,id]=sn.dataset.staynight.split(":"), x=(stayFor(dayTo(+k2))?.places||[]).find(q=>q.id===id); if(x){ map.closePopup(); chooseStay(+k2,x); } });
 
 ["vehicle","wVehicle"].forEach(id=>{ const el=$(id); if(el) el.addEventListener("change",()=>{ if(settings.rangeSet) return; const r=$(id==="vehicle"?"range":"wRange"); if(r) r.value=RANGE_DEF[el.value]||200; }); });
+
+/* "Make a trip of it" at the finish: the same tiles as the event pages (src/js/03-trip.js) */
+fetch("/data/airports.json").then(r=>r.ok?r.json():[]).then(a=>{ OTMtrip.setAirports(a); if(trip.end&&trip.end.lat!=null&&typeof renderAll==="function") renderAll(); }).catch(()=>{});
+function tripBlockHtml(){
+  const e=trip.end; if(!plan||planStale||!e||e.lat==null||trip.round) return "";
+  const from=trip.startDate?addDays(trip.startDate,nDays()-1):"", to=from?addDays(from,1):"";
+  const ev=(typeof evList!=="undefined"&&evList||[]).find(x=>Math.abs(x.lat-e.lat)<0.01&&Math.abs(x.lon-e.lon)<0.01);
+  return OTMtrip.html({ place:e.name, town:e.name, country:ev?ev.country:null, lat:e.lat, lon:e.lon, from:ev?addDays(ev.start,-1):from, to:ev?addDays(ev.end,1):to, tickets:ev&&ev.tickets, bike:settings.vehicle==="bike" }, "At the finish · "+e.name);
+}
