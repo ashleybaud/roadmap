@@ -65,3 +65,4 @@
 .sq .unc2{color:#E8A317}
 @media(max-width:420px){.sq .sqrow,.sq .sqtop{grid-template-columns:46px 1fr!important}.sq .sqwhen{grid-column:2;text-align:left}}
 .fomonote{color:#9AAEB1;font-size:.9rem;margin-left:10px}
+.trip .twok{background:#E8A317;color:#0B1D21;border:0;border-radius:10px;padding:7px 14px;font-weight:700;cursor:pointer;margin:0 6px}
