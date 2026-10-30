@@ -17,6 +17,7 @@ COMING UP
 LAST WEEK
 - Mexico City Grand Prix 2026: https://www.formula1.com/en/results/2026/races
 - MotoGP Malaysian Grand Prix 2026: https://www.motogp.com/en/world-standing/2026/motogp/championship-standings
+- Killarney Motor Show 2026: https://www.wpmc.co.za/
 
 CURVES OF THE WEEK
 Montagu Pass, Seven Passes and Prince Alfred's: https://onetrackmind.online/routes/seven-passes-prince-alfred/
@@ -28,7 +29,10 @@ Christmas: give a race weekend. A ticket to a 2027 race beats socks. Pick the ra
 ONE IDEA
 Bring the partner. Every event page lists what else is nearby. Pick one thing for them each day and the weekend sells itself.
 
-Powered by AlterEgo: https://alterego.online
+Racing is life. Everything else is preparation.
+Ashley
+
+Fuelled by AlterEgo: https://alterego.online
 
 Change how often: {{PREFS}}
 Unsubscribe: {{UNSUB}}

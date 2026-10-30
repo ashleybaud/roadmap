@@ -10,6 +10,7 @@ THIS WEEK
 LAST WEEK
 - Mexico City Grand Prix 2026: https://www.formula1.com/en/results/2026/races
 - MotoGP Malaysian Grand Prix 2026: https://www.motogp.com/en/world-standing/2026/motogp/championship-standings
+- Killarney Motor Show 2026: https://www.wpmc.co.za/
 
 THE ROAD THERE
 Motor Valley and EICMA in a Fiat 500: https://onetrackmind.online/routes/motor-valley-2017/
@@ -20,7 +21,10 @@ The 2027 calendar is in. Le Mans, the TT, Monaco, Pikes Peak: the dates are out 
 ONE IDEA
 Bring the partner. Every event page lists what else is nearby. Pick one thing for them each day and the weekend sells itself.
 
-Powered by AlterEgo: https://alterego.online
+Racing is life. Everything else is preparation.
+Ashley
+
+Fuelled by AlterEgo: https://alterego.online
 
 Change how often: {{PREFS}}
 Unsubscribe: {{UNSUB}}

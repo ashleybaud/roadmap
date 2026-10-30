@@ -39,12 +39,12 @@ li.big span{font-weight:600;font-size:3.35mm}li.big b{color:#B5740A}li.home span
 li.hol b,li.hol span{color:#8a2d1c;font-style:italic}
 footer{flex:none;display:flex;align-items:center;gap:6mm;margin-top:3mm;border-top:.5mm solid #ccd;padding-top:3mm}
 footer img.qr{width:22mm;height:22mm}footer .t{flex:1;font-size:3.4mm;line-height:1.35}footer .t b{font:800 5.5mm/1 B;text-transform:uppercase;display:block;color:#0A4A63}
-footer .ae{display:flex;align-items:center;gap:3mm;font:700 4mm B;text-transform:uppercase}footer .ae img{height:18mm}
+footer .rq{font:700 4.2mm/1.15 B;text-transform:uppercase;color:#121A1E;text-align:right}footer .rq b{color:#B5740A;font-weight:800}footer .ae{display:flex;align-items:center;gap:3mm;font:700 4mm B;text-transform:uppercase}footer .ae img{height:18mm}
 .key{font-size:2.9mm;color:#444;margin-top:1mm}.t .key b{font:600 2.9mm P;display:inline;text-transform:none;color:#B5740A}
 </style><body>
 <header><img class="hos" src="${fileUrl(path.join(ROOT, "img/high-octane.png"))}"><h1>The ${Y} <span>Wall Planner</span></h1><div class="sub">FOMO: races, shows and festivals<br>you'll kick yourself for missing<small>Book early: nobody decides on Friday to go to a Grand Prix on Sunday.</small></div></header>
 <main>${M.map((_, i) => month(i)).join("")}</main>
-<footer><img class="qr" src="${fileUrl(path.join(ROOT, "img/qr-events.svg"))}"><div class="t"><b>onetrackmind.online/events</b>Every date checked weekly, tickets, how to watch, and a trip planner to get you there. Dates change: check before you book.<div class="key"><b>Gold</b> = the big ones · ★ = in South Africa · <i style="color:#8a2d1c">red</i> = public holidays and gift days · * = date to be confirmed. Printed ${new Date().toISOString().slice(0, 10)}.</div></div><div class="ae">Fuelled by <img src="${fileUrl(path.join(ROOT, "img/alterego-logo-black.png"))}"></div></footer>
+<footer><img class="qr" src="${fileUrl(path.join(ROOT, "img/qr-events.svg"))}"><div class="t"><b>onetrackmind.online/events</b>Every date checked weekly, tickets, how to watch, and a trip planner to get you there. Dates change: check before you book.<div class="key"><b>Gold</b> = the big ones · ★ = in South Africa · <i style="color:#8a2d1c">red</i> = public holidays and gift days · * = date to be confirmed. Printed ${new Date().toISOString().slice(0, 10)}.</div></div><div class="rq">Racing is life.<br><b>Everything else is preparation.</b></div><div class="ae">Fuelled by <img src="${fileUrl(path.join(ROOT, "img/alterego-logo-black.png"))}"></div></footer>
 </body>`;
 const tmp = path.join(ROOT, "events", "_wall.html"); fs.mkdirSync(path.dirname(tmp), { recursive: true }); fs.writeFileSync(tmp, html);
 const { chromium } = require("playwright");
