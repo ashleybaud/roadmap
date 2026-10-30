@@ -28,7 +28,7 @@
     var where = o.town || o.place, abroad = !!o.country && (o.home ? o.country !== o.home : o.country !== "South Africa");
     var bk = "https://www.booking.com/searchresults.html?latitude=" + o.lat + "&longitude=" + o.lon + "&radius=30" + (o.from ? "&checkin=" + o.from + "&checkout=" + o.to : "");
     T.push({ k: "stay", ic: "🛏", t: "Stay", d: "Beds within 30 km of " + o.place + (when ? ", " + when : ""), p: "Booking.com", u: bk, b: "See places" });
-    if (a) T.push({ k: "fly", ic: "✈", t: "Flights", d: "To " + a.name + (o.from ? ", in " + dm(o.from) + ", out " + dm(o.to) : ""), p: "Kiwi.com", u: "https://www.kiwi.com/deep?to=" + a.iata + (o.from ? "&departure=" + o.from + "&return=" + o.to : ""), b: "Find flights" });
+    if (a) T.push({ k: "fly", ic: "✈", t: "Flights", d: "To " + a.name + (o.from ? ", in " + dm(o.from) + ", out " + dm(o.to) : ""), p: "Our flight search: airlines and booking sites compared", u: "https://flights.onetrackmind.online/flights/?destination_iata=" + a.iata + (o.from ? "&depart_date=" + o.from + "&return_date=" + o.to : ""), b: "Find flights" });
     if (a && !o.bike) T.push({ k: "car", ic: "🚗", t: "Car hire", d: "Pick up at " + a.name + " airport" + (when ? ", " + when : ""), p: "Discover Cars", u: "https://www.discovercars.com/", b: "Compare cars" });
     var tq = o.tours || where;
     if (o.tickets) T.push({ k: "tix", ic: "🎟", t: "Tickets & tours", d: "Official tickets, plus tours and things to do around " + where, p: "Official site · GetYourGuide", u: o.tickets, b: "Get tickets", u2: "https://www.getyourguide.com/s/?q=" + encodeURIComponent(tq) + (o.from ? "&date_from=" + o.from + "&date_to=" + o.to : ""), b2: "Tours" });
@@ -37,12 +37,16 @@
     return T;
   }
   var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+  // how it works, who we work with, and what we're not: under every block
+  var HOW = '<div class="triphow"><div><b>You search here</b>Everything is filled in for you. Prices are live from the company you pick.</div><div><b>You pay them, not us</b>You book and pay on their site. We never see your card.</div><div><b>We get a small fee</b>If you book, they pay us a few percent. Same price to you. It keeps OneTrackMind free.</div></div>' +
+    '<p class="tripf"><b>Who we work with.</b> We\'re picky. Only names we\'d hand our own money to: Booking.com, Agoda, Expedia and Hotels.com for beds, airlines and the big booking sites for flights, Discover Cars for car hire, GetYourGuide for tours and Airalo for eSIMs. If one lets us down, it goes. <a href="/partners/">The full list and how we earn ›</a></p>' +
+    '<p class="tripf">OneTrackMind is not a travel agent. Bookings, payments, changes and refunds are between you and the company you book with, on their terms. Prices and availability are theirs and can change.</p>';
   // the block on the site (styles in .trip / .tt)
   function html(o, head) {
     var T = tiles(o);
     return '<section class="trip">' + (head === false ? "" : '<div class="triplab">' + esc(head || "") + '</div><h2>Make a trip of it</h2>' + (o.from ? '<p class="tripsub">Everything for ' + esc(span(o.from, o.to)) + ', already filled in.</p>' : "")) +
       '<div class="tiles">' + T.map(function (t) { return '<div class="tt' + (t.alt ? " alt" : "") + '"><span class="ic" aria-hidden="true">' + t.ic + '</span><b>' + esc(t.t) + '</b><span class="d">' + esc(t.d) + '</span><span class="p">' + esc(t.p) + '</span><a href="' + esc(t.u) + '" target="_blank" rel="noopener sponsored">' + esc(t.b) + ' ›</a>' + (t.u2 ? '<a class="t2" href="' + esc(t.u2) + '" target="_blank" rel="noopener sponsored">' + esc(t.b2) + ' ›</a>' : "") + '</div>'; }).join("") +
-      '</div><p class="tripf">Some of these links pay OneTrackMind a small fee, at no cost to you.</p></section>';
+      '</div>' + HOW + '</section>';
   }
   var T = { tiles: tiles, html: html, airport: airport, setAirports: function (l) { AIR = l; }, span: span };
   if (typeof module !== "undefined" && module.exports) module.exports = T; else g.OTMtrip = T;
