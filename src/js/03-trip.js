@@ -28,8 +28,8 @@
     var where = o.town || o.place, abroad = !!o.country && (o.home ? o.country !== o.home : o.country !== "South Africa");
     var bk = "https://www.booking.com/searchresults.html?latitude=" + o.lat + "&longitude=" + o.lon + "&radius=30" + (o.from ? "&checkin=" + o.from + "&checkout=" + o.to : "");
     T.push({ k: "stay", ic: "🛏", t: "Stay", d: "Beds within 30 km of " + o.place + (when ? ", " + when : ""), p: "Booking.com", u: bk, b: "See places" });
-    if (a) T.push({ k: "fly", ic: "✈", t: "Flights", d: "To " + a.name + (o.from ? ", in " + dm(o.from) + ", out " + dm(o.to) : ""), p: "Our flight search: airlines and booking sites compared", u: "https://flights.onetrackmind.online/flights/?destination_iata=" + a.iata + (o.from ? "&depart_date=" + o.from + "&return_date=" + o.to : ""), b: "Find flights" });
-    if (a && !o.bike) T.push({ k: "car", ic: "🚗", t: "Car hire", d: "Pick up at " + a.name + " airport" + (when ? ", " + when : ""), p: "Discover Cars", u: "https://www.discovercars.com/", b: "Compare cars" });
+    if (a) T.push({ k: "fly", ic: "✈", t: "Flights", d: "To " + a.name + " (" + a.iata + ")" + (o.from ? ", in " + dm(o.from) + ", out " + dm(o.to) : ""), p: "Our flight search: airlines and booking sites compared", u: "https://flights.onetrackmind.online/flights/?destination_iata=" + a.iata + (o.from ? "&depart_date=" + o.from + "&return_date=" + o.to : ""), b: "Find flights" });
+    if (a && !o.bike) T.push({ k: "car", ic: "🚗", t: "Car hire", d: "Pick up at " + a.name + " airport (" + a.iata + ")" + (when ? ", " + when : ""), p: "Discover Cars", u: "https://www.discovercars.com/", b: "Compare cars" });
     var tq = o.tours || where;
     if (o.tickets) T.push({ k: "tix", ic: "🎟", t: "Tickets & tours", d: "Official tickets, plus tours and things to do around " + where, p: "Official site · GetYourGuide", u: o.tickets, b: "Get tickets", u2: "https://www.getyourguide.com/s/?q=" + encodeURIComponent(tq) + (o.from ? "&date_from=" + o.from + "&date_to=" + o.to : ""), b2: "Tours" });
     else T.push({ k: "tix", ic: "🎟", t: "Tours & tickets", d: o.tours ? o.tours : "Tours and things to do around " + where, p: "GetYourGuide", u: "https://www.getyourguide.com/s/?q=" + encodeURIComponent(tq) + (o.from ? "&date_from=" + o.from + "&date_to=" + o.to : ""), b: "See tours" });
@@ -44,7 +44,7 @@
   // the block on the site (styles in .trip / .tt)
   function html(o, head) {
     var T = tiles(o);
-    return '<section class="trip">' + (head === false ? "" : '<div class="triplab">' + esc(head || "") + '</div><h2>Make a trip of it</h2>' + (o.from ? '<p class="tripsub">Everything for ' + esc(span(o.from, o.to)) + ', already filled in.</p>' : "")) +
+    return '<section class="trip">' + (head === false ? "" : '<div class="triplab">' + esc(head || "") + '</div><h2>Make a trip of it</h2>' + (o.unconfirmed ? '<p class="tripsub tripwarn">The organiser hasn\'t confirmed these dates yet, so nothing is filled in. Check the official site before you book anything.</p>' : o.from ? '<p class="tripsub">Everything for ' + esc(span(o.from, o.to)) + ', already filled in.</p>' : "")) +
       '<div class="tiles">' + T.map(function (t) { return '<div class="tt' + (t.alt ? " alt" : "") + '"><span class="ic" aria-hidden="true">' + t.ic + '</span><b>' + esc(t.t) + '</b><span class="d">' + esc(t.d) + '</span><span class="p">' + esc(t.p) + '</span><a href="' + esc(t.u) + '" target="_blank" rel="noopener sponsored">' + esc(t.b) + ' ›</a>' + (t.u2 ? '<a class="t2" href="' + esc(t.u2) + '" target="_blank" rel="noopener sponsored">' + esc(t.b2) + ' ›</a>' : "") + '</div>'; }).join("") +
       '</div>' + HOW + '</section>';
   }
