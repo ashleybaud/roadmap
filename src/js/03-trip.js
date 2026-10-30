@@ -24,8 +24,8 @@
   var span = function (a, b) { var x = new Date(a + "T12:00:00Z"), y = new Date(b + "T12:00:00Z"); return x.getUTCMonth() === y.getUTCMonth() ? x.getUTCDate() + "–" + dm(b) : dm(a) + " – " + dm(b); };
   // our flight search (flights.onetrackmind.online): from Cape Town by default (changeable on the page), dates only when they're still ahead
   var ddmm = function (d) { return d.slice(8, 10) + d.slice(5, 7); };
-  function flightUrl(to, from, back) {
-    var o = to === "CPT" ? "JNB" : "CPT", today = new Date().toISOString().slice(0, 10);
+  function flightUrl(to, from, back, orig) {
+    var o = orig && orig !== to ? orig : to === "CPT" ? "JNB" : "CPT", today = new Date().toISOString().slice(0, 10);
     if (!from || from <= today) return "https://flights.onetrackmind.online/?origin_iata=" + o + "&destination_iata=" + to;
     return "https://flights.onetrackmind.online/?flightSearch=" + o + ddmm(from) + to + ddmm(back) + "1";
   }
@@ -71,6 +71,6 @@
   // the planner adds blocks after load, where inline scripts don't run
   if (typeof document !== "undefined" && !window.otmTabs) { try { (0, eval)(LOADER); } catch (e) {} }
   if (false) document.addEventListener("click", function (e) { if (window.otmTabs) return; var b = e.target.closest && e.target.closest(".ttab"); if (!b) return; var s = b.closest(".trip"); s.querySelectorAll(".ttab").forEach(function (x) { x.setAttribute("aria-selected", String(x === b)); }); s.querySelectorAll(".tpanel").forEach(function (p) { p.hidden = p.id !== b.getAttribute("aria-controls"); }); });
-  var T = { tiles: tiles, html: html, airport: airport, setAirports: function (l) { AIR = l; }, span: span };
+  var T = { flightUrl: flightUrl, tiles: tiles, html: html, airport: airport, setAirports: function (l) { AIR = l; }, span: span };
   if (typeof module !== "undefined" && module.exports) module.exports = T; else g.OTMtrip = T;
 })(typeof window !== "undefined" ? window : globalThis);

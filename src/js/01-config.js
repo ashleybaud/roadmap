@@ -1,3 +1,5 @@
+window.otmArriveQuery=location.search; /* read before any link handler tidies the address bar */
+try{ window.otmArriveEnd=(JSON.parse(localStorage.getItem("rr4-trip")||"{}")||{}).endDate||""; }catch(e){ window.otmArriveEnd=""; }
 const OSRM="https://router.project-osrm.org/route/v1/driving/";
 const PHOTON="https://photon.komoot.io/api/";
 /* routing and map tiles: Stadia Maps (paid, authorised by domain); free servers only as a fallback */
