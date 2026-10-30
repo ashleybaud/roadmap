@@ -1133,13 +1133,20 @@ function parseGpx(text){
   var add = function (s, n) { var d = new Date(s + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
   var dm = function (s) { var d = new Date(s + "T12:00:00Z"); return d.getUTCDate() + " " + M[d.getUTCMonth()]; };
   var span = function (a, b) { var x = new Date(a + "T12:00:00Z"), y = new Date(b + "T12:00:00Z"); return x.getUTCMonth() === y.getUTCMonth() ? x.getUTCDate() + "–" + dm(b) : dm(a) + " – " + dm(b); };
+  // our flight search (flights.onetrackmind.online): from Cape Town by default (changeable on the page), dates only when they're still ahead
+  var ddmm = function (d) { return d.slice(8, 10) + d.slice(5, 7); };
+  function flightUrl(to, from, back) {
+    var o = to === "CPT" ? "JNB" : "CPT", today = new Date().toISOString().slice(0, 10);
+    if (!from || from <= today) return "https://flights.onetrackmind.online/?origin_iata=" + o + "&destination_iata=" + to;
+    return "https://flights.onetrackmind.online/?flightSearch=" + o + ddmm(from) + to + ddmm(back) + "1";
+  }
   /* o: { place, town, country, lat, lon, from, to (dates, optional), tickets, tours, air: [name, IATA] (optional), bike, home } */
   function tiles(o) {
     var a = o.air && o.air[1] ? { iata: o.air[1], name: o.air[0] } : airport(o.lat, o.lon), when = o.from && o.to ? span(o.from, o.to) : "", T = [];
     var where = o.town || o.place, abroad = !!o.country && (o.home ? o.country !== o.home : o.country !== "South Africa");
     var bk = "https://www.booking.com/searchresults.html?latitude=" + o.lat + "&longitude=" + o.lon + "&radius=30" + (o.from ? "&checkin=" + o.from + "&checkout=" + o.to : "");
     T.push({ k: "stay", ic: "🛏", t: "Stay", d: "Beds within 30 km of " + o.place + (when ? ", " + when : ""), p: "Booking.com", u: bk, b: "See places" });
-    if (a) T.push({ k: "fly", ic: "✈", t: "Flights", d: "To " + a.name + " (" + a.iata + ")" + (o.from ? ", in " + dm(o.from) + ", out " + dm(o.to) : ""), p: "Our flight search: airlines and booking sites compared", u: "https://flights.onetrackmind.online/flights/?destination_iata=" + a.iata + (o.from ? "&depart_date=" + o.from + "&return_date=" + o.to : ""), b: "Find flights" });
+    if (a) T.push({ k: "fly", ic: "✈", t: "Flights", d: "To " + a.name + " (" + a.iata + ")" + (o.from ? ", in " + dm(o.from) + ", out " + dm(o.to) : ""), p: "Our flight search: airlines and booking sites compared", u: flightUrl(a.iata, o.from, o.to), b: "Find flights" });
     if (a && !o.bike) T.push({ k: "car", ic: "🚗", t: "Car hire", d: "Pick up at " + a.name + " airport (" + a.iata + ")" + (when ? ", " + when : ""), p: "Discover Cars", u: "https://www.discovercars.com/", b: "Compare cars" });
     var tq = o.tours || where;
     if (o.tickets) T.push({ k: "tix", ic: "🎟", t: "Tickets & tours", d: "Official tickets, plus tours and things to do around " + where, p: "Official site · GetYourGuide", u: o.tickets, b: "Get tickets", u2: "https://www.getyourguide.com/s/?q=" + encodeURIComponent(tq) + (o.from ? "&date_from=" + o.from + "&date_to=" + o.to : ""), b2: "Tours" });
