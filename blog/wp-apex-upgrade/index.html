@@ -191,6 +191,21 @@ body.blogdark{--bg:#0E1417;--panel:#0F5874;--line:#2B7896;--chip:#13617E;backgro
 .chips button[data-grp]{border-color:var(--grp);box-shadow:inset 4px 0 0 var(--grp)}.chips button[data-grp].on{background:var(--grp);color:#121A1E;border-color:var(--grp)}
 .evtag{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;background:var(--grp,#4FB8D8);color:#121A1E;font:700 .75rem "IBM Plex Sans",Arial,sans-serif;text-transform:uppercase;letter-spacing:.06em}
 .evmk[data-grp]{border-color:var(--grp);background:var(--grp)}
+
+/* FOMO squares: every event a card; the next one double size; the countdown right-aligned in gold */
+.sq .sqtop{grid-template-columns:64px 1fr auto!important;align-items:center!important}
+.sq .sqwhen{color:#E8A317;font-weight:700;font-size:.9rem;text-align:right;white-space:nowrap;align-self:center}
+.sq .sqtop .sqwhen{font-size:1rem}
+.sq .sqrow{grid-template-columns:46px 1fr auto!important;gap:10px!important;align-items:center;background:rgba(0,0,0,.18);border-radius:10px;border-top:0!important;padding:8px 10px!important;margin:6px -4px 0}
+.sq .sqrow:hover{background:rgba(232,163,23,.12)}
+.sq .sqrow .evdate{background:var(--c);border-radius:8px;text-align:center;padding:4px 0;color:#121A1E}
+.sq .sqrow .evdate b{display:block;color:#121A1E!important;font:800 1.25rem/1 "Saira Condensed","Arial Narrow",sans-serif}
+.sq .sqrow .evdate i{display:block;font:600 .62rem "IBM Plex Sans",Arial,sans-serif;font-style:normal;letter-spacing:.08em;text-transform:uppercase}
+.sq .sqrow b{display:block;color:#fff!important;font:800 1rem/1.1 "Saira Condensed","Arial Narrow",sans-serif;text-transform:uppercase}
+.sq .sqrow .ew{display:block;color:#B5D3DE;font-size:.8rem}
+.sq .unc2{color:#E8A317}
+@media(max-width:420px){.sq .sqrow,.sq .sqtop{grid-template-columns:46px 1fr!important}.sq .sqwhen{grid-column:2;text-align:left}}
+.fomonote{color:#9AAEB1;font-size:.9rem;margin-left:10px}
 </style>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"BlogPosting","headline":"Scalpel - WP Apex Upgrade","datePublished":"2019-10-31","author":{"@type":"Person","@id":"https://onetrackmind.online/about/#founder","name":"Ashley","jobTitle":"Founder","url":"https://onetrackmind.online/about/","sameAs":["https://onetrackmind.co.za","https://onetrackmind.co.za/aboutme/"]},"publisher":{"@type":"Organization","@id":"https://onetrackmind.online/#org","name":"OneTrackMind","url":"https://onetrackmind.online","logo":"https://onetrackmind.online/img/icon.svg","sameAs":["https://onetrackmind.co.za"]},"url":"https://onetrackmind.online/blog/wp-apex-upgrade/","image":"/media/blog/2019/10/49E3EEFC-100E-4359-AEC6-98A0EE590D9E-e1572511768755-scaled.jpeg"}</script>
 <!-- Booking partners (Travelpayouts, Stay22): their scripts load only after the visitor says OK -->

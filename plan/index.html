@@ -771,6 +771,21 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
 .evtag{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;background:var(--grp,#4FB8D8);color:#121A1E;font:700 .75rem "IBM Plex Sans",Arial,sans-serif;text-transform:uppercase;letter-spacing:.06em}
 .evmk[data-grp]{border-color:var(--grp);background:var(--grp)}
 
+/* FOMO squares: every event a card; the next one double size; the countdown right-aligned in gold */
+.sq .sqtop{grid-template-columns:64px 1fr auto!important;align-items:center!important}
+.sq .sqwhen{color:#E8A317;font-weight:700;font-size:.9rem;text-align:right;white-space:nowrap;align-self:center}
+.sq .sqtop .sqwhen{font-size:1rem}
+.sq .sqrow{grid-template-columns:46px 1fr auto!important;gap:10px!important;align-items:center;background:rgba(0,0,0,.18);border-radius:10px;border-top:0!important;padding:8px 10px!important;margin:6px -4px 0}
+.sq .sqrow:hover{background:rgba(232,163,23,.12)}
+.sq .sqrow .evdate{background:var(--c);border-radius:8px;text-align:center;padding:4px 0;color:#121A1E}
+.sq .sqrow .evdate b{display:block;color:#121A1E!important;font:800 1.25rem/1 "Saira Condensed","Arial Narrow",sans-serif}
+.sq .sqrow .evdate i{display:block;font:600 .62rem "IBM Plex Sans",Arial,sans-serif;font-style:normal;letter-spacing:.08em;text-transform:uppercase}
+.sq .sqrow b{display:block;color:#fff!important;font:800 1rem/1.1 "Saira Condensed","Arial Narrow",sans-serif;text-transform:uppercase}
+.sq .sqrow .ew{display:block;color:#B5D3DE;font-size:.8rem}
+.sq .unc2{color:#E8A317}
+@media(max-width:420px){.sq .sqrow,.sq .sqtop{grid-template-columns:46px 1fr!important}.sq .sqwhen{grid-column:2;text-align:left}}
+.fomonote{color:#9AAEB1;font-size:.9rem;margin-left:10px}
+
 </style>
 <!-- Booking partners (Travelpayouts, Stay22): their scripts load only after the visitor says OK -->
 <script>(function(){var K="otm-consent",v=null;try{v=localStorage.getItem(K)}catch(e){}
@@ -1243,7 +1258,8 @@ function parseGpx(text){
     var a = o.air && o.air[1] ? { iata: o.air[1], name: o.air[0] } : airport(o.lat, o.lon), when = o.from && o.to ? span(o.from, o.to) : "", T = [];
     var where = o.town || o.place, abroad = !!o.country && (o.home ? o.country !== o.home : o.country !== "South Africa");
     var bk = "https://www.booking.com/searchresults.html?latitude=" + o.lat + "&longitude=" + o.lon + "&radius=30" + (o.from ? "&checkin=" + o.from + "&checkout=" + o.to : "");
-    T.push({ k: "stay", t: "Stay", d: "Beds within 30 km of " + o.place + (when ? ", " + when : ""), p: "Booking.com", u: bk, b: "See places" });
+    var today0 = new Date().toISOString().slice(0, 10);
+    T.push({ w: ["https://www.stay22.com/embed/gm?aid=onetrackmind&lat=" + (+o.lat).toFixed(5) + "&lng=" + (+o.lon).toFixed(5) + (o.from && o.from > today0 ? "&checkin=" + o.from + "&checkout=" + o.to : "") + "&maincolor=0F5874&currency=ZAR"], k: "stay", t: "Stay", d: "Beds within 30 km of " + o.place + (when ? ", " + when : ""), p: "Booking.com", u: bk, b: "See places" });
     if (a) { var org = a.iata === "CPT" ? "JNB" : "CPT"; var W = [
       "https://tpembd.com/content?currency=zar&trs=593333&shmarker=797995&show_hotels=false&powered_by=false&locale=en&searchUrl=flights.onetrackmind.online&primary_override=%230F5874&color_button=%23E8A317&color_icons=%230F5874&dark=%23262626&light=%23FFFFFF&secondary=%230F5874&special=%23C4C4C4&color_focused=%230F5874&border_radius=10&plain=false&origin=" + org + "&destination=" + a.iata + (o.from && o.from > new Date().toISOString().slice(0, 10) ? "&depart_date=" + o.from + "&return_date=" + o.to : "") + "&promo_id=7879&campaign_id=100",
       "https://tpembd.com/content?currency=zar&trs=593333&shmarker=797995&color_button=%23E8A317&target_host=flights.onetrackmind.online&locale=en&powered_by=false&origin=" + org + "&destination=" + a.iata + "&with_fallback=true&non_direct_flights=true&min_lines=5&border_radius=10&color_background=%23FFFFFF&color_text=%23000000&color_border=%23FFFFFF&promo_id=2811&campaign_id=100"]; }
@@ -1266,7 +1282,7 @@ function parseGpx(text){
   var uid = 0;
   // tabs + the partners' live widgets (loaded into the open tab, only after OK on the cookie notice)
   var LOADER = 'window.otmTabs||(window.otmTabs=1,(function(){function ok(){try{return localStorage.getItem("otm-consent")==="yes"}catch(e){return false}}' +
-    'function load(p){if(!p||!ok())return;p.querySelectorAll(".twid:not([data-done])").forEach(function(w){w.setAttribute("data-done","1");w.innerHTML="";JSON.parse(w.getAttribute("data-w")).forEach(function(u){var d=document.createElement("div");w.appendChild(d);var s=document.createElement("script");s.async=true;s.charset="utf-8";s.src=u;d.appendChild(s)});setTimeout(function(){if(w.offsetHeight<90)w.hidden=true},12000)})}' +
+    'function load(p){if(!p||!ok())return;p.querySelectorAll(".twid:not([data-done])").forEach(function(w){w.setAttribute("data-done","1");w.innerHTML="";JSON.parse(w.getAttribute("data-w")).forEach(function(u){var d=document.createElement("div");w.appendChild(d);if(/^https:\/\/www\.stay22\.com\/embed\//.test(u)){var f=document.createElement("iframe");f.src=u;f.width="100%";f.height="460";f.style.border="0";f.style.borderRadius="10px";f.setAttribute("loading","lazy");f.title="Places to stay";d.appendChild(f);return}var s=document.createElement("script");s.async=true;s.charset="utf-8";s.src=u;d.appendChild(s)});setTimeout(function(){if(w.offsetHeight<90)w.hidden=true},12000)})}' +
     'function first(){document.querySelectorAll(".trip").forEach(function(t){load(t.querySelector(".tpanel:not([hidden])"))})}' +
     'document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".ttab");if(!b)return;var s=b.closest(".trip");s.querySelectorAll(".ttab").forEach(function(x){x.setAttribute("aria-selected",String(x===b))});s.querySelectorAll(".tpanel").forEach(function(p){p.hidden=p.id!==b.getAttribute("aria-controls")});load(document.getElementById(b.getAttribute("aria-controls")))});' +
     'document.addEventListener("otm-consent",first);if(document.readyState!=="loading")first();else document.addEventListener("DOMContentLoaded",first)})())';

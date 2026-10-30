@@ -54,21 +54,24 @@
     var days = function (s) { return Math.round((new Date(s + "T12:00:00") - new Date(today + "T12:00:00")) / 864e5); };
     var when = function (e) { var d = days(e.start); return e.start <= today ? "On now" : d === 1 ? "Tomorrow" : d <= 13 ? "In " + d + " days" : d <= 60 ? "In " + Math.round(d / 7) + " weeks" : "In " + Math.round(d / 30) + " months"; };
     function draw() {
-      $("fomoView").innerHTML = [["soon", "Coming up"], ["ahead", "Book ahead"]].map(function (x) { return '<button type="button" data-v="' + x[0] + '" class="' + (x[0] === view ? "on" : "") + '">' + x[1] + "</button>"; }).join("");
-      $("fomoReg").innerHTML = "";
-      var from = view === "soon" ? today : add(today, 30), to = view === "soon" ? add(today, 30) : add(today, 183);
+      $("fomoView").innerHTML = [["week", "This week"], ["soon", "Coming up"], ["ahead", "Book ahead"]].map(function (x) { return '<button type="button" data-v="' + x[0] + '" class="' + (x[0] === view ? "on" : "") + '">' + x[1] + "</button>"; }).join("");
+      // This week: every event in the next 7 days, no limit. Coming up: the next four of each kind. Book ahead: the big ones 1 to 6 months out.
+      var from = view === "ahead" ? add(today, 30) : today, to = view === "week" ? add(today, 6) : view === "soon" ? add(today, 30) : add(today, 183);
+      var fd = function (s) { var x = new Date(s + "T12:00:00"); return x.getDate() + " " + M[x.getMonth()]; };
+      $("fomoReg").innerHTML = '<span class="fomonote">' + (view === "week" ? "Everything on from " + fd(today) + " to " + fd(to) + "." : view === "soon" ? "The next four of each kind, however far off." : "The big ones from " + fd(from) + " to " + fd(to) + ". Book these early.") + "</span>";
       var html = GROUPS.map(function (G) {
         // Coming up: the next four in each square, however far off, so no square is ever empty. Book ahead: from a month out, the big ones first.
         var L = EV.filter(function (e) { return (G[0] === "home" ? isHome(e) : !isHome(e) && groupOf(e) === G[0]) && e.end >= from && (view === "soon" || e.start <= to); })
-          .sort(function (a, b) { return view === "ahead" ? (a.tier || 2) - (b.tier || 2) || a.start.localeCompare(b.start) : a.start.localeCompare(b.start); }).slice(0, 4);
+          .sort(function (a, b) { return view === "ahead" ? (a.tier || 2) - (b.tier || 2) || a.start.localeCompare(b.start) : a.start.localeCompare(b.start); }).slice(0, view === "week" ? 99 : 4);
         if (view === "ahead") L.sort(function (a, b) { return a.start.localeCompare(b.start); });
         if (!L.length) return "";
         var top = L[0], d = new Date(top.start + "T12:00:00");
         return '<div class="sq' + (G[0] === "home" ? " sqhome" : "") + '" style="--c:' + G[2] + '"><div class="sqh">' + esc(G[1]) + "</div>" +
-          '<a class="sqtop" href="/events/' + esc(top.id) + '/"><span class="evdate"><b>' + d.getDate() + "</b><i>" + M[d.getMonth()] + "</i></span><span><b>" + esc(clean(top.name)) + '</b><span class="ew">' + esc(top.city || top.venue || "") + ", " + esc(top.country || "") + '</span><span class="ef">' + when(top) + (top.confirmed ? "" : " · date to confirm") + "</span></span></a>" +
-          L.slice(1).map(function (e) { var x = new Date(e.start + "T12:00:00"); return '<a class="sqrow" href="/events/' + esc(e.id) + '/"><b>' + x.getDate() + " " + M[x.getMonth()] + "</b><span>" + esc(clean(e.name)) + "</span></a>"; }).join("") + "</div>";
+          '<a class="sqtop" href="/events/' + esc(top.id) + '/"><span class="evdate"><b>' + d.getDate() + "</b><i>" + M[d.getMonth()] + "</i></span><span><b>" + esc(clean(top.name)) + '</b><span class="ew">' + esc(top.city || top.venue || "") + ", " + esc(top.country || "") + "</span>" + (top.confirmed ? "" : '<span class="ef unc2">Date to confirm</span>') + '</span><span class="sqwhen">' + when(top) + "</span></a>" +
+          // every other event is its own small card too, so nobody mistakes them for small print
+          L.slice(1).map(function (e) { var x = new Date(e.start + "T12:00:00"); return '<a class="sqrow" href="/events/' + esc(e.id) + '/"><span class="evdate"><b>' + x.getDate() + "</b><i>" + M[x.getMonth()] + '</i></span><span><b>' + esc(clean(e.name)) + '</b><span class="ew">' + esc((e.city || e.venue || "").split(",")[0]) + ", " + esc(e.country || "") + '</span></span><span class="sqwhen">' + when(e) + "</span></a>"; }).join("") + "</div>";
       }).join("");
-      $("fomoList").innerHTML = html || '<p class="note">Nothing on yet.</p>';
+      $("fomoList").innerHTML = html || '<p class="note">' + (view === "week" ? "Nothing on this week. Try Coming up." : "Nothing on yet.") + "</p>";
     }
     box.addEventListener("click", function (e) { var v = e.target.closest("[data-v]"); if (v) { view = v.dataset.v; store("otm-evview3", view); draw(); } });
     draw();
