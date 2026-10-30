@@ -49,7 +49,8 @@ const pickFresh = (list, key, kind, gap) => { const recent = new Set(Object.entr
 
 const BIG = /SEMA|EICMA|Goodwood|Le Mans|Daytona|Indianapolis 500|Indy 500|Pikes Peak|Isle of Man|TT Races|Dakar|Monaco|Pebble Beach|Car Week|Essen Motor|N(ü|u)rburgring 24|Bathurst|Macau|Spa 24|Rennsport|Luftgek|Sebring|Baja 1000|North West 200/i;
 const RANK = { f1: 0, endurance: 1, festival: 2, bikes: 3, rally: 4, us: 5, sa: 6, offroad: 7 };
-const rank = e => (BIG.test(e.name) ? -1 : (RANK[e.category] ?? 9));
+// the size of the event first (tier), home races a step up for our South African readers, then the kind of racing
+const rank = e => ((e.tier || (BIG.test(e.name) ? 1 : 2)) - 1) * 10 + (e.country === "South Africa" ? -5 : 0) + (RANK[e.category] ?? 9);
 const plainText = st => String(st.html || "").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/&amp;/g, "&").replace(/&#8217;|&rsquo;/g, "’").replace(/&#8211;/g, "–").replace(/\s+/g, " ").trim();
 const cleanTitle = t => t.replace(/^\d{4}[\s:-]+/, "").replace(/\s*[-–]\s*Gallery$/i, "").trim();
 const short = n => n.replace(/\s+20\d\d$/, "").replace(/\s*\(.*?\)\s*/g, " ").trim();
@@ -204,6 +205,7 @@ await browser.close(); fs.rmSync(tmp, { force: true });
 for (const wk of fs.readdirSync(path.join(ROOT, "kits"))) if (/^\d{4}-\d\d-\d\d$/.test(wk) && wk < add(from, -28)) fs.rmSync(path.join(ROOT, "kits", wk), { recursive: true, force: true });
 
 /* ---------- the week's page ---------- */
+const camps = ((J("data/campaigns.json", {}).campaigns) || []).filter(c => !c.hidden && c.from <= add(from, 6) && c.to >= from);
 const dates = days.map((d, i) => add(from, i));
 const html = `<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
 <title>Posts for ${fd(from)} – ${fd(sun)}</title>
@@ -212,7 +214,8 @@ h1{font-size:1.5rem;margin:0 0 4px}.note{color:#B5D3DE;font-size:.92rem}.day{bac
 .day h2{margin:0 0 10px;font-size:1.15rem}.day h2 span{color:#E8A317}.pics{display:flex;gap:10px;overflow-x:auto}.pics a{flex:0 0 auto}.pics img{height:260px;border-radius:8px;display:block}
 .cap{background:#06303F;border-radius:10px;padding:12px;white-space:pre-wrap;font-size:.92rem;margin:10px 0 6px}.btn{display:inline-block;background:#E8A317;color:#06303F;border:0;border-radius:8px;padding:9px 14px;font-weight:700;font-size:.9rem;text-decoration:none;cursor:pointer;margin:4px 6px 4px 0}
 .ghost{background:#13617E;color:#fff}.warn{color:#E8A317;font-weight:700}</style>
-<main><h1>Posts for ${fd(from)} – ${fd(sun)}</h1><p class="note">Tap a picture to open it full size, then save it. Copy the caption, post. Stories: add a link sticker with the link shown.</p>
+<main><h1>Posts for ${fd(from)} – ${fd(sun)}</h1>${camps.length ? `<div class="day" style="border-top-color:#8FD3EA"><h2><span>This week, plan ahead</span></h2>${camps.map(c => `<p><b>${esc(c.title)}.</b> ${esc(c.line)} <a href="${SITE + c.link}" style="color:#E8A317">${esc(c.cta)} ›</a></p>`).join("")}<p class="note">Work it into a post or a story this week. Book-ahead posts do best 3 to 6 months before the date.</p></div>` : ""}
+<p class="note">Tap a picture to open it full size, then save it. Copy the caption, post. Stories: add a link sticker with the link shown.</p>
 ${days.map((d, i) => `<section class="day"><h2><span>${d.day} ${fd(dates[i])}</span> · ${esc(d.theme)}</h2>
 ${d.needsLine ? `<p class="warn">Your photo: fill in the lines in [brackets] before you post. Or send Claude a line and it goes in for you.</p>` : ""}${d.needs ? `<p class="warn">Needs your photos. Send them to Claude with the place, town and what you drove.</p>` : d.archive ? `<p class="note">No garage photo this week, so this one is from the archive. Send a photo to use your own.</p>` : ""}
 <div class="pics">${d.files.map(f => `<a href="${d.slug}/${f}" target="_blank"><img src="${d.slug}/${f}" alt="${esc(d.theme)} ${f}"></a>`).join("")}</div>

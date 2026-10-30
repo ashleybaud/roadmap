@@ -680,6 +680,11 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
 .evband .evstory{background:#0B0D0E;border-radius:8px;padding:18px;border:1px solid #3A4449}
 .evband .evstory b:first-child{font-size:1.6rem;line-height:1.05;margin-bottom:10px;color:#FFD23F!important}
 .evband .evstory>span{color:#F2F2F2}
+.ev2027{display:flex;flex-direction:column;gap:6px;margin:0 0 10px}.ev2027:empty{display:none}.camp{padding:9px 12px;border-radius:8px;background:rgba(232,163,23,.14);border-left:4px solid var(--gold);font-size:.9rem}.camp b{color:var(--gold)}.camp a{color:var(--gold);font-weight:700;white-space:nowrap}
+.evview{display:flex;gap:0;border:1px solid var(--line);border-radius:8px;overflow:hidden}.evview button{background:transparent;border:0;color:#E4EEF2;padding:6px 14px;font:700 .9rem var(--f-display);text-transform:uppercase;letter-spacing:.04em;cursor:pointer}.evview button.on{background:var(--gold);color:#121A1E}
+.evband .eg{display:block;font:700 .68rem/1.2 var(--f-body);text-transform:uppercase;letter-spacing:.08em;color:#8FD3EA;margin-bottom:2px}.evband .evgrid{grid-auto-flow:row dense}.evband .evcard.t1{grid-column:span 2;border-bottom:2px solid var(--gold)}.evband .evcard.t1 .en{font:800 1.35rem/1.1 var(--f-display);text-transform:uppercase;letter-spacing:.01em}.evband .evcard.t1 .evdate{padding:8px 0}.evband .evcard.t1 .evdate b{font-size:1.7rem}
+.evband .evcard.t3 .en{font-weight:600;font-size:.86rem}.evband .evcard.t3 .evdate{opacity:.85}
+@media(max-width:700px){.evband .evcard.t1{grid-column:1/-1}}
 /* gold fill means "do this": one per section; the rest are outlines */
 .pcol:first-child .palt{background:rgba(6,48,63,.55);color:var(--gold);border:2px solid var(--gold);box-shadow:none}
 .herobtn{background:transparent!important;color:var(--gold)!important;border:2px solid var(--gold)!important}
@@ -728,7 +733,7 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
         <div class="evstory"><b>Plan your year around the races.</b><span>I was in Monterey a week before Car Week and didn't know it was on. I'd broken down and spent the weekend there, never realising it's the car capital of the world. With this calendar I'd have timed it right.</span>
           <button type="button" class="btn evtripbtn" data-evtrip>Build a trip around the races ›</button>
           <div class="evalert"><b>Never miss lights out.</b><span>Every Monday: who's racing that week, where, and how to watch.</span><form class="nlf" data-source="race-alerts" novalidate><input type="email" name="email" placeholder="Your email" autocomplete="email" aria-label="Your email" required><input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px"><button type="submit">Count me in</button></form><span class="nlm" aria-live="polite"></span></div></div>
-        <div class="evcoming"><div class="evhead"><span class="lbl">Coming up</span><div class="evregs" id="evRegs" aria-label="Where"></div></div>
+        <div class="evcoming"><div class="ev2027" id="ev2027"></div><div class="evhead"><div class="evview" id="evView" aria-label="When"></div><div class="evregs" id="evRegs" aria-label="Where"></div></div>
           <div class="evgrid" id="evNext"></div>
           <a class="evall" href="/events/">Every race and festival ›</a></div>
       </section>
@@ -800,7 +805,7 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
 <aside class="nlbox"><b>Get The OneTrackMind Week</b><span>What's on this week, last week's results and a road worth riding. Every Monday, or less often if you like.</span><form class="nlf" novalidate><input type="email" name="email" placeholder="Your email" autocomplete="email" aria-label="Your email" required><input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px"><button type="submit">Sign me up</button></form><span class="nlm" aria-live="polite"></span></aside>
   <script>(function(){document.querySelectorAll(".nlf").forEach(function(f){f.addEventListener("submit",function(e){e.preventDefault();var m=f.parentNode.querySelector(".nlm"),em=f.email.value.trim();if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)){m.textContent="That email doesn't look right.";return}m.textContent="Sending…";fetch("/api/subscribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:em,website:f.website.value,source:f.dataset.source||location.pathname})}).then(function(r){return r.json().then(function(j){return[r.ok,j]})}).then(function(x){if(x[0]){f.hidden=true;m.textContent=x[1].already?"You're already on the list.":"Almost done: tap the link in the email we just sent."}else m.textContent=x[1].error||"Something went wrong. Try again."}).catch(function(){m.textContent="No connection. Try again."})})})})();</script>
   <footer class="sitefoot">
-    <div class="sponsors"><span class="lbl">OneTrackMind is free thanks to</span>
+    <div class="sponsors"><span class="lbl">Powered by</span>
       <a class="spons splogo" href="https://alterego.online/?utm_source=onetrackmind&utm_medium=sponsor" target="_blank" rel="noopener sponsored"><img src="/img/alterego-logo-white.png" width="96" height="84" alt="AlterEgo"><span>Made-to-order wear for petrolheads</span></a>
       <a class="spons open" href="/advertise/"><b>Your brand here</b><span>Sponsor or advertise ›</span></a></div>
     <div class="note">OneTrackMind: plan road trips anywhere, on the roads less travelled, then ride them on your GPS or phone. · <a href="/how-to/">How to</a> · <a href="/record/">Record a ride</a> · <a href="/advertise/">Advertise</a> · <a href="/about/">About</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> · <a href="mailto:hello@onetrackmind.online">hello@onetrackmind.online</a></div>

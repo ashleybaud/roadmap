@@ -1,7 +1,16 @@
 [
  {
+  "id": "2026-11-09-weekly",
+  "subject": "Nine Hour of Kyalami, and 2 more on this week",
+  "from": "2026-11-09",
+  "to": "2026-11-15",
+  "period": "weekly",
+  "events": 3,
+  "last": 5
+ },
+ {
   "id": "2026-11-02-weekly",
-  "subject": "SEMA Show 2026, and 4 more on this week",
+  "subject": "EICMA Milan, and 4 more on this week",
   "from": "2026-11-02",
   "to": "2026-11-08",
   "period": "weekly",
@@ -10,7 +19,7 @@
  },
  {
   "id": "2026-11-02-monthly",
-  "subject": "SEMA Show 2026, and 15 more on the calendar",
+  "subject": "Las Vegas Grand Prix 2026, and 15 more on the calendar",
   "from": "2026-11-02",
   "to": "2026-11-29",
   "period": "monthly",

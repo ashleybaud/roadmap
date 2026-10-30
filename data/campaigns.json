@@ -1,0 +1,17 @@
+{
+ "_note": "Seasonal campaigns: each shows on the site, in the newsletter and on the week's post page between 'from' and 'to'. 'hidden': true keeps one off until it's ready (e.g. driving experiences need the affiliate codes). Plan these 3 to 6 months out: nobody decides on Friday to go to a Grand Prix on Sunday.",
+ "campaigns": [
+  {"id": "calendar-2027", "from": "2026-10-26", "to": "2027-03-31", "kind": "booking", "title": "The 2027 calendar is in", "line": "Le Mans, the TT, Monaco, Pikes Peak: the dates are out and the good beds go first.", "cta": "See 2027 and book early", "link": "/events/#y2027"},
+  {"id": "christmas-2026", "from": "2026-11-09", "to": "2026-12-20", "kind": "gift", "title": "Christmas: give a race weekend", "line": "A ticket to a 2027 race beats socks. Pick the race, build the trip, print it and put it in a card.", "cta": "Find a race", "link": "/events/#y2027"},
+  {"id": "december-roads-2026", "from": "2026-11-23", "to": "2026-12-31", "kind": "holiday", "title": "Driving home for Christmas? Take the long way", "line": "Swap a day of N1 for a pass or two. Fuel, night stops and the roads worth the detour.", "cta": "Routes", "link": "/routes/"},
+  {"id": "human-rights-2027", "from": "2027-02-01", "to": "2027-03-19", "kind": "longweekend", "title": "Long weekend: 20 to 22 March", "line": "Human Rights Day falls on a Sunday, so the Monday's off. Three days is a proper ride.", "cta": "Plan it", "link": "/"},
+  {"id": "easter-2027", "from": "2027-02-08", "to": "2027-03-25", "kind": "longweekend", "title": "Easter: four days, 26 to 29 March", "line": "Good Friday to Family Day. Enough for the Karoo and back, or the Swartberg both ways.", "cta": "Plan it", "link": "/routes/"},
+  {"id": "freedom-2027", "from": "2027-03-15", "to": "2027-04-23", "kind": "longweekend", "title": "Freedom Day is a Tuesday", "line": "Take the Monday off and it's four days, 24 to 27 April.", "cta": "Plan it", "link": "/"},
+  {"id": "fathers-day-2027", "from": "2027-05-10", "to": "2027-06-19", "kind": "gift", "title": "Father's Day, 20 June: give him a race weekend", "line": "Not another tie. Pick a race, plan the trip, go together.", "cta": "Find a race", "link": "/events/"},
+  {"id": "womens-day-2027", "from": "2027-06-28", "to": "2027-08-06", "kind": "longweekend", "title": "Long weekend: 7 to 9 August", "line": "Women's Day is a Monday. Three days, one good road.", "cta": "Plan it", "link": "/"},
+  {"id": "heritage-2027", "from": "2027-08-16", "to": "2027-09-23", "kind": "longweekend", "title": "Heritage Day long weekend: 24 to 26 September", "line": "Spring in the Karoo, flowers on the West Coast. Pick one.", "cta": "Plan it", "link": "/routes/"},
+  {"id": "calendar-2028", "from": "2027-10-25", "to": "2028-03-31", "kind": "booking", "title": "The 2028 calendar is in", "line": "Plan next year now: the dates are out and the good beds go first.", "cta": "See 2028", "link": "/events/"},
+  {"id": "christmas-2027", "from": "2027-11-08", "to": "2027-12-20", "kind": "gift", "title": "Christmas: give a race weekend", "line": "A ticket to a 2028 race beats socks. Pick the race, build the trip, put it in a card.", "cta": "Find a race", "link": "/events/"},
+  {"id": "experiences", "from": "2026-11-01", "to": "2027-12-31", "kind": "experience", "hidden": true, "title": "Driving and riding experiences", "line": "Laps in a race car, a day at a riding school, a track day. Turns on when the affiliate codes are in.", "cta": "See them", "link": "/how-to/"}
+ ]
+}

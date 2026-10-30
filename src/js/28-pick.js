@@ -38,15 +38,36 @@ document.querySelectorAll(".pbox").forEach(b=>b.addEventListener("click",()=>set
 
 /* Coming up on the landing page: the next races and festivals, filtered by where (remembered), followed series first */
 var evRegSel=null;
-function drawComing(){ const u=$("evNext"), r=$("evRegs"); if(!u||!evList) return;
+// Seasonal campaigns (data/campaigns.json): Christmas, Father's Day, long weekends, the new year's calendar. Two at most, gifts and long weekends first.
+var campList=null;
+function drawCampaigns(){ const b=$("ev2027"); if(!b) return;
+  if(!campList){ campList=[]; fetch("/data/campaigns.json").then(r=>r.ok?r.json():{campaigns:[]}).then(j=>{ campList=j.campaigns||[]; drawCampaigns(); }).catch(()=>{}); return; }
+  const t=ymd(new Date()), K={gift:0,longweekend:1,holiday:2,experience:3,booking:4};
+  const L=campList.filter(c=>!c.hidden&&c.from<=t&&c.to>=t).sort((a,b)=>(K[a.kind]??5)-(K[b.kind]??5)).slice(0,2);
+  b.innerHTML=L.map(c=>`<div class="camp"><b>${esc(c.title)}.</b> ${esc(c.line)} <a href="${esc(c.link)}">${esc(c.cta)} ›</a></div>`).join("");
+}
+// Two views: Book ahead (1 to 6 months out: when people actually decide) and This month. The big ones get bigger cards.
+var evView=null;
+function drawComing(){ const u=$("evNext"), r=$("evRegs"), v=$("evView"); if(!u||!evList) return;
   if(evRegSel===null){ try{ evRegSel=localStorage.getItem("otm-evcome")||""; }catch(e){ evRegSel=""; } }
+  if(evView===null){ try{ evView=localStorage.getItem("otm-evview")||"ahead"; }catch(e){ evView="ahead"; } }
   const t=ymd(new Date()), my=mySeries(), M=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   const reg=typeof EVT_REG!=="undefined"?EVT_REG:[];
+  if(v) v.innerHTML=[["ahead","Book ahead"],["soon","This month"]].map(([k,n])=>`<button type="button" data-evview="${k}" class="${k===evView?"on":""}">${n}</button>`).join("");
   r.innerHTML=[["","Everywhere"],...reg.map(x=>[x[0],x[1].replace(" and the UK","").replace(", Canada and Mexico","").replace(" and Australia","")])].map(([k,n])=>`<button type="button" data-evcome="${k}" class="${k===evRegSel?"on":""}">${esc(n)}</button>`).join("");
-  const L=evList.filter(e=>e.end>=t&&(!evRegSel||evtRegion(e.country)===evRegSel)).sort((a,b)=>a.start.localeCompare(b.start)||(my.includes(b.series)-my.includes(a.series))).slice(0,12);
-  u.innerHTML=L.length?L.map(e=>{ const d=new Date(e.start+"T12:00:00"), live=e.start<=t;
-    return `<a class="evcard" href="/events/${esc(e.id)}/"><span class="evdate"><b>${d.getDate()}</b><i>${M[d.getMonth()]}</i></span><span><span class="en">${esc(e.name.replace(/\s*\(.*?\)/g,"").replace(/\s+20\d\d$/,""))}${my.includes(e.series)?" ★":""}</span><span class="ew">${esc(e.city||e.venue||"")}, ${esc(e.country||"")}${e.confirmed?"":" · to confirm"}</span>${live?`<span class="ef">On now</span>`:""}</span></a>`; }).join(""):`<p class="note">Nothing coming up there yet.</p>`; }
+  const inReg=e=>!evRegSel||evtRegion(e.country)===evRegSel, a30=addDays(t,30), a183=addDays(t,183);
+  let L;
+  if(evView==="ahead"){ // the big ones first, then fill with championship rounds, in date order
+    const pool=evList.filter(e=>e.start>=a30&&e.start<=a183&&inReg(e));
+    const pick=[...pool.filter(e=>e.tier===1),...pool.filter(e=>e.tier===2&&my.includes(e.series)),...pool.filter(e=>e.tier===2),...pool.filter(e=>e.tier===3)];
+    L=[...new Map(pick.map(e=>[e.id,e])).values()].slice(0,12).sort((a,b)=>a.start.localeCompare(b.start));
+  } else L=evList.filter(e=>e.end>=t&&e.start<=a30&&inReg(e)).sort((a,b)=>a.start.localeCompare(b.start)||(a.tier||2)-(b.tier||2)).slice(0,12);
+  u.innerHTML=L.length?L.map(e=>{ const d=new Date(e.start+"T12:00:00"), live=e.start<=t, tier=e.tier||2;
+    return `<a class="evcard t${tier}" href="/events/${esc(e.id)}/"><span class="evdate"><b>${d.getDate()}</b><i>${M[d.getMonth()]}${d.getFullYear()!==new Date().getFullYear()?" "+String(d.getFullYear()).slice(2):""}</i></span><span>${e.genre?`<span class="eg">${esc(genreName(e.genre))}</span>`:""}<span class="en">${esc(e.name.replace(/\s*\(.*?\)/g,"").replace(/\s+20\d\d$/,""))}${my.includes(e.series)?" ★":""}</span><span class="ew">${esc(e.city||e.venue||"")}, ${esc(e.country||"")}${e.confirmed?"":" · to confirm"}</span>${live?`<span class="ef">On now</span>`:tier===1&&e.tickets?`<span class="ef">Tickets on sale. Book early ›</span>`:""}</span></a>`; }).join(""):`<p class="note">Nothing ${evView==="ahead"?"in the next six months":"this month"} there yet.</p>`;
+  drawCampaigns();
+}
 loadEvents().then(drawComing);
+document.addEventListener("click",e=>{ const v=e.target.closest&&e.target.closest("[data-evview]"); if(!v) return; evView=v.dataset.evview; try{ localStorage.setItem("otm-evview",evView); }catch(x){} drawComing(); });
 document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-evcome]"); if(!b) return; evRegSel=b.dataset.evcome; try{ localStorage.setItem("otm-evcome",evRegSel); }catch(x){} drawComing(); });
 
 /* On your dates: races and festivals near the route while you're travelling (Motorsport looks further afield) */

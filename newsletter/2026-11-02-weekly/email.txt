@@ -11,11 +11,16 @@ LAST WEEK
 - Mexico City Grand Prix 2026: https://www.formula1.com/en/results/2026/races
 - MotoGP Malaysian Grand Prix 2026: https://www.motogp.com/en/world-standing/2026/motogp/championship-standings
 
-CURVES OF THE WEEK
-Montagu Pass, Seven Passes and Prince Alfred's: https://onetrackmind.online/routes/seven-passes-prince-alfred/
+THE ROAD THERE
+Motor Valley and EICMA in a Fiat 500: https://onetrackmind.online/routes/motor-valley-2017/
+
+PLAN AHEAD
+The 2027 calendar is in. Le Mans, the TT, Monaco, Pikes Peak: the dates are out and the good beds go first. https://onetrackmind.online/events/#y2027
 
 ONE IDEA
 Bring the partner. Every event page lists what else is nearby. Pick one thing for them each day and the weekend sells itself.
+
+Powered by AlterEgo: https://alterego.online
 
 Change how often: {{PREFS}}
 Unsubscribe: {{UNSUB}}
