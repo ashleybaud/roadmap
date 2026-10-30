@@ -163,7 +163,20 @@ body.blogdark{--bg:#0E1417;--panel:#0F5874;--line:#2B7896;--chip:#13617E;backgro
 @media(max-width:760px){.doors,.fuelrow{grid-template-columns:1fr}.door{min-height:0}.cd{grid-template-columns:1fr auto}.cdb{grid-column:1/-1}.evcard.t1{grid-column:1/-1}.home .oneliner{font-size:.98rem}}
 @media(max-width:640px){.hdrlinks>a.navplan{display:inline-block!important;width:auto!important;margin-left:auto;order:-1}.hdrlinks .navtoggle{order:-2}.hdrlinks.open>a.navplan{display:inline-block!important}}.hdrlinks a.navplan{display:flex!important;flex-direction:column;align-items:center;gap:3px;line-height:1;padding:8px 20px!important;font-size:1.2rem!important}.pinic{display:block}`;
 
-function page({ url, title, desc, body, ld, image, active, ads = true, dark = false }) {
+// AlterEgo product ads: one shop, a different product per page (picked by the page address, so it doesn't flicker or change on reload)
+const AE = JSON.parse(fs.readFileSync(path.join(ROOT, "data/alterego-products.json"), "utf8"));
+const aeHash = s => { let h = 7; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
+function aePick(seed, n = 1, ctx = "") {
+  const fit = /killarney/i.test(ctx) ? AE.filter(x => x.t === "killarney") : [], rest = AE.filter(x => x.t !== "killarney"), out = [];
+  if (fit.length) out.push(fit[aeHash(seed) % fit.length]);
+  for (let i = 0; out.length < n && i < rest.length; i++) { const x = rest[(aeHash(seed) + i * 3) % rest.length]; if (!out.includes(x)) out.push(x); }
+  return out.slice(0, n);
+}
+const aeUrl = (x, where) => `https://alterego.online/products/${x.h}?utm_source=onetrackmind&utm_medium=${where}&utm_content=${x.h}`;
+const aeCard = (x, where) => `<a class="adcard" href="${aeUrl(x, where)}" target="_blank" rel="noopener sponsored"><img src="${x.i}&width=360" alt="AlterEgo ${esc(x.b.replace(/\.$/, ""))} ${x.c.split(" ").pop()}" loading="lazy"><span class="adt"><em>AlterEgo · Ad</em><b>${esc(x.b)}</b><span>${esc(x.s)} $${x.p}.</span><i>${esc(x.c)} ›</i></span></a>`;
+const aeSide = (x) => `<aside class="aeside"><a class="aecol" href="${aeUrl(x, "sidebar")}" target="_blank" rel="noopener sponsored"><em>AlterEgo · Ad</em><img src="${x.i}&width=600" alt="AlterEgo ${esc(x.b.replace(/\.$/, ""))} ${x.c.split(" ").pop()}" loading="lazy"><b>${esc(x.b)}</b><span>${esc(x.s)}</span><span class="aep">$${x.p} · made to order</span><i>${esc(x.c)} ›</i></a></aside>`;
+function page({ url, title, desc, body, ld, image, active, ads = true, dark = false, side = false }) {
+  const aeP = aePick(url, 3, title);
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -198,8 +211,8 @@ b.addEventListener("click",function(e){var t=e.target.closest("[data-ck]");if(t)
 </head>
 <body${dark ? ' class="blogdark"' : ""}><div class="wrap">
 <header><a class="logo" href="/">OneTrackMind</a>${HOUSE.nav(active)}</header><script>document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".navtoggle");if(!b)return;var n=b.closest(".hdrlinks"),o=n.classList.toggle("open");b.setAttribute("aria-expanded",String(o))});document.addEventListener("click",function(e){document.querySelectorAll(".navdd[open]").forEach(function(d){if(!d.contains(e.target))d.open=false;});});</script>
-${body}
-${ads ? `<div class="adrow"><a class="adcard" href="https://alterego.online/products/build-race-repeat-hoodie?utm_source=onetrackmind&utm_medium=sponsor&utm_content=hoodie" target="_blank" rel="noopener sponsored"><img src="https://alterego.online/cdn/shop/files/3158941636033974733_2048.jpg?v=1792398701&width=360" alt="AlterEgo Build Race Repeat hoodie" loading="lazy"><span class="adt"><em>AlterEgo · Ad</em><b>Build. Race. Repeat.</b><span>The hoodie, made to order for petrolheads. From $65.</span><i>Shop the hoodie ›</i></span></a><a class="adcard" href="https://alterego.online/products/racing-is-life?utm_source=onetrackmind&utm_medium=sponsor&utm_content=racing-is-life" target="_blank" rel="noopener sponsored"><img src="/img/ashley.jpg" alt="Ashley in the AlterEgo Racing is Life tee" loading="lazy" style="object-position:50% 40%"><span class="adt"><em>AlterEgo · Ad</em><b>Racing is life.</b><span>Everything else is preparation. The tee I wear in the garage.</span><i>Shop the tee ›</i></span></a></div>` : ""}
+${side ? `<div class="withad">${body}${aeSide(aeP[0])}</div>` : body}
+${ads ? `<div class="adrow">${aeCard(aeP[side ? 1 : 0], "sponsor")}${aeCard(aeP[side ? 2 : 1], "sponsor")}</div>` : ""}
 <aside class="nlbox" id="newsletter"><b>Get The OneTrackMind Week</b><span>What's on this week, last week's results and a road worth riding. Every Monday, or less often if you like.</span><form class="nlf" novalidate><input type="text" name="fname" placeholder="First name" autocomplete="given-name" aria-label="First name" maxlength="40"><input type="email" name="email" placeholder="Your email" autocomplete="email" aria-label="Your email" required><input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px"><button type="submit">Sign me up</button></form><span class="nlm" aria-live="polite"></span></aside>
 <section class="fuelrow"><a class="fuel" href="https://alterego.online/?utm_source=onetrackmind&utm_medium=sponsor&utm_content=fuelled" target="_blank" rel="noopener sponsored"><img src="/img/alterego-logo-white.png" width="96" height="84" alt="AlterEgo"><span><b>Fuelled by AlterEgo</b><span>OneTrackMind is free to use. AlterEgo keeps it that way.</span><span class="btnline">Shop AlterEgo ›</span></span></a><a class="fuelyou" href="/advertise/"><b>Your brand here</b><span>Sponsor a route, the diary or the whole site ›</span></a></section>
 <script>(function(){document.querySelectorAll(".nlf").forEach(function(f){f.addEventListener("submit",function(e){e.preventDefault();var m=f.parentNode.querySelector(".nlm"),em=f.email.value.trim();if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)){m.textContent="That email doesn't look right.";return}m.textContent="Sending…";fetch("/api/subscribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:em,name:f.fname?f.fname.value.trim():"",website:f.website.value,source:f.dataset.source||location.pathname})}).then(function(r){return r.json().then(function(j){return[r.ok,j]})}).then(function(x){if(x[0]){f.hidden=true;m.textContent=x[1].already?"You're already on the list.":"Almost done: tap the link in the email we just sent."}else m.textContent=x[1].error||"Something went wrong. Try again."}).catch(function(){m.textContent="No connection. Try again."})})})})();</script>
@@ -244,7 +257,7 @@ ${f.posts.length ? `<h2>Read the misadventures</h2><ul>${f.posts.map(p => `<li><
     provider: ORG, ...(f ? { author: FOUNDER } : {}),
     itinerary: { "@type": "ItemList", itemListElement: places(r).map((p, i) => ({ "@type": "ListItem", position: i + 1, item: { "@type": "Place", name: p.name, geo: { "@type": "GeoCoordinates", latitude: p.lat, longitude: p.lon } } })) },
   }, { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "Routes", item: SITE + "/routes/" }, { "@type": "ListItem", position: 2, name: r.title, item: `${SITE}/routes/${r.id}/` }] }];
-  return page({ active: "/routes/", url: `/routes/${r.id}/`, title: `${r.title} · ${n}-day route · OneTrackMind`, desc, body, ld });
+  return page({ side: true, active: "/routes/", url: `/routes/${r.id}/`, title: `${r.title} · ${n}-day route · OneTrackMind`, desc, body, ld });
 }
 
 function routesIndex() {
@@ -303,7 +316,7 @@ ${r ? `<h2>The trip it's from</h2><div class="cards"><a class="card" href="/rout
 </main>`;
   const ld = [{ "@context": "https://schema.org", "@type": "TouristAttraction", name: x.name, description: x.short, url: `${SITE}/favourites/${x.id}/`, geo: { "@type": "GeoCoordinates", latitude: x.lat, longitude: x.lon }, address: x.area },
     { "@context": "https://schema.org", "@type": "BreadcrumbList", itemListElement: [{ "@type": "ListItem", position: 1, name: "POI", item: SITE + "/favourites/" }, { "@type": "ListItem", position: 2, name: x.name, item: `${SITE}/favourites/${x.id}/` }] }];
-  return page({ active: "/favourites/", url: `/favourites/${x.id}/`, title: `${x.name}, ${x.area.split(",").pop().trim()}: how to get there and plan a trip · OneTrackMind`, desc: `${x.short} How to get there, where to stay, and a road trip planned around it.`, body, ld });
+  return page({ side: true, active: "/favourites/", url: `/favourites/${x.id}/`, title: `${x.name}, ${x.area.split(",").pop().trim()}: how to get there and plan a trip · OneTrackMind`, desc: `${x.short} How to get there, where to stay, and a road trip planned around it.`, body, ld });
 }
 // a photo for each fav: from the blog post that tells its story (the picture nearest where it's mentioned), else a map of the spot
 const FAV_POST = { "grootberg-lodge": "namibia-2017-day-5", "stuttgart-museums": "2018-porsche-museum-gallery", "maranello": "ferrari", "motor-valley": "lamborghini", "franschhoek-motor-museum": "franschoek-motor-museum-gallery", "killarney": "wpmc-killarney", monaco: null, sutherland: null };
@@ -464,10 +477,9 @@ function storiesIndex(M) {
       const go = x.lat != null ? `<a class="plot" href="/plan/?poi=${x.lat},${x.lon}&n=${encodeURIComponent(x.place || "")}">Route me there ›</a>` : "";
       const kind = x.lat != null ? "place" : "story"; return toCard(`<div class="ctile soc" data-cat="${cats}" data-tags="${tags}" data-kind="${kind}"><a class="cimg" href="${esc(x.url)}" target="_blank" rel="noopener"><img src="${esc(x.img)}" alt="" loading="lazy"><span class="badges"><em class="kind k-${kind}">${KIND[kind]}</em><em class="srcb">${x.src === "ig" ? "Instagram" : "Facebook"}</em></span><span class="cmeta"><b>${esc(first)}</b><span>${x.date.slice(0, 4)}${x.place ? " · 📍 " + esc(x.place) : ""}</span></span></a>${go}</div>`, opening(x.text, 150), x.src === "ig" ? "See it on Instagram ›" : "See it on Facebook ›", true); })() }));
     const blog = groups.map(g => ({ date: g[1][g[1].length - 1].date, html: tile(g) }));
-    const AD = [`<div class="ctile adtile"><a class="cimg" href="https://alterego.online/products/racing-is-life?utm_source=onetrackmind&utm_medium=blog-tile" target="_blank" rel="noopener sponsored"><img src="/img/ashley.jpg" alt="Ashley in the AlterEgo Racing is Life tee" loading="lazy" style="object-position:50% 35%"><span class="badges"><em class="srcb">AlterEgo · Ad</em></span><span class="cmeta"><b>Racing is life.</b><span>Everything else is preparation. Shop the tee ›</span></span></a></div>`,
-      `<div class="ctile adtile"><a class="cimg" href="https://alterego.online/products/build-race-repeat-hoodie?utm_source=onetrackmind&utm_medium=blog-tile" target="_blank" rel="noopener sponsored"><img src="https://alterego.online/cdn/shop/files/3158941636033974733_2048.jpg?v=1792398701&width=480" alt="AlterEgo Build Race Repeat hoodie" loading="lazy" style="background:#fff;object-fit:contain"><span class="badges"><em class="srcb">AlterEgo · Ad</em></span><span class="cmeta"><b>Build. Race. Repeat.</b><span>The hoodie, from $65. Shop it ›</span></span></a></div>`];
+    const AD = aePick("blog", 6).map(x => `<div class="ctile adtile"><a class="cimg" href="${aeUrl(x, "blog-tile")}" target="_blank" rel="noopener sponsored"><img src="${x.i}&width=480" alt="AlterEgo ${esc(x.b.replace(/\.$/, ""))} ${x.c.split(" ").pop()}" loading="lazy" style="background:#fff;object-fit:contain"><span class="badges"><em class="srcb">AlterEgo · Ad</em></span><span class="cmeta"><b>${esc(x.b)}</b><span>${esc(x.s)} $${x.p}. ${esc(x.c)} ›</span></span></a></div>`);
     const all = [...soc, ...blog].sort((a, b) => b.date.localeCompare(a.date)).map(x => x.html), outT = [];
-    all.forEach((h, i) => { outT.push(h); if (i % 12 === 7) outT.push(toCard(AD[Math.floor(i / 12) % 2], "", "Shop it ›", true)); });
+    all.forEach((h, i) => { outT.push(h); if (i % 12 === 7) outT.push(toCard(AD[Math.floor(i / 12) % AD.length], "", "Shop it ›", true)); });
     return outT.join("");
   })()}</div>
 <p class="note"><a href="/favourites/">The places I'd send you: POI ›</a></p>
@@ -570,7 +582,7 @@ ${r ? `<p class="note">Or take the trip I did: <a href="/routes/${esc(r.id)}/">$
 <h2>Where this comes from</h2><ul class="sources">${g.sources.map(([t, u]) => `<li><a href="${esc(u)}" target="_blank" rel="noopener">${esc(t)}</a></li>`).join("")}</ul>
 </main>`;
   const ld = { "@context": "https://schema.org", "@type": "HowTo", name: g.title, description: g.short, url: `${SITE}/how-to/${g.id}/`, author: FOUNDER, dateModified: g.checked, step: g.sections.map(x => ({ "@type": "HowToSection", name: x.h, itemListElement: x.items.map(t => ({ "@type": "HowToStep", text: t.replace(/<[^>]+>/g, "") })) })) };
-  return page({ active: "/how-to/", url: `/how-to/${g.id}/`, title: `${g.title}: cost, dates, booking and rules · OneTrackMind`, desc: g.short, body, ld });
+  return page({ side: true, active: "/how-to/", url: `/how-to/${g.id}/`, title: `${g.title}: cost, dates, booking and rules · OneTrackMind`, desc: g.short, body, ld });
 }
 
 function recordPage() {
@@ -668,7 +680,7 @@ ${routes.length ? `<h3>Ride or drive it</h3><ul>${routes.map(r => `<li><a href="
 </main>
 <script>(function(){var s=document.querySelector(".evcount");if(!s)return;var t=new Date();t.setHours(12,0,0,0);var a=new Date(s.dataset.start+"T12:00:00"),b=new Date(s.dataset.end+"T12:00:00"),d=Math.round((a-t)/864e5);s.textContent=t>b?"· finished":t>=a?"· on now":d===1?"· tomorrow":"· in "+d+" days";})();</script>`;
   const ld = { "@context": "https://schema.org", "@type": /shows/.test(e.genre || "") ? "ExhibitionEvent" : /classics|bikefest/.test(e.genre || "") ? "Festival" : "SportsEvent", name: e.name, startDate: e.start, endDate: e.end, url: `${SITE}/events/${e.id}/`, description: `${e.name}, ${dRange(e)}${e.venue ? " at " + e.venue : ""}. How to watch, tickets, beds near the venue and the road trip there.`, image: [`${SITE}/img/og.png`], eventStatus: "https://schema.org/EventScheduled", eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode", ...(e.series ? { organizer: { "@type": "Organization", name: e.series, url: e.url || e.source } } : {}), location: { "@type": "Place", name: e.venue || city, geo: { "@type": "GeoCoordinates", latitude: e.lat, longitude: e.lon }, address: { "@type": "PostalAddress", addressLocality: e.city, addressCountry: e.country } } };
-  return page({ active: "/events/", url: `/events/${e.id}/`, title: `${e.name} ${e.start.slice(0, 4)}: dates, how to watch, tickets and road trip · OneTrackMind`, desc: `${e.name}, ${dRange(e)}${e.venue ? " at " + e.venue : ""}. How to watch live, tickets, beds near the venue and the road trip there.`, body, ld });
+  return page({ side: true, active: "/events/", url: `/events/${e.id}/`, title: `${e.name} ${e.start.slice(0, 4)}: dates, how to watch, tickets and road trip · OneTrackMind`, desc: `${e.name}, ${dRange(e)}${e.venue ? " at " + e.venue : ""}. How to watch live, tickets, beds near the venue and the road trip there.`, body, ld });
 }
 function addDays(s, n) { const d = new Date(s + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); }
 function eventsPage() {
