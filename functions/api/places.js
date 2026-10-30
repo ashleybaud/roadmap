@@ -26,7 +26,10 @@ async function ask(url, body, signal) {
   return text;
 }
 
-export async function onRequestPost({ request }) {
+import { sameSite, limitIp, HttpError } from "../../server/otm.js";
+export async function onRequestPost({ request, env }) {
+  try { sameSite(request); await limitIp(env, request, "places", 600, 3600e3); }
+  catch (e) { return Response.json({ error: e.message }, { status: e instanceof HttpError ? e.status : 400 }); }
   const body = await request.text();
   if (!body.startsWith("data=") || body.length > 200000) {
     return Response.json({ error: "bad request" }, { status: 400 });

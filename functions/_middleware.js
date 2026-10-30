@@ -11,5 +11,17 @@ export async function onRequest(ctx) {
     }
     return Response.redirect(to, 301);
   }
-  return ctx.next();
+  // the project's own working files are not part of the website
+  if (/^\/(server|scripts|src|tests|docs|reports|routing|functions|node_modules|\.git[^/]*)(\/|$)|^\/(build\.sh|package(-lock)?\.json|\.gitlab-ci\.yml|\.gitignore|README\.md|wrangler\.toml)$/i.test(u.pathname))
+    return new Response("Not found", { status: 404, headers: { "Content-Type": "text/plain", "Cache-Control": "no-store" } });
+  const res = await ctx.next();
+  // standard browser protections on every page
+  const r = new Response(res.body, res);
+  r.headers.set("X-Content-Type-Options", "nosniff");
+  r.headers.set("Referrer-Policy", "strict-origin-when-cross-origin");
+  r.headers.set("Strict-Transport-Security", "max-age=31536000");
+  r.headers.set("Permissions-Policy", "camera=(), microphone=(), payment=(), usb=(), geolocation=(self)");
+  if (!r.headers.has("Content-Security-Policy")) r.headers.set("Content-Security-Policy", "frame-ancestors 'self'; base-uri 'self'; object-src 'none'");
+  if (!r.headers.has("X-Frame-Options")) r.headers.set("X-Frame-Options", "SAMEORIGIN");
+  return r;
 }
