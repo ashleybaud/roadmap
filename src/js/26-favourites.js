@@ -42,3 +42,18 @@ document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closes
     const t=$("toast"); t.innerHTML=`Finish set to <b>${esc(name)}</b>. Tap ⌖ to start from where you are, or type a town.`; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,15000);
     if(!trip.start||trip.start.lat==null) $("startPlace").focus();
   },300); } }
+
+/* /plan/?to=<place>[&from=<place>]: the Plan a trip bar on the home page. The place is looked up the same way as typing it here. */
+{ const q=new URLSearchParams(location.search), to=(q.get("to")||"").trim().slice(0,80), fr=(q.get("from")||"").trim().slice(0,80);
+  if(to){ history.replaceState(null,"",location.pathname);
+    setTimeout(async()=>{ try{ localStorage.setItem("rr-welcome","1"); if($("welcome").open) $("welcome").close(); }catch(e){}
+      const hv=homeView()[0], c={lat:hv[0],lng:hv[1]};
+      const find=async t=>{ const r=await searchPlaces(t,c); return r&&r[0]?pt(r[0].name,r[0].lat,r[0].lon):null; };
+      const dest=await find(to); if(!dest){ $("status").textContent=`Couldn't find "${to}". Type it in Where to?`; return; }
+      snapTrip(true); trip.end=dest; trip.round=false; trip.days.forEach(d=>{ d.vias=[]; d.legs=[]; d.to=null; delete d.noAutoNight; });
+      if(fr&&!/^my location$/i.test(fr)){ const st=await find(fr); if(st) trip.start=st; }
+      else if(!trip.start||trip.start.lat==null||hav(trip.start,dest)<1) trip.start=pt("My location",null,null);
+      changed();
+      const t=$("toast"); t.innerHTML=`Going to <b>${esc(dest.name)}</b>.${trip.start&&trip.start.lat!=null?"":" Tap ⌖ to start from where you are, or type a town."}`; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,12000);
+      if(!trip.start||trip.start.lat==null) $("startPlace").focus();
+    },300); } }
