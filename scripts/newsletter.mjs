@@ -1,4 +1,4 @@
-// Builds "The OneTrackMind Week" from the site's own data: events, results, Founder's fav's, routes.
+// Builds "The OneTrackMind Week" from the site's own data: events, results, POI, routes.
 // Usage: node scripts/newsletter.mjs [--from 2026-11-02] [--period weekly|fortnightly|monthly]
 // Writes newsletter/<from>-<period>/index.html (email body, also the "view in browser" copy) and email.txt.
 // {{UNSUB}} and {{PREFS}} are filled in per subscriber when it is sent.
@@ -18,7 +18,10 @@ const from = arg("from", monday(add(new Date().toISOString().slice(0, 10), 7))),
 const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const M = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const fd = (s, y) => { const d = new Date(s + "T12:00:00Z"); return `${d.getUTCDate()} ${M[d.getUTCMonth()]}${y ? " " + d.getUTCFullYear() : ""}`; };
-const rng = e => e.start === e.end ? fd(e.start) : `${fd(e.start)} – ${fd(e.end)}`;
+const HOUSE = (await import("module")).createRequire(import.meta.url)(path.join(ROOT, "src/js/02-house.js"));
+const rng = e => HOUSE.range(e.start, e.end, false);
+const TRIP = (await import("module")).createRequire(import.meta.url)(path.join(ROOT, "src/js/03-trip.js"));
+TRIP.setAirports(J("data/airports.json") || []);
 const hav = (a, b) => { const R = 6371, x = Math.sin((b.lat - a.lat) * Math.PI / 360) ** 2 + Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) * Math.sin((b.lon - a.lon) * Math.PI / 360) ** 2; return 2 * R * Math.asin(Math.sqrt(x)); };
 const week = Math.floor(new Date(from + "T12:00:00Z") / 6048e5);
 
@@ -115,9 +118,10 @@ ${P(esc(opener), "font-size:16px")}
 <span style="display:block;padding:12px 14px;font:15px/1.45 Arial,Helvetica,sans-serif;color:${C.ink}"><span style="font-size:11px;letter-spacing:1px;color:${C.gold}">LOCAL IS LEKKER</span><br><b style="font-size:17px">${esc(lil.title)}</b><br>${esc(lil.line)}<br><b style="color:${C.gold}">${lil.cta} ›</b></span></a></td></tr>
 ${H2(period === "weekly" ? "This week" : "Coming up")}
 ${on.length ? on.map(evCard).join("\n") : P("Nothing on the calendar. Good week to ride instead.")}
+${head ? `<tr><td style="padding:12px 24px 4px;font:14px/1.6 Arial,Helvetica,sans-serif;color:${C.muted}">Make a trip of ${esc(short(head))}: ${TRIP.tiles({ place: head.venue || head.city, town: (head.city || "").split(",")[0], country: head.country, lat: head.lat, lon: head.lon, from: head.confirmed && head.start > from ? add(head.start, -1) : "", to: head.confirmed && head.start > from ? add(head.end, 1) : "", tickets: head.tickets }).map(t => A(t.u, t.t)).join(" · ")}</td></tr>` : ""}
 <!--none-->${P(`Nothing in your kinds of racing this week. ${A("{{PREFS}}", "Change what you get ›")}`, `color:${C.muted}`)}<!--/none-->
 ${route ? H2(routeNear ? "The road there" : "Route of the week") + P(`<b style="font-size:16px">${esc(route.title)}</b><br><span style="color:${C.muted}">${esc(route.region || "")}</span><br>${esc(route.blurb || "")}`) + `<tr><td style="padding:10px 24px">${BTN(`${SITE}/routes/${route.id}/`, "Ride it ›")}</td></tr>` : ""}
-${poi ? H2("Worth the stop") + P(`<b style="font-size:16px">${esc(poi.name)}</b><br><span style="color:${C.muted}">${esc(poi.area || "")}</span><br>${esc(poi.short || "")}`) + `<tr><td style="padding:10px 24px;font:15px Arial,Helvetica,sans-serif">${BTN(`${SITE}/plan/?poi=${poi.lat},${poi.lon}&n=${encodeURIComponent(poi.name)}&go=1`, "Take me there ›")} &nbsp;${A(`${SITE}/favourites/${poi.id}/`, "Read about it")}</td></tr>` : ""}
+${poi ? H2("POI") + P(`<b style="font-size:16px">${esc(poi.name)}</b><br><span style="color:${C.muted}">${esc(poi.area || "")}</span><br>${esc(poi.short || "")}`) + `<tr><td style="padding:10px 24px;font:15px Arial,Helvetica,sans-serif">${BTN(`${SITE}/plan/?poi=${poi.lat},${poi.lon}&n=${encodeURIComponent(poi.name)}&go=1`, "Take me there ›")} &nbsp;${A(`${SITE}/favourites/${poi.id}/`, "Read about it")}</td></tr>` : ""}
 <tr><td style="padding:24px 24px 6px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${C.panel};border-left:5px solid ${C.gold};border-radius:8px"><tr>
 <td width="96" style="padding:10px"><img src="https://alterego.online/cdn/shop/files/3158941636033974733_2048.jpg?v=1792398701&width=240" width="84" height="84" alt="AlterEgo hoodie" style="display:block;border-radius:6px;background:#fff"></td>
 <td style="padding:10px 12px 10px 0;font:14px/1.4 Arial,Helvetica,sans-serif;color:${C.ink}"><img src="${SITE}/img/alterego-logo-white.png" width="64" height="56" alt="AlterEgo" style="display:block;margin:0 0 6px"><span style="font-size:11px;color:${C.muted};letter-spacing:1px">AD</span><br><b style="color:${C.gold};font-size:18px">BUILD. RACE. REPEAT.</b><br>Made to order for petrolheads. ${A("https://alterego.online/?utm_source=onetrackmind&utm_medium=newsletter", "Shop ›")}</td></tr></table></td></tr>
@@ -130,7 +134,7 @@ ${poi ? H2("Worth the stop") + P(`<b style="font-size:16px">${esc(poi.name)}</b>
 const text = [`${title} · ${fd(from)} – ${fd(to, 1)}`, "", "Hi {{NAME}},", "", opener, "", `LOCAL IS LEKKER: ${lil.title}. ${lil.line} ${lil.url}`, "", period === "weekly" ? "THIS WEEK" : "COMING UP",
   ...(on.length ? on.map(e => `<!--k:${KIND(e)}-->- ${short(e)}, ${rng(e)}, ${(e.city || e.venue || "").split(",")[0]}. Take me there: ${SITE}/plan/?ev=${e.id}&go=1<!--/k-->`) : ["Nothing on the calendar. Good week to ride instead."]),
   ...(route ? ["", routeNear ? "THE ROAD THERE" : "ROUTE OF THE WEEK", `${route.title}: ${SITE}/routes/${route.id}/`] : []),
-  ...(poi ? ["", "WORTH THE STOP", `${poi.name}, ${poi.area || ""}: ${SITE}/favourites/${poi.id}/`] : []), "", "Racing is life. Everything else is preparation.", "Ashley", "", "Fuelled by AlterEgo: https://alterego.online", "", "Choose what you get: {{PREFS}}", "Unsubscribe: {{UNSUB}}"].join("\n");
+  ...(poi ? ["", "POI", `${poi.name}, ${poi.area || ""}: ${SITE}/favourites/${poi.id}/`] : []), "", "Racing is life. Everything else is preparation.", "Ashley", "", "Fuelled by AlterEgo: https://alterego.online", "", "Choose what you get: {{PREFS}}", "Unsubscribe: {{UNSUB}}"].join("\n");
 
 const dir = path.join(ROOT, "newsletter", `${from}-${period}`); fs.mkdirSync(dir, { recursive: true });
 fs.writeFileSync(path.join(dir, "index.html"), html.replace(/\{\{(UNSUB|PREFS)\}\}/g, SITE + "/").replace(/\{\{NAME\}\}/g, "there").replace(/<!--none-->[\s\S]*?<!--\/none-->/g, ""));

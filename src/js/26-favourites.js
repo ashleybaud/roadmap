@@ -10,14 +10,14 @@ function loadFavs(){ return favList?Promise.resolve(favList):fetch("/data/favour
     const t=$("toast"); t.innerHTML=`Finish set to <b>${esc(x.name)}</b>. Now set where you start (tap ⌖ or type a town) and your dates.`; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,15000);
     if(go){ /* "Take me there" from the newsletter: route from where you are, with the High Octane places and Founder's fav's along the way */
       ui.lay.moto=true; ui.lay.fav=true; ui.lay.sights=true; saveUi(); renderLayers(); renderAll();
-      if(!trip.start||trip.start.lat==null){ t.innerHTML=`Routing you to <b>${esc(trip.end.name)}</b> from where you are. Racing places and Founder's fav's along the way are on the map.`; useMyLocation(); return; } }
+      if(!trip.start||trip.start.lat==null){ t.innerHTML=`Routing you to <b>${esc(trip.end.name)}</b> from where you are. Racing places and POI along the way are on the map.`; useMyLocation(); return; } }
     if(!trip.start||trip.start.lat==null) $("startPlace").focus();
   },300); } }
 function drawFavs(){
   if(!favList){ setTimeout(()=>loadFavs().then(()=>{ if(favList.length) drawMap(); }),0); return; } // later: this can run before the rest of this file has
   // with a trip planned, only the ones near your route (within 50 km); with no trip, all of them to browse
   const g=plan&&plan.geom, near=x=>{ if(!g) return true; for(let i=0;i<g.length;i+=Math.max(1,Math.floor(g.length/1500))) if(Math.abs(g[i].lat-x.lat)<0.6&&hav(g[i],x)<=50) return true; return false; };
-  favList.filter(near).forEach(x=>{ const html=`<b>${esc(x.name)}</b><br><span class="note">Founder's fav · ${esc(x.area)}</span><br>${esc(x.short)}<br><a href="/favourites/${x.id}/">Read it</a> · <button type="button" class="linkbtn" data-favgo="${x.id}">Go here</button>`;
+  favList.filter(near).forEach(x=>{ const html=`<b>${esc(x.name)}</b><br><span class="note">POI · ${esc(x.area)}</span><br>${esc(x.short)}<br><a href="/favourites/${x.id}/">Read about it</a> · <button type="button" class="linkbtn" data-favgo="${x.id}">Take me there</button>`;
     L.marker([x.lat,x.lon],{icon:L.divIcon({className:"",html:`<div class="favmk" title="${esc(x.name)}">♥</div>`,iconSize:[26,26],iconAnchor:[13,13]}),zIndexOffset:700}).bindTooltip(x.name).bindPopup(html).addTo(layer); });
 }
 document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-favgo]"); if(!b) return; const x=(favList||[]).find(f=>f.id===b.dataset.favgo); if(!x) return; map.closePopup(); setFinish(pt(x.name,x.lat,x.lon)); });
@@ -33,7 +33,7 @@ document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closes
     const t=$("toast"); t.innerHTML=`Finish set to <b>${esc(x.name)}</b> (${esc(x.start)}). Now set where you start and arrive by then.`; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,15000);
     if(go){ /* "Take me there" from the newsletter: route from where you are, with the High Octane places and Founder's fav's along the way */
       ui.lay.moto=true; ui.lay.fav=true; ui.lay.sights=true; saveUi(); renderLayers(); renderAll();
-      if(!trip.start||trip.start.lat==null){ t.innerHTML=`Routing you to <b>${esc(trip.end.name)}</b> from where you are. Racing places and Founder's fav's along the way are on the map.`; useMyLocation(); return; } }
+      if(!trip.start||trip.start.lat==null){ t.innerHTML=`Routing you to <b>${esc(trip.end.name)}</b> from where you are. Racing places and POI along the way are on the map.`; useMyLocation(); return; } }
     if(!trip.start||trip.start.lat==null) $("startPlace").focus();
   },300); } }
 
@@ -48,7 +48,7 @@ document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closes
     const t=$("toast"); t.innerHTML=`Finish set to <b>${esc(name)}</b>. Tap ⌖ to start from where you are, or type a town.`; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,15000);
     if(go){ /* "Take me there" from the newsletter: route from where you are, with the High Octane places and Founder's fav's along the way */
       ui.lay.moto=true; ui.lay.fav=true; ui.lay.sights=true; saveUi(); renderLayers(); renderAll();
-      if(!trip.start||trip.start.lat==null){ t.innerHTML=`Routing you to <b>${esc(trip.end.name)}</b> from where you are. Racing places and Founder's fav's along the way are on the map.`; useMyLocation(); return; } }
+      if(!trip.start||trip.start.lat==null){ t.innerHTML=`Routing you to <b>${esc(trip.end.name)}</b> from where you are. Racing places and POI along the way are on the map.`; useMyLocation(); return; } }
     if(!trip.start||trip.start.lat==null) $("startPlace").focus();
   },300); } }
 
@@ -58,9 +58,10 @@ document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closes
     setTimeout(async()=>{ try{ localStorage.setItem("rr-welcome","1"); if($("welcome").open) $("welcome").close(); }catch(e){}
       const hv=homeView()[0], c={lat:hv[0],lng:hv[1]};
       const find=async t=>{ const r=await searchPlaces(t,c); return r&&r[0]?pt(r[0].name,r[0].lat,r[0].lon):null; };
-      const dest=await find(to); if(!dest){ $("status").textContent=`Couldn't find "${to}". Type it in Where to?`; return; }
+      const ll=(q.get("tll")||"").split(",").map(Number), fl=(q.get("fll")||"").split(",").map(Number);
+      const dest=ll.length===2&&ll.every(isFinite)&&ll[0]?pt(to,ll[0],ll[1]):await find(to); if(!dest){ $("status").textContent=`Couldn't find "${to}". Type it in Where to?`; return; }
       snapTrip(true); trip.end=dest; trip.round=false; trip.days.forEach(d=>{ d.vias=[]; d.legs=[]; d.to=null; delete d.noAutoNight; });
-      if(fr&&!/^my location$/i.test(fr)){ const st=await find(fr); if(st) trip.start=st; }
+      if(fr&&!/^my location$/i.test(fr)){ const st=fl.length===2&&fl.every(isFinite)&&fl[0]?pt(fr,fl[0],fl[1]):await find(fr); if(st) trip.start=st; }
       else if(!trip.start||trip.start.lat==null||hav(trip.start,dest)<1) trip.start=pt("My location",null,null);
       changed();
       const t=$("toast"); t.innerHTML=`Going to <b>${esc(dest.name)}</b>.${trip.start&&trip.start.lat!=null?"":" Tap ⌖ to start from where you are, or type a town."}`; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,12000);

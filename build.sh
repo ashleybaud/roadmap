@@ -6,7 +6,7 @@ set -euo pipefail
 cd "$(dirname "$0")"
 node scripts/make-pages.mjs
 tmp=$(mktemp)
-{ cat src/page.html; echo "<script>"; for f in src/js/*.js; do cat "$f"; echo; done; echo "</script></body></html>"; } > "$tmp"
+{ node scripts/planner-head.cjs; echo "<script>"; for f in src/js/*.js; do cat "$f"; echo; done; echo "</script></body></html>"; } > "$tmp"
 sed -n '/<script>$/,/<\/script>/p' "$tmp" | sed '1d;$d' > "$tmp.js"
 node --check "$tmp.js"
 mkdir -p plan; cp "$tmp" plan/index.html; rm -f "$tmp" "$tmp.js"
