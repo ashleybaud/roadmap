@@ -42,3 +42,4 @@
 @media(max-width:640px){.hdrlinks.open>a:not(.navplan){text-align:left!important;padding-left:14px!important}}
 /* on the gold Plan a trip bar the main button is dark, so it stands out */
 .wherebar button{background:#0B1D21!important;color:#E8A317!important;border:2px solid #0B1D21!important;border-radius:10px!important;display:inline-flex;align-items:center;gap:8px}
+.trip .twid{background:#fff;color:#11262B;border-radius:10px;padding:10px;margin:0 0 12px;min-height:60px}.trip .twid>div{margin-bottom:10px}.trip .twnote{margin:6px;color:#54666A;font-size:.9rem}

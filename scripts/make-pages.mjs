@@ -186,7 +186,7 @@ ${HOUSE_CSS}</style>
 ${(Array.isArray(ld) ? ld : [ld]).filter(Boolean).map(x => `<script type="application/ld+json">${JSON.stringify(x)}</script>`).join("\n")}
 <!-- Booking partners (Travelpayouts, Stay22): their scripts load only after the visitor says OK -->
 <script>(function(){var K="otm-consent",v=null;try{v=localStorage.getItem(K)}catch(e){}
-function go(){var d=document,s=d.createElement("script");s.async=1;s.src="https://emrld.ltd/NTkzMzMz.js?t=593333";d.head.appendChild(s);window.Stay22={params:{lmaID:"6ae476c5a34dc56ee430ba25"}};var z=d.createElement("script");z.async=1;z.src="https://lma.stay22.com/letmeallez.js";d.head.appendChild(z);}
+function go(){var d=document,s=d.createElement("script");s.async=1;s.src="https://emrld.ltd/NTkzMzMz.js?t=593333";d.head.appendChild(s);window.Stay22={params:{lmaID:"6ae476c5a34dc56ee430ba25"}};var z=d.createElement("script");z.async=1;z.src="https://lma.stay22.com/letmeallez.js";d.head.appendChild(z);try{document.dispatchEvent(new Event("otm-consent"))}catch(e){}}
 function set(x){try{localStorage.setItem(K,x)}catch(e){}var b=document.getElementById("otmck");if(b)b.remove();if(x==="yes")go();}
 if(v==="yes"){go();return}if(v==="no")return;
 document.addEventListener("DOMContentLoaded",function(){var b=document.createElement("div");b.id="otmck";b.setAttribute("role","dialog");b.setAttribute("aria-label","Cookies");

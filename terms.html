@@ -5,7 +5,7 @@
 <link rel="canonical" href="https://onetrackmind.online/terms.html">
 <style>body{font-family:"IBM Plex Sans",system-ui,sans-serif;max-width:680px;margin:0 auto;padding:24px 16px 60px;line-height:1.55;color:#18201C;background:#EEF0EA}h1{font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-size:2rem;margin:.2em 0}h2{font-size:1.1rem;margin:1.6em 0 .3em}a{color:#0B6E4F}@media (prefers-color-scheme:dark){body{background:#121614;color:#E6EAE4}a{color:#3FB48A}}</style><!-- Booking partners (Travelpayouts, Stay22): their scripts load only after the visitor says OK -->
 <script>(function(){var K="otm-consent",v=null;try{v=localStorage.getItem(K)}catch(e){}
-function go(){var d=document,s=d.createElement("script");s.async=1;s.src="https://emrld.ltd/NTkzMzMz.js?t=593333";d.head.appendChild(s);window.Stay22={params:{lmaID:"6ae476c5a34dc56ee430ba25"}};var z=d.createElement("script");z.async=1;z.src="https://lma.stay22.com/letmeallez.js";d.head.appendChild(z);}
+function go(){var d=document,s=d.createElement("script");s.async=1;s.src="https://emrld.ltd/NTkzMzMz.js?t=593333";d.head.appendChild(s);window.Stay22={params:{lmaID:"6ae476c5a34dc56ee430ba25"}};var z=d.createElement("script");z.async=1;z.src="https://lma.stay22.com/letmeallez.js";d.head.appendChild(z);try{document.dispatchEvent(new Event("otm-consent"))}catch(e){}}
 function set(x){try{localStorage.setItem(K,x)}catch(e){}var b=document.getElementById("otmck");if(b)b.remove();if(x==="yes")go();}
 if(v==="yes"){go();return}if(v==="no")return;
 document.addEventListener("DOMContentLoaded",function(){var b=document.createElement("div");b.id="otmck";b.setAttribute("role","dialog");b.setAttribute("aria-label","Cookies");
