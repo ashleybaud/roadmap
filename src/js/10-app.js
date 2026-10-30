@@ -1220,5 +1220,5 @@ function tripBlockHtml(){
   const e=trip.end; if(!plan||planStale||!e||e.lat==null||trip.round) return "";
   const from=trip.startDate?addDays(trip.startDate,nDays()-1):"", to=from?addDays(from,1):"";
   const ev=(typeof evList!=="undefined"&&evList||[]).find(x=>Math.abs(x.lat-e.lat)<0.01&&Math.abs(x.lon-e.lon)<0.01);
-  return OTMtrip.html({ place:e.name, town:e.name, country:ev?ev.country:null, lat:e.lat, lon:e.lon, from:ev?addDays(ev.start,-1):from, to:ev?addDays(ev.end,1):to, tickets:ev&&ev.tickets, bike:settings.vehicle==="bike" }, "At the finish · "+e.name);
+  return OTMtrip.html({ place:e.name, town:e.name, country:ev?ev.country:null, lat:e.lat, lon:e.lon, from:ev?addDays(ev.start,-1):from, to:ev?addDays(ev.end,1):to, tickets:ev&&ev.tickets, bike:settings.vehicle==="bike", near:!!(trip.start&&trip.start.lat!=null&&Math.hypot(trip.start.lat-e.lat,(trip.start.lon-e.lon)*Math.cos(e.lat*Math.PI/180))*111<300) }, "At the finish · "+e.name);
 }
