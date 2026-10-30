@@ -1,6 +1,15 @@
 /* ---------- Founder's fav's in the planner: /?fav=<id> sets it as your finish; a map layer shows them all ---------- */
 var favList=null; // var: drawMap can run before this file does
 function loadFavs(){ return favList?Promise.resolve(favList):fetch("/data/favourites/favourites.json").then(r=>r.ok?r.json():[]).then(j=>favList=j).catch(()=>favList=[]); }
+/* Take me there to somewhere overseas: it's a flight first, so the road trip starts at the airport you'd land at */
+async function farStart(dest){
+  if(!dest||dest.lat==null||hav({lat:-29,lon:24},dest)<2500) return false;
+  try{ await window.otmAirP; }catch(e){}
+  const a=typeof OTMtrip!=="undefined"&&OTMtrip.airport(dest.lat,dest.lon); if(!a||a.lat==null) return false;
+  trip.start=pt(a.name+" airport ("+a.iata+")",a.lat,a.lon); changed();
+  const t=$("toast"); t.innerHTML=`It's a flight first, so the road trip starts at <b>${esc(a.name)} airport (${esc(a.iata)})</b>. Flights, beds and a hire car are under <b>Make a trip of it</b>, below the plan.`; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,20000);
+  return true;
+}
 { const m=location.search.match(/[?&]fav=([\w-]+)/), go=/[?&]go=1/.test(location.search); if(m){ history.replaceState(null,"",location.pathname);
   setTimeout(async()=>{ const x=(await loadFavs()).find(f=>f.id===m[1]); if(!x) return;
     try{ localStorage.setItem("rr-welcome","1"); if($("welcome").open) $("welcome").close(); }catch(e){}
@@ -10,6 +19,7 @@ function loadFavs(){ return favList?Promise.resolve(favList):fetch("/data/favour
     const t=$("toast"); t.innerHTML=`Finish set to <b>${esc(x.name)}</b>. Now set where you start (tap ⌖ or type a town) and your dates.`; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,15000);
     if(go){ /* "Take me there" from the newsletter: route from where you are, with the High Octane places and Founder's fav's along the way */
       ui.lay.moto=true; ui.lay.fav=true; ui.lay.sights=true; saveUi(); renderLayers(); renderAll();
+      if(await farStart(trip.end)) return;
       if(!trip.start||trip.start.lat==null){ t.innerHTML=`Routing you to <b>${esc(trip.end.name)}</b> from where you are. Racing places and POI along the way are on the map.`; useMyLocation(); return; } }
     if(!trip.start||trip.start.lat==null) $("startPlace").focus();
   },300); } }
@@ -33,13 +43,14 @@ document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closes
     const t=$("toast"); t.innerHTML=`Finish set to <b>${esc(x.name)}</b> (${esc(x.start)}). Now set where you start and arrive by then.`; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,15000);
     if(go){ /* "Take me there" from the newsletter: route from where you are, with the High Octane places and Founder's fav's along the way */
       ui.lay.moto=true; ui.lay.fav=true; ui.lay.sights=true; saveUi(); renderLayers(); renderAll();
+      if(await farStart(trip.end)) return;
       if(!trip.start||trip.start.lat==null){ t.innerHTML=`Routing you to <b>${esc(trip.end.name)}</b> from where you are. Racing places and POI along the way are on the map.`; useMyLocation(); return; } }
     if(!trip.start||trip.start.lat==null) $("startPlace").focus();
   },300); } }
 
 /* /?poi=lat,lon&n=<name>: route from where you are to a place from the blog or Instagram */
 { const m=location.search.match(/[?&]poi=(-?\d+(?:\.\d+)?),(-?\d+(?:\.\d+)?)/), go=/[?&]go=1/.test(location.search); if(m){ const nm=(location.search.match(/[?&]n=([^&]*)/)||[])[1]; history.replaceState(null,"",location.pathname);
-  setTimeout(()=>{ const lat=+m[1], lon=+m[2], name=nm?decodeURIComponent(nm.replace(/\+/g," ")).slice(0,80):"The place";
+  setTimeout(async()=>{ const lat=+m[1], lon=+m[2], name=nm?decodeURIComponent(nm.replace(/\+/g," ")).slice(0,80):"The place";
     if(!isFinite(lat)||!isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180) return;
     try{ localStorage.setItem("rr-welcome","1"); if($("welcome").open) $("welcome").close(); }catch(e){}
     snapTrip(true); trip.end=pt(name,lat,lon); trip.round=false; trip.days.forEach(d=>{ d.vias=[]; d.legs=[]; d.to=null; delete d.noAutoNight; });
@@ -48,6 +59,7 @@ document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closes
     const t=$("toast"); t.innerHTML=`Finish set to <b>${esc(name)}</b>. Tap ⌖ to start from where you are, or type a town.`; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,15000);
     if(go){ /* "Take me there" from the newsletter: route from where you are, with the High Octane places and Founder's fav's along the way */
       ui.lay.moto=true; ui.lay.fav=true; ui.lay.sights=true; saveUi(); renderLayers(); renderAll();
+      if(await farStart(trip.end)) return;
       if(!trip.start||trip.start.lat==null){ t.innerHTML=`Routing you to <b>${esc(trip.end.name)}</b> from where you are. Racing places and POI along the way are on the map.`; useMyLocation(); return; } }
     if(!trip.start||trip.start.lat==null) $("startPlace").focus();
   },300); } }
@@ -61,6 +73,7 @@ document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closes
       const ll=(q.get("tll")||"").split(",").map(Number), fl=(q.get("fll")||"").split(",").map(Number);
       const dest=ll.length===2&&ll.every(isFinite)&&ll[0]?pt(to,ll[0],ll[1]):await find(to); if(!dest){ $("status").textContent=`Couldn't find "${to}". Type it in Where to?`; return; }
       snapTrip(true); trip.end=dest; trip.round=false; trip.days.forEach(d=>{ d.vias=[]; d.legs=[]; d.to=null; delete d.noAutoNight; });
+      if((!fr||/^my location$/i.test(fr))&&await farStart(dest)) return;
       if(fr&&!/^my location$/i.test(fr)){ const st=fl.length===2&&fl.every(isFinite)&&fl[0]?pt(fr,fl[0],fl[1]):await find(fr); if(st) trip.start=st; }
       else if(!trip.start||trip.start.lat==null||hav(trip.start,dest)<1) trip.start=pt("My location",null,null);
       changed();

@@ -11,10 +11,10 @@
   function airport(lat, lon, list) {
     list = list || AIR || []; var hub = null, hd = 1e9;
     for (var j = 0; j < list.length; j++) if (HUB.indexOf(list[j][0]) >= 0) { var dh = km([lat, lon], [list[j][2], list[j][3]]); if (dh < hd) { hd = dh; hub = list[j]; } }
-    if (hub && hd <= 260) return { iata: hub[0], name: hub[1], km: Math.round(hd) };
+    if (hub && hd <= 260) return { iata: hub[0], name: hub[1], km: Math.round(hd), lat: hub[2], lon: hub[3] };
     var big = null, small = null, bd = 1e9, sd = 1e9;
     for (var i = 0; i < list.length; i++) { var a = list[i], d = km([lat, lon], [a[2], a[3]]); if (a[4]) { if (d < bd) { bd = d; big = a; } } else if (d < sd) { sd = d; small = a; } }
-    var a2 = bd <= 250 || !small || sd > 150 ? big : small; return a2 ? { iata: a2[0], name: a2[1], km: Math.round(a2 === big ? bd : sd) } : null;
+    var a2 = bd <= 250 || !small || sd > 150 ? big : small; return a2 ? { iata: a2[0], name: a2[1], km: Math.round(a2 === big ? bd : sd), lat: a2[2], lon: a2[3] } : null;
   }
   var ESIM = { "united states": "united-states", usa: "united-states", uk: "united-kingdom", "united kingdom": "united-kingdom", "isle of man": "united-kingdom", turkiye: "turkey", czechia: "czech-republic", "united arab emirates": "united-arab-emirates", "saudi arabia": "saudi-arabia", "south africa": "south-africa", "new zealand": "new-zealand", korea: "south-korea", "south korea": "south-korea" };
   var esimUrl = function (c) { var k = String(c || "").toLowerCase().trim(); if (!k) return "https://www.airalo.com/"; return "https://www.airalo.com/" + (ESIM[k] || k.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z]+/g, "-")) + "-esim"; };

@@ -1212,7 +1212,7 @@ $("map").addEventListener("click",e=>{ const sn=e.target.closest&&e.target.close
 ["vehicle","wVehicle"].forEach(id=>{ const el=$(id); if(el) el.addEventListener("change",()=>{ if(settings.rangeSet) return; const r=$(id==="vehicle"?"range":"wRange"); if(r) r.value=RANGE_DEF[el.value]||200; }); });
 
 /* "Make a trip of it" at the finish: the same tiles as the event pages (src/js/03-trip.js) */
-fetch("/data/airports.json").then(r=>r.ok?r.json():[]).then(a=>{ OTMtrip.setAirports(a); if(trip.end&&trip.end.lat!=null&&typeof renderAll==="function") renderAll(); }).catch(()=>{});
+window.otmAirP=fetch("/data/airports.json").then(r=>r.ok?r.json():[]).then(a=>{ OTMtrip.setAirports(a); if(trip.end&&trip.end.lat!=null&&typeof renderAll==="function") renderAll(); }).catch(()=>{});
 function tripBlockHtml(){
   const e=trip.end; if(!plan||planStale||!e||e.lat==null||trip.round) return "";
   const from=trip.startDate?addDays(trip.startDate,nDays()-1):"", to=from?addDays(from,1):"";
