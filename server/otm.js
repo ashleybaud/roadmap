@@ -60,6 +60,10 @@ const MIGRATIONS = [
   // newsletter: how often each subscriber wants it, and when they last got one
   `ALTER TABLE subscribers ADD COLUMN freq TEXT NOT NULL DEFAULT 'weekly'`,
   `ALTER TABLE subscribers ADD COLUMN last_sent INTEGER`,
+  // first name, for "Hi Ashley" at the top of the newsletter
+  `ALTER TABLE subscribers ADD COLUMN name TEXT`,
+  // which kinds of racing they want in it (comma list); empty means all of them
+  `ALTER TABLE subscribers ADD COLUMN kinds TEXT`,
   `CREATE TABLE IF NOT EXISTS newsletter_sends (issue TEXT PRIMARY KEY, sent_at INTEGER NOT NULL, sent_by TEXT, count INTEGER NOT NULL DEFAULT 0)`,
 ];
 let schemaReady = null;
@@ -166,6 +170,15 @@ export const brandPage = (title, inner = "") => new Response(`<!doctype html><ht
 <div style="background:#0F5874;border-radius:14px;padding:26px 24px;border-top:4px solid #E8A317"><div style="font-weight:800;letter-spacing:.06em;color:#E8A317;font-size:.85rem;margin-bottom:10px">ONETRACKMIND</div>
 <h1 style="font-size:1.35rem;margin:0 0 10px">${title}</h1>${inner}<p style="margin:18px 0 0"><a href="/" style="color:#E8A317;font-weight:700;text-decoration:none">Back to OneTrackMind ›</a></p></div></div></body></html>`,
   { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
+export const KINDS = { f1: "F1", bikes: "Bikes: MotoGP, superbikes, the TT", endurance: "Endurance, rally and hill climbs", us: "NASCAR and IndyCar", shows: "Shows, classics and festivals" };
+// the newsletter for one subscriber: drop the events in kinds they've switched off; if that leaves none, say so
+export function forKinds(s, kinds) {
+  const want = String(kinds || "").split(",").filter(k => KINDS[k]), all = !want.length || want.length >= Object.keys(KINDS).length;
+  let rows = 0, kept = 0;
+  s = s.replace(/<!--k:(\w+)-->([\s\S]*?)<!--\/k-->/g, (m, k, x) => { rows++; if (all || want.includes(k)) { kept++; return x; } return ""; });
+  // "nothing in your kinds this week" only when there were events and all of them were switched off
+  return s.replace(/<!--none-->([\s\S]*?)<!--\/none-->/g, (m, x) => rows && !kept ? x : "").replace(/\n{3,}/g, "\n\n");
+}
 export const FREQS = { weekly: "Every week", fortnightly: "Every two weeks", monthly: "Once a month" };
 export const validEmail = e => typeof e === "string" && e.length <= 200 && /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(e);
 export const clean = (s, n) => String(s == null ? "" : s).replace(/[\u0000-\u0008\u000b\u000c\u000e-\u001f]/g, "").trim().slice(0, n);
