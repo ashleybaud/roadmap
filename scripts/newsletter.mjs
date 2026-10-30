@@ -58,17 +58,12 @@ const bits = shows.map(e => e.start < from ? `${short(e)} is on in ${(e.city || 
 const byDay = {}; races.forEach(e => (byDay[e.end] = byDay[e.end] || []).push(e));
 Object.keys(byDay).sort().forEach(d => { const L = byDay[d]; bits.push(L.length > 1 ? `${dow(d)} is a ${L.length === 2 ? "double" : "triple"}: ${L.slice(0, -1).map(label).join(", ")} and ${label(L[L.length - 1])}` : `${label(L[0])} on ${dow(d)}`); });
 const and = L => L.length > 1 ? L.slice(0, -1).join(", ") + (L.length > 2 ? "," : "") + " and " + L[L.length - 1] : L[0] || "";
-const opener = !on.length ? "Quiet one on the calendar. Good week to ride instead." : `${on.length >= 5 ? "Big week. " : on.length >= 3 ? "Good week. " : ""}${and(bits) || short(on[0]) + " is on"}.`;
-// the three-to-six-month window: nobody decides on Monday to go to a race that weekend
-const AHEAD = EV.filter(e => e.tier === 1 && !/nascar|indycar/.test(e.genre) && e.start >= add(from, 90) && e.start <= add(from, 180)).sort((a, b) => a.start.localeCompare(b.start));
-const AWAY = AHEAD.filter(e => !/United States|USA/.test(e.country || "")), POOL = AWAY.length ? AWAY : AHEAD;
-const ahead = POOL[week % Math.max(1, POOL.length)];
-const wks = ahead ? Math.round((new Date(ahead.start + "T12:00:00Z") - new Date(from + "T12:00:00Z")) / 6048e5) : 0;
-const NUDGE = ahead ? [
-  `${short(ahead)} is ${wks} weeks away. This is when the sorted ones book: tickets still on sale, beds near the track still sane.`,
-  `${short(ahead)}, ${fd(ahead.start)}. ${wks} weeks. Every year someone tells me they left it too late. Don't be that guy.`,
-  `${wks} weeks to ${short(ahead)}. The good beds go first, and they're going.`,
-][week % 3] : "";
+const pastBits = last.filter(e => (e.tier || 2) <= 2 || e.country === "South Africa").sort((a, b) => rank(a) - rank(b)).slice(0, 3)
+  .map(e => { const r = RES[e.id], w = r && r.podium && r.podium[0]; return w ? `${w.split(" ").slice(-1)[0]} won ${label(e)}` : label(e); });
+const lastLine = pastBits.length ? `Last week: ${and(pastBits)}.` : "";
+const opener0 = !on.length ? "Quiet one on the calendar. Good week to ride instead." : `${on.length >= 5 ? "Big week. " : on.length >= 3 ? "Good week. " : ""}${and(bits) || short(on[0]) + " is on"}.`;
+const opener = lastLine ? `${lastLine} This week${on.length ? ": " + opener0.replace(/^(Big|Good) week\. /, "") : " is quiet. Good week to ride instead."}` : opener0;
+
 
 
 // email-safe building blocks: tables and inline styles only
@@ -83,7 +78,27 @@ const resRow = e => { const r = RES[e.id], w = WATCH[e.series] || {};
   const body = r && r.podium ? `1. ${esc(r.podium[0])}${r.podium[1] ? ` · 2. ${esc(r.podium[1])}` : ""}${r.podium[2] ? ` · 3. ${esc(r.podium[2])}` : ""}` : (r && r.link) || w.results ? A((r && r.link) || w.results, r && r.fresh ? "Results are in ›" : "Official results ›") : `<span style="color:${C.muted}">Results on the ${A(e.url || e.source, "official site")}</span>`;
   return `<tr><td style="padding:8px 24px;border-top:1px solid #2B7896;font:15px/1.45 Arial,Helvetica,sans-serif;color:${C.ink}"><b>${esc(e.name)}</b> <span style="color:${C.muted}">· ${rng(e)}</span><br>${body}</td></tr>`; };
 
-const camps = CAMP.filter(c => !c.hidden && c.from <= to && c.to >= from).slice(0, 2);
+
+// what's hot this month, for the featured route when no route goes near the week's big event
+const HOT = { "namaqua-coast": [8, 9], "west-coast-gravel": [8, 9, 10], "cederberg-traverse": [3, 4, 5, 9, 10], "tankwa-gannaga": [4, 5, 6, 7, 8], "die-hel": [3, 4, 5, 9, 10, 11], "swartberg-loop": [3, 4, 5, 9, 10, 11], "seweweekspoort-ouberg": [3, 4, 5, 9, 10], "baviaanskloof": [3, 4, 5, 9, 10, 11], "seven-passes-prince-alfred": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12], "sani-pass": [10, 11, 12, 1, 2, 3, 4], "wild-coast-2019": [3, 4, 5, 9, 10], "speedweek-hakskeenpan": [9, 10], "namib-sesriem": [5, 6, 7, 8, 9], "namibia-2020-tortoise": [5, 6, 7, 8, 9], "namibia-2017-epupa": [5, 6, 7, 8, 9], "namibia-2020-orange-river": [4, 5, 6, 7, 8, 9], "namibia-2004-orange-river-mouth": [4, 5, 6, 7, 8, 9], "eu-road-trip-2018": [5, 6, 7, 8, 9], "eu-road-trip-2019": [5, 6, 7, 8, 9], "motor-valley-2017": [5, 6, 7, 8, 9, 10] };
+const mon = new Date(from + "T12:00:00Z").getUTCMonth() + 1, hotNow = PICKS.filter(r => (HOT[r.id] || []).includes(mon));
+const route = routeNear ? routeNear.r : (hotNow.length ? hotNow : PICKS)[week % Math.max(1, (hotNow.length ? hotNow : PICKS).length)];
+// featured place: one near the week's big event, otherwise the next one in turn
+const poi = nearHead.length ? nearHead[0].f : FAV[week % Math.max(1, FAV.length)];
+// Local is lekker: the latest Saturday run, or the campaign itself until the first one is up
+const LIL = (J("data/local-is-lekker.json") || []).slice(-1)[0];
+const lil = LIL ? { img: /^https?:/.test(LIL.photo || "") ? LIL.photo : SITE + (LIL.photo || ""), title: `${LIL.place}, ${LIL.town}`, line: LIL.line || LIL.vehicle || "", url: LIL.lat != null ? `${SITE}/plan/?poi=${LIL.lat},${LIL.lon}&n=${encodeURIComponent(LIL.place)}&go=1` : `${SITE}/local-is-lekker/`, cta: "Take me there" }
+  : { img: `${SITE}/media/founder/porsche-cayman-portimao-pitlane.jpg`, title: "Saturday breakfast runs", line: "One of my cars or bikes, somewhere new for breakfast, and the road there.", url: `${SITE}/local-is-lekker/`, cta: "Check it out" };
+
+// every event this week. Each row is marked with its kind of racing, so the send can leave out what a subscriber has switched off.
+const KIND = e => { const g = e.genre; return g === "f1" ? "f1" : /motogp|superbike|mx|roadrace|bikefest/.test(g) ? "bikes" : /endurance|rally|offroad|hillclimb|timeattack/.test(g) ? "endurance" : /nascar|indycar/.test(g) ? "us" : "shows"; };
+const BTN2 = (u, t) => `<a href="${esc(u)}" style="display:inline-block;border:2px solid ${C.gold};color:${C.gold};font:bold 13px Arial,Helvetica,sans-serif;text-decoration:none;padding:7px 12px;border-radius:6px">${t}</a>`;
+const evCard = e => { const w = (WATCH[e.series] || {}).watch || [], d = new Date(e.start + "T12:00:00Z");
+  return `<!--k:${KIND(e)}--><tr><td style="padding:12px 24px;border-top:1px solid #2B7896"><table role="presentation" cellpadding="0" cellspacing="0" width="100%"><tr>
+<td width="54" valign="top" style="font:bold 22px/1 Arial,Helvetica,sans-serif;color:${C.ink};text-align:center">${d.getUTCDate()}<br><span style="font-size:12px;color:${C.gold};text-transform:uppercase">${M[d.getUTCMonth()]}</span></td>
+<td style="padding-left:10px;font:15px/1.45 Arial,Helvetica,sans-serif;color:${C.ink}"><b style="font-size:16px">${esc(short(e))}</b><br><span style="color:${C.muted}">${rng(e)} · ${esc((e.city || e.venue || "").split(",")[0])}, ${esc(e.country || "")}${e.confirmed ? "" : " · date to confirm"}</span><br>
+<span style="display:inline-block;margin-top:8px">${BTN(`${SITE}/plan/?ev=${e.id}&go=1`, "Take me there ›")}</span>${e.tickets ? ` <span style="display:inline-block;margin-top:8px">${BTN2(e.tickets, "Tickets")}</span>` : ""}${w[0] ? ` <span style="display:inline-block;margin-top:8px">${BTN2(w[0].url, "Watch")}</span>` : ""}</td></tr></table></td></tr><!--/k-->`; };
+
 const title = `The OneTrackMind ${period === "weekly" ? "Week" : period === "fortnightly" ? "Fortnight" : "Month"}`;
 const tops = [...shows, ...races].sort((a, b) => rank(a) - rank(b)).slice(0, 3).map(e => SER[e.genre] ? label(e) : short(e));
 const subject = tops.length ? `${and(tops)} ${period === "weekly" ? "this week" : "coming up"}` : `${title}: what's on, ${fd(from)} – ${fd(to, 1)}`;
@@ -96,32 +111,29 @@ const html = `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta n
 <tr><td style="padding:0 24px 14px;font:13px Arial,Helvetica,sans-serif;color:${C.muted};border-bottom:3px solid ${C.gold}">${title} · ${fd(from)} – ${fd(to, 1)} · ${A(`${SITE}/newsletter/${from}-${period}/`, "View in browser")}</td></tr>
 ${P(`Hi {{NAME}},`, "padding-top:20px;font-size:16px")}
 ${P(esc(opener), "font-size:16px")}
-${ahead ? P(`${esc(NUDGE)} ${A(`${SITE}/events/${ahead.id}/`, "Start planning ›")}`, "font-size:16px") : ""}
-${H2(period === "weekly" ? "What's on" : "Coming up")}
-${on.length ? on.slice(0, 12).map(evRow).join("") : P("A quiet one on the calendar. Good week to ride instead.")}
-${last.length ? H2("How it went") + last.slice(0, 10).map(resRow).join("") : ""}
-${head && nearHead.length ? H2(`Going to ${esc(short(head))}?`) + P(`Don't fly all that way and miss these:`) + nearHead.map(({ f, d }) => P(`${A(`${SITE}/favourites/${f.id}/`, esc(f.name))} · ${Math.round(d)} km · ${esc(f.short || "")}`)).join("") + P(`Turn on High Octane and tap Near me in the planner for every museum and track around the venue.`, `color:${C.muted};font-size:13px`) : ""}
-${curve ? H2(routeNear ? "The road there" : "Curves of the week") + P(`<b>${esc(curve.title)}</b><br><span style="color:${C.muted}">${esc(curve.region || "")}</span><br>${esc(curve.blurb || "")}`) + `<tr><td style="padding:10px 24px">${BTN(`${SITE}/routes/${curve.id}/`, "Show the route ›")}</td></tr>` : ""}
-${head ? H2("Make a weekend of it") + P(`${A(`https://www.booking.com/searchresults.html?latitude=${head.lat}&longitude=${head.lon}&radius=30&checkin=${add(head.start, -1)}&checkout=${add(head.end, 1)}`, `Beds near ${esc(head.venue || head.city)} ›`)}<br>${A(`https://www.google.com/travel/flights?q=${encodeURIComponent("Flights to " + (head.city || head.venue))}`, `Flights to ${esc(head.city || head.venue)} ›`)}<br>${A(`https://www.discovercars.com/`, "Hire a car there ›")}`) + P("Some of these links pay OneTrackMind a small fee, at no cost to you.", `color:${C.muted};font-size:12px`) : ""}
-${camps.length ? H2("Plan ahead") + camps.map(c => P(`<b>${esc(c.title)}.</b> ${esc(c.line)} ${A(SITE + c.link, c.cta + " ›")}`)).join("") : ""}
-${H2("One more thing")}${P(`<b>${esc(idea[0])}.</b> ${esc(idea[1])}`)}
+<tr><td style="padding:16px 24px 4px"><a href="${esc(lil.url)}" style="text-decoration:none;display:block;background:${C.panel};border-radius:10px;overflow:hidden"><img src="${esc(lil.img)}" width="552" alt="" style="display:block;width:100%;height:auto;max-height:300px;object-fit:cover;border:0">
+<span style="display:block;padding:12px 14px;font:15px/1.45 Arial,Helvetica,sans-serif;color:${C.ink}"><span style="font-size:11px;letter-spacing:1px;color:${C.gold}">LOCAL IS LEKKER</span><br><b style="font-size:17px">${esc(lil.title)}</b><br>${esc(lil.line)}<br><b style="color:${C.gold}">${lil.cta} ›</b></span></a></td></tr>
+${H2(period === "weekly" ? "This week" : "Coming up")}
+${on.length ? on.map(evCard).join("\n") : P("Nothing on the calendar. Good week to ride instead.")}
+<!--none-->${P(`Nothing in your kinds of racing this week. ${A("{{PREFS}}", "Change what you get ›")}`, `color:${C.muted}`)}<!--/none-->
+${route ? H2(routeNear ? "The road there" : "Route of the week") + P(`<b style="font-size:16px">${esc(route.title)}</b><br><span style="color:${C.muted}">${esc(route.region || "")}</span><br>${esc(route.blurb || "")}`) + `<tr><td style="padding:10px 24px">${BTN(`${SITE}/routes/${route.id}/`, "Ride it ›")}</td></tr>` : ""}
+${poi ? H2("Worth the stop") + P(`<b style="font-size:16px">${esc(poi.name)}</b><br><span style="color:${C.muted}">${esc(poi.area || "")}</span><br>${esc(poi.short || "")}`) + `<tr><td style="padding:10px 24px;font:15px Arial,Helvetica,sans-serif">${BTN(`${SITE}/plan/?poi=${poi.lat},${poi.lon}&n=${encodeURIComponent(poi.name)}&go=1`, "Take me there ›")} &nbsp;${A(`${SITE}/favourites/${poi.id}/`, "Read about it")}</td></tr>` : ""}
 <tr><td style="padding:24px 24px 6px"><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${C.panel};border-left:5px solid ${C.gold};border-radius:8px"><tr>
 <td width="96" style="padding:10px"><img src="https://alterego.online/cdn/shop/files/3158941636033974733_2048.jpg?v=1792398701&width=240" width="84" height="84" alt="AlterEgo hoodie" style="display:block;border-radius:6px;background:#fff"></td>
 <td style="padding:10px 12px 10px 0;font:14px/1.4 Arial,Helvetica,sans-serif;color:${C.ink}"><img src="${SITE}/img/alterego-logo-white.png" width="64" height="56" alt="AlterEgo" style="display:block;margin:0 0 6px"><span style="font-size:11px;color:${C.muted};letter-spacing:1px">AD</span><br><b style="color:${C.gold};font-size:18px">BUILD. RACE. REPEAT.</b><br>Made to order for petrolheads. ${A("https://alterego.online/?utm_source=onetrackmind&utm_medium=newsletter", "Shop ›")}</td></tr></table></td></tr>
 <tr><td style="padding:18px 24px 6px"><table role="presentation" cellpadding="0" cellspacing="0"><tr><td width="52"><img src="${SITE}/img/ashley.jpg" width="44" height="44" alt="" style="display:block;border-radius:22px;border:2px solid ${C.gold};object-fit:cover"></td>
-<td style="font:14px/1.45 Arial,Helvetica,sans-serif;color:${C.ink}"><b style="text-transform:uppercase;letter-spacing:.5px">Racing is life. <span style="color:${C.gold}">Everything else is preparation.</span></b><br>Ride safe. Reply to this email if there's a race, road or place I should know about.<br><b>Ashley</b> · ${A(SITE, "onetrackmind.online")}</td></tr></table></td></tr>
+<td style="font:14px/1.45 Arial,Helvetica,sans-serif;color:${C.ink}"><b style="text-transform:uppercase;letter-spacing:.5px">Racing is life. <span style="color:${C.gold}">Everything else is preparation.</span></b><br>Ride safe. Reply if there's a race, road or place I should know about.<br><b>Ashley</b> · ${A(SITE, "onetrackmind.online")}</td></tr></table></td></tr>
 <tr><td style="padding:6px 24px 0;font:11px/1 Arial,Helvetica,sans-serif;color:${C.muted};letter-spacing:1px">FUELLED BY <a href="https://alterego.online/?utm_source=onetrackmind&utm_medium=newsletter&utm_content=powered" style="text-decoration:none"><img src="${SITE}/img/alterego-logo-white.png" width="40" height="35" alt="AlterEgo" style="vertical-align:middle;margin-left:6px;border:0"></a></td></tr>
-<tr><td style="padding:16px 24px 22px;font:12px/1.5 Arial,Helvetica,sans-serif;color:${C.muted}">You get this because you signed up at onetrackmind.online. ${A("{{PREFS}}", "Change how often")} · ${A("{{UNSUB}}", "Unsubscribe")}</td></tr>
+<tr><td style="padding:16px 24px 22px;font:12px/1.5 Arial,Helvetica,sans-serif;color:${C.muted}">You get this because you signed up at onetrackmind.online. ${A("{{PREFS}}", "Choose what you get")} · ${A("{{UNSUB}}", "Unsubscribe")}</td></tr>
 </table></td></tr></table></body></html>`;
 
-const text = [`${title} · ${fd(from)} – ${fd(to, 1)}`, "", "Hi {{NAME}},", "", opener, ...(ahead ? ["", `${NUDGE} ${SITE}/events/${ahead.id}/`] : []), "", period === "weekly" ? "WHAT'S ON" : "COMING UP",
-  ...(on.length ? on.slice(0, 12).map(e => `- ${e.name}, ${rng(e)}, ${e.venue || e.city || ""}: ${SITE}/events/${e.id}/`) : ["A quiet one. Good week to ride instead."]),
-  ...(last.length ? ["", "HOW IT WENT", ...last.slice(0, 10).map(e => `- ${e.name}: ${(RES[e.id] && RES[e.id].podium) ? "1. " + RES[e.id].podium[0] : (WATCH[e.series] || {}).results || e.url || ""}`)] : []),
-  ...(curve ? ["", routeNear ? "THE ROAD THERE" : "CURVES OF THE WEEK", `${curve.title}: ${SITE}/routes/${curve.id}/`] : []),
-  ...(camps.length ? ["", "PLAN AHEAD", ...camps.map(c => `${c.title}. ${c.line} ${SITE}${c.link}`)] : []), "", "ONE MORE THING", `${idea[0]}. ${idea[1]}`, "", "Racing is life. Everything else is preparation.", "Ashley", "", "Fuelled by AlterEgo: https://alterego.online", "", "Change how often: {{PREFS}}", "Unsubscribe: {{UNSUB}}"].join("\n");
+const text = [`${title} · ${fd(from)} – ${fd(to, 1)}`, "", "Hi {{NAME}},", "", opener, "", `LOCAL IS LEKKER: ${lil.title}. ${lil.line} ${lil.url}`, "", period === "weekly" ? "THIS WEEK" : "COMING UP",
+  ...(on.length ? on.map(e => `<!--k:${KIND(e)}-->- ${short(e)}, ${rng(e)}, ${(e.city || e.venue || "").split(",")[0]}. Take me there: ${SITE}/plan/?ev=${e.id}&go=1<!--/k-->`) : ["Nothing on the calendar. Good week to ride instead."]),
+  ...(route ? ["", routeNear ? "THE ROAD THERE" : "ROUTE OF THE WEEK", `${route.title}: ${SITE}/routes/${route.id}/`] : []),
+  ...(poi ? ["", "WORTH THE STOP", `${poi.name}, ${poi.area || ""}: ${SITE}/favourites/${poi.id}/`] : []), "", "Racing is life. Everything else is preparation.", "Ashley", "", "Fuelled by AlterEgo: https://alterego.online", "", "Choose what you get: {{PREFS}}", "Unsubscribe: {{UNSUB}}"].join("\n");
 
 const dir = path.join(ROOT, "newsletter", `${from}-${period}`); fs.mkdirSync(dir, { recursive: true });
-fs.writeFileSync(path.join(dir, "index.html"), html.replace(/\{\{(UNSUB|PREFS)\}\}/g, SITE + "/").replace(/\{\{NAME\}\}/g, "there"));
+fs.writeFileSync(path.join(dir, "index.html"), html.replace(/\{\{(UNSUB|PREFS)\}\}/g, SITE + "/").replace(/\{\{NAME\}\}/g, "there").replace(/<!--none-->[\s\S]*?<!--\/none-->/g, ""));
 fs.writeFileSync(path.join(dir, "email.html"), html);
 fs.writeFileSync(path.join(dir, "email.txt"), text);
 fs.writeFileSync(path.join(dir, "meta.json"), JSON.stringify({ subject, from, to, period, events: on.length, last: last.length }, null, 1));

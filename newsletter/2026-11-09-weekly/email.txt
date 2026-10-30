@@ -2,36 +2,25 @@ The OneTrackMind Week · 9 Nov – 15 Nov 2026
 
 Hi {{NAME}},
 
-Good week. Nine Hour of Kyalami on Saturday.
+Last week: EICMA, SEMA, and F1 at Interlagos. This week: Nine Hour of Kyalami on Saturday.
 
-13 weeks to Bathurst 12 Hour. The good beds go first, and they're going. https://onetrackmind.online/events/bathurst-12-hour-2027/
+LOCAL IS LEKKER: Saturday breakfast runs. One of my cars or bikes, somewhere new for breakfast, and the road there. https://onetrackmind.online/local-is-lekker/
 
-WHAT'S ON
-- Classic Motor Show 2026, 13 Nov – 15 Nov, NEC Birmingham: https://onetrackmind.online/events/classic-motor-show-nec-2026/
-- Global Time Attack Finals (formerly Super Lap Battle), 13 Nov – 15 Nov, Buttonwillow Raceway Park: https://onetrackmind.online/events/gta-finals-buttonwillow-2026/
-- Nine Hour of Kyalami, 13 Nov – 14 Nov, Kyalami Grand Prix Circuit: https://onetrackmind.online/events/nine-hour-kyalami-2026/
+THIS WEEK
+<!--k:shows-->- Classic Motor Show, 13 Nov – 15 Nov, Birmingham. Take me there: https://onetrackmind.online/plan/?ev=classic-motor-show-nec-2026&go=1<!--/k-->
+<!--k:endurance-->- Global Time Attack Finals, 13 Nov – 15 Nov, Buttonwillow. Take me there: https://onetrackmind.online/plan/?ev=gta-finals-buttonwillow-2026&go=1<!--/k-->
+<!--k:endurance-->- Nine Hour of Kyalami, 13 Nov – 14 Nov, Midrand. Take me there: https://onetrackmind.online/plan/?ev=nine-hour-kyalami-2026&go=1<!--/k-->
 
-HOW IT WENT
-- SEMA Show 2026: https://www.semashow.com/
-- EICMA Milan: https://www.eicma.it
-- MotoGP Qatar Grand Prix 2026: https://www.motogp.com/en/world-standing/2026/motogp/championship-standings
-- Retro Classics Bavaria 2026: https://www.retro-classics.de/en/
-- São Paulo Grand Prix 2026: https://www.formula1.com/en/results/2026/races
+ROUTE OF THE WEEK
+Swartberg Pass and Meiringspoort: https://onetrackmind.online/routes/swartberg-loop/
 
-CURVES OF THE WEEK
-Speedweek run to Hakskeenpan: https://onetrackmind.online/routes/speedweek-hakskeenpan/
-
-PLAN AHEAD
-The 2027 calendar is in. Le Mans, the TT, Monaco, Pikes Peak: the dates are out and the good beds go first. https://onetrackmind.online/events/#y2027
-Christmas: give a race weekend. A ticket to a 2027 race beats socks. Pick the race, build the trip, print it and put it in a card. https://onetrackmind.online/events/#y2027
-
-ONE MORE THING
-Turn a race weekend into four days. Arrive Thursday, leave Monday. Put the venue in as your finish and let the planner find the roads.
+WORTH THE STOP
+Kyalami, Midrand, Gauteng: https://onetrackmind.online/favourites/kyalami/
 
 Racing is life. Everything else is preparation.
 Ashley
 
 Fuelled by AlterEgo: https://alterego.online
 
-Change how often: {{PREFS}}
+Choose what you get: {{PREFS}}
 Unsubscribe: {{UNSUB}}

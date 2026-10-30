@@ -2,35 +2,27 @@ The OneTrackMind Week · 2 Nov – 8 Nov 2026
 
 Hi {{NAME}},
 
-Big week. SEMA opens in Las Vegas on Tuesday, EICMA opens in Milan on Thursday, and Sunday is a double: F1 at Interlagos and MotoGP in Lusail.
+Last week: F1 in Mexico City, Killarney Motor Show, and MotoGP in Sepang. This week: SEMA opens in Las Vegas on Tuesday, EICMA opens in Milan on Thursday, and Sunday is a double: F1 at Interlagos and MotoGP in Lusail.
 
-Bathurst 12 Hour, 11 Feb. 14 weeks. Every year someone tells me they left it too late. Don't be that guy. https://onetrackmind.online/events/bathurst-12-hour-2027/
+LOCAL IS LEKKER: Saturday breakfast runs. One of my cars or bikes, somewhere new for breakfast, and the road there. https://onetrackmind.online/local-is-lekker/
 
-WHAT'S ON
-- SEMA Show 2026, 3 Nov – 6 Nov, Las Vegas Convention Center: https://onetrackmind.online/events/sema-show-2026/
-- EICMA Milan, 5 Nov – 8 Nov, Fiera Milano Rho: https://onetrackmind.online/events/eicma-2026/
-- MotoGP Qatar Grand Prix 2026, 6 Nov – 8 Nov, Lusail International Circuit: https://onetrackmind.online/events/motogp-qatar-grand-prix-2026/
-- Retro Classics Bavaria 2026, 6 Nov – 8 Nov, Messe Nürnberg: https://onetrackmind.online/events/retro-classics-bavaria-2026/
-- São Paulo Grand Prix 2026, 6 Nov – 8 Nov, Interlagos: https://onetrackmind.online/events/sao-paulo-grand-prix-2026/
-
-HOW IT WENT
-- Mexico City Grand Prix 2026: https://www.formula1.com/en/results/2026/races
-- MotoGP Malaysian Grand Prix 2026: https://www.motogp.com/en/world-standing/2026/motogp/championship-standings
-- Killarney Motor Show 2026: https://www.wpmc.co.za/
+THIS WEEK
+<!--k:shows-->- SEMA, 3 Nov – 6 Nov, Las Vegas. Take me there: https://onetrackmind.online/plan/?ev=sema-show-2026&go=1<!--/k-->
+<!--k:shows-->- EICMA, 5 Nov – 8 Nov, Milan. Take me there: https://onetrackmind.online/plan/?ev=eicma-2026&go=1<!--/k-->
+<!--k:bikes-->- MotoGP Qatar Grand Prix, 6 Nov – 8 Nov, Lusail. Take me there: https://onetrackmind.online/plan/?ev=motogp-qatar-grand-prix-2026&go=1<!--/k-->
+<!--k:shows-->- Retro Classics Bavaria, 6 Nov – 8 Nov, Nuremberg. Take me there: https://onetrackmind.online/plan/?ev=retro-classics-bavaria-2026&go=1<!--/k-->
+<!--k:f1-->- São Paulo Grand Prix, 6 Nov – 8 Nov, São Paulo. Take me there: https://onetrackmind.online/plan/?ev=sao-paulo-grand-prix-2026&go=1<!--/k-->
 
 THE ROAD THERE
 Motor Valley and EICMA in a Fiat 500: https://onetrackmind.online/routes/motor-valley-2017/
 
-PLAN AHEAD
-The 2027 calendar is in. Le Mans, the TT, Monaco, Pikes Peak: the dates are out and the good beds go first. https://onetrackmind.online/events/#y2027
-
-ONE MORE THING
-Bring the partner. Every event page lists what else is nearby. Pick one thing for them each day and the weekend sells itself.
+WORTH THE STOP
+Alfa Romeo Museum, Arese, Arese, near Milan, Italy: https://onetrackmind.online/favourites/alfa-romeo-museum/
 
 Racing is life. Everything else is preparation.
 Ashley
 
 Fuelled by AlterEgo: https://alterego.online
 
-Change how often: {{PREFS}}
+Choose what you get: {{PREFS}}
 Unsubscribe: {{UNSUB}}
