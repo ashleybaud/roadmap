@@ -85,7 +85,7 @@
  {
   "category": "bikes",
   "tickets": "https://www.eicma.it",
-  "confirmed": false,
+  "confirmed": true,
   "id": "eicma-2026",
   "name": "EICMA Milan",
   "series": "EICMA",
@@ -98,6 +98,7 @@
   "lon": 9.087,
   "url": "https://www.eicma.it",
   "source": "https://www.motorradonline.de/ratgeber/eicma-2026-internationale-zweiradmesse-in-mailand/",
+  "source2": "https://en.ilsole24ore.com/art/eicma-2026-everything-you-need-to-know-about-the-milan-motorcycle-show-AJfoG4qB",
   "checked": "2026-10-30",
   "tier": 1,
   "genre": "shows"
@@ -165,7 +166,7 @@
  {
   "category": "festival",
   "tickets": "https://classicmotorshow.seetickets.com/content/ticket-options/",
-  "confirmed": false,
+  "confirmed": true,
   "id": "classic-motor-show-nec-2026",
   "name": "Classic Motor Show 2026",
   "series": "Classic Motor Show",
@@ -178,6 +179,7 @@
   "lon": -1.7178,
   "url": "https://www.thenec.co.uk/events/classic-motor-show/",
   "source": "https://www.thenec.co.uk/events/classic-motor-show/",
+  "source2": "https://www.tr-register.co.uk/news-events/club-news/nec-show-organisers-change-dates-avoiding-remembrance-sunday",
   "checked": "2026-10-30",
   "tier": 3,
   "genre": "classics"
@@ -245,7 +247,7 @@
  {
   "category": "festival",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "macau-gp-2026",
   "name": "Macau Grand Prix (73rd)",
   "series": "Macau GP",
@@ -258,6 +260,7 @@
   "lon": 113.5614,
   "url": "https://www.macaugp.com",
   "source": "https://www.pitdebrief.com/?p=116111",
+  "source2": "https://www.pitdebrief.com/?p=116111",
   "checked": "2026-10-30",
   "tier": 1,
   "genre": "roadrace"
@@ -285,7 +288,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "motorcycle-live-2026",
   "name": "Motorcycle Live 2026",
   "series": "Motorcycle Live",
@@ -298,6 +301,7 @@
   "lon": -1.7178,
   "url": "https://www.motorcyclelive.co.uk/",
   "source": "https://www.visordown.com/news/more-attractions-and-deals-ever-promised-mcl26",
+  "source2": "https://www.visordown.com/news/more-attractions-and-deals-ever-promised-mcl26",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "shows"
@@ -305,7 +309,7 @@
  {
   "category": "us",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "daytona-turkey-run-2026",
   "name": "Daytona Turkey Run 2026",
   "series": "Turkey Run",
@@ -318,6 +322,7 @@
   "lon": -81.0705,
   "url": "https://www.turkeyrun.com/",
   "source": "https://www.daytonabeach.com/event/daytona-turkey-run-2026/54557/",
+  "source2": "https://www.daytonabeach.com/event/daytona-turkey-run-2026/54557/",
   "checked": "2026-10-30",
   "tier": 3,
   "genre": "classics"
@@ -365,7 +370,7 @@
  {
   "category": "f1",
   "tickets": "https://tickets.formula1.com/en",
-  "confirmed": false,
+  "confirmed": true,
   "id": "qatar-grand-prix-2026",
   "name": "Qatar Grand Prix 2026",
   "series": "Formula 1",
@@ -379,13 +384,14 @@
   "url": "https://www.formula1.com/en/racing/2026",
   "source": "https://www.crash.net/f1/news/1073119/1/2026-f1-calendar-full-race-schedule-revealed",
   "checked": "2026-10-30",
+  "source2": "https://www.formula1.com/en/latest/article/formula-1-reveals-calendar-for-2026-season.YctbMZWqBvrgyddrnauo8",
   "tier": 2,
   "genre": "f1"
  },
  {
   "category": "f1",
   "tickets": "https://tickets.formula1.com/en",
-  "confirmed": false,
+  "confirmed": true,
   "id": "abu-dhabi-grand-prix-2026",
   "name": "Abu Dhabi Grand Prix 2026",
   "series": "Formula 1",
@@ -399,6 +405,7 @@
   "url": "https://www.formula1.com/en/racing/2026",
   "source": "https://www.crash.net/f1/news/1073119/1/2026-f1-calendar-full-race-schedule-revealed",
   "checked": "2026-10-30",
+  "source2": "https://www.formula1.com/en/latest/article/formula-1-reveals-calendar-for-2026-season.YctbMZWqBvrgyddrnauo8",
   "tier": 2,
   "genre": "f1"
  },
@@ -425,7 +432,7 @@
  {
   "category": "offroad",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "dakar-2027",
   "name": "Dakar Rally 2027 (moved out of Saudi Arabia, Europe-Africa route)",
   "series": "Dakar",
@@ -438,6 +445,7 @@
   "lon": -5.834,
   "url": "https://www.dakar.com",
   "source": "https://en.ara.cat/sports/it-is-now-definitive-the-dakar-flees-from-saudi-arabia-and-changes-dates_1_5883869.html",
+  "source2": "https://en.ara.cat/sports/it-is-now-definitive-the-dakar-flees-from-saudi-arabia-and-changes-dates_1_5883869.html",
   "checked": "2026-10-30",
   "tier": 1,
   "genre": "offroad"
@@ -465,7 +473,7 @@
  {
   "category": "festival",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "interclassics-maastricht-2027",
   "name": "InterClassics Maastricht 2027",
   "series": "InterClassics",
@@ -478,6 +486,7 @@
   "lon": 5.7106,
   "url": "https://www.interclassics.nl/",
   "source": "https://www.octane-magazine.com/events/interclassics-maastrict/",
+  "source2": "https://www.eventseye.com/messen/f-interclassics-maastricht-3580-2.html",
   "checked": "2026-10-30",
   "tier": 3,
   "genre": "classics"
@@ -525,7 +534,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "motor-bike-expo-verona-2027",
   "name": "Motor Bike Expo 2027",
   "series": "Motor Bike Expo",
@@ -538,6 +547,7 @@
   "lon": 10.9868,
   "url": "https://www.motorbikeexpo.it/",
   "source": "https://italianismo.com.br/agenda-evento/motor-bike-expo-2027-em-verona-a-feira-de-motos/",
+  "source2": "https://italianismo.com.br/agenda-evento/motor-bike-expo-2027-em-verona-a-feira-de-motos/",
   "checked": "2026-10-30",
   "tier": 3,
   "genre": "shows"
@@ -545,7 +555,7 @@
  {
   "category": "us",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "barrett-jackson-scottsdale-2027",
   "name": "Barrett-Jackson Scottsdale Auction 2027",
   "series": "Barrett-Jackson",
@@ -558,6 +568,7 @@
   "lon": -111.8857,
   "url": "https://www.barrett-jackson.com/",
   "source": "https://theshopmag.com/news/barrett-jackson-2027-scottsdale-auction-expansion-nine-days/",
+  "source2": "https://theshopmag.com/news/barrett-jackson-2027-scottsdale-auction-expansion-nine-days/",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "classics"
@@ -585,7 +596,7 @@
  {
   "category": "offroad",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "africa-eco-race-2027",
   "name": "Africa Eco Race (18th)",
   "series": "Africa Eco Race",
@@ -598,6 +609,7 @@
   "lon": -5.834,
   "url": "https://www.africaecorace.com",
   "source": "https://enduro21.com/en/news/2027-africa-eco-race-dates-set-for-original-rally-raid-18th-edition",
+  "source2": "https://enduro21.com/en/news/2027-africa-eco-race-dates-set-for-original-rally-raid-18th-edition",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "offroad"
@@ -645,7 +657,7 @@
  {
   "category": "festival",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "retromobile-2027",
   "name": "Rétromobile",
   "series": "Rétromobile",
@@ -658,6 +670,7 @@
   "lon": 2.2878,
   "url": "https://www.retromobile.com",
   "source": "https://www.neventum.com/tradeshows/retromobile-0",
+  "source2": "https://parisjetaime.com/eng/event/retromobile-e116",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "classics"
@@ -665,7 +678,7 @@
  {
   "category": "festival",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "bremen-classic-motorshow-2027",
   "name": "Bremen Classic Motorshow 2027",
   "series": "Bremen Classic Motorshow",
@@ -678,6 +691,7 @@
   "lon": 8.8143,
   "url": "https://www.classicmotorshow.de/",
   "source": "https://www.messen.de/de/7477/bremen/bremen-classic-motorshow/info",
+  "source2": "https://www.messen.de/de/7477/bremen/bcm-bremen-classic-motorshow/info",
   "checked": "2026-10-30",
   "tier": 3,
   "genre": "classics"
@@ -685,7 +699,7 @@
  {
   "category": "sa",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "cape-grand-prix-revival-2027",
   "name": "AG Capital Cape Grand Prix Revival",
   "series": "Cape Grand Prix Revival",
@@ -698,6 +712,7 @@
   "lon": 18.4767,
   "url": "",
   "source": "https://www.ewn.co.za/2026/07/10/killarney-s-80-year-racing-legacy-gets-new-life-with-cape-grand-prix-revival",
+  "source2": "https://www.ewn.co.za/2026/07/10/killarney-s-80-year-racing-legacy-gets-new-life-with-cape-grand-prix-revival",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "classics"
@@ -805,7 +820,7 @@
  {
   "category": "bikes",
   "tickets": "https://tickets.worldsbk.com/en/",
-  "confirmed": false,
+  "confirmed": true,
   "id": "wsbk-australian-round-2027",
   "name": "WorldSBK Australian Round",
   "series": "WorldSBK",
@@ -818,6 +833,7 @@
   "lon": 145.2336,
   "url": "https://www.worldsbk.com/en/calendar",
   "source": "https://www.worldsbk.com/en/news/2026/10/01/provisional-2027-worldsbk-calendar-revealed-china-to-debut-and-valencia-returns/1144887",
+  "source2": "https://www.crash.net/wsbk/news/1105926/1/worldsbk-reveals-2027-calendar-old-motogp-track-final-round",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "superbike"
@@ -865,7 +881,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "mxgp-mxgp-of-andalucia-2027",
   "name": "MXGP of Andalucia",
   "series": "MXGP",
@@ -878,6 +894,7 @@
   "lon": -6.5205,
   "url": "https://www.mxgp.com/",
   "source": "https://www.mxgp.com/news/provisional-2027-fim-motocross-world-championship-calendar-announced",
+  "source2": "https://www.fim-moto.com/en/news/news-detail/article/provisional-2027-fim-motorcross-world-championship-calendar-announced",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "mx"
@@ -1085,7 +1102,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "mxgp-mxgp-of-argentina-2027",
   "name": "MXGP of Argentina",
   "series": "MXGP",
@@ -1098,6 +1115,7 @@
   "lon": -71.3103,
   "url": "https://www.mxgp.com/",
   "source": "https://www.mxgp.com/news/provisional-2027-fim-motocross-world-championship-calendar-announced",
+  "source2": "https://www.fim-moto.com/en/news/news-detail/article/provisional-2027-fim-motorcross-world-championship-calendar-announced",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "mx"
@@ -1185,7 +1203,7 @@
  {
   "category": "endurance",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "12h-mugello-2027",
   "name": "Michelin 12H Mugello",
   "series": "24H Series Europe",
@@ -1198,6 +1216,7 @@
   "lon": 11.3719,
   "url": "https://www.24hseries.com",
   "source": "https://www.24hseries.com/news/red-bull-ring-returns-as-michelin-24h-series-reveals-2027-european-calender",
+  "source2": "https://www.24hseries.com/news/red-bull-ring-returns-as-michelin-24h-series-reveals-2027-european-calender",
   "checked": "2026-10-30",
   "tier": 3,
   "genre": "endurance"
@@ -1225,7 +1244,7 @@
  {
   "category": "bikes",
   "tickets": "https://tickets.worldsbk.com/en/",
-  "confirmed": false,
+  "confirmed": true,
   "id": "wsbk-portuguese-round-portimao-2027",
   "name": "WorldSBK Portuguese Round (Portimao)",
   "series": "WorldSBK",
@@ -1238,6 +1257,7 @@
   "lon": -8.6267,
   "url": "https://www.worldsbk.com/en/calendar",
   "source": "https://www.worldsbk.com/en/news/2026/10/01/provisional-2027-worldsbk-calendar-revealed-china-to-debut-and-valencia-returns/1144887",
+  "source2": "https://www.cyclenews.com/2026/10/article/2027-fim-world-superbike-calendar/",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "superbike"
@@ -1325,7 +1345,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "mxgp-mxgp-of-italy-2027",
   "name": "MXGP of Italy",
   "series": "MXGP",
@@ -1338,6 +1358,7 @@
   "lon": 11.569,
   "url": "https://www.mxgp.com/",
   "source": "https://www.mxgp.com/news/provisional-2027-fim-motocross-world-championship-calendar-announced",
+  "source2": "https://www.fim-moto.com/en/news/news-detail/article/provisional-2027-fim-motorcross-world-championship-calendar-announced",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "mx"
@@ -1407,7 +1428,7 @@
  {
   "category": "bikes",
   "tickets": "https://tickets.worldsbk.com/en/",
-  "confirmed": false,
+  "confirmed": true,
   "id": "wsbk-spanish-round-valencia-2027",
   "name": "WorldSBK Spanish Round (Valencia)",
   "series": "WorldSBK",
@@ -1420,6 +1441,7 @@
   "lon": -0.6314,
   "url": "https://www.worldsbk.com/en/calendar",
   "source": "https://www.worldsbk.com/en/news/2026/10/01/provisional-2027-worldsbk-calendar-revealed-china-to-debut-and-valencia-returns/1144887",
+  "source2": "https://www.cyclenews.com/2026/10/article/2027-fim-world-superbike-calendar/",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "superbike"
@@ -1427,7 +1449,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "mxgp-mxgp-of-sardegna-2027",
   "name": "MXGP of Sardegna",
   "series": "MXGP",
@@ -1440,6 +1462,7 @@
   "lon": 8.62,
   "url": "https://www.mxgp.com/",
   "source": "https://www.mxgp.com/news/provisional-2027-fim-motocross-world-championship-calendar-announced",
+  "source2": "https://www.fim-moto.com/en/news/news-detail/article/provisional-2027-fim-motorcross-world-championship-calendar-announced",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "mx"
@@ -1507,7 +1530,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "24-heures-motos-2027",
   "name": "24 Heures Motos (Le Mans)",
   "series": "FIM EWC",
@@ -1520,6 +1543,7 @@
   "lon": 0.2086,
   "url": "https://www.24h-lemans.com/en",
   "source": "https://www.cyclenews.com/2026/10/article/2027-fim-endurance-world-championship-calendar/",
+  "source2": "https://www.cyclenews.com/2026/10/article/2027-fim-endurance-world-championship-calendar/",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "superbike"
@@ -1587,7 +1611,7 @@
  {
   "category": "endurance",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "12h-spa-2027",
   "name": "Michelin 12H Spa-Francorchamps",
   "series": "24H Series Europe",
@@ -1600,6 +1624,7 @@
   "lon": 5.9714,
   "url": "https://www.24hseries.com",
   "source": "https://www.24hseries.com/news/red-bull-ring-returns-as-michelin-24h-series-reveals-2027-european-calender",
+  "source2": "https://www.24hseries.com/news/red-bull-ring-returns-as-michelin-24h-series-reveals-2027-european-calender",
   "checked": "2026-10-30",
   "tier": 3,
   "genre": "endurance"
@@ -1747,7 +1772,7 @@
  {
   "category": "bikes",
   "tickets": "https://tickets.worldsbk.com/en/",
-  "confirmed": false,
+  "confirmed": true,
   "id": "wsbk-dutch-round-2027",
   "name": "WorldSBK Dutch Round",
   "series": "WorldSBK",
@@ -1760,6 +1785,7 @@
   "lon": 6.5272,
   "url": "https://www.worldsbk.com/en/calendar",
   "source": "https://www.worldsbk.com/en/news/2026/10/01/provisional-2027-worldsbk-calendar-revealed-china-to-debut-and-valencia-returns/1144887",
+  "source2": "https://www.cyclenews.com/2026/10/article/2027-fim-world-superbike-calendar/",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "superbike"
@@ -1767,7 +1793,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "mxgp-mxgp-of-spain-extremadura-2027",
   "name": "MXGP of Spain (Extremadura)",
   "series": "MXGP",
@@ -1780,6 +1806,7 @@
   "lon": -6.3437,
   "url": "https://www.mxgp.com/",
   "source": "https://www.mxgp.com/news/provisional-2027-fim-motocross-world-championship-calendar-announced",
+  "source2": "https://www.fim-moto.com/en/news/news-detail/article/provisional-2027-fim-motorcross-world-championship-calendar-announced",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "mx"
@@ -1887,7 +1914,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "mxgp-mxgp-of-trentino-2027",
   "name": "MXGP of Trentino",
   "series": "MXGP",
@@ -1900,6 +1927,7 @@
   "lon": 10.95,
   "url": "https://www.mxgp.com/",
   "source": "https://www.mxgp.com/news/provisional-2027-fim-motocross-world-championship-calendar-announced",
+  "source2": "https://www.fim-moto.com/en/news/news-detail/article/provisional-2027-fim-motorcross-world-championship-calendar-announced",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "mx"
@@ -1967,7 +1995,7 @@
  {
   "category": "sa",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "simola-hillclimb-2027",
   "name": "Simola Hillclimb (17th edition)",
   "series": "Simola Hillclimb",
@@ -1980,6 +2008,7 @@
   "lon": 23.0283,
   "url": "https://www.knysnaplettherald.com/News/Article/Business/simola-hillclimb-wins-best-of-knysna-plett-202608240354",
   "source": "https://www.knysnaplettherald.com/News/Article/Business/simola-hillclimb-wins-best-of-knysna-plett-202608240354",
+  "source2": "https://www.knysnaplettherald.com/News/Article/Business/simola-hillclimb-wins-best-of-knysna-plett-202608240354",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "hillclimb"
@@ -2027,7 +2056,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "mxgp-mxgp-of-china-2027",
   "name": "MXGP of China",
   "series": "MXGP",
@@ -2040,6 +2069,7 @@
   "lon": 121.4737,
   "url": "https://www.mxgp.com/",
   "source": "https://www.mxgp.com/news/provisional-2027-fim-motocross-world-championship-calendar-announced",
+  "source2": "https://www.fim-moto.com/en/news/news-detail/article/provisional-2027-fim-motorcross-world-championship-calendar-announced",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "mx"
@@ -2187,7 +2217,7 @@
  {
   "category": "endurance",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "12h-red-bull-ring-2027",
   "name": "Michelin 12H Red Bull Ring",
   "series": "24H Series Europe",
@@ -2200,6 +2230,7 @@
   "lon": 14.7647,
   "url": "https://www.24hseries.com",
   "source": "https://www.24hseries.com/news/red-bull-ring-returns-as-michelin-24h-series-reveals-2027-european-calender",
+  "source2": "https://www.24hseries.com/news/red-bull-ring-returns-as-michelin-24h-series-reveals-2027-european-calender",
   "checked": "2026-10-30",
   "tier": 3,
   "genre": "endurance"
@@ -2287,7 +2318,7 @@
  {
   "category": "bikes",
   "tickets": "https://tickets.worldsbk.com/en/",
-  "confirmed": false,
+  "confirmed": true,
   "id": "wsbk-aragon-round-2027",
   "name": "WorldSBK Aragon Round",
   "series": "WorldSBK",
@@ -2300,6 +2331,7 @@
   "lon": -0.2033,
   "url": "https://www.worldsbk.com/en/calendar",
   "source": "https://www.worldsbk.com/en/news/2026/10/01/provisional-2027-worldsbk-calendar-revealed-china-to-debut-and-valencia-returns/1144887",
+  "source2": "https://www.cyclenews.com/2026/10/article/2027-fim-world-superbike-calendar/",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "superbike"
@@ -2307,7 +2339,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "mxgp-mxgp-of-portugal-2027",
   "name": "MXGP of Portugal",
   "series": "MXGP",
@@ -2320,6 +2352,7 @@
   "lon": -8.445,
   "url": "https://www.mxgp.com/",
   "source": "https://www.mxgp.com/news/provisional-2027-fim-motocross-world-championship-calendar-announced",
+  "source2": "https://www.fim-moto.com/en/news/news-detail/article/provisional-2027-fim-motorcross-world-championship-calendar-announced",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "mx"
@@ -2347,7 +2380,7 @@
  {
   "category": "festival",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "mille-miglia-2027",
   "name": "1000 Miglia (centenary)",
   "series": "1000 Miglia",
@@ -2360,6 +2393,7 @@
   "lon": 10.2118,
   "url": "https://www.1000miglia.it",
   "source": "https://ohhitaly.com/mille-miglia-2027-private-journey-tour/",
+  "source2": "https://motori.quotidiano.net/varie/curiosita/1000-miglia-2027-percorso.htm",
   "checked": "2026-10-30",
   "tier": 1,
   "genre": "classics"
@@ -2367,7 +2401,7 @@
  {
   "category": "endurance",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "nurburgring-24h-2027",
   "name": "ADAC 24h Nürburgring",
   "series": "ADAC 24h Nürburgring Series",
@@ -2380,6 +2414,7 @@
   "lon": 6.9475,
   "url": "https://www.nuerburgring.de",
   "source": "https://www.pitdebrief.com/?p=136173",
+  "source2": "https://www.gpfans.com/nl/f1-nieuws/1088478/droomscenario-voor-verstappen-in-2027-spa-24h-en-24h-nurburgring-vallen-niet-samen-met-f1/",
   "checked": "2026-10-30",
   "tier": 1,
   "genre": "endurance"
@@ -2427,7 +2462,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "mxgp-mxgp-of-france-2027",
   "name": "MXGP of France",
   "series": "MXGP",
@@ -2440,6 +2475,7 @@
   "lon": -0.52,
   "url": "https://www.mxgp.com/",
   "source": "https://www.mxgp.com/news/provisional-2027-fim-motocross-world-championship-calendar-announced",
+  "source2": "https://www.fim-moto.com/en/news/news-detail/article/provisional-2027-fim-motorcross-world-championship-calendar-announced",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "mx"
@@ -2547,7 +2583,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "spa-8-hours-motos-2027",
   "name": "8 Hours of Spa Motos",
   "series": "FIM EWC",
@@ -2560,6 +2596,7 @@
   "lon": 5.9714,
   "url": "https://www.fim-ewc.com",
   "source": "https://www.cyclenews.com/2026/10/article/2027-fim-endurance-world-championship-calendar/",
+  "source2": "https://www.cyclenews.com/2026/10/article/2027-fim-endurance-world-championship-calendar/",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "superbike"
@@ -2587,7 +2624,7 @@
  {
   "category": "endurance",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "12h-paul-ricard-2027",
   "name": "Michelin 12H Paul Ricard",
   "series": "24H Series Europe",
@@ -2600,6 +2637,7 @@
   "lon": 5.7917,
   "url": "https://www.24hseries.com",
   "source": "https://www.24hseries.com/news/red-bull-ring-returns-as-michelin-24h-series-reveals-2027-european-calender",
+  "source2": "https://www.24hseries.com/news/red-bull-ring-returns-as-michelin-24h-series-reveals-2027-european-calender",
   "checked": "2026-10-30",
   "tier": 3,
   "genre": "endurance"
@@ -2627,7 +2665,7 @@
  {
   "category": "bikes",
   "tickets": "https://tickets.worldsbk.com/en/",
-  "confirmed": false,
+  "confirmed": true,
   "id": "wsbk-czech-round-2027",
   "name": "WorldSBK Czech Round",
   "series": "WorldSBK",
@@ -2640,6 +2678,7 @@
   "lon": 13.6028,
   "url": "https://www.worldsbk.com/en/calendar",
   "source": "https://www.worldsbk.com/en/news/2026/10/01/provisional-2027-worldsbk-calendar-revealed-china-to-debut-and-valencia-returns/1144887",
+  "source2": "https://www.cyclenews.com/2026/10/article/2027-fim-world-superbike-calendar/",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "superbike"
@@ -2747,7 +2786,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "mxgp-mxgp-of-latvia-2027",
   "name": "MXGP of Latvia",
   "series": "MXGP",
@@ -2760,6 +2799,7 @@
   "lon": 24.72,
   "url": "https://www.mxgp.com/",
   "source": "https://www.mxgp.com/news/provisional-2027-fim-motocross-world-championship-calendar-announced",
+  "source2": "https://www.fim-moto.com/en/news/news-detail/article/provisional-2027-fim-motorcross-world-championship-calendar-announced",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "mx"
@@ -2847,7 +2887,7 @@
  {
   "category": "bikes",
   "tickets": "https://tickets.worldsbk.com/en/",
-  "confirmed": false,
+  "confirmed": true,
   "id": "wsbk-italian-round-misano-2027",
   "name": "WorldSBK Italian Round (Misano)",
   "series": "WorldSBK",
@@ -2860,6 +2900,7 @@
   "lon": 12.6847,
   "url": "https://www.worldsbk.com/en/calendar",
   "source": "https://www.worldsbk.com/en/news/2026/10/01/provisional-2027-worldsbk-calendar-revealed-china-to-debut-and-valencia-returns/1144887",
+  "source2": "https://www.cyclenews.com/2026/10/article/2027-fim-world-superbike-calendar/",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "superbike"
@@ -2867,7 +2908,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "mxgp-mxgp-of-germany-2027",
   "name": "MXGP of Germany",
   "series": "MXGP",
@@ -2880,6 +2921,7 @@
   "lon": 11.8,
   "url": "https://www.mxgp.com/",
   "source": "https://www.mxgp.com/news/provisional-2027-fim-motocross-world-championship-calendar-announced",
+  "source2": "https://www.fim-moto.com/en/news/news-detail/article/provisional-2027-fim-motorcross-world-championship-calendar-announced",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "mx"
@@ -3007,7 +3049,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "mxgp-mxgp-of-great-britain-2027",
   "name": "MXGP of Great Britain",
   "series": "MXGP",
@@ -3020,6 +3062,7 @@
   "lon": -0.56,
   "url": "https://www.mxgp.com/",
   "source": "https://www.mxgp.com/news/provisional-2027-fim-motocross-world-championship-calendar-announced",
+  "source2": "https://www.fim-moto.com/en/news/news-detail/article/provisional-2027-fim-motorcross-world-championship-calendar-announced",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "mx"
@@ -3027,7 +3070,7 @@
  {
   "category": "endurance",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "spa-24h-2027",
   "name": "TotalEnergies 24 Hours of Spa",
   "series": "GT World Challenge Europe",
@@ -3040,6 +3083,7 @@
   "lon": 5.9714,
   "url": "https://www.gt-world-challenge-europe.com",
   "source": "https://www.speedweek.com/en/a/sportscar/will-the-2027-spa-24-hours-be-rescheduled-for-max-verstappen-",
+  "source2": "https://www.speedweek.com/en/a/sportscar/gt-world-challenge-europe-announces-race-calendar-for-2027",
   "checked": "2026-10-30",
   "tier": 1,
   "genre": "endurance"
@@ -3127,7 +3171,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "suzuka-8-hours-2027",
   "name": "Suzuka 8 Hours",
   "series": "FIM EWC",
@@ -3140,6 +3184,7 @@
   "lon": 136.541,
   "url": "https://www.suzukacircuit.jp/8tai_e/",
   "source": "https://www.cyclenews.com/2026/10/article/2027-fim-endurance-world-championship-calendar/",
+  "source2": "https://www.cyclenews.com/2026/10/article/2027-fim-endurance-world-championship-calendar/",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "superbike"
@@ -3307,7 +3352,7 @@
  {
   "category": "bikes",
   "tickets": "https://tickets.worldsbk.com/en/",
-  "confirmed": false,
+  "confirmed": true,
   "id": "wsbk-uk-round-2027",
   "name": "WorldSBK UK Round",
   "series": "WorldSBK",
@@ -3320,6 +3365,7 @@
   "lon": -1.3753,
   "url": "https://www.worldsbk.com/en/calendar",
   "source": "https://www.worldsbk.com/en/news/2026/10/01/provisional-2027-worldsbk-calendar-revealed-china-to-debut-and-valencia-returns/1144887",
+  "source2": "https://www.cyclenews.com/2026/10/article/2027-fim-world-superbike-calendar/",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "superbike"
@@ -3547,7 +3593,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "mxgp-mxgp-of-czech-republic-2027",
   "name": "MXGP of Czech Republic",
   "series": "MXGP",
@@ -3560,6 +3606,7 @@
   "lon": 12.75,
   "url": "https://www.mxgp.com/",
   "source": "https://www.mxgp.com/news/provisional-2027-fim-motocross-world-championship-calendar-announced",
+  "source2": "https://www.fim-moto.com/en/news/news-detail/article/provisional-2027-fim-motorcross-world-championship-calendar-announced",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "mx"
@@ -3667,7 +3714,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "mxgp-mxgp-of-flanders-2027",
   "name": "MXGP of Flanders",
   "series": "MXGP",
@@ -3680,6 +3727,7 @@
   "lon": 5.31,
   "url": "https://www.mxgp.com/",
   "source": "https://www.mxgp.com/news/provisional-2027-fim-motocross-world-championship-calendar-announced",
+  "source2": "https://www.cyclenews.com/2026/09/article/2027-fim-motocross-world-championship-calendar-updated/",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "mx"
@@ -3727,7 +3775,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "sturgis-rally-2027",
   "name": "Sturgis Motorcycle Rally",
   "series": "Sturgis",
@@ -3740,6 +3788,7 @@
   "lon": -103.5091,
   "url": "https://www.sturgismotorcyclerally.com",
   "source": "https://bikenrider.com/news/bike-week-sturgis-2027-dates-and-event-schedule-officially-released-here-is-what-riders-need-to-know",
+  "source2": "https://www.travelsouthdakota.com/events/sturgis-motorcycle-rally",
   "checked": "2026-10-30",
   "tier": 1,
   "genre": "bikefest"
@@ -3807,7 +3856,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "mxgp-mxgp-of-sweden-2027",
   "name": "MXGP of Sweden",
   "series": "MXGP",
@@ -3820,6 +3869,7 @@
   "lon": 11.94,
   "url": "https://www.mxgp.com/",
   "source": "https://www.mxgp.com/news/provisional-2027-fim-motocross-world-championship-calendar-announced",
+  "source2": "https://www.cyclenews.com/2026/09/article/2027-fim-motocross-world-championship-calendar-updated/",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "mx"
@@ -3927,7 +3977,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "mxgp-mxgp-of-the-netherlands-2027",
   "name": "MXGP of the Netherlands",
   "series": "MXGP",
@@ -3940,6 +3990,7 @@
   "lon": 5.91,
   "url": "https://www.mxgp.com/",
   "source": "https://www.mxgp.com/news/provisional-2027-fim-motocross-world-championship-calendar-announced",
+  "source2": "https://www.cyclenews.com/2026/09/article/2027-fim-motocross-world-championship-calendar-updated/",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "mx"
@@ -4107,7 +4158,7 @@
  {
   "category": "bikes",
   "tickets": "https://tickets.worldsbk.com/en/",
-  "confirmed": false,
+  "confirmed": true,
   "id": "wsbk-french-round-2027",
   "name": "WorldSBK French Round",
   "series": "WorldSBK",
@@ -4120,6 +4171,7 @@
   "lon": 3.1636,
   "url": "https://www.worldsbk.com/en/calendar",
   "source": "https://www.worldsbk.com/en/news/2026/10/01/provisional-2027-worldsbk-calendar-revealed-china-to-debut-and-valencia-returns/1144887",
+  "source2": "https://www.cyclenews.com/2026/10/article/2027-fim-world-superbike-calendar/",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "superbike"
@@ -4127,7 +4179,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "mxgp-mxgp-of-turkiye-2027",
   "name": "MXGP of Turkiye",
   "series": "MXGP",
@@ -4140,6 +4192,7 @@
   "lon": 30.54,
   "url": "https://www.mxgp.com/",
   "source": "https://www.mxgp.com/news/provisional-2027-fim-motocross-world-championship-calendar-announced",
+  "source2": "https://www.cyclenews.com/2026/09/article/2027-fim-motocross-world-championship-calendar-updated/",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "mx"
@@ -4207,7 +4260,7 @@
  {
   "category": "endurance",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "24h-barcelona-2027",
   "name": "Michelin 24H Barcelona",
   "series": "24H Series Europe",
@@ -4220,6 +4273,7 @@
   "lon": 2.2611,
   "url": "https://www.24hseries.com",
   "source": "https://www.24hseries.com/news/red-bull-ring-returns-as-michelin-24h-series-reveals-2027-european-calender",
+  "source2": "https://www.24hseries.com/news/red-bull-ring-returns-as-michelin-24h-series-reveals-2027-european-calender",
   "checked": "2026-10-30",
   "tier": 3,
   "genre": "endurance"
@@ -4307,7 +4361,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "bol-d-or-2027",
   "name": "Bol d'Or",
   "series": "FIM EWC",
@@ -4320,6 +4374,7 @@
   "lon": 5.7917,
   "url": "https://www.bol-or.com",
   "source": "https://www.cyclenews.com/2026/10/article/2027-fim-endurance-world-championship-calendar/",
+  "source2": "https://www.lerepairedesmotards.com/actualites/2026/calendrier-2027-championnat-monde-endurance-fim-ewc.php",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "superbike"
@@ -4367,7 +4422,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "mxgp-mxgp-of-australia-2027",
   "name": "MXGP of Australia",
   "series": "MXGP",
@@ -4380,6 +4435,7 @@
   "lon": 130.84,
   "url": "https://www.mxgp.com/",
   "source": "https://www.mxgp.com/news/provisional-2027-fim-motocross-world-championship-calendar-announced",
+  "source2": "https://www.cyclenews.com/2026/09/article/2027-fim-motocross-world-championship-calendar-updated/",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "mx"
@@ -4447,7 +4503,7 @@
  {
   "category": "bikes",
   "tickets": "https://tickets.worldsbk.com/en/",
-  "confirmed": false,
+  "confirmed": true,
   "id": "wsbk-italian-round-cremona-2027",
   "name": "WorldSBK Italian Round (Cremona)",
   "series": "WorldSBK",
@@ -4460,6 +4516,7 @@
   "lon": 10.0425,
   "url": "https://www.worldsbk.com/en/calendar",
   "source": "https://www.worldsbk.com/en/news/2026/10/01/provisional-2027-worldsbk-calendar-revealed-china-to-debut-and-valencia-returns/1144887",
+  "source2": "https://www.cyclenews.com/2026/10/article/2027-fim-world-superbike-calendar/",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "superbike"
@@ -4607,7 +4664,7 @@
  {
   "category": "bikes",
   "tickets": "",
-  "confirmed": false,
+  "confirmed": true,
   "id": "mxgp-motocross-of-nations-2027",
   "name": "Motocross of Nations",
   "series": "MXGP",
@@ -4620,6 +4677,7 @@
   "lon": 6.5272,
   "url": "https://www.mxgp.com/",
   "source": "https://www.mxgp.com/news/provisional-2027-fim-motocross-world-championship-calendar-announced",
+  "source2": "https://www.cyclenews.com/2026/09/article/2027-fim-motocross-world-championship-calendar-updated/",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "mx"
@@ -4667,7 +4725,7 @@
  {
   "category": "bikes",
   "tickets": "https://tickets.worldsbk.com/en/",
-  "confirmed": false,
+  "confirmed": true,
   "id": "wsbk-portuguese-round-estoril-2027",
   "name": "WorldSBK Portuguese Round (Estoril)",
   "series": "WorldSBK",
@@ -4680,6 +4738,7 @@
   "lon": -9.3939,
   "url": "https://www.worldsbk.com/en/calendar",
   "source": "https://www.worldsbk.com/en/news/2026/10/01/provisional-2027-worldsbk-calendar-revealed-china-to-debut-and-valencia-returns/1144887",
+  "source2": "https://www.cyclenews.com/2026/10/article/2027-fim-world-superbike-calendar/",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "superbike"
@@ -4827,7 +4886,7 @@
  {
   "category": "bikes",
   "tickets": "https://tickets.worldsbk.com/en/",
-  "confirmed": false,
+  "confirmed": true,
   "id": "wsbk-chinese-round-2027",
   "name": "WorldSBK Chinese Round",
   "series": "WorldSBK",
@@ -4840,6 +4899,7 @@
   "lon": 121.2197,
   "url": "https://www.worldsbk.com/en/calendar",
   "source": "https://www.worldsbk.com/en/news/2026/10/01/provisional-2027-worldsbk-calendar-revealed-china-to-debut-and-valencia-returns/1144887",
+  "source2": "https://www.cyclenews.com/2026/10/article/2027-fim-world-superbike-calendar/",
   "checked": "2026-10-30",
   "tier": 2,
   "genre": "superbike"
