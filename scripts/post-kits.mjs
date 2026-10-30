@@ -82,7 +82,7 @@ const sun = add(from, 6);
   const photo = fMatch(f.name, f.area) || storyPhotos(st)[0] || null;
   const town = (f.area || "").split(",")[0];
   days.push({ day: "Tuesday", theme: "Places", slug: "2-places", tex: f.group === "petrol" ? "tar" : "gravel", photo,
-    title: f.name, sub: f.area, cta: ["Visit it", SHORT], link: `${SITE}/?poi=${f.lat},${f.lon}&n=${encodeURIComponent(f.name)}`,
+    title: f.name, sub: f.area, cta: ["Visit it", SHORT], link: `${SITE}/plan/?poi=${f.lat},${f.lon}&n=${encodeURIComponent(f.name)}`,
     ig: [f.short, "", cut((f.text || [])[0], 420), "", (f.tips || [])[0] ? `Tip: ${f.tips[0]}` : "", "", "Route there from wherever you are, link in bio.", "", `📍 ${f.name}, ${town}`, "", "#roadtrip #placestogo #onetrackmind"] }); }
 
 // Wednesday: Roads (a founder route)
@@ -90,7 +90,7 @@ const sun = add(from, 6);
   const facts = [s.km && `${s.km} km`, s.gravelPct != null && (s.gravelPct ? `${s.gravelPct}% gravel` : "all tar"), r.trip && r.trip.days && `${r.trip.days.length} day${r.trip.days.length > 1 ? "s" : ""}`, s.highM && `highest point ${s.highM} m`].filter(Boolean);
   const startName = r.trip && r.trip.start && r.trip.start.name;
   days.push({ day: "Wednesday", theme: "Roads", slug: "3-roads", tex: r.style === "rough" ? "gravel" : "tar", photo: fMatch(r.title, r.region || "") || pickPhoto(r),
-    title: r.title, sub: [r.region, facts.join(" · ")].filter(Boolean).join("\n"), cta: ["Ride it", SHORT], link: `${SITE}/?pick=${r.id}`,
+    title: r.title, sub: [r.region, facts.join(" · ")].filter(Boolean).join("\n"), cta: ["Ride it", SHORT], link: `${SITE}/plan/?pick=${r.id}`,
     ig: [cut(r.blurb, 400), "", facts.join(" · "), "", "The whole route, ready for your GPS, link in bio.", "", startName ? `📍 ${startName}` : "", "", "#advrider #roadtrip #onetrackmind"] }); }
 
 // Thursday: Throwback: on even weeks one of the founder's own photos (captioned ones first), otherwise a story from around this time of year
@@ -125,8 +125,15 @@ else { const doy = s => { const d = new Date(s + "T12:00:00Z"); return (d - Date
   const place = n.place || "[Restaurant]", town = n.town || "[Town]", veh = n.vehicle || "[What I drove or rode]";
   days.push({ day: "Saturday", theme: "Breakfast Run", slug: "6-breakfast-run", tex: "tar", photo: ph[0] || null, extra: ph.slice(1), needs: !ph.length,
     title: n.place ? place : "Breakfast Run", sub: n.place ? `${town} · ${veh}` : "Photos needed: the vehicle outside, the food, two or three candids",
-    cta: ["Go there", SHORT], link: n.lat ? `${SITE}/?poi=${n.lat},${n.lon}&n=${encodeURIComponent(place)}` : SITE,
-    ig: [`Breakfast Run: ${place}, ${town}.`, "", `Took the ${veh}.`, n.order ? `Ordered: ${n.order}.` : "Ordered: [what you ate].", n.verdict || "[One line: would you go back, and why.]", "", "Route there from wherever you are, link in bio.", "", `📍 ${place}, ${town}`, "", "#breakfastrun #saturdayride #onetrackmind"] }); }
+    cta: ["Go there", SHORT], link: n.lat ? `${SITE}/plan/?poi=${n.lat},${n.lon}&n=${encodeURIComponent(place)}` : SITE,
+    ig: [`Local is lekker. Breakfast Run: ${place}, ${town}.`, "", `Took the ${veh}.`, n.order ? `Ordered: ${n.order}.` : "Ordered: [what you ate].", n.verdict || "[One line: would you go back, and why.]", "", "Route there from wherever you are, link in bio.", "", `📍 ${place}, ${town}`, "", "#localislekker #breakfastrun #onetrackmind"] }); }
+
+// the run goes onto the Local is lekker page once the place is known (photo copied into media/lil/)
+{ const n = NOTES.breakfast || {}, ph = inbox(/^breakfast.*\.(jpe?g|png|webp)$/i), sat = add(from, 5);
+  if (n.place) { const F = path.join(ROOT, "data/local-is-lekker.json"); let L = []; try { L = JSON.parse(fs.readFileSync(F, "utf8")); } catch (e) {}
+    let photo = ""; if (ph[0]) { fs.mkdirSync(path.join(ROOT, "media/lil"), { recursive: true }); const to = `media/lil/${sat}${path.extname(ph[0]).toLowerCase()}`; fs.copyFileSync(ph[0], path.join(ROOT, to)); photo = "/" + to; }
+    L = L.filter(x => x.date !== sat); L.push({ date: sat, place: n.place, town: n.town || "", vehicle: n.vehicle || "", line: n.verdict || "", photo, lat: n.lat ?? null, lon: n.lon ?? null });
+    L.sort((a, b) => a.date.localeCompare(b.date)); fs.writeFileSync(F, JSON.stringify(L, null, 1) + "\n"); } }
 
 // Sunday: Race Day
 { const racing = e => (WATCH[e.series] || {}).watch && e.category !== "festival";

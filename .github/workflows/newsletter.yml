@@ -22,11 +22,12 @@ jobs:
         run: |
           npm i --no-save playwright@1.63.0 && npx playwright install --with-deps chromium
           node scripts/post-kits.mjs --from "$(date -u +%F)"
+          node scripts/wall-planner.mjs "$(( $(date -u +%Y) + 1 ))"
       - run: ./build.sh --no-test
       - name: Commit
         run: |
           git config user.name "otm-bot"; git config user.email "bot@onetrackmind.online"
-          git add data/events/results.json reports newsletter kits sitemap.xml events blog index.html || true
+          git add data/events/results.json data/local-is-lekker.json media/lil reports newsletter kits sitemap.xml events blog index.html plan adventure petrolhead local-is-lekker || true
           git diff --cached --quiet || { git commit -m "Newsletter and results $(date -u +%F)"; git push; }
       - name: Tell the founder
         env: { GH_TOKEN: "${{ github.token }}" }

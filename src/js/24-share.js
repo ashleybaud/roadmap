@@ -18,7 +18,7 @@ let shareBusy=false;
 async function shareLink(){
   const t=JSON.parse(JSON.stringify(trip)); delete t.savedId; delete t.savedTitle; delete t.sharedId;
   const j=await api("/api/share",{method:"POST",body:{title:defaultTitle(),trip:t,settings}}); track("share");
-  const url=`${location.origin}/?s=${j.id}`; return {url,text:shareText(url)};
+  const url=`${location.origin}/plan/?s=${j.id}`; return {url,text:shareText(url)};
 }
 // straight into WhatsApp: the window opens on the tap (so it isn't blocked), then gets the link
 async function shareWhatsApp(btn){

@@ -1,0 +1,18 @@
+name: news
+# Daily 05:15 UTC: the latest headlines for races in the next six weeks (Motorsport.com RSS, word for word, with links).
+on:
+  schedule: [{ cron: "15 5 * * *" }]
+  workflow_dispatch:
+permissions: { contents: write }
+jobs:
+  news:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22 }
+      - run: node scripts/fetch-news.mjs && node scripts/make-pages.mjs
+      - run: |
+          git config user.name "otm-bot"; git config user.email "bot@onetrackmind.online"
+          git add data/events/news.json events || true
+          git diff --cached --quiet || { git commit -m "Headlines $(date -u +%F)"; git push; }

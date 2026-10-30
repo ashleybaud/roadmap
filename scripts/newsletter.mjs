@@ -78,7 +78,7 @@ ${H2("One idea")}${P(`<b>${esc(idea[0])}.</b> ${esc(idea[1])}`)}
 <td style="padding:10px 12px 10px 0;font:14px/1.4 Arial,Helvetica,sans-serif;color:${C.ink}"><img src="${SITE}/img/alterego-logo-white.png" width="64" height="56" alt="AlterEgo" style="display:block;margin:0 0 6px"><span style="font-size:11px;color:${C.muted};letter-spacing:1px">AD</span><br><b style="color:${C.gold};font-size:18px">BUILD. RACE. REPEAT.</b><br>Made to order for petrolheads. ${A("https://alterego.online/?utm_source=onetrackmind&utm_medium=newsletter", "Shop ›")}</td></tr></table></td></tr>
 <tr><td style="padding:18px 24px 6px"><table role="presentation" cellpadding="0" cellspacing="0"><tr><td width="52"><img src="${SITE}/img/ashley.jpg" width="44" height="44" alt="" style="display:block;border-radius:22px;border:2px solid ${C.gold};object-fit:cover"></td>
 <td style="font:14px/1.45 Arial,Helvetica,sans-serif;color:${C.ink}">Ride safe. Reply to this email if there's a race, road or place I should know about.<br><b>Ashley</b> · ${A(SITE, "onetrackmind.online")}</td></tr></table></td></tr>
-<tr><td style="padding:6px 24px 0;font:11px/1 Arial,Helvetica,sans-serif;color:${C.muted};letter-spacing:1px">POWERED BY <a href="https://alterego.online/?utm_source=onetrackmind&utm_medium=newsletter&utm_content=powered" style="text-decoration:none"><img src="${SITE}/img/alterego-logo-white.png" width="40" height="35" alt="AlterEgo" style="vertical-align:middle;margin-left:6px;border:0"></a></td></tr>
+<tr><td style="padding:6px 24px 0;font:11px/1 Arial,Helvetica,sans-serif;color:${C.muted};letter-spacing:1px">FUELLED BY <a href="https://alterego.online/?utm_source=onetrackmind&utm_medium=newsletter&utm_content=powered" style="text-decoration:none"><img src="${SITE}/img/alterego-logo-white.png" width="40" height="35" alt="AlterEgo" style="vertical-align:middle;margin-left:6px;border:0"></a></td></tr>
 <tr><td style="padding:16px 24px 22px;font:12px/1.5 Arial,Helvetica,sans-serif;color:${C.muted}">You get this because you signed up at onetrackmind.online. ${A("{{PREFS}}", "Change how often")} · ${A("{{UNSUB}}", "Unsubscribe")}</td></tr>
 </table></td></tr></table></body></html>`;
 
@@ -86,7 +86,7 @@ const text = [`${title} · ${fd(from)} – ${fd(to, 1)}`, "", period === "weekly
   ...(on.length ? on.slice(0, 12).map(e => `- ${e.name}, ${rng(e)}, ${e.venue || e.city || ""}: ${SITE}/events/${e.id}/`) : ["A quiet one. Good week to ride instead."]),
   ...(last.length ? ["", "LAST WEEK", ...last.slice(0, 10).map(e => `- ${e.name}: ${(RES[e.id] && RES[e.id].podium) ? "1. " + RES[e.id].podium[0] : (WATCH[e.series] || {}).results || e.url || ""}`)] : []),
   ...(curve ? ["", routeNear ? "THE ROAD THERE" : "CURVES OF THE WEEK", `${curve.title}: ${SITE}/routes/${curve.id}/`] : []),
-  ...(camps.length ? ["", "PLAN AHEAD", ...camps.map(c => `${c.title}. ${c.line} ${SITE}${c.link}`)] : []), "", "ONE IDEA", `${idea[0]}. ${idea[1]}`, "", "Powered by AlterEgo: https://alterego.online", "", "Change how often: {{PREFS}}", "Unsubscribe: {{UNSUB}}"].join("\n");
+  ...(camps.length ? ["", "PLAN AHEAD", ...camps.map(c => `${c.title}. ${c.line} ${SITE}${c.link}`)] : []), "", "ONE IDEA", `${idea[0]}. ${idea[1]}`, "", "Fuelled by AlterEgo: https://alterego.online", "", "Change how often: {{PREFS}}", "Unsubscribe: {{UNSUB}}"].join("\n");
 
 const dir = path.join(ROOT, "newsletter", `${from}-${period}`); fs.mkdirSync(dir, { recursive: true });
 fs.writeFileSync(path.join(dir, "index.html"), html.replace(/\{\{(UNSUB|PREFS)\}\}/g, SITE + "/"));

@@ -13,7 +13,7 @@ function serve() {
     const srv = http.createServer((q, r) => {
       const u = decodeURIComponent(q.url.split("?")[0]);
       if (u.startsWith("/api/")) { r.writeHead(200, { "Content-Type": "application/json" }); return r.end("[]"); }
-      const f = path.join(ROOT, u === "/" ? "index.html" : u);
+      let f = path.join(ROOT, u === "/" ? "index.html" : u); if (fs.existsSync(f) && fs.statSync(f).isDirectory()) f = path.join(f, "index.html");
       if (!f.startsWith(ROOT) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { r.writeHead(404); return r.end(); }
       r.writeHead(200, { "Content-Type": TYPES[path.extname(f)] || "application/octet-stream" }); fs.createReadStream(f).pipe(r);
     }).listen(0, () => res(srv));
@@ -74,7 +74,7 @@ const TRIP = {
     return route.abort();
   });
   await page.addInitScript(t => { if (!sessionStorage.getItem("seeded")) { localStorage.clear(); localStorage.setItem("rr4-trip", t); localStorage.setItem("rr-welcome", "1"); localStorage.setItem("otm-gpsasked", "1"); sessionStorage.setItem("seeded", "1"); } }, JSON.stringify(TRIP));
-  await page.goto(base);
+  await page.goto(base + "plan/");
   const ok = (c, m) => { if (!c) fails.push(m); };
   await page.waitForFunction(() => typeof plan !== "undefined" && plan && !planStale && plan.days.filter(Boolean).length === 2, null, { timeout: 30000 }).catch(() => fails.push("route not worked out"));
   await page.waitForFunction(() => placesOk && typeof townList !== "undefined" && townList, null, { timeout: 30000 }).catch(() => fails.push("places/towns not loaded"));

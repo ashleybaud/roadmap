@@ -2,5 +2,7 @@
 User-agent: *
 Allow: /
 Disallow: /api/
+Disallow: /kits/
+Disallow: /newsletter/
 
 Sitemap: https://onetrackmind.online/sitemap.xml

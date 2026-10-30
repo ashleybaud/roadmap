@@ -1000,12 +1000,12 @@ function townLabels(){ if(!map||!lblLayer||!townList) return; lblLayer.clearLaye
   const own=plan?townPoints():[];
   const used=own.map(p=>map.latLngToContainerPoint([p.lat,p.lon])); list.forEach(t=>{ const pnt=map.latLngToContainerPoint([t.lat,t.lon]); if(used.some(u=>Math.abs(u.x-pnt.x)<90&&Math.abs(u.y-pnt.y)<22)) return; used.push(pnt);
     L.marker([t.lat,t.lon],{interactive:false,keyboard:false,icon:L.divIcon({className:"townlbl"+(t.place==="city"?" city":""),html:`<span>${esc(t.name)}</span>`,iconSize:[0,0]})}).addTo(lblLayer); }); }
-function ensureMap(){ if(!map){map=L.map("map",{scrollWheelZoom:true});L.tileLayer(TILES.url,{maxZoom:TILES.maxZoom,attribution:TILES.attribution}).addTo(map);map.setView(...homeView()); lblLayer=L.layerGroup().addTo(map); map.on("moveend",townLabels); map.on("zoomend",()=>$("map").classList.toggle("zoomin",map.getZoom()>=12)); $("map").classList.toggle("zoomin",map.getZoom()>=12); if(window.ResizeObserver) new ResizeObserver(()=>map.invalidateSize()).observe($("map"));} map.invalidateSize(); if(layer) layer.remove(); layer=L.layerGroup().addTo(map); }
+function ensureMap(){ if(!map){map=L.map("map",{scrollWheelZoom:true});L.tileLayer(TILES.url,{maxZoom:TILES.maxZoom,attribution:TILES.attribution}).addTo(map);map.setView(...homeView()); setTimeout(()=>{ try{ map.invalidateSize(); if(!plan&&!startSeen) map.setView(...homeView(),{animate:false}); }catch(e){} },400); /* the map can be created before its box has a size; recentre once it has one */ lblLayer=L.layerGroup().addTo(map); map.on("moveend",townLabels); map.on("zoomend",()=>$("map").classList.toggle("zoomin",map.getZoom()>=12)); $("map").classList.toggle("zoomin",map.getZoom()>=12); if(window.ResizeObserver) new ResizeObserver(()=>map.invalidateSize()).observe($("map"));} map.invalidateSize(); if(layer) layer.remove(); layer=L.layerGroup().addTo(map); }
 const seg=(a,b)=>plan.geom.filter((g,i)=>plan.cum[i]>=a-0.01&&plan.cum[i]<=b+0.01);
 // where the map opens before there's a trip: the region of the device's time zone, no location prompt
 function homeView(){
   let tz=""; try{ tz=Intl.DateTimeFormat().resolvedOptions().timeZone||""; }catch(e){}
-  if(/^Africa\/(Johannesburg|Windhoek|Gaborone|Maputo|Harare|Maseru|Mbabane|Lusaka)/.test(tz)) return [[-29,24],5];
+  if(/^Africa\/(Johannesburg|Windhoek|Gaborone|Maputo|Harare|Maseru|Mbabane|Lusaka)/.test(tz)) return [[-33.25,20.4],7]; // the Western Cape: Cape Town, the passes and the Karoo
   if(/^Europe\/(London|Dublin)|^Atlantic\/(Reykjavik|Faroe)/.test(tz)) return [[54,-3],6];
   if(/^America\/(New_York|Chicago|Denver|Los_Angeles|Phoenix|Anchorage|Detroit|Boise|Indiana|Kentucky|North_Dakota)|^US\//.test(tz)) return [[39,-97],4];
   if(/^America\/(Toronto|Vancouver|Edmonton|Winnipeg|Halifax|Regina|St_Johns)/.test(tz)) return [[54,-100],4];
@@ -1166,8 +1166,10 @@ $("welcome").addEventListener("close",()=>{
 });
 $("howItWorks").addEventListener("click",openWelcome);
 /* no popup on the first visit: the map opens straight away with sensible defaults; the vehicle and road style chip (Change) opens the settings card */ // wait for fonts so the box doesn't jump
-const STYLE_TEXT={rough:"<b>Road less travelled</b>: gravel and back roads wherever they go",mixed:"<b>Mixed</b>: plenty of gravel, tar to link it up",tar:"<b>Tar</b>: main roads, like normal sat-nav"};
-function showStyle(){ $("styleBanner").innerHTML=`${VEHICLES[settings.vehicle]||VEHICLES.bike} · ${STYLE_TEXT[settings.style]||STYLE_TEXT.rough}.${settings.style==="tar"?"":" Tap a stretch's way icon to switch it to the quick way."} <button type="button" class="linkbtn" id="bannerEdit">Change</button>`; }
+const STYLE_TEXT={rough:"back roads and gravel",mixed:"a mix of gravel and tar",tar:"main roads, the quick way"};
+const VEH_WORD={bike:"motorbike",jeep:"4x4",car:"car"};
+// one plain sentence about how this trip is being planned, and a proper button to change it
+function showStyle(){ $("styleBanner").innerHTML=`<span>You're planning on a <b>${VEH_WORD[settings.vehicle]||"motorbike"}</b>, on <b>${STYLE_TEXT[settings.style]||STYLE_TEXT.rough}</b>.</span> <button type="button" class="btnline small" id="bannerEdit">Change</button>`; }
 document.addEventListener("click",e=>{ if(e.target.id==="bannerEdit") openWelcome(); });
 function render(){ renderAll(); }
 function renderAll(){

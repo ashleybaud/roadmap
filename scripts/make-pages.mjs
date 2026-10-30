@@ -89,7 +89,7 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
 
 .me{float:right;width:min(38%,260px);height:auto;margin:0 0 14px 20px;border-radius:10px;border:3px solid var(--gold)}@media(max-width:640px){.me{float:none;display:block;width:70%;max-width:260px;margin:0 0 14px}}
 
-.hdrlinks{display:flex!important;flex-wrap:wrap;align-items:center}.hdrlinks .modesw{margin-left:auto}.navtoggle{display:none}
+.hdrlinks{display:flex!important;flex-wrap:wrap;align-items:center}.hdrlinks a.navplan{margin-left:auto;background:var(--gold)!important;color:#121A1E!important;border-radius:8px;border-bottom:0!important;padding:7px 16px}.hdrlinks .modesw{margin-left:auto}.navtoggle{display:none}
 @media(max-width:640px){.navtoggle{display:block;font:700 1.15rem "Saira Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.06em;background:none;border:0;color:var(--bg);padding:9px 14px;cursor:pointer}.hdrlinks{justify-content:space-between}.hdrlinks>a{display:none!important;width:100%}.hdrlinks.open>a{display:block!important}.hdrlinks .modesw{margin:4px 8px}}
 
 .blog .bpick{display:grid;grid-template-columns:.6fr 1fr 1fr;gap:10px;margin:14px 0 16px}.bbox{min-height:90px;border:3px solid transparent;border-radius:10px;padding:12px;text-align:left;cursor:pointer;color:#fff;font:inherit;display:flex;flex-direction:column;justify-content:flex-end;background:linear-gradient(180deg,rgba(3,20,26,.1),rgba(3,20,26,.88)),var(--img,linear-gradient(135deg,#1E8EB4,#0B4A60)) center/cover}.bbox b{font:700 1.4rem var(--f-display,"Saira Condensed",sans-serif);text-transform:uppercase}.bbox span{color:var(--gold);font-size:.85rem;font-weight:600}.bbox.on{border-color:var(--gold)}
@@ -121,6 +121,36 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
 body.blogdark{--bg:#0E1417;--panel:#0F5874;--line:#2B7896;--chip:#13617E;background:#0E1417}
 
 .evc b a{color:inherit;text-decoration:none}.evc b a:hover{color:var(--gold)}.follow{align-self:flex-start;background:none;border:1px solid var(--line);border-radius:999px;color:var(--muted);font-size:.75rem;padding:1px 8px;cursor:pointer}.follow.on{border-color:var(--gold);color:var(--gold)}.chips .mine{border-color:var(--gold)}.evpage .evwhen{font-size:1.1rem}.evpage .evcta{margin:10px 0 14px;gap:8px;display:flex;flex-wrap:wrap}.evsec{margin:22px 0}.evsec h3{font:700 1.05rem var(--f-display,"Saira Condensed",sans-serif);text-transform:uppercase;margin:12px 0 4px}
+
+/* buttons: gold fill = the main action; outline = everything else (no lost text links) */
+.btn{display:inline-block;background:var(--gold);color:#121A1E;border:2px solid var(--gold);border-radius:8px;padding:10px 18px;font-weight:700;text-decoration:none;cursor:pointer}
+.btnline{display:inline-block;background:transparent;color:var(--gold);border:2px solid var(--gold);border-radius:8px;padding:7px 14px;font-weight:700;text-decoration:none;white-space:nowrap}.btnline:hover{background:rgba(232,163,23,.12)}
+.evnews .nw{padding:10px 0;border-bottom:1px solid var(--line)}.evnews .nw b{display:block;font-size:1.05rem}.evnews .nw p{margin:4px 0 8px;color:var(--muted)}.btnrow{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 0}
+.tex-gravel{background:linear-gradient(90deg,rgba(20,14,8,.8),rgba(20,14,8,.35)),url(/img/tex-gravel.jpg) center/cover}
+.tex-tar{background:linear-gradient(90deg,rgba(0,0,0,.6),rgba(0,0,0,.2)),url(/img/tex-tar2.jpg) center bottom/cover}
+.pk{display:inline-block;background:var(--gold);color:#121A1E;font:700 .78rem/1 "Saira Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.1em;padding:6px 10px;border-radius:4px}
+/* home */
+.home .oneliner{display:flex;align-items:center;justify-content:center;gap:14px;margin:18px auto 16px;max-width:820px;color:var(--ink);text-decoration:none;font-size:1.08rem}.home .oneliner img{border-radius:50%;border:2px solid var(--gold);object-fit:cover}.home .oneliner b{color:var(--gold)}
+.doors{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:8px 0 18px}.door{display:flex;flex-direction:column;gap:10px;align-items:flex-start;padding:26px 24px;border-radius:12px;min-height:240px;color:#fff;text-decoration:none;border:2px solid transparent}.door:hover{border-color:var(--gold)}.door>b{font:800 2rem/1.05 "Saira Condensed","Arial Narrow",sans-serif;text-transform:uppercase}.door>span:not(.pk):not(.btn){max-width:460px;font-size:1rem;line-height:1.45}.door .btn{margin-top:auto}
+.cd{display:grid;grid-template-columns:1fr auto auto;gap:18px;align-items:center;background:var(--panel);border:1px solid var(--line);border-left:6px solid var(--gold);border-radius:12px;padding:16px 20px;margin:0 0 12px}.cd[hidden]{display:none}.cdk{display:block;font:700 .75rem/1 var(--f-body,sans-serif);text-transform:uppercase;letter-spacing:.1em;color:#8FD3EA;margin-bottom:4px}.cdl b{display:block;font:800 1.7rem/1.05 "Saira Condensed","Arial Narrow",sans-serif;text-transform:uppercase}.cdw{color:var(--muted)}.cdn{text-align:center}.cdn b{display:block;font:800 3rem/1 "Saira Condensed","Arial Narrow",sans-serif;color:var(--gold)}.cdn span{color:var(--muted);font-size:.85rem}.cdb{display:flex;gap:8px;flex-wrap:wrap}.cdnews{grid-column:1/-1;margin:0;font-size:.92rem;border-top:1px solid var(--line);padding-top:10px}.cdnews span{color:var(--muted)}.cdnews a{color:var(--ink)}
+.camps{display:flex;flex-direction:column;gap:6px;margin:0 0 14px}.camps:empty{display:none}.camp{padding:10px 14px;border-radius:8px;background:rgba(232,163,23,.14);border-left:4px solid var(--gold)}.camp b{color:var(--gold)}.camp a{color:var(--gold);font-weight:700;white-space:nowrap}
+.hub{margin:26px 0}.hubh{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;justify-content:space-between;margin-bottom:8px}.hubh h2{margin:0}.hubsub{color:var(--muted)}.lede{font-size:1.05rem;max-width:760px}
+.hub .pcards{display:grid;grid-template-columns:repeat(4,1fr)!important;gap:12px}@media(max-width:1000px){.hub .pcards{grid-template-columns:repeat(2,1fr)!important}}@media(max-width:520px){.hub .pcards{grid-template-columns:1fr!important}}.fuel span span.btnline{display:inline-block;margin:0}.hubcard img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:6px;margin-bottom:6px}.hubcard .go{color:var(--gold);font-weight:700;margin-top:4px}
+.planown{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:20px 22px}
+/* hub pages */
+.hubhero{border-radius:12px;padding:30px 26px;margin:16px 0 18px;color:#fff;display:flex;flex-direction:column;gap:10px;align-items:flex-start}.hubhero h1{margin:0;font-size:2.4rem}.hubhero p{max-width:640px;font-size:1.05rem;margin:0}
+.prog .btnline{margin:12px 0 4px}
+/* FOMO list (home, Petrolhead) */
+.fomo .evhead{display:flex;flex-wrap:wrap;gap:8px;justify-content:space-between;margin-bottom:8px}.evview{display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}.evview button{background:transparent;border:0;color:var(--ink);padding:7px 14px;font:700 .9rem "Saira Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.04em;cursor:pointer}.evview button.on{background:var(--gold);color:#121A1E}
+.evregs{display:flex;flex-wrap:wrap;gap:6px}.evregs button{border:1px solid var(--line);background:transparent;color:var(--ink);border-radius:999px;padding:4px 11px;font-weight:600;font-size:.82rem;cursor:pointer}.evregs button.on{background:var(--gold);border-color:var(--gold);color:#121A1E}
+.fomo .evgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:0 22px;grid-auto-flow:row dense;background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:6px 16px 10px}
+.evcard{display:grid;grid-template-columns:54px 1fr;gap:12px;padding:12px 2px;border-bottom:1px solid rgba(255,255,255,.14);color:#fff;text-decoration:none}.evcard:hover{background:rgba(232,163,23,.08)}.evdate{background:var(--gold);border-radius:6px;text-align:center;padding:6px 0 5px;line-height:1.05;align-self:start}.evdate b{display:block;font:800 1.5rem "Saira Condensed","Arial Narrow",sans-serif;color:#121A1E}.evdate i{font-style:normal;font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:#121A1E}
+.eg{display:block;font:700 .66rem/1.2 var(--f-body,sans-serif);text-transform:uppercase;letter-spacing:.08em;color:#8FD3EA;margin-bottom:2px}.en{display:block;font-weight:700;line-height:1.25}.ew{display:block;color:var(--muted);font-size:.84rem;margin-top:2px}.ef{display:block;color:#FFD23F;font-size:.82rem;font-weight:700;margin-top:3px}
+.evcard.t1{grid-column:span 2;border-bottom:2px solid var(--gold)}.evcard.t1 .en{font:800 1.35rem/1.1 "Saira Condensed","Arial Narrow",sans-serif;text-transform:uppercase}.evcard.t1 .evdate b{font-size:1.75rem}.evcard.t3 .en{font-weight:600;font-size:.88rem}
+/* Fuelled by AlterEgo, with room for the next sponsor beside it */
+.fuelrow{display:grid;grid-template-columns:2fr 1fr;gap:14px;margin:30px 0 8px}.fuel{display:flex;gap:18px;align-items:center;background:var(--panel);border:1px solid var(--line);border-left:6px solid var(--gold);border-radius:12px;padding:16px 20px;color:var(--ink);text-decoration:none}.fuel img{height:84px;width:auto;flex:none}.fuel b{display:block;font:800 1.5rem/1.1 "Saira Condensed","Arial Narrow",sans-serif;text-transform:uppercase;color:var(--gold)}.fuel span span{display:block;margin:4px 0 10px;color:var(--muted)}
+.fuelyou{display:flex;flex-direction:column;justify-content:center;gap:4px;border:2px dashed var(--line);border-radius:12px;padding:16px 20px;color:var(--ink);text-decoration:none}.fuelyou b{font:800 1.3rem "Saira Condensed","Arial Narrow",sans-serif;text-transform:uppercase;color:var(--gold)}.fuelyou span{color:var(--muted)}
+@media(max-width:760px){.doors,.fuelrow{grid-template-columns:1fr}.door{min-height:0}.cd{grid-template-columns:1fr auto}.cdb{grid-column:1/-1}.evcard.t1{grid-column:1/-1}.home .oneliner{font-size:.98rem}}
 `;
 
 function page({ url, title, desc, body, ld, image, active, ads = true, dark = false }) {
@@ -146,11 +176,11 @@ function page({ url, title, desc, body, ld, image, active, ads = true, dark = fa
 ${(Array.isArray(ld) ? ld : [ld]).filter(Boolean).map(x => `<script type="application/ld+json">${JSON.stringify(x)}</script>`).join("\n")}
 </head>
 <body${dark ? ' class="blogdark"' : ""}><div class="wrap">
-<header><a class="logo" href="/">OneTrackMind</a><nav class="hdrlinks" id="sitenav" aria-label="Site"><button type="button" class="navtoggle" aria-expanded="false" aria-controls="sitenav">Menu ▾</button>${[["/","Plan a trip"],["/routes/","Routes"],["/events/","Events"],["/blog/","Blog"],["/about/","About"]].map(([h,t])=>`<a href="${h}"${active===h?' class="on" aria-current="page"':""}>${t}</a>`).join("")}</nav></header><script>document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".navtoggle");if(!b)return;var n=b.closest(".hdrlinks"),o=n.classList.toggle("open");b.setAttribute("aria-expanded",String(o))});document.addEventListener("click",function(e){document.querySelectorAll(".navdd[open]").forEach(function(d){if(!d.contains(e.target))d.open=false;});});</script>
+<header><a class="logo" href="/">OneTrackMind</a><nav class="hdrlinks" id="sitenav" aria-label="Site"><button type="button" class="navtoggle" aria-expanded="false" aria-controls="sitenav">Menu ▾</button>${(n => [["/adventure/","Adventure"],["/petrolhead/","Petrolhead"],["/blog/","Blog"],["/about/","About"],["/plan/","Plan a trip"]].map(([h,t])=>`<a href="${h}"${h === "/plan/" ? ' class="navplan"' : ""}${n===h?' class="on" aria-current="page"':""}>${t}</a>`).join(""))(({ "/routes/": "/adventure/", "/rides/": "/adventure/", "/favourites/": "/adventure/", "/events/": "/petrolhead/", "/how-to/": "/petrolhead/", "/local-is-lekker/": "/" })[active] || active)}</nav></header><script>document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".navtoggle");if(!b)return;var n=b.closest(".hdrlinks"),o=n.classList.toggle("open");b.setAttribute("aria-expanded",String(o))});document.addEventListener("click",function(e){document.querySelectorAll(".navdd[open]").forEach(function(d){if(!d.contains(e.target))d.open=false;});});</script>
 ${body}
 ${ads ? `<div class="adrow"><a class="adcard" href="https://alterego.online/products/build-race-repeat-hoodie?utm_source=onetrackmind&utm_medium=sponsor&utm_content=hoodie" target="_blank" rel="noopener sponsored"><img src="https://alterego.online/cdn/shop/files/3158941636033974733_2048.jpg?v=1792398701&width=360" alt="AlterEgo Build Race Repeat hoodie" loading="lazy"><span class="adt"><em>AlterEgo · Ad</em><b>Build. Race. Repeat.</b><span>The hoodie, made to order for petrolheads. From $65.</span><i>Shop the hoodie ›</i></span></a><a class="adcard" href="https://alterego.online/products/racing-is-life?utm_source=onetrackmind&utm_medium=sponsor&utm_content=racing-is-life" target="_blank" rel="noopener sponsored"><img src="/img/ashley.jpg" alt="Ashley in the AlterEgo Racing is Life tee" loading="lazy" style="object-position:50% 40%"><span class="adt"><em>AlterEgo · Ad</em><b>Racing is life.</b><span>Everything else is preparation. The tee I wear in the garage.</span><i>Shop the tee ›</i></span></a></div>` : ""}
 <aside class="nlbox"><b>Get The OneTrackMind Week</b><span>What's on this week, last week's results and a road worth riding. Every Monday, or less often if you like.</span><form class="nlf" novalidate><input type="email" name="email" placeholder="Your email" autocomplete="email" aria-label="Your email" required><input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px"><button type="submit">Sign me up</button></form><span class="nlm" aria-live="polite"></span></aside>
-<aside class="spbox"><span>Powered by</span> <a class="splogo" href="https://alterego.online/?utm_source=onetrackmind&utm_medium=sponsor" target="_blank" rel="noopener sponsored"><img src="/img/alterego-logo-white.png" width="96" height="84" alt="AlterEgo"><span>Made-to-order wear for petrolheads</span></a> · <a href="/advertise/">Your brand here ›</a></aside>
+<section class="fuelrow"><a class="fuel" href="https://alterego.online/?utm_source=onetrackmind&utm_medium=sponsor&utm_content=fuelled" target="_blank" rel="noopener sponsored"><img src="/img/alterego-logo-white.png" width="96" height="84" alt="AlterEgo"><span><b>Fuelled by AlterEgo</b><span>OneTrackMind is free to use. AlterEgo keeps it that way.</span><span class="btnline">Shop AlterEgo ›</span></span></a><a class="fuelyou" href="/advertise/"><b>Your brand here</b><span>Sponsor a route, the diary or the whole site ›</span></a></section>
 <script>(function(){document.querySelectorAll(".nlf").forEach(function(f){f.addEventListener("submit",function(e){e.preventDefault();var m=f.parentNode.querySelector(".nlm"),em=f.email.value.trim();if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)){m.textContent="That email doesn't look right.";return}m.textContent="Sending…";fetch("/api/subscribe",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email:em,website:f.website.value,source:f.dataset.source||location.pathname})}).then(function(r){return r.json().then(function(j){return[r.ok,j]})}).then(function(x){if(x[0]){f.hidden=true;m.textContent=x[1].already?"You're already on the list.":"Almost done: tap the link in the email we just sent."}else m.textContent=x[1].error||"Something went wrong. Try again."}).catch(function(){m.textContent="No connection. Try again."})})})})();</script>
 <footer>OneTrackMind: plan road trips anywhere, on the roads less travelled, then ride them on your GPS or phone. Free for riders and drivers. · <a href="/how-to/">How to</a> · <a href="/record/">Record a ride</a> · <a href="/advertise/">Advertise</a> · <a href="/terms.html">Terms and disclaimer</a> · <a href="/privacy.html">Privacy</a> · <a href="/rules.html">Rules</a> · <a href="mailto:hello@onetrackmind.online">hello@onetrackmind.online</a></footer>
 </div></body></html>
@@ -176,7 +206,7 @@ ${S.fuelGapKm ? `<div class="stat"><b>${km(S.fuelGapKm)} km</b><span>longest gap
 <div class="meta">${esc(r.region)} · ${n} day${n > 1 ? "s" : ""} · ${esc(veh)} · ${esc(STYLE[r.style] || "")}</div>
 ${f ? `<p class="fdr">Ridden by the founder${f.year ? " in " + f.year : ""} · ${esc(f.ride)}</p>` : ""}
 <p>${esc(r.blurb)}</p>
-<a class="cta" href="/?pick=${esc(r.id)}">Open in the planner</a>
+<a class="cta" href="/plan/?pick=${esc(r.id)}">Open in the planner</a>
 <p class="note">Change the dates, stops and your vehicle. The planner works out fuel, night stops, sunset, weather and the grade of every road. Then ride it: GPX straight to your Garmin or bike app, or Google Maps and Waze on your phone.</p>
 ${statBox}${S ? `<p class="note">Distances and grades from the planner's route on OpenStreetMap roads. Your plan may differ.</p>` : ""}
 ${S && S.grade ? `<p>Hardest stretch: <b>${GR[S.grade]}</b>, ${GRTXT[S.grade] || ""}. The grade reads differently by vehicle: what's fun on an adventure bike can be slow and hard in a car.</p>` : ""}
@@ -251,7 +281,7 @@ function favPage(x) {
 <p class="intro">${esc(x.short)}</p>
 ${x.text.map(t => `<p>${esc(t)}</p>`).join("\n")}
 ${HOWTO.some(g => g.fav === x.id) ? `<p class="howlink"><a href="/how-to/${HOWTO.find(g => g.fav === x.id).id}/">How to do it: cost, dates, booking ›</a></p>` : ""}
-<a class="cta" href="/?fav=${esc(x.id)}">Plan a trip here</a>
+<a class="cta" href="/plan/?fav=${esc(x.id)}">Plan a trip here</a>
 <p class="note">Opens the planner with ${esc(x.name)} as your finish. Set where you start and how many days, and it works out the route, fuel, night stops and weather.</p>
 ${getThere(x)}
 ${x.tips.length ? `<h2>Good to know</h2><ul>${x.tips.map(t => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
@@ -297,6 +327,7 @@ ${sec("btrips", "The trips", "Day by day, as they happened.", multi.map(tripCard
 ${sec("bposts", "More stories", "", single.map(postCard).join(""))}
 <p class="note"><a href="/blog/">Every blog post</a> · <a href="/routes/">All routes</a></p>
 <a class="cta" href="/">Plan your own</a></main>
+<script>(function(){var t=new Date();t.setHours(12,0,0,0);document.querySelectorAll(".evc[data-start]").forEach(function(c){var d=Math.round((new Date(c.dataset.start+"T12:00:00")-t)/864e5);c.classList.add(d<=7?"t1":d<=45?"t2":"t3");});})();</script>
 <script>(function(){var b=document.querySelectorAll(".chips button");b.forEach(function(x){x.onclick=function(){var f=x.dataset.f;b.forEach(function(y){y.classList.toggle("on",y===x)});document.querySelectorAll(".pcard").forEach(function(c){c.hidden=f!=="all"&&c.dataset.cat!==f});document.querySelectorAll(".fsec").forEach(function(s){s.hidden=!s.querySelector(".pcard:not([hidden])")});try{history.replaceState(null,"",f==="all"?location.pathname:"#"+f)}catch(e){}}});var h=location.hash.slice(1);var t=[].find.call(b,function(x){return x.dataset.f===h});if(t)t.click();else if(!h&&document.documentElement.getAttribute('data-mode')==='motorsport'){var mm=[].find.call(b,function(x){return x.dataset.f==='motor'});if(mm)mm.click()}})();</script>`;
   const ld = { "@context": "https://schema.org", "@type": "CollectionPage", name: "Founder's fav's", url: SITE + "/favourites/", hasPart: FAV.map(x => ({ "@type": "TouristAttraction", name: x.name, url: `${SITE}/favourites/${x.id}/` })) };
   return page({ active: "/favourites/", url: "/favourites/", title: "Founder's fav's: places, road trips and motorsport · OneTrackMind", desc: "The places the founder of OneTrackMind would send you in Namibia, South Africa, Lesotho and Europe, the road trips behind them, and the race tracks, museums and factories worth travelling for.", body, ld });
@@ -351,7 +382,7 @@ function tripPage(n, L) {
 <h1>${esc(tripName(n))}</h1>
 <div class="meta">${fmtDate(L[0].date)} – ${fmtDate(L[L.length - 1].date)} · ${esc(line)}</div>
 ${r ? tripMap(r) : (coverOf(L) ? `<img class="cover" src="${esc(coverOf(L))}" alt="${esc(tripName(n))}">` : "")}
-${r ? `<p class="intro">${esc(r.blurb)}</p><a class="cta" href="/?pick=${esc(r.id)}">Open this trip in the planner</a> <a class="cta ghost" href="/routes/${esc(r.id)}/">Day by day</a>` : ""}
+${r ? `<p class="intro">${esc(r.blurb)}</p><a class="cta" href="/plan/?pick=${esc(r.id)}">Open this trip in the planner</a> <a class="cta ghost" href="/routes/${esc(r.id)}/">Day by day</a>` : ""}
 <h2>The trip, day by day</h2>
 <div class="days">${L.map((x, i) => `<a href="/blog/${esc(x.slug)}/" class="day">${x.cover ? `<img src="${esc(x.cover)}" alt="" loading="lazy">` : `<span class="noimg"></span>`}<b>${i + 1}. ${esc(shortTitle(x.title))}</b><small>${fmtDate(x.date)}</small></a>`).join("")}</div>
 </main>`;
@@ -380,7 +411,7 @@ const TAGS = [["namibia", "Namibia", /namibia|tortoise|epupa/i], ["southafrica",
 const BLOG_POI = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data/blog-poi.json"), "utf8")); } catch (e) { return {}; } })();
 // the one button a post gets: the trip's route when there is one, otherwise "route me there" to the place it's about
 const goLink = name => { const rid = TRIP_ROUTE[name], p = BLOG_POI[name];
-  return rid ? { href: `/?pick=${rid}`, label: "Show the route ›" } : p ? { href: `/?poi=${p.lat},${p.lon}&n=${encodeURIComponent(p.name)}`, label: `Route me to ${p.name} ›` } : null; };
+  return rid ? { href: `/plan/?pick=${rid}`, label: "Show the route ›" } : p ? { href: `/plan/?poi=${p.lat},${p.lon}&n=${encodeURIComponent(p.name)}`, label: `Route me to ${p.name} ›` } : null; };
 const SOCIAL = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data/social.json"), "utf8")); } catch (e) { return []; } })();
 const KIND = { story: "Story", route: "Route", place: "Place" };
 function storiesIndex(M) {
@@ -409,7 +440,7 @@ function storiesIndex(M) {
     const soc = SOCIAL.filter(x => x.img).map(x => ({ date: x.date.slice(0, 10), html: (() => {
       const txt = x.text || "", cats = [ADV.test(txt) ? "adventure" : "", (MOTOR_RX.test(txt) || MOT.test(txt)) ? "motorsport" : ""].filter(Boolean).join(" ");
       const tags = TAGS.filter(([, , rx]) => rx.test(txt)).map(([k]) => k).join(" "), first = txt.split(/\n/)[0].replace(/#\S+/g, "").trim().slice(0, 90);
-      const go = x.lat != null ? `<a class="plot" href="/?poi=${x.lat},${x.lon}&n=${encodeURIComponent(x.place || "")}">Route me there ›</a>` : "";
+      const go = x.lat != null ? `<a class="plot" href="/plan/?poi=${x.lat},${x.lon}&n=${encodeURIComponent(x.place || "")}">Route me there ›</a>` : "";
       const kind = x.lat != null ? "place" : "story"; return `<div class="ctile soc" data-cat="${cats}" data-tags="${tags}" data-kind="${kind}"><a class="cimg" href="${esc(x.url)}" target="_blank" rel="noopener"><img src="${esc(x.img)}" alt="" loading="lazy"><span class="badges"><em class="kind k-${kind}">${KIND[kind]}</em><em class="srcb">${x.src === "ig" ? "Instagram" : "Facebook"}</em></span><span class="cmeta"><b>${esc(first)}</b><span>${x.date.slice(0, 4)}${x.place ? " · 📍 " + esc(x.place) : ""}</span></span></a>${go}</div>`; })() }));
     const blog = groups.map(g => ({ date: g[1][g[1].length - 1].date, html: tile(g) }));
     const AD = [`<div class="ctile adtile"><a class="cimg" href="https://alterego.online/products/racing-is-life?utm_source=onetrackmind&utm_medium=blog-tile" target="_blank" rel="noopener sponsored"><img src="/img/ashley.jpg" alt="Ashley in the AlterEgo Racing is Life tee" loading="lazy" style="object-position:50% 35%"><span class="badges"><em class="srcb">AlterEgo · Ad</em></span><span class="cmeta"><b>Racing is life.</b><span>Everything else is preparation. Shop the tee ›</span></span></a></div>`,
@@ -488,7 +519,7 @@ ${g.hook.map(t => `<p>${esc(t)}</p>`).join("\n")}
 ${g.sections.map(x => `<h2>${esc(x.h)}</h2><ul>${x.items.map(t => `<li>${t}</li>`).join("")}</ul>`).join("\n")}
 <section class="gethere"><h2>Book it</h2><ul>${g.links.map(([t, u, d]) => `<li><a href="${esc(u)}" target="_blank" rel="noopener sponsored">${esc(t)} ›<span>${esc(d)}</span></a></li>`).join("")}<li><a href="${esc(g.official[1])}" target="_blank" rel="noopener">${esc(g.official[0])} ›<span>Check the day before you go</span></a></li></ul>
 <p class="note">Some of these links pay OneTrackMind a small fee if you book, at no cost to you. It's what keeps the planner free.</p></section>
-${f ? `<a class="cta" href="/?fav=${esc(f.id)}">Plan the road trip there</a> <a class="cta ghost" href="/favourites/${esc(f.id)}/">More about the place</a>` : ""}
+${f ? `<a class="cta" href="/plan/?fav=${esc(f.id)}">Plan the road trip there</a> <a class="cta ghost" href="/favourites/${esc(f.id)}/">More about the place</a>` : ""}
 ${r ? `<p class="note">Or take the trip I did: <a href="/routes/${esc(r.id)}/">${esc(r.title)}</a>.</p>` : ""}
 <h2>Where this comes from</h2><ul class="sources">${g.sources.map(([t, u]) => `<li><a href="${esc(u)}" target="_blank" rel="noopener">${esc(t)}</a></li>`).join("")}</ul>
 </main>`;
@@ -548,6 +579,7 @@ const GENRES = [["f1","F1"],["motogp","MotoGP"],["superbike","Superbikes"],["end
 const EVENTS = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data/events/events.json"), "utf8")); } catch (e) { return []; } })();
 
 const WATCH = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data/events/watch.json"), "utf8")); } catch (e) { return {}; } })();
+const NEWS = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data/events/news.json"), "utf8")); } catch (e) { return {}; } })();
 const RESULTS = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data/events/results.json"), "utf8")); } catch (e) { return {}; } })();
 const hav2 = (a, b) => { const R = 6371, dLa = (b.lat - a.lat) * Math.PI / 180, dLo = (b.lon - a.lon) * Math.PI / 180, x = Math.sin(dLa / 2) ** 2 + Math.cos(a.lat * Math.PI / 180) * Math.cos(b.lat * Math.PI / 180) * Math.sin(dLo / 2) ** 2; return 2 * R * Math.asin(Math.sqrt(x)); };
 const MON3 = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -565,8 +597,9 @@ function eventPage(e) {
 <p class="note"><a href="/events/">Events</a> · ${esc(e.series || "")}</p>
 <h1>${esc(e.name)}</h1>
 <p class="evwhen"><b>${dRange(e)}</b>${e.confirmed ? "" : ' <em class="unc">dates unconfirmed</em>'} · ${esc(e.venue || "")}${e.city ? ", " + esc(e.city) : ""}${e.country ? ", " + esc(e.country) : ""} <span class="evcount" data-start="${e.start}" data-end="${e.end}"></span></p>
-<div class="btns evcta"><a class="cta" href="/?ev=${esc(e.id)}">Plan the road trip there ›</a>${e.tickets ? ` <a class="cta ghost" href="${esc(e.tickets)}" target="_blank" rel="noopener sponsored">Tickets ›</a>` : ""} <a class="cta ghost" href="${esc(e.url || e.source)}" target="_blank" rel="noopener">Official site ›</a></div>
+<div class="btns evcta"><a class="cta" href="/plan/?ev=${esc(e.id)}">Plan the road trip there ›</a>${e.tickets ? ` <a class="cta ghost" href="${esc(e.tickets)}" target="_blank" rel="noopener sponsored">Tickets ›</a>` : ""} <a class="cta ghost" href="${esc(e.url || e.source)}" target="_blank" rel="noopener">Official site ›</a></div>
 ${map}
+${(NEWS[e.id] || []).length ? `<section class="evsec evnews"><h2>In the news</h2>${NEWS[e.id].map(n => `<div class="nw"><b>${esc(n.title)}</b>${n.summary ? `<p>${esc(n.summary)}</p>` : ""}<a class="btnline" href="${esc(n.url)}" target="_blank" rel="noopener">Read more on ${esc(n.source)} ›</a></div>`).join("")}<p class="note">Headlines and summaries are ${esc(NEWS[e.id][0].source)}'s own words, updated daily.</p></section>` : ""}
 <section class="evsec"><h2>How to watch</h2>${w.watch && w.watch.length ? `<ul>${w.watch.map(x => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.label)} ›</a></li>`).join("")}</ul>${w.note ? `<p class="note">${esc(w.note)}</p>` : ""}` : `<p class="note">Check the <a href="${esc(e.url || e.source)}" target="_blank" rel="noopener">official site</a> for live streams and TV.</p>`}</section>
 <section class="evsec"><h2>Results</h2>${res && res.podium ? `<ol>${res.podium.map(p => `<li>${esc(p)}</li>`).join("")}</ol><p class="note">From <a href="${esc(res.source)}" target="_blank" rel="noopener">the official results</a>.</p>` : res && res.link ? `<p><a href="${esc(res.link)}" target="_blank" rel="noopener">${res.fresh ? "Results are in ›" : "Official results ›"}</a></p>` : `<p class="note">${w.results ? `Results go up <a href="${esc(w.results)}" target="_blank" rel="noopener">here</a> once it has run.` : "Results appear here once it has run."}</p>`}</section>
 <section class="evsec"><h2>Getting there</h2><ul>
@@ -592,14 +625,14 @@ function eventsPage() {
   const CAT = [["all", "All"], ...GENRES.filter(([k]) => L.some(e => e.genre === k)), ["za", "In South Africa"]];
   const MONTHS = ["January","February","March","April","May","June","July","August","September","October","November","December"];
   const rng = e => { const a = new Date(e.start + "T12:00:00Z"), b = new Date(e.end + "T12:00:00Z"); const f = (d, y) => `${d.getUTCDate()} ${MONTHS[d.getUTCMonth()].slice(0, 3)}${y ? " " + d.getUTCFullYear() : ""}`; return e.start === e.end ? f(a, 1) : a.getUTCMonth() === b.getUTCMonth() ? `${a.getUTCDate()}–${f(b, 1)}` : `${f(a)} – ${f(b, 1)}`; };
-  const card = e => `<div class="fx evc t${e.tier || 2}" data-cat="${esc(e.genre || "")}" data-za="${e.country === "South Africa" ? 1 : 0}" data-series="${esc(e.series || "")}"><span class="fxd"><b>${+e.start.slice(8, 10)}</b><i>${MONTHS[+e.start.slice(5, 7) - 1].slice(0, 3)}</i></span><span class="fxb">${e.genre ? `<span class="eg">${esc(genreName(e.genre))}</span>` : ""}<b><a href="/events/${esc(e.id)}/">${esc(e.name)}</a></b><button type="button" class="follow" data-series="${esc(e.series || "")}" title="Follow ${esc(e.series || "")}">☆ ${esc(e.series || "")}</button><span class="evd">${rng(e)}${e.confirmed ? "" : ' <em class="unc">dates unconfirmed</em>'}</span><span class="area">${esc(e.venue || "")}${e.city ? ", " + esc(e.city) : ""}${e.country ? " · " + esc(e.country) : ""}</span><span class="evl"><a href="${esc(e.url || e.source)}" target="_blank" rel="noopener">Official site ›</a>${e.tickets ? ` <a href="${esc(e.tickets)}" target="_blank" rel="noopener sponsored">Tickets ›</a>` : ""} <a href="/?ev=${esc(e.id)}">Plan the road trip ›</a> <a href="/events/${esc(e.id)}/">Watch, tickets, beds ›</a></span></span></div>`;
+  const card = e => `<div class="fx evc" data-start="${e.start}" data-cat="${esc(e.genre || "")}" data-za="${e.country === "South Africa" ? 1 : 0}" data-series="${esc(e.series || "")}"><span class="fxd"><b>${+e.start.slice(8, 10)}</b><i>${MONTHS[+e.start.slice(5, 7) - 1].slice(0, 3)}</i></span><span class="fxb">${e.genre ? `<span class="eg">${esc(genreName(e.genre))}</span>` : ""}<b><a href="/events/${esc(e.id)}/">${esc(e.name)}</a></b><button type="button" class="follow" data-series="${esc(e.series || "")}" title="Follow ${esc(e.series || "")}">☆ ${esc(e.series || "")}</button><span class="evd">${rng(e)}${e.confirmed ? "" : ' <em class="unc">dates unconfirmed</em>'}</span><span class="area">${esc(e.venue || "")}${e.city ? ", " + esc(e.city) : ""}${e.country ? " · " + esc(e.country) : ""}</span><span class="evl"><a href="${esc(e.url || e.source)}" target="_blank" rel="noopener">Official site ›</a>${e.tickets ? ` <a href="${esc(e.tickets)}" target="_blank" rel="noopener sponsored">Tickets ›</a>` : ""} <a href="/plan/?ev=${esc(e.id)}">Plan the road trip ›</a> <a href="/events/${esc(e.id)}/">Watch, tickets, beds ›</a></span></span></div>`;
   const months = [...new Set(L.map(e => e.start.slice(0, 7)))], first27 = months.find(m => m >= "2027-01"), n27 = L.filter(e => e.start >= "2027-01-01").length;
   const sec = ym => { const [y, mo] = ym.split("-"); return `<section class="fsec evm prog" id="m-${ym}"${ym === first27 ? ' data-y27' : ""}>${ym === first27 ? '<span id="y2027"></span>' : ""}<h2>${MONTHS[+mo - 1]} ${y}</h2><div class="fix">${L.filter(e => e.start.slice(0, 7) === ym).map(card).join("")}</div></section>`; };
-  const body = `<main><h1>Motorsport and motoring events</h1>
-<p class="intro">Races, rallies, festivals and classics worth travelling for. Every date comes from the organiser's own page and is checked every week. Tap Plan the road trip and the planner sets the venue as your finish.</p>
+  const body = `<main><p class="note"><a class="btnline" href="/petrolhead/">‹ Petrolhead</a></p><h1>FOMO</h1>
+<p class="intro"><b>Races, shows and festivals you'll kick yourself for missing.</b> Every date comes from the organiser's own page and is checked every week. Nobody decides on Friday to go to a Grand Prix on Sunday, so book early.</p>
+<p class="btnrow"><a class="btn" href="/plan/?evtrip=1">Build a trip around several races ›</a><a class="btnline" href="/events/wall-planner-2027.pdf" download>Get the Wall Planner (PDF) ›</a></p>
 <nav class="chips" aria-label="Show"><button type="button" data-f="mine" class="mine">★ My racing</button>${CAT.map(([k, t], i) => `<button type="button" data-f="${k}"${i ? "" : ' class="on"'}>${t}</button>`).join("")}</nav>
 ${n27 ? `<p class="ev27"><b>The 2027 calendar is in.</b> ${n27} dates so far. Nobody decides on Friday to go to a Grand Prix on Sunday: <a href="#y2027">see 2027 and book early ›</a></p>` : ""}
-<p class="btns"><a class="cta" href="/?evtrip=1">Build a trip around several races ›</a></p>
 <div class="evalert evalert-page"><b>Never miss lights out.</b><span>Every Monday: who's racing that week, where, and how to watch.</span><form class="nlf" data-source="race-alerts" novalidate><input type="email" name="email" placeholder="Your email" autocomplete="email" aria-label="Your email" required><input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px"><button type="submit">Count me in</button></form><span class="nlm" aria-live="polite"></span></div>
 <p class="note">Tap ☆ next to any series to follow it. ★ My racing then shows just yours, here and on the planner map.</p>
 ${months.length ? months.map(sec).join("\n") : "<p class=\"note\">Events are being added.</p>"}
@@ -617,9 +650,87 @@ function howtoIndex() {
   return page({ active: "/how-to/", url: "/how-to/", title: "How to: drive the Nürburgring, do a track day, visit the factories · OneTrackMind", desc: "Practical guides from a petrolhead who's done it: what it costs, when it's open, how to book and what nobody tells you.", body, ld: { "@context": "https://schema.org", "@type": "CollectionPage", name: "How to", url: SITE + "/how-to/" } });
 }
 
+
+/* ---------- the front doors: Home, Adventure, Petrolhead, Local is lekker ---------- */
+const ADV_RX = /namibia|lesotho|wild coast|cdba|enduro|africa twin|790 adventure|eu road trip|tortoise|introduction|cycle tour|sani|baviaans|cederberg|karoo|swartberg/i;
+const MOT_STORY_RX = /eu road trip|motor valley|eicma|motogp|monterey|laguna seca|pebble beach/i;
+const LIL = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data/local-is-lekker.json"), "utf8")); } catch (e) { return []; } })();
+const storyCards = (rx, n) => [...seriesOf().entries()].filter(([name]) => rx.test(name)).filter(([, L]) => coverOf(L))
+  .sort((a, b) => b[1][b[1].length - 1].date.localeCompare(a[1][a[1].length - 1].date)).slice(0, n)
+  .map(([name, L]) => { const multi = L.length > 1, href = multi ? `/blog/${tripSlug(name, L)}/` : `/blog/${esc(L[0].slug)}/`;
+    return `<a class="card pcard hubcard" href="${href}"><img src="${esc(coverOf(L))}" alt="" loading="lazy"><b>${esc(multi ? tripName(name) : L[0].title)}</b><span class="area">${L[L.length - 1].date.slice(0, 4)}${multi ? ` · ${L.length} parts` : ""}</span></a>`; }).join("");
+const placeCards = (list, n) => list.slice(0, n).map(x => { const st = favStory(x);
+  return `<a class="card pcard hubcard" href="/favourites/${x.id}/">${st && st.img ? `<img src="${esc(st.img)}" alt="" loading="lazy">` : `<img class="maptile" src="${tileOf(x.lat, x.lon, 9)}" alt="" loading="lazy">`}<b>${esc(x.name)}</b><span class="area">${esc(x.area)}</span></a>`; }).join("");
+const routeRow = r => { const n = r.trip.days.length, km = r.stats && r.stats.km, gp = r.stats && r.stats.gravelPct;
+  return `<a class="fx" href="/routes/${r.id}/"><span class="fxd"><b>${n}</b><i>day${n > 1 ? "s" : ""}</i></span><span class="fxb"><b>${esc(r.title)}</b><span class="fxs">${esc(r.region)}</span><span class="fxs">${[km && `${km.toLocaleString("en-ZA")} km`, gp != null && (gp ? `${gp}% gravel` : "all tar"), r.founder && r.founder.year && `ridden ${r.founder.year}`].filter(Boolean).join(" · ")}</span></span></a>`; };
+const lilCard = x => `<a class="card pcard hubcard" href="${x.lat != null ? `/plan/?poi=${x.lat},${x.lon}&n=${encodeURIComponent(x.place)}` : "/local-is-lekker/"}">${x.photo ? `<img src="${esc(x.photo)}" alt="" loading="lazy">` : ""}<b>${esc(x.place)}, ${esc(x.town)}</b><span class="area">${esc(x.vehicle || "")}${x.date ? " · " + fmtDate(x.date) : ""}</span>${x.line ? `<span>${esc(x.line)}</span>` : ""}<span class="go">Go there ›</span></a>`;
+const FOMO_BOX = `<section class="fomo" id="fomo"><div class="evhead"><div class="evview" id="fomoView"></div><div class="evregs" id="fomoReg"></div></div><div class="evgrid" id="fomoList"><p class="note">Loading the diary…</p></div></section>`;
+
+function homePage() {
+  const lat = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data/latest.json"), "utf8")); } catch (e) { return []; } })();
+  const body = `<main class="home">
+<a class="oneliner" href="/about/"><img src="/img/ashley.jpg" alt="" width="52" height="52"><span>Ducati taught me the road, KTM taught me to live off it. These are the roads, the races and the places I'd tell a mate about. <b>More about me ›</b></span></a>
+<div class="doors">
+<a class="door tex-gravel" href="/adventure/"><span class="pk">Adventure</span><b>Recce. Ride. Report.</b><span>Back roads, gravel, passes and farm stalls. My routes, the places worth the detour, and the trips that went sideways.</span><span class="btn">Go Adventure ›</span></a>
+<a class="door tex-tar" href="/petrolhead/"><span class="pk">Petrolhead</span><b>Plan it. Book it. Ride it.</b><span>Races, shows, museums and the cars and bikes that matter. What's on, what to book, and how to get there.</span><span class="btn">Go Petrolhead ›</span></a>
+</div>
+<section class="cd" id="cd" hidden></section>
+<div class="camps" id="camps"></div>
+<section class="hub"><div class="hubh"><h2>Local is lekker</h2><a class="btnline" href="/local-is-lekker/">Every run ›</a></div>
+${LIL.length ? `<div class="cards pcards">${LIL.slice(-3).reverse().map(lilCard).join("")}</div>` : `<p class="lede">Saturdays: one of my cars or bikes, somewhere new for breakfast, and the road there. Every place gets a button to route you there.</p>`}</section>
+<section class="hub"><div class="hubh"><h2>How it started</h2><a class="btnline" href="/blog/">All of my stories ›</a></div>
+<p class="lede">In 2004 I took a KTM 950 Adventure, a paper map and a planning committee that mostly drank beer into Namibia, and I've been going back ever since. Then came the Alfas, the hill climbs and a racecar that wouldn't drive. This is where the roads and the stories live.</p>
+<div class="cards pcards">${lat.map(x => `<a class="card pcard hubcard" href="${esc(x.url)}"><img src="${esc(x.cover)}" alt="" loading="lazy"><b>${esc(x.title)}</b><span>${esc(x.hook)}</span></a>`).join("")}</div></section>
+${SOCIAL.length ? `<section class="hub"><div class="hubh"><h2>Lately</h2><a class="btnline" href="https://www.instagram.com/ashleybaud/" target="_blank" rel="noopener">Instagram ›</a></div><div class="cards pcards">${SOCIAL.slice(0, 3).map(x => `<a class="card pcard hubcard" href="${esc(x.url)}" target="_blank" rel="noopener"><img src="${esc(x.img)}" alt="" loading="lazy"><span>${esc((x.text || "").slice(0, 110))}${(x.text || "").length > 110 ? "…" : ""}</span></a>`).join("")}</div></section>` : ""}
+<section class="hub planown"><h2>Plan your own</h2><p class="lede">Tell it where you're starting, where you're going and what you drive or ride. It finds the roads you like, the fuel, the beds and everything worth stopping for, then puts it on your GPS or phone. Free, no sign-up needed.</p><a class="btn" href="/plan/">Plan a trip ›</a></section>
+</main>
+<script src="/js/hub.js" defer></script>
+<script>(function(){var q=location.search;if(/[?&](pick|poi|fav|ev|evtrip|s|mode|route)=/.test(q))location.replace("/plan/"+q+location.hash);})();</script>`;
+  return page({ active: "/", url: "/", title: "OneTrackMind · Adventure and Petrolhead road trips, races and places", desc: "Back roads and gravel, races and car culture: routes ridden by the founder, the motorsport diary, places worth the detour, and a free trip planner for bikes, 4x4s and cars.", body });
+}
+
+function adventurePage() {
+  const fdr = live.filter(r => r.founder), oth = live.filter(r => !r.founder), places = FAV.filter(x => x.group !== "petrol");
+  const body = `<main class="hubpage">
+<div class="hubhero tex-gravel"><span class="pk">Adventure</span><h1>Recce. Ride. Report.</h1><p>For years I planned trips without really knowing what was around me, and rode straight past great places right under my nose. These are the roads I'd ride again, and the places worth the detour.</p><a class="btn" href="/plan/?mode=adventure">Plan a ride ›</a></div>
+<section class="prog"><h2>Roads I've ridden</h2><div class="fix">${fdr.slice(0, 6).map(routeRow).join("")}</div><a class="btnline" href="/routes/">All the routes ›</a></section>
+<section class="hub"><div class="hubh"><h2>Places worth the detour</h2><a class="btnline" href="/favourites/">All my places ›</a></div><div class="cards pcards">${placeCards(places, 4)}</div></section>
+<section class="prog"><h2>Short and sharp</h2><div class="fix">${oth.slice(0, 6).map(routeRow).join("")}</div></section>
+<section class="hub"><div class="hubh"><h2>Stories from the road</h2><a class="btnline" href="/blog/">All the stories ›</a></div><div class="cards pcards">${storyCards(ADV_RX, 8)}</div></section>
+</main>`;
+  return page({ active: "/adventure/", url: "/adventure/", title: "Adventure: back roads, gravel routes and places worth the detour · OneTrackMind", desc: "Multi-day gravel and back-road routes in South Africa, Namibia, Lesotho and Europe, ridden by the founder, with the places worth the detour.", body });
+}
+
+function petrolheadPage() {
+  const places = FAV.filter(x => x.group === "petrol");
+  const body = `<main class="hubpage">
+<div class="hubhero tex-tar"><span class="pk">Petrolhead</span><h1>Plan it. Book it. Ride it.</h1><p>Same story at race weekends: a museum, a factory or a famous corner ten minutes away that I only heard about afterwards. Here's what's on, what to book early, and everything worth seeing on the way.</p><a class="btn" href="/plan/?evtrip=1">Plan a race trip ›</a></div>
+<section class="cd" id="cd" hidden></section>
+<div class="camps" id="camps"></div>
+<section class="hub"><div class="hubh"><h2>FOMO</h2><span class="hubsub">Races, shows and festivals you'll kick yourself for missing</span></div>${FOMO_BOX}<div class="btnrow"><a class="btnline" href="/events/">The whole diary ›</a><a class="btnline" href="/events/wall-planner-2027.pdf" download>Get the Wall Planner (PDF) ›</a></div></section>
+<section class="hub"><div class="hubh"><h2>Museums, tracks and factories</h2><a class="btnline" href="/favourites/">All my places ›</a></div><div class="cards pcards">${placeCards(places, 4)}</div></section>
+<section class="hub"><div class="hubh"><h2>Race weekends and garages</h2><a class="btnline" href="/blog/">All the stories ›</a></div><div class="cards pcards">${storyCards(new RegExp(MOTOR_RX.source + "|" + MOT_STORY_RX.source, "i"), 8)}</div></section>
+<section class="hub"><div class="hubh"><h2>How to</h2><a class="btnline" href="/how-to/">All the guides ›</a></div><div class="cards pcards">${HOWTO.map(g => `<a class="card pcard hubcard" href="/how-to/${g.id}/">${g.cover ? `<img src="${esc(g.cover)}" alt="" loading="lazy">` : ""}<b>${esc(g.title)}</b><span>${esc(g.short || "")}</span></a>`).join("")}</div></section>
+</main>
+<script src="/js/hub.js" defer></script>`;
+  return page({ active: "/petrolhead/", url: "/petrolhead/", title: "Petrolhead: races, shows, museums and road trips to them · OneTrackMind", desc: "What's on in motorsport and car culture, what to book early, and the museums, tracks and factories worth the trip. With a planner that gets you there.", body });
+}
+
+function lilPage() {
+  const body = `<main class="hubpage">
+<div class="hubhero tex-tar"><span class="pk">A OneTrackMind campaign</span><h1>Local is lekker</h1><p>Saturdays: one of my cars or bikes, somewhere new for breakfast, and the road there. No reviews, no stars. If I'd go back, it's here. Every place has a button that routes you there from wherever you are.</p></div>
+${LIL.length ? `<div class="cards pcards">${LIL.slice().reverse().map(lilCard).join("")}</div>` : `<p class="lede">The first run is this Saturday. Follow along on <a href="https://www.instagram.com/ashleybaud/" target="_blank" rel="noopener">Instagram</a> or get The OneTrackMind Week below.</p>`}
+</main>`;
+  return page({ active: "/local-is-lekker/", url: "/local-is-lekker/", title: "Local is lekker: Saturday breakfast runs · OneTrackMind", desc: "Saturday breakfast runs in the Western Cape: a car or a bike, somewhere new to eat, and the road there.", body });
+}
+
 function write(rel, s) { const p = path.join(ROOT, rel); fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, s); }
 fs.rmSync(path.join(ROOT, "routes"), { recursive: true, force: true });
 live.forEach(r => write(`routes/${r.id}/index.html`, routePage(r)));
+write("index.html", homePage());
+write("adventure/index.html", adventurePage());
+write("petrolhead/index.html", petrolheadPage());
+write("local-is-lekker/index.html", lilPage());
 write("routes/index.html", routesIndex());
 write("about/index.html", aboutPage());
 fs.rmSync(path.join(ROOT, "favourites"), { recursive: true, force: true });
@@ -641,9 +752,9 @@ write("events/index.html", eventsPage());
     ["Namibia by Tortoise", "Nine days up the Skeleton Coast and Epupa, with the air conditioning on.", tort ? `/blog/${tripSlug(tort[0], tort[1])}/` : "", tort ? { cover: coverOf(tort[1]) } : null]];
   fs.writeFileSync(path.join(ROOT, "data/latest.json"), JSON.stringify(pick.filter(x => x[3] && x[3].cover && x[2]).map(([title, hook, url, s]) => ({ title, hook, url, cover: s.cover })))); }
 HOWTO.forEach(g => write(`how-to/${g.id}/index.html`, howtoPage(g)));
-const urls = ["/", "/routes/", "/favourites/", "/about/", "/advertise/", "/how-to/", "/record/", "/events/", ...EVENTS.filter(e => e.end >= new Date().toISOString().slice(0, 10)).map(e => `/events/${e.id}/`), ...HOWTO.map(g => `/how-to/${g.id}/`), ...live.map(r => `/routes/${r.id}/`), ...FAV.map(x => `/favourites/${x.id}/`), "/blog/", ...STORIES.map(x => `/blog/${x.slug}/`), ...[...seriesOf().entries()].filter(([, L]) => L.length > 1).map(([n, L]) => `/blog/${tripSlug(n, L)}/`), "/terms.html", "/privacy.html", "/rules.html"];
+const urls = ["/", "/adventure/", "/petrolhead/", "/plan/", "/local-is-lekker/", "/routes/", "/favourites/", "/about/", "/advertise/", "/how-to/", "/record/", "/events/", ...EVENTS.filter(e => e.end >= new Date().toISOString().slice(0, 10)).map(e => `/events/${e.id}/`), ...HOWTO.map(g => `/how-to/${g.id}/`), ...live.map(r => `/routes/${r.id}/`), ...FAV.map(x => `/favourites/${x.id}/`), "/blog/", ...STORIES.map(x => `/blog/${x.slug}/`), ...[...seriesOf().entries()].filter(([, L]) => L.length > 1).map(([n, L]) => `/blog/${tripSlug(n, L)}/`), "/terms.html", "/privacy.html", "/rules.html"];
 write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${today}</lastmod></url>`).join("\n")}\n</urlset>\n`);
-write("robots.txt", `# Everyone welcome, search engines and AI assistants included.\nUser-agent: *\nAllow: /\nDisallow: /api/\n\nSitemap: ${SITE}/sitemap.xml\n`);
+write("robots.txt", `# Everyone welcome, search engines and AI assistants included.\nUser-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /kits/\nDisallow: /newsletter/\n\nSitemap: ${SITE}/sitemap.xml\n`);
 write("llms.txt", `# OneTrackMind
 
 > Free planner for multi-day motorbike, 4x4 and self-drive trips. Plans a trip day by day on real roads: fuel stops and gaps, night stops and places to stay (filter by camping, guesthouse, hotel, self-catering, backpackers), sunset and weather, height profile, and a road grade for every stretch read for your vehicle. Built by riders, free for riders. Based in South Africa; strongest in South Africa, Namibia and Lesotho, works worldwide.

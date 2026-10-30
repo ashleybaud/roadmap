@@ -13,7 +13,7 @@ function serve() {
       const u = decodeURIComponent(q.url.split("?")[0]);
       if (u.startsWith("/api/places")) { let b = ""; q.on("data", c => b += c); q.on("end", () => { const t = decodeURIComponent(b.replace(/^data=/, "").replace(/\+/g, " ")); const els = [...t.matchAll(/around:30000,(-?[\d.]+),(-?[\d.]+)/g)].map((m, i) => ({ type: "node", id: i, lat: +m[1] + 0.05, lon: +m[2] + 0.05, tags: { name: "Town" + i + "@" + (+m[1]).toFixed(1) + "," + (+m[2]).toFixed(1), place: "town" } })); r.writeHead(200, { "Content-Type": "application/json" }); r.end(JSON.stringify({ elements: els })); }); return; }
       if (u.startsWith("/api/")) { r.writeHead(200, { "Content-Type": "application/json" }); return r.end("[]"); }
-      const f = path.join(ROOT, u === "/" ? "index.html" : u);
+      let f = path.join(ROOT, u === "/" ? "index.html" : u); if (fs.existsSync(f) && fs.statSync(f).isDirectory()) f = path.join(f, "index.html");
       if (!f.startsWith(ROOT) || !fs.existsSync(f) || fs.statSync(f).isDirectory()) { r.writeHead(404); return r.end(); }
       r.writeHead(200, { "Content-Type": TYPES[path.extname(f)] || "application/octet-stream" }); fs.createReadStream(f).pipe(r);
     }).listen(0, () => res(srv));
@@ -78,7 +78,7 @@ for (const k in D) if (!process.env[k]) process.env[k] = D[k];
   const ok = (c, m) => { if (!c) fails.push(m); };
   const T = Object.assign({}, TRIP, { start: { name: process.env.SN || "Malmesbury", lat: +(process.env.SLA || -33.4608), lon: +(process.env.SLO || 18.7271) } });
   await page.addInitScript(([t, reg]) => { if (!sessionStorage.getItem("seeded2")) { localStorage.clear(); localStorage.setItem("rr4-trip", t); localStorage.setItem("rr-welcome", "1"); localStorage.setItem("otm-gpsasked", "1"); localStorage.setItem("otm-evtreg", reg); sessionStorage.setItem("seeded2","1"); } }, [JSON.stringify(T), JSON.stringify((process.env.REG||"za").split(","))]);
-  await page.goto(base); await page.waitForTimeout(2500);
+  await page.goto(base + "plan/"); await page.waitForTimeout(2500);
   await page.click("[data-evtrip]"); await page.waitForTimeout(800);
   await page.fill("#evtFrom", process.env.FROM); await page.dispatchEvent("#evtFrom","change");
   await page.fill("#evtTo", process.env.TO); await page.dispatchEvent("#evtTo","change"); await page.waitForTimeout(300);
