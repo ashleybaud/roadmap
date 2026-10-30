@@ -32,6 +32,8 @@ if(settings.rangeSet===undefined&&+settings.range!==200&&+settings.range!==150) 
 if(!settings.rangeSet) settings.range=RANGE_DEF[settings.vehicle]||200;
 const ui=Object.assign({types:Object.fromEntries(TYPES.map(t=>[t.id,t.on])),max:"10",sleep:false},store.get("rr4-ui")||{});
 ui.tab=ui.tab??"ov"; delete ui._lastSel;
+// the map follows the open tab of a day card (Fuel shows only fuel, Sleep only beds, ...); false keeps the rider's own "On the map" choices always
+const MAP_FOLLOWS_TAB=true;
 let passNear=[];
 let plan=null, pois=[], fuelStations=[], fuelAll=[], stays=[], placesOk=false, dataDate="", seq=0, panel=null, fp=null;
 fetch("/data/updated.json").then(r=>r.ok?r.json():null).then(j=>{if(j&&j.updated)dataDate=new Date(j.updated).toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"});}).catch(()=>{});
@@ -279,7 +281,7 @@ $("dayTabs").addEventListener("click",e=>{if(e.target.closest("[data-key]")){$("
 
 /* ---------- details ---------- */
 const TB=document.querySelector(".tripbar");
-function renderDetails(){ hidePeek(); $("tbHold").append(TB); $("details").innerHTML=ui.tab==="ov"?overviewHtml():dayHtml(ui.tab); const slot=$("details").querySelector(".tbslot"); TB.querySelectorAll(".tadd").forEach(x=>x.remove()); if(slot){ slot.replaceWith(TB); const a=$("details").querySelector(".planbox>.tadd"); if(a) TB.insertBefore(a,TB.querySelector(".tbwhen")); } wireDetails(); }
+function renderDetails(){ hidePeek(); $("tbHold").append(TB); $("details").innerHTML=ui.tab==="ov"?overviewHtml():dayHtml(ui.tab); const slot=$("details").querySelector(".tbslot"); TB.querySelectorAll(".tadd").forEach(x=>x.remove()); if(slot){ slot.replaceWith(TB); const a=$("details").querySelector(".planbox>.tadd"); if(a) TB.insertBefore(a,TB.querySelector(".tbwhen")); } wireDetails(); dcAfterRender(); }
 
 /* ---------- weather, time zones (Open-Meteo, no key) ---------- */
 let wx=null, meds=null, fords=null;
@@ -828,19 +830,21 @@ function clearLink(){ return `<div class="btns clearrow">${clearArm?`<span class
 function overviewHtml(){
   // 1. Your trip  2. Stop  3. Details (each its own box)
   let h=tripBox(null)+stopSummary(null), det="";
-  if(nDays()===1){ det=sumBox(0,false,true)+(typeof founderLine==="function"?founderLine():"")+(plan&&!planStale&&typeof rateLine==="function"?rateLine():"")+(!planStale&&plan&&plan.days[0]?gtkHtml(0):"")+dayBody(0,true); }
+  const one=nDays()===1&&!planStale&&plan&&plan.days[0]; // a one-day trip: its day card is the details
+  if(one) det=null;
+  else if(nDays()===1){ det=sumBox(0,false,true)+(typeof founderLine==="function"?founderLine():"")+(plan&&!planStale&&typeof rateLine==="function"?rateLine():"")+(!planStale&&plan&&plan.days[0]?gtkHtml(0):"")+dayBody(0,true); }
   else { let hh=`<div class="days">`; trip.days.forEach((d,k)=>{ hh+=`<div class="ovday" data-gotoday="${k}">${sumBox(k,false,true)}</div>`; }); hh+=`</div>`;
     det=(function(){ let h=hh;
   h+=tripTotals();
   h+=sleepList();
   if(plan&&!planStale) h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px"><button class="btn small share" type="button" data-sharetrip title="A link anyone can open: the whole plan, then Google Maps / Waze or GPX">Share this trip ↗</button><button class="btn small wa" type="button" data-sharewa title="Send this trip on WhatsApp">WhatsApp this trip</button>${nameBtn()}${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">${esc(dayName(k))} GPX</button>`:"").join("")}<button class="btn small" type="button" data-gpx="all">Whole trip GPX</button><button class="btn small" type="button" data-navlinks title="Open each day in Google Maps or Waze on your phone">Google Maps / Waze</button><button class="btn small ghost" type="button" data-grouppack title="Every GPX format in one zip, with a read-me, for a group ride">Group ride pack ↓</button><button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}</div></div>`;
       return h; })(); }
-  h+=boxSec("detailbox","Details",det);
-  h+=tripBlockHtml();
+  h+=one?dayCard(0,(typeof founderLine==="function"?founderLine():"")+(typeof rateLine==="function"?rateLine():"")):boxSec("detailbox","Details",det);
+  if(!(one&&dcHasBook(0))) h+=tripBlockHtml(); // a one-day trip books from its card's Book tab
   return h+(typeof flightHtml==="function"?flightHtml():"")+(typeof onDatesHtml==="function"?onDatesHtml():"")+clearLink()+footNote();
 }
 function footNote(){ return `<div class="note">${placesOk&&dataDate?`Map data from OpenStreetMap, as of ${esc(dataDate)}. Weather from Open-Meteo. Phone ahead on remote legs. `:""}Plan with it, check before you go: you ride at your own risk. <a href="/terms.html">Terms and disclaimer</a> · <a href="/privacy.html">Privacy</a></div>`; }
-function dayHtml(k){ return tripBox(k)+stopSummary(k)+boxSec("detailbox","Details",sumBox(k,true,true)+(!planStale&&plan&&plan.days[k]?gtkHtml(k):"")+dayBody(k,true)); }
+function dayHtml(k){ return tripBox(k)+stopSummary(k)+dayCard(k); }
 function wireDetails(){
   trip.days.forEach((d,k)=>hook("night-"+k,p=>{editTo.delete(k);trip.days[k].to=p;changed();}));
   hook("whereto-0",p=>{ trip.days[0].vias.push(p); trip.days[0].legs=[]; changed(); });
@@ -887,14 +891,14 @@ $("details").addEventListener("click",e=>{
   const cl=t.closest("[data-clear]"); if(cl){ const id=cl.dataset.clear, m=id.match(/^(night|finish|via)-(\d+)(?:-(\d+))?$/); if(!m) return;
     if(m[1]==="night"){trip.days[+m[2]].to=null;trip.days[+m[2]].noAutoNight=true;editTo.add(+m[2]);} else if(m[1]==="finish"){trip.end=null;} else {trip.days[+m[2]].vias.splice(+m[3],1);trip.days[+m[2]].legs=[];}
     changed(); return; }
-  const fk=t.closest("[data-fuelk]"); if(fk&&goGap(+fk.dataset.fuelk)) return; if(fk){const k2=+fk.dataset.fuelk; if(ui.tab==="ov"){ fuelOpen.add(k2); const tb=document.querySelector(`[data-day="${k2}"]`); if(tb){ tb.click(); return; } } fuelOpen.has(k2)?fuelOpen.delete(k2):fuelOpen.add(k2); renderDetails(); return;}
+  const fk=t.closest("[data-fuelk]"); if(fk&&goGap(+fk.dataset.fuelk)) return; if(fk){const k2=+fk.dataset.fuelk; if(document.querySelector(`.daycard[data-k="${k2}"]`)){ setDtab(k2,"fuel"); return; } if(ui.tab==="ov"){ fuelOpen.add(k2); const tb=document.querySelector(`[data-day="${k2}"]`); if(tb){ tb.click(); return; } } fuelOpen.has(k2)?fuelOpen.delete(k2):fuelOpen.add(k2); renderDetails(); return;}
   const af=t.closest("[data-addfill]"); if(af){const f=fp.fills.find(x=>x.id===af.dataset.addfill); if(f){insertVia(+af.dataset.day,pt(f.name&&f.name!=="Fuel"?f.name:"Fuel stop",f.lat,f.lon,{fuelHere:true}));changed();} return;}
   const er=t.closest("[data-editroute]"); if(er){const k2=+er.dataset.editroute; editOpen.has(k2)?editOpen.delete(k2):editOpen.add(k2); renderDetails(); return;}
   const mo=t.closest("[data-more]"); if(mo){const key=mo.dataset.more; showAll.has(key)?showAll.delete(key):showAll.add(key); renderDetails(); return;}
   const sn=t.closest("[data-staynight]"); if(sn){const [k2,id]=sn.dataset.staynight.split(":"); const to=dayTo(+k2), x=(stayFor(to)?.places||[]).find(q=>q.id===id); if(x){ if(map) map.closePopup(); chooseStay(+k2,x); } return;}
   const bk=t.closest("[data-booked]"); if(bk){ const d2=trip.days[+bk.dataset.booked]; if(d2&&d2.to&&d2.to.stay){ d2.to.booked=!d2.to.booked; save(); renderAll(); $("status").textContent=d2.to.booked?`${d2.to.name} marked booked.`:`${d2.to.name}: not booked.`; } return; }
   const stn=t.closest("[data-staytown]"); if(stn){ const d2=trip.days[+stn.dataset.staytown], tw=d2&&d2.to&&d2.to.town; if(tw){ d2.to=pt(tw.name,tw.lat,tw.lon); $("status").textContent=`Night stop back to ${tw.name}.`; changed(); } return; }
-  const ps=t.closest("[data-pickstay]"); if(ps){ const k2=+ps.dataset.pickstay; ui.tab=k2; saveUi(); renderAll(); setTimeout(()=>{ const el=$("stays-"+k2); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); },60); return; }
+  const ps=t.closest("[data-pickstay]"); if(ps){ const k2=+ps.dataset.pickstay; ui.tab=k2; ui.dtab=ui.dtab||{}; ui.dtab[k2]="stay"; saveUi(); renderAll(); setTimeout(()=>{ const el=$("stays-"+k2); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); },60); return; }
   if(t.closest("[data-copysleep]")){ const txt=sleepText(); (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>{ $("status").textContent="List copied. Paste it into a note or message."; },()=>{ $("status").textContent="Couldn't copy here. Use Save as PDF instead."; }); return; }
   const ap=t.closest("[data-addpoi]"); if(ap){const [k2,id]=ap.dataset.addpoi.split(":"); const x=pois.find(q=>q.id===id); if(x){insertVia(+k2,pt(x.name,x.lat,x.lon,{}));$("status").textContent=`Added ${x.name}.`;changed();} return;}
   const go=t.closest("[data-gotoday]"); if(go&&!t.closest("button,input,a")){ui.tab=+go.dataset.gotoday;saveUi();renderAll();return;}
@@ -1026,15 +1030,16 @@ function drawMap(){
   if(!plan){ const s0=trip.start; if(s0&&s0.lat!=null){ L.marker([s0.lat,s0.lon],{icon:L.divIcon({className:"",html:`<div class="pin pstart">▶</div>`,iconSize:[28,28],iconAnchor:[14,14]})}).bindTooltip("Start: "+s0.name,{permanent:true,direction:"right",offset:[14,0],className:"maplbl"}).addTo(layer);
       const key=s0.lat+","+s0.lon; if(startSeen!==key){ startSeen=key; map.setView([s0.lat,s0.lon],9,{animate:false}); } } try{ if(ui.lay.fav&&typeof drawFavs==="function") drawFavs(); }catch(e){} try{ if(typeof drawEvents==="function") drawEvents(); }catch(e){} return; }
   townLabels();
-  const sel=ui.tab==="ov"?null:plan.days[ui.tab];
+  const sel=ui.tab==="ov"?null:plan.days[ui.tab], LY=mapLay(), lay=LY.lay; // lay: what to show, the rider's choices or the open tab's
+
   const hl=sel?null:ovHi;
   plan.days.forEach((d,k)=>{ if(!d) return; const on=sel?k===ui.tab:(hl==null||hl===k), col=DAYCOL[k%DAYCOL.length];
     const st=sel?{color:on?col:"#54666A",weight:on?5:3,opacity:on?.9:.3}:{color:on?col:"#54666A",weight:on?(k===0?7:5):3,opacity:on?.95:.25,dashArray:k>0?"10 8":null,lineCap:"butt"};
     L.polyline(seg(d.a,d.b).map(g=>[g.lat,g.lon]),st).addTo(layer); });
-  if(ui.lay.road) drawGradeLayer(sel);
-  if(ui.lay.rep&&typeof drawReports==="function") drawReports(sel);
-  if(ui.lay.spots&&typeof drawSpots==="function") drawSpots();
-  try{ if(ui.lay.fav&&typeof drawFavs==="function") drawFavs(); }catch(e){} // an extra layer must never stop the route
+  if(lay.road) drawGradeLayer(sel);
+  if(lay.rep&&typeof drawReports==="function") drawReports(sel);
+  if(lay.spots&&typeof drawSpots==="function") drawSpots();
+  try{ if(lay.fav&&typeof drawFavs==="function") drawFavs(); }catch(e){} // an extra layer must never stop the route
   try{ if(typeof drawEvents==="function") drawEvents(); }catch(e){}
   if(panel){ drawPanelLayer(); return; }
   if(stopFocus&&sel&&stopFocus.k===ui.tab&&drawStopLayer()) return;
@@ -1055,7 +1060,7 @@ function drawMap(){
     const m=L.marker([p.lat,p.lon],{icon:L.divIcon({className:"",html,iconSize:size,iconAnchor:[size[0]/2,size[1]/2]}),zIndexOffset:night||isStart||isEnd?1000:0}).bindTooltip(label,key?{permanent:true,direction:night&&nk%2===1?"left":"right",offset:[night&&nk%2===1?-size[0]/2:size[0]/2,0],className:"maplbl"+(night?" mlnight":"")}:{}).addTo(layer);
     m.on("click",()=>{ const k=trip.days.findIndex((d,i)=>plan.days[i]&&plan.days[i].pts.includes(p)&&(sel?i===ui.tab:true)); if(k<0) return; const j=plan.days[k].pts.indexOf(p); ui.tab=k; stopFocus={k,j}; saveUi(); renderAll(); });
   });
-  if(fp&&ui.lay.fuel){
+  if(fp&&lay.fuel){
     fuelStations.filter(f=>inR(f)&&f.off<=2).forEach(f=>L.marker([f.lat,f.lon],{icon:dotIcon("#1E8EB4",10,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
     const stopsHere=townPoints(), gapsOn=(fp.days||[]).flatMap(d=>d?d.probs:[]);
     const ftowns=stopTowns().filter(t=>t.fuel&&t.off>2&&inR(t)&&!stopsHere.some(p=>hav(p,t)<3)&&gapsOn.some(g=>t.km>=g.from-5&&t.km<=g.to+5)), lbl=sel&&ftowns.length<=8;
@@ -1064,12 +1069,12 @@ function drawMap(){
         .bindTooltip(t.name,lbl?{permanent:true,direction:"right",offset:[12,0],className:"maplbl"}:{})
         .bindPopup(`<b>${esc(t.name)}</b><br>${Math.round(t.off)} km off the route${t.food?" · food":""}<br><button class="btn small" type="button" data-addtown="${k}|${esc(t.name)}|${t.lat}|${t.lon}">Add as a stop</button>`).addTo(layer); });
   }
-  if(ui.lay.med&&meds) meds.filter(m=>m.off<=25&&inR(m)).forEach(m=>L.marker([m.lat,m.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:#B3261E">🏥</div>`,iconSize:[22,22],iconAnchor:[11,11]})}).bindTooltip(`${m.name||(m.type==="hospital"?"Hospital":"Clinic")}${m.phone?" · "+m.phone:""}`).addTo(layer));
-  pois.filter(p=>ui.types[p.kind]&&inR(p)).sort((a,b)=>a.off-b.off).slice(0,+ui.max).forEach(p=>{const t=TYPES.find(x=>x.id===p.kind); L.marker([p.lat,p.lon],{icon:dotIcon(t.c,10)}).bindTooltip(`${p.name} · ${t.n}`).addTo(layer);});
+  if(lay.med&&meds) meds.filter(m=>m.off<=25&&inR(m)).forEach(m=>L.marker([m.lat,m.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:#B3261E">🏥</div>`,iconSize:[22,22],iconAnchor:[11,11]})}).bindTooltip(`${m.name||(m.type==="hospital"?"Hospital":"Clinic")}${m.phone?" · "+m.phone:""}`).addTo(layer));
+  pois.filter(p=>LY.types[p.kind]&&inR(p)).sort((a,b)=>a.off-b.off).slice(0,LY.cat?1000:+ui.max).forEach(p=>{const t=TYPES.find(x=>x.id===p.kind); L.marker([p.lat,p.lon],{icon:dotIcon(t.c,10)}).bindTooltip(`${p.name} · ${t.n}`).addTo(layer);});
   // zoomed out, 21 dots sit on top of each other under the night marker: show one "🏨 21" badge per night instead (tap to zoom in)
-  if(ui.lay.stay) stays.forEach(s=>{ const k=trip.days.findIndex((d,i)=>d.to===s.night&&i<nDays()-1); if(k<0) return; const n=s.places.filter(p=>stayMatch(p,stayTypeOf(k))).length; if(!n||(trip.days[k].to&&trip.days[k].to.stay)) return;
+  if(lay.stay) stays.forEach(s=>{ const k=trip.days.findIndex((d,i)=>d.to===s.night&&i<nDays()-1); if(k<0||(LY.cat&&k!==LY.k)) return; const n=s.places.filter(p=>stayMatch(p,stayTypeOf(k))).length; if(!n||(trip.days[k].to&&trip.days[k].to.stay)) return;
     L.marker([s.night.lat,s.night.lon],{icon:L.divIcon({className:"",html:`<div class="staybadge" title="${n} places to stay. Tap to see them">🛏 ${n}</div>`,iconSize:[54,24],iconAnchor:[-14,30]}),zIndexOffset:900}).on("click",()=>map.setView([s.night.lat,s.night.lon],14)).addTo(layer); });
-  if(ui.lay.stay) stays.forEach(s=>{ const k=trip.days.findIndex((d,i)=>d.to===s.night&&i<nDays()-1); if(k<0) return; s.places.filter(p=>stayMatch(p,stayTypeOf(k))).forEach(p=>{ const on=trip.days[k].to&&trip.days[k].to.stay&&trip.days[k].to.name===p.name&&hav(p,trip.days[k].to)<0.1;
+  if(lay.stay) stays.forEach(s=>{ const k=trip.days.findIndex((d,i)=>d.to===s.night&&i<nDays()-1); if(k<0||(LY.cat&&k!==LY.k)) return; s.places.filter(p=>stayMatch(p,stayTypeOf(k))).forEach(p=>{ const on=trip.days[k].to&&trip.days[k].to.stay&&trip.days[k].to.name===p.name&&hav(p,trip.days[k].to)<0.1;
     L.marker([p.lat,p.lon],{icon:dotIcon(on?"#1E8EB4":"#2F5BA8",on?13:9)}).bindTooltip(p.name).bindPopup(`<b>${esc(p.name)}</b><br><span class="note">${esc((p.tags.tourism||"").replace(/_/g," "))}</span><br>${on?`<span class="okt">✓ Your stay, ${esc(dayName(k))}</span>`:`<button class="btn small" type="button" data-staynight="${k}:${esc(p.id)}">Stay here, ${esc(dayName(k))}</button>`}`).addTo(layer); }); });
   if(!focusR){ const g=sel?seg(sel.a,sel.b):plan.geom; if(g.length>1&&(window._refit||sel||lastSel!==ui.tab)){map.fitBounds(L.latLngBounds(g.map(x=>[x.lat,x.lon])),{padding:[24,24]});} if(!planStale) window._refit=false; lastSel=ui.tab; }
 }
@@ -1089,11 +1094,14 @@ const LAY_IC={moto:"race",fuel:"fuel",stay:"stay",food:"utensils",sights:"eye",m
 const LAY=[["moto","🏁","High Octane","Tracks, motor museums, factories and events nearby (Near me)"],["fuel","⛽","Fuel","Fuel stations on the route"],["stay","🛏","Places to stay","Places to stay at your night stops"],["food","🍴","Food","Places to eat"],["sights","★","Sights","Sights, viewpoints and passes"],["med","🏥","Medical","Hospitals and clinics"],["rep","📣","Rider reports","What riders reported on the road lately"],["spots","📍","Riders' places","Places riders marked: viewpoints, farm stalls, stays"],["fav","♥","POI","Points of interest: places worth the trip, and petrolhead places"],["road","🛣","Road grade","The route coloured by terrain grade, Race to Single"]];
 ui.lay=Object.assign({fuel:true,stay:!!ui.sleep,food:!!ui.types.food,sights:true,med:false,rep:true,spots:true,fav:false},ui.lay||{}); if(ui.favV!==1){ ui.lay.fav=false; ui.favV=1; } // fav's off by default: a button for those who want them if(ui.lay.rep===undefined) ui.lay.rep=true; if(ui.lay.spots===undefined) ui.lay.spots=true;
 function renderLayers(){
-  $("iconbar").innerHTML=`<span class="ibhead">On the map</span>`+LAY.map(([id,ic,w,t])=>{ const on=!!ui.lay[id];
+  const LY=mapLay(), tabName=LY.cat?{fuel:"Fuel",stay:"Sleep",food:"Eat",sights:"See"}[LY.cat]:"";
+  $("iconbar").innerHTML=`<span class="ibhead">On the map${tabName?` <span class="ibfollow" title="The map shows what the open tab lists. Open Route to see your own choices again.">· ${tabName} tab</span>`:""}</span>`+LAY.map(([id,ic,w,t])=>{ const on=!!LY.lay[id];
     return `<button type="button" class="ib ${on?"on":""}" data-lay="${id}" title="${esc(w)}: ${esc(t)}" aria-label="${esc(w)}" aria-pressed="${on}">${OTMhouse.icon(LAY_IC[id]||"info",20)}</button>`; }).join("")
     +(ui.lay.sights?`<label class="ibmax" title="How many sights to show">★ <select data-max aria-label="How many sights">${[["10","10"],["25","25"],["50","50"],["1000","All"]].map(([v,l])=>`<option value="${v}" ${ui.max===v?"selected":""}>${l}</option>`).join("")}</select></label>`:"")+`<button type="button" class="ibkey" data-key title="What the icons and colours mean">?</button>`;
 }
-$("iconbar").addEventListener("click",e=>{ if(e.target.closest("select")) return; if(e.target.closest("[data-key]")){ $("keyDlg").showModal(); return; } const b=e.target.closest("[data-lay]"); if(!b||b.disabled) return; const id=b.dataset.lay; ui.lay[id]=!ui.lay[id];
+$("iconbar").addEventListener("click",e=>{ if(e.target.closest("select")) return; if(e.target.closest("[data-key]")){ $("keyDlg").showModal(); return; } const b=e.target.closest("[data-lay]"); if(!b||b.disabled) return; const id=b.dataset.lay;
+  { const LY=mapLay(); if(LY.cat){ ui.dtab[LY.k]="route"; } } // the map was following a tab: back to Route and the rider's own choices, then the change
+  ui.lay[id]=!ui.lay[id];
   if(id==="food") ui.types.food=ui.lay.food; if(id==="sights") ["view","pass","sight"].forEach(t=>ui.types[t]=ui.lay.sights); if(id==="stay"){ ui.sleep=ui.lay.stay; ui.types.camp=ui.lay.stay; }
   saveUi(); renderLayers(); renderAll(); });
 $("iconbar").addEventListener("change",e=>{ if(e.target.dataset.max!==undefined){ ui.max=e.target.value; saveUi(); renderAll(); } });
@@ -1178,7 +1186,7 @@ document.addEventListener("click",e=>{ if(e.target.id==="bannerEdit") openWelcom
 function render(){ renderAll(); }
 function renderAll(){
   fp=plan?fuelPlan():null;
-  renderTripBar(); renderTabs();
+  renderTripBar(); renderTabs(); try{ renderLayers(); }catch(e){} // the map buttons show what the map shows
   const ae=document.activeElement; if(!(ae&&ae.closest&&ae.closest("#details")&&ae.tagName==="INPUT"&&ae.type==="text")) renderDetails();
   if(panel) renderPanel();
   drawMap();
@@ -1216,9 +1224,9 @@ $("map").addEventListener("click",e=>{ const sn=e.target.closest&&e.target.close
 
 /* "Make a trip of it" at the finish: the same tiles as the event pages (src/js/03-trip.js) */
 window.otmAirP=fetch("/data/airports.json").then(r=>r.ok?r.json():[]).then(a=>{ OTMtrip.setAirports(a); if(trip.end&&trip.end.lat!=null&&typeof renderAll==="function") renderAll(); }).catch(()=>{});
-function tripBlockHtml(){
+function tripBlockHtml(noHead){
   const e=trip.end; if(!plan||planStale||!e||e.lat==null||trip.round) return "";
   const from=trip.startDate?addDays(trip.startDate,nDays()-1):"", to=from?addDays(from,1):"";
   const ev=(typeof evList!=="undefined"&&evList||[]).find(x=>Math.abs(x.lat-e.lat)<0.01&&Math.abs(x.lon-e.lon)<0.01);
-  return OTMtrip.html({ place:e.name, town:e.name, country:ev?ev.country:null, lat:e.lat, lon:e.lon, from:ev?addDays(ev.start,-1):from, to:ev?addDays(ev.end,1):to, tickets:ev&&ev.tickets, bike:settings.vehicle==="bike", near:!!(trip.start&&trip.start.lat!=null&&Math.hypot(trip.start.lat-e.lat,(trip.start.lon-e.lon)*Math.cos(e.lat*Math.PI/180))*111<300) }, "At the finish · "+e.name);
+  return OTMtrip.html({ place:e.name, town:e.name, country:ev?ev.country:null, lat:e.lat, lon:e.lon, from:ev?addDays(ev.start,-1):from, to:ev?addDays(ev.end,1):to, tickets:ev&&ev.tickets, bike:settings.vehicle==="bike", near:!!(trip.start&&trip.start.lat!=null&&Math.hypot(trip.start.lat-e.lat,(trip.start.lon-e.lon)*Math.cos(e.lat*Math.PI/180))*111<300) }, noHead?false:"At the finish · "+e.name);
 }

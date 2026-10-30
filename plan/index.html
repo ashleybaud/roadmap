@@ -718,6 +718,67 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
 
 .plantitle{margin:14px 0 6px;font:800 1.9rem var(--f-display,"Saira Condensed",sans-serif);text-transform:uppercase;text-align:center;color:var(--gold)}
 .lastbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:10px 0;padding:10px 14px;background:#0F5874;border-left:4px solid #E8A317;border-radius:12px;color:#fff}.lastbar .btns{display:flex;gap:8px;align-items:center}
+/* ---------- day card: one card per day, tabs instead of icons (same tab look as Make a trip of it) ---------- */
+.box.daycard{container-type:inline-size;--ink:#F4F8F9;--muted:#B5D3DE;--line:#1E6A86;--chip:#14708F;--panel:#0F5874;--bg:#0B2A35;--accent:#E8A317;--warn:#E8A317;--bad:#E5674A;--ok:#3E9E63;--onfill:#0B1D21;
+  background:#0B2A35;border:1px solid #1F5568;border-radius:12px;padding:14px 16px 16px;color:var(--ink)}
+.daycard .dchead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.daycard .dcl{color:var(--muted);font-size:1rem}.daycard .dcl b{font:800 1.45rem/1 var(--f-display,"Saira Condensed",sans-serif);text-transform:uppercase;color:#fff;letter-spacing:.01em}
+.daycard .dcr{background:none;border:0;padding:0;color:#fff;font:700 1rem "IBM Plex Sans",Arial,sans-serif;cursor:pointer;white-space:nowrap}.daycard .dcr .overt{color:var(--warn)}
+.daycard .dcft{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin:6px 0 10px;font-size:1.05rem}
+.daycard .dcft .ep{display:inline-flex;align-items:center;gap:6px}.daycard .dcft .ico{color:var(--muted)}.daycard .dcft .arr{color:var(--accent)}
+.daycard .dcft .tolink{color:#fff;font-weight:600}.daycard .dcft .nbadge{font-size:.7rem}
+.daycard .gradebar .gpc{display:none}
+.dcleg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.78rem;color:var(--muted);margin:5px 0 0}.dcleg>span{display:inline-flex;align-items:center;gap:5px}.dcleg i{width:9px;height:9px;border-radius:2px;display:inline-block}.dcleg .vn{opacity:.75}
+.dctabs{display:flex;gap:3px;flex-wrap:nowrap;margin-top:14px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.dctabs::-webkit-scrollbar{display:none}
+.dctab{flex:1 0 auto;display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:9px 7px;border:0;border-radius:12px 12px 0 0;background:#0B3A4B;color:#B5D3DE;font:700 .82rem "IBM Plex Sans",Arial,sans-serif;white-space:nowrap;cursor:pointer}
+.dctab:hover{color:#fff}.dctab[aria-selected="true"]{background:#0F5874;color:#fff;box-shadow:inset 0 3px 0 #E8A317}
+.dctab:focus-visible{outline:2px solid #E8A317;outline-offset:-2px}
+.dctab.empty:not([aria-selected="true"]){opacity:.55}
+.dctab .cnt{font-style:normal;font-size:.68rem;line-height:1;background:#1F5568;color:#fff;border-radius:9px;padding:3px 5px;min-width:17px;text-align:center}
+.dctab .cnt.bad{background:#D9483B}.dctab .cnt.warn{background:#E8A317;color:#0B1D21}
+.dcpanels{background:#0F5874;border-radius:0 0 12px 12px;padding:12px 14px;color:#F4F8F9}
+.dcpanel[hidden]{display:none}
+.dcempty{margin:4px 0;color:var(--muted)}
+.dcroute{list-style:none;margin:0;padding:0}
+.dcst{display:grid;grid-template-columns:44px minmax(0,1fr) auto 58px;align-items:center;gap:8px;padding:8px 6px;border-bottom:1px solid #1E6A86;cursor:pointer;border-radius:8px}
+.dcst:last-child{border-bottom:0}.dcst:hover{background:rgba(255,255,255,.05)}.dcst.on{background:#14708F}
+.dcst .tm{font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}.dcst .km{text-align:right;font-size:.82rem;color:var(--muted);white-space:nowrap}
+.dcst .nm{min-width:0}.dcst .nm b{font-weight:600}.dcst .autotag{font-size:.68rem;margin-left:4px}
+.dcst .mk{display:flex;gap:4px}
+.dcmk{width:26px;height:26px;border-radius:6px;border:0;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.dcmk.f{background:#E8A317;color:#0B1D21}.dcmk.b{background:#D6E7EE;color:#0B3A4B}.dcmk:focus-visible{outline:2px solid #fff;outline-offset:1px}
+.dcelev{margin-top:8px}.dcelev .elevprof svg{height:60px}.dcnote{margin:8px 0 0}
+.dcsum{display:flex;align-items:center;gap:10px;margin:0 0 6px}.dcsum .fbtn{background:none;border:0;padding:0;cursor:pointer}
+.dcrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 6px;border-bottom:1px solid #1E6A86;border-radius:8px}
+.dcrow>div:first-child{display:flex;flex-direction:column;min-width:0;gap:1px}.dcrow:last-child{border-bottom:0}.dcrow.on{background:#14708F}
+.dcrow .fgrp summary{margin:2px 0}.dcgap{border-bottom:1px solid #1E6A86}.dcrow.dcgap{padding-top:4px}.dcrow.dcgap.warn b{color:var(--warn)}.dcrow.dcgap.bad b{color:var(--bad)}
+.dcrow[data-ploc]{cursor:pointer}
+.dcpanel .verdict{margin:8px 0 0}
+.dcgrp{margin-bottom:10px}.dcgrp .linkbtn{margin-top:6px}.dcgrp h4{margin:10px 0 2px;font-size:.95rem}.dcgrp:first-child h4{margin-top:2px}
+.dcsel .dcgrp h4{color:var(--accent)}
+.dcpanel .srow{border-bottom-color:#1E6A86}.dcpanel .dsec{border-top:0;padding-top:0}.dcpanel .dsec+.dsec{border-top:1px solid #1E6A86;padding-top:10px;margin-top:8px}
+.dcpanel .staychips button{background:#0B3A4B;color:#F4F8F9;border-color:#1E6A86}.dcpanel .staychips button.on{background:#F4F8F9;color:#0B2A35}.dcpanel .staychips button.on span{color:#0B2A35}
+.dcpanel .mystay{border-color:#E8A317}
+.dcgtk.gtk{border:0;padding:0;margin:0}
+.dcnote2{display:flex;gap:10px;padding:9px 4px;border-bottom:1px solid #1E6A86}.dcnote2:last-child{border-bottom:0}
+.dcnote2 .dot{width:10px;height:10px;border-radius:50%;margin-top:6px;flex:none;background:#5E8C9C}
+.dcnote2.bad .dot{background:#D9483B}.dcnote2.warn .dot{background:#E8A317}
+.dcnote2>div{display:flex;flex-direction:column;gap:1px;min-width:0}.dcnote2 span{font-size:.88rem;color:#D6E7EE}.dcnote2 a{font-size:.85rem;color:var(--accent);font-weight:700}
+.dcnote2.info b{font-weight:500}
+.dcpanel .medbox{margin-top:10px;border-top:1px solid #1E6A86;padding-top:8px}
+.dcpanel .trip{margin:0}.dcpanel .trip .ttabs{margin-top:0}.dcpanel .trip .tpanels{background:#0B3A4B}
+.dcfoot{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+@container (min-width:420px) and (max-width:600px){.dctab .ico{display:none}.dctab{padding:9px 6px}} /* a desktop details column: words and counts fit on one row without icons */
+.ibfollow{color:var(--gold,#E8A317);text-transform:none;letter-spacing:0;font-weight:600}
+@media (max-width:640px){
+  .box.daycard{padding:12px 12px 14px}
+  .dctabs{margin-right:-12px;padding-right:28px;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 36px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 36px),transparent)}
+  .dctab{flex:0 0 auto;padding:10px 10px}
+  .dcpanels{padding:10px 10px;border-radius:0 0 12px 12px}
+  .dcst{grid-template-columns:40px minmax(0,1fr) auto 50px;gap:6px;padding:8px 2px}
+  .dcrow{flex-wrap:wrap}
+}
 /* ===== House rules (docs: OneTrackMind house rules). Loaded last, so it wins. ===== */
 .ico{display:inline-block;vertical-align:-.15em;flex:none}
 /* menu: dropdowns (details/summary), same look as the plain links */
@@ -1619,6 +1680,8 @@ if(settings.rangeSet===undefined&&+settings.range!==200&&+settings.range!==150) 
 if(!settings.rangeSet) settings.range=RANGE_DEF[settings.vehicle]||200;
 const ui=Object.assign({types:Object.fromEntries(TYPES.map(t=>[t.id,t.on])),max:"10",sleep:false},store.get("rr4-ui")||{});
 ui.tab=ui.tab??"ov"; delete ui._lastSel;
+// the map follows the open tab of a day card (Fuel shows only fuel, Sleep only beds, ...); false keeps the rider's own "On the map" choices always
+const MAP_FOLLOWS_TAB=true;
 let passNear=[];
 let plan=null, pois=[], fuelStations=[], fuelAll=[], stays=[], placesOk=false, dataDate="", seq=0, panel=null, fp=null;
 fetch("/data/updated.json").then(r=>r.ok?r.json():null).then(j=>{if(j&&j.updated)dataDate=new Date(j.updated).toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"});}).catch(()=>{});
@@ -1866,7 +1929,7 @@ $("dayTabs").addEventListener("click",e=>{if(e.target.closest("[data-key]")){$("
 
 /* ---------- details ---------- */
 const TB=document.querySelector(".tripbar");
-function renderDetails(){ hidePeek(); $("tbHold").append(TB); $("details").innerHTML=ui.tab==="ov"?overviewHtml():dayHtml(ui.tab); const slot=$("details").querySelector(".tbslot"); TB.querySelectorAll(".tadd").forEach(x=>x.remove()); if(slot){ slot.replaceWith(TB); const a=$("details").querySelector(".planbox>.tadd"); if(a) TB.insertBefore(a,TB.querySelector(".tbwhen")); } wireDetails(); }
+function renderDetails(){ hidePeek(); $("tbHold").append(TB); $("details").innerHTML=ui.tab==="ov"?overviewHtml():dayHtml(ui.tab); const slot=$("details").querySelector(".tbslot"); TB.querySelectorAll(".tadd").forEach(x=>x.remove()); if(slot){ slot.replaceWith(TB); const a=$("details").querySelector(".planbox>.tadd"); if(a) TB.insertBefore(a,TB.querySelector(".tbwhen")); } wireDetails(); dcAfterRender(); }
 
 /* ---------- weather, time zones (Open-Meteo, no key) ---------- */
 let wx=null, meds=null, fords=null;
@@ -2415,19 +2478,21 @@ function clearLink(){ return `<div class="btns clearrow">${clearArm?`<span class
 function overviewHtml(){
   // 1. Your trip  2. Stop  3. Details (each its own box)
   let h=tripBox(null)+stopSummary(null), det="";
-  if(nDays()===1){ det=sumBox(0,false,true)+(typeof founderLine==="function"?founderLine():"")+(plan&&!planStale&&typeof rateLine==="function"?rateLine():"")+(!planStale&&plan&&plan.days[0]?gtkHtml(0):"")+dayBody(0,true); }
+  const one=nDays()===1&&!planStale&&plan&&plan.days[0]; // a one-day trip: its day card is the details
+  if(one) det=null;
+  else if(nDays()===1){ det=sumBox(0,false,true)+(typeof founderLine==="function"?founderLine():"")+(plan&&!planStale&&typeof rateLine==="function"?rateLine():"")+(!planStale&&plan&&plan.days[0]?gtkHtml(0):"")+dayBody(0,true); }
   else { let hh=`<div class="days">`; trip.days.forEach((d,k)=>{ hh+=`<div class="ovday" data-gotoday="${k}">${sumBox(k,false,true)}</div>`; }); hh+=`</div>`;
     det=(function(){ let h=hh;
   h+=tripTotals();
   h+=sleepList();
   if(plan&&!planStale) h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px"><button class="btn small share" type="button" data-sharetrip title="A link anyone can open: the whole plan, then Google Maps / Waze or GPX">Share this trip ↗</button><button class="btn small wa" type="button" data-sharewa title="Send this trip on WhatsApp">WhatsApp this trip</button>${nameBtn()}${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">${esc(dayName(k))} GPX</button>`:"").join("")}<button class="btn small" type="button" data-gpx="all">Whole trip GPX</button><button class="btn small" type="button" data-navlinks title="Open each day in Google Maps or Waze on your phone">Google Maps / Waze</button><button class="btn small ghost" type="button" data-grouppack title="Every GPX format in one zip, with a read-me, for a group ride">Group ride pack ↓</button><button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}</div></div>`;
       return h; })(); }
-  h+=boxSec("detailbox","Details",det);
-  h+=tripBlockHtml();
+  h+=one?dayCard(0,(typeof founderLine==="function"?founderLine():"")+(typeof rateLine==="function"?rateLine():"")):boxSec("detailbox","Details",det);
+  if(!(one&&dcHasBook(0))) h+=tripBlockHtml(); // a one-day trip books from its card's Book tab
   return h+(typeof flightHtml==="function"?flightHtml():"")+(typeof onDatesHtml==="function"?onDatesHtml():"")+clearLink()+footNote();
 }
 function footNote(){ return `<div class="note">${placesOk&&dataDate?`Map data from OpenStreetMap, as of ${esc(dataDate)}. Weather from Open-Meteo. Phone ahead on remote legs. `:""}Plan with it, check before you go: you ride at your own risk. <a href="/terms.html">Terms and disclaimer</a> · <a href="/privacy.html">Privacy</a></div>`; }
-function dayHtml(k){ return tripBox(k)+stopSummary(k)+boxSec("detailbox","Details",sumBox(k,true,true)+(!planStale&&plan&&plan.days[k]?gtkHtml(k):"")+dayBody(k,true)); }
+function dayHtml(k){ return tripBox(k)+stopSummary(k)+dayCard(k); }
 function wireDetails(){
   trip.days.forEach((d,k)=>hook("night-"+k,p=>{editTo.delete(k);trip.days[k].to=p;changed();}));
   hook("whereto-0",p=>{ trip.days[0].vias.push(p); trip.days[0].legs=[]; changed(); });
@@ -2474,14 +2539,14 @@ $("details").addEventListener("click",e=>{
   const cl=t.closest("[data-clear]"); if(cl){ const id=cl.dataset.clear, m=id.match(/^(night|finish|via)-(\d+)(?:-(\d+))?$/); if(!m) return;
     if(m[1]==="night"){trip.days[+m[2]].to=null;trip.days[+m[2]].noAutoNight=true;editTo.add(+m[2]);} else if(m[1]==="finish"){trip.end=null;} else {trip.days[+m[2]].vias.splice(+m[3],1);trip.days[+m[2]].legs=[];}
     changed(); return; }
-  const fk=t.closest("[data-fuelk]"); if(fk&&goGap(+fk.dataset.fuelk)) return; if(fk){const k2=+fk.dataset.fuelk; if(ui.tab==="ov"){ fuelOpen.add(k2); const tb=document.querySelector(`[data-day="${k2}"]`); if(tb){ tb.click(); return; } } fuelOpen.has(k2)?fuelOpen.delete(k2):fuelOpen.add(k2); renderDetails(); return;}
+  const fk=t.closest("[data-fuelk]"); if(fk&&goGap(+fk.dataset.fuelk)) return; if(fk){const k2=+fk.dataset.fuelk; if(document.querySelector(`.daycard[data-k="${k2}"]`)){ setDtab(k2,"fuel"); return; } if(ui.tab==="ov"){ fuelOpen.add(k2); const tb=document.querySelector(`[data-day="${k2}"]`); if(tb){ tb.click(); return; } } fuelOpen.has(k2)?fuelOpen.delete(k2):fuelOpen.add(k2); renderDetails(); return;}
   const af=t.closest("[data-addfill]"); if(af){const f=fp.fills.find(x=>x.id===af.dataset.addfill); if(f){insertVia(+af.dataset.day,pt(f.name&&f.name!=="Fuel"?f.name:"Fuel stop",f.lat,f.lon,{fuelHere:true}));changed();} return;}
   const er=t.closest("[data-editroute]"); if(er){const k2=+er.dataset.editroute; editOpen.has(k2)?editOpen.delete(k2):editOpen.add(k2); renderDetails(); return;}
   const mo=t.closest("[data-more]"); if(mo){const key=mo.dataset.more; showAll.has(key)?showAll.delete(key):showAll.add(key); renderDetails(); return;}
   const sn=t.closest("[data-staynight]"); if(sn){const [k2,id]=sn.dataset.staynight.split(":"); const to=dayTo(+k2), x=(stayFor(to)?.places||[]).find(q=>q.id===id); if(x){ if(map) map.closePopup(); chooseStay(+k2,x); } return;}
   const bk=t.closest("[data-booked]"); if(bk){ const d2=trip.days[+bk.dataset.booked]; if(d2&&d2.to&&d2.to.stay){ d2.to.booked=!d2.to.booked; save(); renderAll(); $("status").textContent=d2.to.booked?`${d2.to.name} marked booked.`:`${d2.to.name}: not booked.`; } return; }
   const stn=t.closest("[data-staytown]"); if(stn){ const d2=trip.days[+stn.dataset.staytown], tw=d2&&d2.to&&d2.to.town; if(tw){ d2.to=pt(tw.name,tw.lat,tw.lon); $("status").textContent=`Night stop back to ${tw.name}.`; changed(); } return; }
-  const ps=t.closest("[data-pickstay]"); if(ps){ const k2=+ps.dataset.pickstay; ui.tab=k2; saveUi(); renderAll(); setTimeout(()=>{ const el=$("stays-"+k2); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); },60); return; }
+  const ps=t.closest("[data-pickstay]"); if(ps){ const k2=+ps.dataset.pickstay; ui.tab=k2; ui.dtab=ui.dtab||{}; ui.dtab[k2]="stay"; saveUi(); renderAll(); setTimeout(()=>{ const el=$("stays-"+k2); if(el) el.scrollIntoView({behavior:"smooth",block:"start"}); },60); return; }
   if(t.closest("[data-copysleep]")){ const txt=sleepText(); (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>{ $("status").textContent="List copied. Paste it into a note or message."; },()=>{ $("status").textContent="Couldn't copy here. Use Save as PDF instead."; }); return; }
   const ap=t.closest("[data-addpoi]"); if(ap){const [k2,id]=ap.dataset.addpoi.split(":"); const x=pois.find(q=>q.id===id); if(x){insertVia(+k2,pt(x.name,x.lat,x.lon,{}));$("status").textContent=`Added ${x.name}.`;changed();} return;}
   const go=t.closest("[data-gotoday]"); if(go&&!t.closest("button,input,a")){ui.tab=+go.dataset.gotoday;saveUi();renderAll();return;}
@@ -2613,15 +2678,16 @@ function drawMap(){
   if(!plan){ const s0=trip.start; if(s0&&s0.lat!=null){ L.marker([s0.lat,s0.lon],{icon:L.divIcon({className:"",html:`<div class="pin pstart">▶</div>`,iconSize:[28,28],iconAnchor:[14,14]})}).bindTooltip("Start: "+s0.name,{permanent:true,direction:"right",offset:[14,0],className:"maplbl"}).addTo(layer);
       const key=s0.lat+","+s0.lon; if(startSeen!==key){ startSeen=key; map.setView([s0.lat,s0.lon],9,{animate:false}); } } try{ if(ui.lay.fav&&typeof drawFavs==="function") drawFavs(); }catch(e){} try{ if(typeof drawEvents==="function") drawEvents(); }catch(e){} return; }
   townLabels();
-  const sel=ui.tab==="ov"?null:plan.days[ui.tab];
+  const sel=ui.tab==="ov"?null:plan.days[ui.tab], LY=mapLay(), lay=LY.lay; // lay: what to show, the rider's choices or the open tab's
+
   const hl=sel?null:ovHi;
   plan.days.forEach((d,k)=>{ if(!d) return; const on=sel?k===ui.tab:(hl==null||hl===k), col=DAYCOL[k%DAYCOL.length];
     const st=sel?{color:on?col:"#54666A",weight:on?5:3,opacity:on?.9:.3}:{color:on?col:"#54666A",weight:on?(k===0?7:5):3,opacity:on?.95:.25,dashArray:k>0?"10 8":null,lineCap:"butt"};
     L.polyline(seg(d.a,d.b).map(g=>[g.lat,g.lon]),st).addTo(layer); });
-  if(ui.lay.road) drawGradeLayer(sel);
-  if(ui.lay.rep&&typeof drawReports==="function") drawReports(sel);
-  if(ui.lay.spots&&typeof drawSpots==="function") drawSpots();
-  try{ if(ui.lay.fav&&typeof drawFavs==="function") drawFavs(); }catch(e){} // an extra layer must never stop the route
+  if(lay.road) drawGradeLayer(sel);
+  if(lay.rep&&typeof drawReports==="function") drawReports(sel);
+  if(lay.spots&&typeof drawSpots==="function") drawSpots();
+  try{ if(lay.fav&&typeof drawFavs==="function") drawFavs(); }catch(e){} // an extra layer must never stop the route
   try{ if(typeof drawEvents==="function") drawEvents(); }catch(e){}
   if(panel){ drawPanelLayer(); return; }
   if(stopFocus&&sel&&stopFocus.k===ui.tab&&drawStopLayer()) return;
@@ -2642,7 +2708,7 @@ function drawMap(){
     const m=L.marker([p.lat,p.lon],{icon:L.divIcon({className:"",html,iconSize:size,iconAnchor:[size[0]/2,size[1]/2]}),zIndexOffset:night||isStart||isEnd?1000:0}).bindTooltip(label,key?{permanent:true,direction:night&&nk%2===1?"left":"right",offset:[night&&nk%2===1?-size[0]/2:size[0]/2,0],className:"maplbl"+(night?" mlnight":"")}:{}).addTo(layer);
     m.on("click",()=>{ const k=trip.days.findIndex((d,i)=>plan.days[i]&&plan.days[i].pts.includes(p)&&(sel?i===ui.tab:true)); if(k<0) return; const j=plan.days[k].pts.indexOf(p); ui.tab=k; stopFocus={k,j}; saveUi(); renderAll(); });
   });
-  if(fp&&ui.lay.fuel){
+  if(fp&&lay.fuel){
     fuelStations.filter(f=>inR(f)&&f.off<=2).forEach(f=>L.marker([f.lat,f.lon],{icon:dotIcon("#1E8EB4",10,true)}).bindTooltip("Fuel: "+f.name).addTo(layer));
     const stopsHere=townPoints(), gapsOn=(fp.days||[]).flatMap(d=>d?d.probs:[]);
     const ftowns=stopTowns().filter(t=>t.fuel&&t.off>2&&inR(t)&&!stopsHere.some(p=>hav(p,t)<3)&&gapsOn.some(g=>t.km>=g.from-5&&t.km<=g.to+5)), lbl=sel&&ftowns.length<=8;
@@ -2651,12 +2717,12 @@ function drawMap(){
         .bindTooltip(t.name,lbl?{permanent:true,direction:"right",offset:[12,0],className:"maplbl"}:{})
         .bindPopup(`<b>${esc(t.name)}</b><br>${Math.round(t.off)} km off the route${t.food?" · food":""}<br><button class="btn small" type="button" data-addtown="${k}|${esc(t.name)}|${t.lat}|${t.lon}">Add as a stop</button>`).addTo(layer); });
   }
-  if(ui.lay.med&&meds) meds.filter(m=>m.off<=25&&inR(m)).forEach(m=>L.marker([m.lat,m.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:#B3261E">🏥</div>`,iconSize:[22,22],iconAnchor:[11,11]})}).bindTooltip(`${m.name||(m.type==="hospital"?"Hospital":"Clinic")}${m.phone?" · "+m.phone:""}`).addTo(layer));
-  pois.filter(p=>ui.types[p.kind]&&inR(p)).sort((a,b)=>a.off-b.off).slice(0,+ui.max).forEach(p=>{const t=TYPES.find(x=>x.id===p.kind); L.marker([p.lat,p.lon],{icon:dotIcon(t.c,10)}).bindTooltip(`${p.name} · ${t.n}`).addTo(layer);});
+  if(lay.med&&meds) meds.filter(m=>m.off<=25&&inR(m)).forEach(m=>L.marker([m.lat,m.lon],{icon:L.divIcon({className:"",html:`<div class="mapemo" style="border-color:#B3261E">🏥</div>`,iconSize:[22,22],iconAnchor:[11,11]})}).bindTooltip(`${m.name||(m.type==="hospital"?"Hospital":"Clinic")}${m.phone?" · "+m.phone:""}`).addTo(layer));
+  pois.filter(p=>LY.types[p.kind]&&inR(p)).sort((a,b)=>a.off-b.off).slice(0,LY.cat?1000:+ui.max).forEach(p=>{const t=TYPES.find(x=>x.id===p.kind); L.marker([p.lat,p.lon],{icon:dotIcon(t.c,10)}).bindTooltip(`${p.name} · ${t.n}`).addTo(layer);});
   // zoomed out, 21 dots sit on top of each other under the night marker: show one "🏨 21" badge per night instead (tap to zoom in)
-  if(ui.lay.stay) stays.forEach(s=>{ const k=trip.days.findIndex((d,i)=>d.to===s.night&&i<nDays()-1); if(k<0) return; const n=s.places.filter(p=>stayMatch(p,stayTypeOf(k))).length; if(!n||(trip.days[k].to&&trip.days[k].to.stay)) return;
+  if(lay.stay) stays.forEach(s=>{ const k=trip.days.findIndex((d,i)=>d.to===s.night&&i<nDays()-1); if(k<0||(LY.cat&&k!==LY.k)) return; const n=s.places.filter(p=>stayMatch(p,stayTypeOf(k))).length; if(!n||(trip.days[k].to&&trip.days[k].to.stay)) return;
     L.marker([s.night.lat,s.night.lon],{icon:L.divIcon({className:"",html:`<div class="staybadge" title="${n} places to stay. Tap to see them">🛏 ${n}</div>`,iconSize:[54,24],iconAnchor:[-14,30]}),zIndexOffset:900}).on("click",()=>map.setView([s.night.lat,s.night.lon],14)).addTo(layer); });
-  if(ui.lay.stay) stays.forEach(s=>{ const k=trip.days.findIndex((d,i)=>d.to===s.night&&i<nDays()-1); if(k<0) return; s.places.filter(p=>stayMatch(p,stayTypeOf(k))).forEach(p=>{ const on=trip.days[k].to&&trip.days[k].to.stay&&trip.days[k].to.name===p.name&&hav(p,trip.days[k].to)<0.1;
+  if(lay.stay) stays.forEach(s=>{ const k=trip.days.findIndex((d,i)=>d.to===s.night&&i<nDays()-1); if(k<0||(LY.cat&&k!==LY.k)) return; s.places.filter(p=>stayMatch(p,stayTypeOf(k))).forEach(p=>{ const on=trip.days[k].to&&trip.days[k].to.stay&&trip.days[k].to.name===p.name&&hav(p,trip.days[k].to)<0.1;
     L.marker([p.lat,p.lon],{icon:dotIcon(on?"#1E8EB4":"#2F5BA8",on?13:9)}).bindTooltip(p.name).bindPopup(`<b>${esc(p.name)}</b><br><span class="note">${esc((p.tags.tourism||"").replace(/_/g," "))}</span><br>${on?`<span class="okt">✓ Your stay, ${esc(dayName(k))}</span>`:`<button class="btn small" type="button" data-staynight="${k}:${esc(p.id)}">Stay here, ${esc(dayName(k))}</button>`}`).addTo(layer); }); });
   if(!focusR){ const g=sel?seg(sel.a,sel.b):plan.geom; if(g.length>1&&(window._refit||sel||lastSel!==ui.tab)){map.fitBounds(L.latLngBounds(g.map(x=>[x.lat,x.lon])),{padding:[24,24]});} if(!planStale) window._refit=false; lastSel=ui.tab; }
 }
@@ -2676,11 +2742,14 @@ const LAY_IC={moto:"race",fuel:"fuel",stay:"stay",food:"utensils",sights:"eye",m
 const LAY=[["moto","🏁","High Octane","Tracks, motor museums, factories and events nearby (Near me)"],["fuel","⛽","Fuel","Fuel stations on the route"],["stay","🛏","Places to stay","Places to stay at your night stops"],["food","🍴","Food","Places to eat"],["sights","★","Sights","Sights, viewpoints and passes"],["med","🏥","Medical","Hospitals and clinics"],["rep","📣","Rider reports","What riders reported on the road lately"],["spots","📍","Riders' places","Places riders marked: viewpoints, farm stalls, stays"],["fav","♥","POI","Points of interest: places worth the trip, and petrolhead places"],["road","🛣","Road grade","The route coloured by terrain grade, Race to Single"]];
 ui.lay=Object.assign({fuel:true,stay:!!ui.sleep,food:!!ui.types.food,sights:true,med:false,rep:true,spots:true,fav:false},ui.lay||{}); if(ui.favV!==1){ ui.lay.fav=false; ui.favV=1; } // fav's off by default: a button for those who want them if(ui.lay.rep===undefined) ui.lay.rep=true; if(ui.lay.spots===undefined) ui.lay.spots=true;
 function renderLayers(){
-  $("iconbar").innerHTML=`<span class="ibhead">On the map</span>`+LAY.map(([id,ic,w,t])=>{ const on=!!ui.lay[id];
+  const LY=mapLay(), tabName=LY.cat?{fuel:"Fuel",stay:"Sleep",food:"Eat",sights:"See"}[LY.cat]:"";
+  $("iconbar").innerHTML=`<span class="ibhead">On the map${tabName?` <span class="ibfollow" title="The map shows what the open tab lists. Open Route to see your own choices again.">· ${tabName} tab</span>`:""}</span>`+LAY.map(([id,ic,w,t])=>{ const on=!!LY.lay[id];
     return `<button type="button" class="ib ${on?"on":""}" data-lay="${id}" title="${esc(w)}: ${esc(t)}" aria-label="${esc(w)}" aria-pressed="${on}">${OTMhouse.icon(LAY_IC[id]||"info",20)}</button>`; }).join("")
     +(ui.lay.sights?`<label class="ibmax" title="How many sights to show">★ <select data-max aria-label="How many sights">${[["10","10"],["25","25"],["50","50"],["1000","All"]].map(([v,l])=>`<option value="${v}" ${ui.max===v?"selected":""}>${l}</option>`).join("")}</select></label>`:"")+`<button type="button" class="ibkey" data-key title="What the icons and colours mean">?</button>`;
 }
-$("iconbar").addEventListener("click",e=>{ if(e.target.closest("select")) return; if(e.target.closest("[data-key]")){ $("keyDlg").showModal(); return; } const b=e.target.closest("[data-lay]"); if(!b||b.disabled) return; const id=b.dataset.lay; ui.lay[id]=!ui.lay[id];
+$("iconbar").addEventListener("click",e=>{ if(e.target.closest("select")) return; if(e.target.closest("[data-key]")){ $("keyDlg").showModal(); return; } const b=e.target.closest("[data-lay]"); if(!b||b.disabled) return; const id=b.dataset.lay;
+  { const LY=mapLay(); if(LY.cat){ ui.dtab[LY.k]="route"; } } // the map was following a tab: back to Route and the rider's own choices, then the change
+  ui.lay[id]=!ui.lay[id];
   if(id==="food") ui.types.food=ui.lay.food; if(id==="sights") ["view","pass","sight"].forEach(t=>ui.types[t]=ui.lay.sights); if(id==="stay"){ ui.sleep=ui.lay.stay; ui.types.camp=ui.lay.stay; }
   saveUi(); renderLayers(); renderAll(); });
 $("iconbar").addEventListener("change",e=>{ if(e.target.dataset.max!==undefined){ ui.max=e.target.value; saveUi(); renderAll(); } });
@@ -2765,7 +2834,7 @@ document.addEventListener("click",e=>{ if(e.target.id==="bannerEdit") openWelcom
 function render(){ renderAll(); }
 function renderAll(){
   fp=plan?fuelPlan():null;
-  renderTripBar(); renderTabs();
+  renderTripBar(); renderTabs(); try{ renderLayers(); }catch(e){} // the map buttons show what the map shows
   const ae=document.activeElement; if(!(ae&&ae.closest&&ae.closest("#details")&&ae.tagName==="INPUT"&&ae.type==="text")) renderDetails();
   if(panel) renderPanel();
   drawMap();
@@ -2803,11 +2872,11 @@ $("map").addEventListener("click",e=>{ const sn=e.target.closest&&e.target.close
 
 /* "Make a trip of it" at the finish: the same tiles as the event pages (src/js/03-trip.js) */
 window.otmAirP=fetch("/data/airports.json").then(r=>r.ok?r.json():[]).then(a=>{ OTMtrip.setAirports(a); if(trip.end&&trip.end.lat!=null&&typeof renderAll==="function") renderAll(); }).catch(()=>{});
-function tripBlockHtml(){
+function tripBlockHtml(noHead){
   const e=trip.end; if(!plan||planStale||!e||e.lat==null||trip.round) return "";
   const from=trip.startDate?addDays(trip.startDate,nDays()-1):"", to=from?addDays(from,1):"";
   const ev=(typeof evList!=="undefined"&&evList||[]).find(x=>Math.abs(x.lat-e.lat)<0.01&&Math.abs(x.lon-e.lon)<0.01);
-  return OTMtrip.html({ place:e.name, town:e.name, country:ev?ev.country:null, lat:e.lat, lon:e.lon, from:ev?addDays(ev.start,-1):from, to:ev?addDays(ev.end,1):to, tickets:ev&&ev.tickets, bike:settings.vehicle==="bike", near:!!(trip.start&&trip.start.lat!=null&&Math.hypot(trip.start.lat-e.lat,(trip.start.lon-e.lon)*Math.cos(e.lat*Math.PI/180))*111<300) }, "At the finish · "+e.name);
+  return OTMtrip.html({ place:e.name, town:e.name, country:ev?ev.country:null, lat:e.lat, lon:e.lon, from:ev?addDays(ev.start,-1):from, to:ev?addDays(ev.end,1):to, tickets:ev&&ev.tickets, bike:settings.vehicle==="bike", near:!!(trip.start&&trip.start.lat!=null&&Math.hypot(trip.start.lat-e.lat,(trip.start.lon-e.lon)*Math.cos(e.lat*Math.PI/180))*111<300) }, noHead?false:"At the finish · "+e.name);
 }
 
 /* ---------- good to know: per-day notes, worst first ----------
@@ -4620,5 +4689,193 @@ if(/[?&]evtrip=1/.test(location.search)){ history.replaceState(null,"",location.
     bar.addEventListener("click",e=>{ const b=e.target.closest("[data-lb]"); if(!b) return; if(b.dataset.lb==="new") fresh(); bar.remove(); });
   }
 })();
+
+/* ---------- day card: one card per day, with tabs for Route, Fuel, Sleep, Eat, See, Good to know (Book on the last day) ----------
+   Function declarations only: the first render runs before this file does, so nothing here may rely on top-level data.
+   The open tab is kept per day in ui.dtab; the map follows it when MAP_FOLLOWS_TAB is on (see mapLay). */
+function dcTabsDef(){ return [["route","route","Route"],["fuel","fuel","Fuel"],["stay","stay","Sleep"],["food","utensils","Eat"],["sights","eye","See"],["gtk","info","Good to know"],["book","tix","Book"]]; }
+function dcIcon(k,n){ return typeof OTMhouse!=="undefined"?OTMhouse.icon(k,n):""; }
+function dcPlay(n){ return `<svg class="ico" width="${n}" height="${n}" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4l14 8-14 8z" fill="currentColor"/></svg>`; }
+function dcLast(k){ return k===nDays()-1; }
+function dcHasBook(k){ const e=trip.end; return dcLast(k)&&!!plan&&!planStale&&!trip.round&&!!e&&e.lat!=null; } // the same test tripBlockHtml makes
+// the tabs this day has: no Sleep on the last day, Book only when there's a trip to book at the finish
+function dcTabs(k){ return dcTabsDef().filter(([t])=>t==="stay"?!dcLast(k):t==="book"?dcHasBook(k):true); }
+function dcTab(k){ const t=ui.dtab&&ui.dtab[k]; return t&&dcTabs(k).some(x=>x[0]===t)?t:"route"; }
+// which map category a tab stands for (Route, Good to know and Book keep the rider's own choices)
+function dcFollowCat(t){ return {fuel:"fuel",stay:"stay",food:"food",sights:"sights"}[t]||null; }
+/* what the map shows: the rider's own "On the map" choices, or only the open tab's category for that day */
+function mapLay(){
+  const k=curDay(), own={lay:ui.lay,types:ui.types,k:null,cat:null};
+  if(!MAP_FOLLOWS_TAB||k==null||planStale||!plan||!plan.days[k]) return own;
+  const cat=dcFollowCat(dcTab(k)); if(!cat) return own;
+  const lay=Object.assign({},ui.lay,{fuel:false,stay:false,food:false,sights:false,med:false,rep:false,spots:false,fav:false,moto:false}); lay[cat]=true;
+  const types=Object.assign({},ui.types); TYPES.forEach(t=>types[t.id]=false);
+  if(cat==="food") types.food=true; if(cat==="sights") ["view","pass","sight"].forEach(t=>types[t]=true); if(cat==="stay") types.camp=true;
+  return {lay,types,k,cat};
+}
+function setDtab(k,t){
+  ui.dtab=ui.dtab||{}; ui.dtab[k]=t; saveUi();
+  const card=document.querySelector(`.daycard[data-k="${k}"]`);
+  if(card){ card.querySelectorAll("[data-dtab]").forEach(b=>{ const on=b.dataset.dtab===t; b.setAttribute("aria-selected",String(on)); b.tabIndex=on?0:-1; });
+    card.querySelectorAll("[data-dpanel]").forEach(p=>p.hidden=p.dataset.dpanel!==t);
+    const b=card.querySelector(`[data-dtab="${t}"]`); if(b&&b.scrollIntoView&&b.parentNode.scrollWidth>b.parentNode.clientWidth) b.parentNode.scrollTo({left:b.offsetLeft-b.parentNode.offsetLeft-24,behavior:"smooth"}); }
+  else renderDetails();
+  try{ renderLayers(); }catch(e){}
+  window._refit=true; drawMap();
+}
+
+/* ---------- what each tab lists ---------- */
+function dcFuelGroups(k){ const pd=plan.days[k]; return fp?fuelGroups(fp.fills.filter(x=>x.km>=pd.a-0.3&&x.km<=pd.b+0.3)):[]; }
+// the longest stretch with no fuel on our map: fuel stations on the route, and stops you said have fuel
+function dcGap(k){
+  const pd=plan.days[k], last=pd.pts.length-1, m=[{km:pd.a,name:pd.pts[0].name}];
+  pd.pts.forEach((p,j)=>{ if(j>0&&j<last&&stopFuel(p)) m.push({km:pd.legs[j-1].b,name:p.name}); });
+  dcFuelGroups(k).forEach(g=>m.push({km:g.km,name:g.town?g.town.name:g.st[0].name}));
+  m.push({km:pd.b,name:pd.pts[last].name}); m.sort((x,y)=>x.km-y.km);
+  let best=null; for(let i=1;i<m.length;i++){ const len=m[i].km-m[i-1].km; if(!best||len>best.len) best={len,from:m[i-1],to:m[i]}; }
+  return best;
+}
+// the stops to group Eat and See by: every stop of the day, and the start on the first day
+function dcStops(k){ const pd=plan.days[k]; return pd.pts.map((p,j)=>({p,j})).filter(x=>x.j>0||k===0); }
+var DCM=null; // lists worked out once per card render
+function dcMemo(name,k,fn){ if(!DCM||DCM.k!==k) return fn(); return DCM[name]||(DCM[name]=fn()); }
+function dcFood(k){ return dcMemo("food",k,()=>dcFood0(k)); }
+function dcSights(k){ return dcMemo("sights",k,()=>dcSights0(k)); }
+function dcGtk(k){ return dcMemo("gtk",k,()=>dcGtk0(k)); }
+function dcFood0(k){ const seen=new Set(); return dcStops(k).map(({p,j})=>({p,j,list:stopAvail(p).food.filter(x=>{ const id=x.id||x.name+x.lat; if(seen.has(id)) return false; seen.add(id); return true; })})); }
+function dcSights0(k){
+  const pd=plan.days[k], seen=new Set(), SK=["view","pass","sight"];
+  return dcStops(k).map(({p,j})=>{ const a=j>0?pd.legs[j-1].a:pd.a, b=j>0?pd.legs[j-1].b:pd.a;
+    const list=pois.filter(x=>SK.includes(x.kind)&&((x.km!=null&&x.km>=a-0.5&&x.km<=b+0.5)||(Math.abs(x.lat-p.lat)<0.1&&hav(x,p)<=5)))
+      .filter(x=>{ const id=x.id||x.name+x.lat; if(seen.has(id)) return false; seen.add(id); return true; }).sort((x,y)=>(x.km??1e9)-(y.km??1e9));
+    return {p,j,list}; });
+}
+function dcPasses(k){ const pd=plan.days[k], d=trip.days[k]; if(!passNear.length) return 0; return passNear.filter(p=>p.km>=pd.a-1&&p.km<=pd.b+1&&!d.vias.some(v=>v.name===p.name)).slice(0,5).length; }
+// Good to know: the day's notes plus sunset and weather (which used to sit in the day summary), worst first
+function dcGtk0(k){
+  const pd=plan.days[k], last=pd.pts.length-1, out=goodToKnow(k).filter(x=>!(x.sec==="dest"&&/sunset/i.test(x.text)));
+  const r=dayRisk(k); (r?r.reasons:[]).filter(x=>x.kind==="stay").forEach(x=>out.push({lvl:x.lvl,sec:"route",text:x.text}));
+  const s=sunMin(k), arr=arrMin(k,last), lv=toMin(settings.leave);
+  if(s!=null) out.push({lvl:s<arr?"bad":s-arr<60?"warn":"info",head:`Sunset ${fmtT(s)}`,text:s<arr?`You arrive about ${fmtT(arr)}, after dark. Leave earlier or shorten the day.`:`You arrive about ${fmtT(arr)} if you leave at ${fmtT(lv)}.${s-arr<60?" Not much light to spare.":""}`});
+  const w=dayWx(k), to=dayTo(k);
+  if(w&&!w.past&&to){ const href=`https://www.windy.com/?${to.lat.toFixed(2)},${to.lon.toFixed(2)},9`;
+    out.push({lvl:"info",head:w.none?"Weather":`${WXW(w.code)}, ${Math.round(w.tmin)}–${Math.round(w.tmax)}°C`,text:w.none?`The forecast opens ${fmtDate(new Date(w.opens+"T12:00:00"))}.`:`Rain ${w.rain<0.5?"none":Math.round(w.rain)+" mm"}${w.prob>=20?` (${w.prob}%)`:""}, gusts ${Math.round(w.gust)} km/h.`,link:href}); }
+  const rank={bad:0,warn:1,info:2};
+  return out.map((x,i)=>Object.assign(x,{i})).sort((a,b)=>rank[a.lvl]-rank[b.lvl]||a.i-b.i);
+}
+// one note in two parts: the first sentence in bold, the rest under it
+function dcSplit(x){ if(x.head) return [x.head,x.text]; const m=x.text.match(/^(.+?[.!?])\s+(.+)$/); return m?[m[1],m[2]]:[x.text,""]; }
+
+/* ---------- the panels ---------- */
+function dcGroup(title,sub,list,key,rowFn){
+  const shown=showAll.has(key)?list:list.slice(0,6);
+  return `<div class="dcgrp"><h4>${esc(title)}${sub?` <span class="note">${esc(sub)}</span>`:""}</h4>${shown.map(rowFn).join("")}${list.length>6?`<button class="linkbtn small" type="button" data-more="${key}">${showAll.has(key)?"Show fewer":`Show all ${list.length}`}</button>`:""}</div>`;
+}
+function dcRoutePanel(k){
+  const pd=plan.days[k], last=pd.pts.length-1, night=!dcLast(k), sel=selStop&&selStop.k===k?selStop.j:null;
+  let h=`<ol class="dcroute">`;
+  pd.pts.forEach((p,j)=>{ const t=j===0?toMin(settings.leave):arrMin(k,j), km=j===0?"":Math.round(j===last?pd.km:pd.legs[j-1].b-pd.a)+" km"; // the end uses the day's total, as the day box does
+    const fuel=placesOk&&stopFuel(p), bed=night&&j===last;
+    const marks=(bed?`<button type="button" class="dcmk b" data-dcgo="${k}:${j}:stay" title="Places to stay at ${esc(p.name)}" aria-label="Places to stay at ${esc(p.name)}">${dcIcon("stay",15)}</button>`:"")
+      +(fuel?`<button type="button" class="dcmk f" data-dcgo="${k}:${j}:fuel" title="Fuel at ${esc(p.name)}" aria-label="Fuel at ${esc(p.name)}">${dcIcon("fuel",15)}</button>`:"");
+    const tag=p.auto?` <span class="autotag ${p.fuelHere?"":"nofuel"}">Suggested${p.fuelHere?"":" · fuel?"}</span>`:j===last?` <span class="note">${night?"night "+(k+1):trip.round?"back home":"finish"}</span>`:"";
+    h+=`<li class="dcst ${sel===j?"on":""}" data-selstop="${k}:${j}" tabindex="0"><span class="tm">${fmtT(t)}</span><span class="nm"><b>${esc(p.name)}</b>${tag}</span><span class="mk">${marks}</span><span class="km">${km}</span></li>`; });
+  h+=`</ol>`;
+  const ep=elevProfile(k), E=ep&&dayElev(k); if(ep) h+=`<div class="dcelev"><span class="note">Climb ${fmtM(E.up)}&nbsp;m · descent ${fmtM(E.dn)}&nbsp;m · highest ${fmtM(E.top)}&nbsp;m</span>${ep}</div>`;
+  return h+`<p class="note dcnote">Tap a stop to see it on the map. Tap a fuel or bed mark to open that tab.</p>`;
+}
+function dcFuelPanel(k){
+  const pd=plan.days[k], G=dcFuelGroups(k), sel=selStop&&selStop.k===k?selStop.j:null, selKm=sel==null?null:sel===0?pd.a:pd.legs[sel-1].b;
+  if(!placesOk) return `<div class="verdict v-warn">Fuel stations didn't load, so long stretches without fuel can't be checked. Check your connection and reload.</div>`;
+  const tel=t=>t.phone?` · <a href="tel:${esc(String(t.phone).replace(/[^\d+]/g,""))}">${esc(t.phone)}</a>`:"";
+  const one=f=>{ const t=f.tags||{}, g=gradesTxt(t); return [g?esc(g):"",t.hours?esc(t.hours):"Hours unknown"].filter(Boolean).join(" · ")+tel(t); };
+  const gapNow=rangeFuel(pd.a,pd.b); // the fuel pill says "Check fuel" then, and shows the gap on the map
+  let h=`<div class="dcsum">${fuelBtn(k)}<span class="note">${gapNow?`${G.length} fuel stop${G.length===1?"":"s"} on this day's route. Tap Check fuel to see the gap on the map.`:`${G.length===1?"fuel stop":"fuel stops"} on this day's route. Tap one to see it on the map.`}</span></div>`;
+  const gp=dcGap(k), R=+settings.range||0;
+  if(gp&&gp.len>=1){ const lvl=R&&gp.len>R?"bad":R&&gp.len>R*0.8?"warn":"";
+    h+=`<div class="dcrow dcgap ${lvl}"><div><b>Longest gap: ${Math.round(gp.len)} km</b><span class="note">${esc(gp.from.name)} to ${esc(gp.to.name)}. ${R?gp.len>R?`That's more than your ${R} km range. Carry extra or add a fuel stop.`:`Your range is ${R} km${gp.len>R*0.8?", so it's close.":", so you're fine."}`:"Set your range in Settings to check it."}</span></div></div>`; }
+  const f=rangeFuel(pd.a,pd.b); if(f) h+=`<div class="verdict v-warn">${esc(f.text)}. Small towns may still have fuel: ask locally or carry extra.</div>`;
+  if(!G.length) h+=`<p class="dcempty">No fuel stops found on this day's route.</p>`;
+  const key="fuel-"+k, selI=selKm==null?-1:G.findIndex(g=>Math.abs(g.km-selKm)<3), shown=showAll.has(key)||selI>=8?G:G.slice(0,8);
+  shown.forEach(g=>{ const f=g.st[0], km=Math.max(0,Math.round(g.km-pd.a)), onRoute=pd.pts.some(p=>hav(p,f)<2), on=selKm!=null&&Math.abs(g.km-selKm)<3;
+    const nm=g.town&&g.town.name!==f.name?`${esc(g.town.name)} · ${esc(f.name)}`:esc(f.name);
+    const act=onRoute?`<span class="note">On your route</span>`:g.town&&g.st.length>1?`<button class="btn small ghost" type="button" data-addtown="${k}|${esc(g.town.name)}|${g.town.lat}|${g.town.lon}">Add as a stop</button>`:`<button class="btn small ghost" type="button" data-addfill="${f.id}" data-day="${k}">Add as a stop</button>`;
+    h+=`<div class="dcrow ${on?"on dcsel":""}" data-ploc="${f.lat},${f.lon}"><div><b>${nm}</b>${g.st.length>1?` <span class="note">${g.st.length} stations</span>`:""}<span class="note">${km?"km "+km:"Start of day"} · ${one(f)}</span>${g.st.length>1?`<details class="fgrp"><summary class="note">All stations</summary>${g.st.map(x=>`<div class="note"><b>${esc(x.name)}</b> · ${one(x)}</div>`).join("")}</details>`:""}</div><div class="sact">${act}</div></div>`; });
+  if(G.length>8) h+=`<button class="linkbtn small" type="button" data-more="${key}">${shown.length>8?"Show fewer":`Show all ${G.length}`}</button>`;
+  return h;
+}
+function dcStayPanel(k){ const h=stayRows(k); return h||`<p class="dcempty">No night stop set for this day.</p>`; }
+function dcFoodPanel(k){
+  const G=dcFood(k).filter(g=>g.list.length);
+  if(!placesOk) return `<p class="dcempty">Finding places to eat…</p>`;
+  if(!G.length) return `<p class="dcempty">No places to eat on our map at this day's stops. Small places are often missing, so ask locally.</p>`;
+  const sel=selStop&&selStop.k===k?selStop.j:null;
+  return G.map(g=>`<div class="${sel===g.j?"dcsel":""}">${dcGroup(g.p.name,g.list.length+" within 1 km",g.list,`eat-${k}-${g.j}`,x=>placeRow(x,k,g.j))}</div>`).join("");
+}
+function dcSeePanel(k){
+  const G=dcSights(k).filter(g=>g.list.length), pr=passRows(k), sel=selStop&&selStop.k===k?selStop.j:null;
+  if(!G.length&&!pr) return `<p class="dcempty">No sights or viewpoints on our map along this day's route.</p>`;
+  return G.map(g=>`<div class="${sel===g.j?"dcsel":""}">${dcGroup(g.j===0?g.p.name:`On the way to ${g.p.name}`,String(g.list.length),g.list,`see-${k}-${g.j}`,x=>placeRow(Object.assign({},x,{kind:"sight"}),k,g.j,g.j>0?`<button class="linkbtn" type="button" data-sadd="${k}:${g.j}:${esc(x.id)}">Add</button>`:""))}</div>`).join("")+pr;
+}
+function dcGtkPanel(k){
+  const g=dcGtk(k), m=dayMed(k), pd=plan.days[k];
+  let h=`<section class="gtk dcgtk">`+(g.length?g.map(x=>{ const [a,b]=dcSplit(x); return `<div class="dcnote2 ${x.lvl}"><span class="dot"></span><div><b>${esc(a)}</b>${b?`<span>${esc(b)}</span>`:""}${x.link?`<a href="${esc(x.link)}" target="_blank" rel="noopener">Full forecast</a>`:""}</div></div>`; }).join(""):`<p class="dcempty">Nothing to flag for this day.</p>`)+`</section>`;
+  if(m) h+=`<details class="medbox"><summary><span class="lbl">Medical</span> ${m.near.length} hospital${m.near.length===1?"":"s"} and clinics near the route · furthest point ${fmtFar(m.far)} km from a hospital</summary>
+    ${m.near.map(x=>`<div class="item"><div class="meta"><b>${esc(x.name||(x.type==="hospital"?"Hospital":"Clinic"))}</b><span class="note">${x.type==="hospital"?"Hospital":"Clinic"} · km ${Math.round(x.km-pd.a)} · ${x.off<0.5?"on the route":x.off.toFixed(1)+" km off"}${x.phone?` · <a href="tel:${esc(x.phone.replace(/[^\d+]/g,""))}">${esc(x.phone)}</a>`:""}</span></div></div>`).join("")||`<div class="note">None listed within 25 km of the route.</div>`}
+    <div class="note">Emergency from a mobile: 112. Check the local numbers before you go.</div></details>`;
+  return h;
+}
+function dcBookPanel(){ return tripBlockHtml(true); }
+
+/* ---------- the card ---------- */
+function dcCounts(k){
+  if(!placesOk) return {};
+  const g=dcGtk(k), warn=g.filter(x=>x.lvl!=="info");
+  return { fuel:dcFuelGroups(k).length, stay:dcLast(k)?0:staysFor(k).length, food:dcFood(k).reduce((t,x)=>t+x.list.length,0),
+    sights:dcSights(k).reduce((t,x)=>t+x.list.length,0)+dcPasses(k), gtk:warn.length, gtkAll:g.length, gtkLvl:g.some(x=>x.lvl==="bad")?"bad":warn.length?"warn":"" };
+}
+function dcGradeLegend(G){
+  if(!G||!G.tot) return "";
+  return `<div class="dcleg">${[1,2,3,4,5,0].filter(g=>G.km[g]>=0.5).map(g=>`<span><i style="background:${GRADES[g].col}"></i>${Math.round(G.km[g]/G.tot*100)}% ${esc(g?GRADES[g].name:"unknown")}${g?` <span class="vn">${esc(vehNote(g))}</span>`:""}</span>`).join("")}</div>`;
+}
+function dayCard(k,pre){
+  const pd=!planStale&&plan&&plan.days[k];
+  if(!pd) return boxSec("detailbox","Details",(pre||"")+sumBox(k,true,true));
+  DCM={k}; try{ return dayCard0(k,pd,pre); } finally{ DCM=null; }
+}
+function dayCard0(k,pd,pre){
+  const last=dcLast(k), from=dayFrom(k), mins=dayMinutes(k), long=mins>+settings.maxHours*60, cur=dcTab(k), C=dcCounts(k);
+  const toIc=last?(trip.round?"home":"race"):"stay";
+  let h=`<section class="box detailbox daycard" data-k="${k}">${pre||""}
+    <div class="dchead"><div class="dcl"><b>Day ${k+1}</b> · ${esc(dayName(k))}</div><button type="button" class="dcr" data-focusday="${k}" title="Show the day on the map">${Math.round(pd.km)} km · <span class="${long?"overt":""}" title="${long?`Over your ${settings.maxHours}h a day`:`${VEH().Ing} time`}">${fmtDur(mins)}</span></button></div>
+    <div class="dcft"><span class="ep">${k===0?dcPlay(14):dcIcon("stay",16)} ${esc(from?from.name:"")}</span><span class="arr">→</span><span class="ep to">${dcIcon(toIc,16)} ${toCell(k)}</span></div>
+    ${gradeBar(dayGrade(k),true)}${dcGradeLegend(dayGrade(k))}`;
+  if(!placesOk) h+=`<div class="verdict v-warn">Fuel stations and places didn't load, so the counts below are missing. Check your connection and reload.</div>`;
+  const tabs=dcTabs(k);
+  h+=`<div class="dctabs" role="tablist" aria-label="${esc(dayName(k))}">`+tabs.map(([t,ic,lab])=>{ const n=t==="gtk"?C.gtk:C[t], empty=t==="gtk"?C.gtkAll===0:n===0;
+    const badge=t==="route"||t==="book"||n==null?"":`<em class="cnt ${t==="gtk"?C.gtkLvl:""}" title="${n}">${n>99?"99+":n}</em>`;
+    return `<button type="button" class="dctab ${empty?"empty":""}" role="tab" id="dct-${k}-${t}" aria-controls="dcp-${k}-${t}" aria-selected="${t===cur}" tabindex="${t===cur?0:-1}" data-dtab="${t}">${dcIcon(ic,15)}<span>${lab}</span>${badge}</button>`; }).join("")+`</div>`;
+  const P={route:dcRoutePanel,fuel:dcFuelPanel,stay:dcStayPanel,food:dcFoodPanel,sights:dcSeePanel,gtk:dcGtkPanel,book:dcBookPanel};
+  h+=`<div class="dcpanels">`+tabs.map(([t])=>`<div class="dcpanel" role="tabpanel" id="dcp-${k}-${t}" aria-labelledby="dct-${k}-${t}" data-dpanel="${t}" ${t===cur?"":"hidden"}>${P[t](k)}</div>`).join("")+`</div>`;
+  // ride files and phone links: for the whole day, whichever tab is open
+  h+=`<div class="dcfoot"><div class="btns"><button class="btn small" type="button" data-gpx="${k}">GPX file</button>${nDays()===1?`<button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}`:""}<span class="note">GPX for your bike's GPS or a phone app.</span></div><div class="btns phonenav"><span class="lbl">On your phone</span>${navButtons(k)}<button class="btn small share" type="button" data-sharetrip>Share this trip ↗</button><button class="btn small wa" type="button" data-sharewa title="Send this trip on WhatsApp">WhatsApp this trip</button>${nameBtn()}</div></div>`;
+  return h+`</section>`;
+}
+
+// after a render: the open tab stays in sight when the tabs scroll sideways (phones)
+function dcAfterRender(){ document.querySelectorAll(".daycard .dctabs").forEach(bar=>{ const b=bar.querySelector('[aria-selected="true"]'); if(b&&bar.scrollWidth>bar.clientWidth) bar.scrollLeft=Math.max(0,b.offsetLeft-bar.offsetLeft-24); }); }
+/* ---------- clicks: tabs, marks on the route, arrow keys ---------- */
+$("details").addEventListener("click",e=>{
+  const t=e.target; if(!t.closest) return;
+  const b=t.closest("[data-dtab]"); if(b){ const card=b.closest(".daycard"); if(card) setDtab(+card.dataset.k,b.dataset.dtab); return; }
+  const g=t.closest("[data-dcgo]"); if(g){ const [k,j,c]=g.dataset.dcgo.split(":"); selStop={k:+k,j:+j}; ovFocus=null; ui.dtab=ui.dtab||{}; ui.dtab[+k]=c; saveUi(); renderAll(); try{ renderLayers(); }catch(err){}
+    const p=plan&&plan.days[+k]&&plan.days[+k].pts[+j]; if(p&&map) map.setView([p.lat,p.lon],c==="stay"?13:12);
+    setTimeout(()=>{ const el=document.querySelector(".daycard .dcpanel:not([hidden]) .dcsel")||document.querySelector(`.daycard [data-dtab="${c}"]`); if(el) el.scrollIntoView({behavior:"smooth",block:"nearest"}); },60); return; }
+});
+$("details").addEventListener("keydown",e=>{
+  const b=e.target.closest&&e.target.closest("[data-dtab]");
+  if(b&&(e.key==="ArrowRight"||e.key==="ArrowLeft")){ const all=[...b.parentNode.querySelectorAll("[data-dtab]")], i=all.indexOf(b), n=all[(i+(e.key==="ArrowRight"?1:-1)+all.length)%all.length]; e.preventDefault(); n.focus(); n.click(); return; }
+  const s=e.target.closest&&e.target.closest(".dcst[data-selstop]"); if(s&&(e.key==="Enter"||e.key===" ")&&e.target===s){ e.preventDefault(); s.click(); }
+});
 
 </script></body></html>
