@@ -1,11 +1,17 @@
 The OneTrackMind Week · 9 Nov – 15 Nov 2026
 
-THIS WEEK
+Hi {{NAME}},
+
+Good week. Nine Hour of Kyalami on Saturday.
+
+13 weeks to Bathurst 12 Hour. The good beds go first, and they're going. https://onetrackmind.online/events/bathurst-12-hour-2027/
+
+WHAT'S ON
 - Classic Motor Show 2026, 13 Nov – 15 Nov, NEC Birmingham: https://onetrackmind.online/events/classic-motor-show-nec-2026/
 - Global Time Attack Finals (formerly Super Lap Battle), 13 Nov – 15 Nov, Buttonwillow Raceway Park: https://onetrackmind.online/events/gta-finals-buttonwillow-2026/
 - Nine Hour of Kyalami, 13 Nov – 14 Nov, Kyalami Grand Prix Circuit: https://onetrackmind.online/events/nine-hour-kyalami-2026/
 
-LAST WEEK
+HOW IT WENT
 - SEMA Show 2026: https://www.semashow.com/
 - EICMA Milan: https://www.eicma.it
 - MotoGP Qatar Grand Prix 2026: https://www.motogp.com/en/world-standing/2026/motogp/championship-standings
@@ -19,10 +25,13 @@ PLAN AHEAD
 The 2027 calendar is in. Le Mans, the TT, Monaco, Pikes Peak: the dates are out and the good beds go first. https://onetrackmind.online/events/#y2027
 Christmas: give a race weekend. A ticket to a 2027 race beats socks. Pick the race, build the trip, print it and put it in a card. https://onetrackmind.online/events/#y2027
 
-ONE IDEA
+ONE MORE THING
 Turn a race weekend into four days. Arrive Thursday, leave Monday. Put the venue in as your finish and let the planner find the roads.
 
-Powered by AlterEgo: https://alterego.online
+Racing is life. Everything else is preparation.
+Ashley
+
+Fuelled by AlterEgo: https://alterego.online
 
 Change how often: {{PREFS}}
 Unsubscribe: {{UNSUB}}

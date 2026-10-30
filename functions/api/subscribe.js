@@ -13,9 +13,10 @@ export const onRequestPost = handle(async ({ request, env }) => {
   const row = await D.prepare(`SELECT confirmed_at, unsub_at, created FROM subscribers WHERE email = ?`).bind(email).first();
   if (row && row.confirmed_at && !row.unsub_at) return json({ ok: true, already: true });
   if (row && !row.confirmed_at && t - row.created < 600e3) return json({ ok: true }); // a link was sent in the last 10 minutes
+  const name = clean(b.name, 40).replace(/[<>"{}]/g, "");
   const raw = newId(32), unsub = newId(24), origin = new URL(request.url).origin, src = clean(b.source, 60) || "site";
-  await D.prepare(`INSERT INTO subscribers (email, source, created, token_hash, unsub) VALUES (?,?,?,?,?)
-    ON CONFLICT(email) DO UPDATE SET created = excluded.created, token_hash = excluded.token_hash, confirmed_at = NULL, unsub_at = NULL`).bind(email, src, t, await sha256(raw), unsub).run();
+  await D.prepare(`INSERT INTO subscribers (email, source, created, token_hash, unsub, name) VALUES (?,?,?,?,?,?)
+    ON CONFLICT(email) DO UPDATE SET name = COALESCE(NULLIF(excluded.name, ''), subscribers.name), created = excluded.created, token_hash = excluded.token_hash, confirmed_at = NULL, unsub_at = NULL`).bind(email, src, t, await sha256(raw), unsub, name).run();
   const link = `${origin}/api/subscribe/confirm?t=${raw}`;
   await sendEmail(env, { to: email, subject: "Confirm: The OneTrackMind Week",
     text: `Tap this link to confirm you want The OneTrackMind Week (what's on, last week's results and a road worth riding, Monday mornings; change it to every two weeks or monthly any time):\n\n${link}\n\nIf you didn't ask for it, ignore this email and nothing will be sent.`,

@@ -60,6 +60,8 @@ const MIGRATIONS = [
   // newsletter: how often each subscriber wants it, and when they last got one
   `ALTER TABLE subscribers ADD COLUMN freq TEXT NOT NULL DEFAULT 'weekly'`,
   `ALTER TABLE subscribers ADD COLUMN last_sent INTEGER`,
+  // first name, for "Hi Ashley" at the top of the newsletter
+  `ALTER TABLE subscribers ADD COLUMN name TEXT`,
   `CREATE TABLE IF NOT EXISTS newsletter_sends (issue TEXT PRIMARY KEY, sent_at INTEGER NOT NULL, sent_by TEXT, count INTEGER NOT NULL DEFAULT 0)`,
 ];
 let schemaReady = null;
