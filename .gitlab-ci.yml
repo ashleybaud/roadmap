@@ -1,0 +1,107 @@
+# OneTrackMind scheduled jobs on GitLab (the same jobs as .github/workflows).
+# Pipelines only run from a schedule or the "Run pipeline" button, never on a push, so the jobs' own commits can't loop.
+# Each schedule sets one variable, TASK, to pick its job (see docs/gitlab-setup.md for the list and times).
+# CI/CD variables (Settings → CI/CD → Variables, masked): PUSH_TOKEN (project access token, scopes api + write_repository), META_TOKEN.
+
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule" || $CI_PIPELINE_SOURCE == "web"'
+    - |
+      when: never
+
+.git: &git
+  - git config user.name "otm-bot"
+  - git config user.email "bot@onetrackmind.online"
+  - git remote set-url origin "https://oauth2:${PUSH_TOKEN}@${CI_SERVER_HOST}/${CI_PROJECT_PATH}.git"
+  - git fetch -q origin "$CI_COMMIT_BRANCH" && git checkout -q -B "$CI_COMMIT_BRANCH" "origin/$CI_COMMIT_BRANCH"
+
+default:
+  image: node:22
+  timeout: 1h
+  before_script: *git
+
+.save: &save |
+  git add -A data reports events blog newsletter kits media index.html plan adventure high-octane petrolhead local-is-lekker sitemap.xml 2>/dev/null || true
+  git diff --cached --quiet || { git commit -q -m "$CI_JOB_NAME $(date -u +%F)"; git push -q origin "HEAD:$CI_COMMIT_BRANCH"; }
+
+# a note for the founder in the project's Issues (shows on the GitLab app and by email)
+.note: &note |
+  note() { curl -s -o /dev/null --request POST --header "PRIVATE-TOKEN: ${PUSH_TOKEN}" --data-urlencode "title=$1" --data-urlencode "description=$2" "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/issues"; }
+
+# Mondays 03:30 UTC: results, newsletter issues due, the week's post kits, next year's Wall Planner. Nothing is emailed.
+newsletter:
+  image: mcr.microsoft.com/playwright:v1.63.0-noble
+  rules: [{ if: '$TASK == "newsletter"' }]
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq git curl >/dev/null
+    - *git
+  script:
+    - npm i --no-save playwright@1.63.0 >/dev/null
+    - node scripts/sniff-results.mjs
+    - set -- $(node scripts/newsletter-due.mjs "$(date -u +%F)"); day=$1; shift; for p in "$@"; do node scripts/newsletter.mjs --from "$day" --period "$p"; done
+    - node scripts/post-kits.mjs --from "$(date -u +%F)"
+    - node scripts/wall-planner.mjs "$(( $(date -u +%Y) + 1 ))"
+    - ./build.sh --no-test
+    - *save
+    - *note
+    - |
+      note "Newsletter ready $(date -u +%F)" "Newsletter: read it, send yourself a test, then press Send it in the Review panel on onetrackmind.online. This week's posts: https://onetrackmind.online/kits/$(date -u +%F)/ $(cat reports/results-sniff.md)"
+
+# Tue, Thu, Fri 04:00 UTC: race results
+results:
+  rules: [{ if: '$TASK == "results"' }]
+  script:
+    - node scripts/sniff-results.mjs && ./build.sh --no-test
+    - *save
+
+# Daily 05:15 UTC: headlines for the races coming up
+news:
+  rules: [{ if: '$TASK == "news"' }]
+  script:
+    - node scripts/fetch-news.mjs && node scripts/make-pages.mjs
+    - *save
+
+# Daily 04:17 UTC: Instagram and Facebook posts into the blog
+social:
+  rules: [{ if: '$TASK == "social"' }]
+  script:
+    - apt-get update -qq && apt-get install -y -qq imagemagick >/dev/null
+    - node scripts/fetch-social.mjs
+    - node scripts/make-pages.mjs
+    - *save
+
+# Mondays 05:00 UTC: are the event dates still right?
+events-check:
+  rules: [{ if: '$TASK == "events-check"' }]
+  script:
+    - node scripts/check-events.mjs
+    - *save
+    - *note
+    - |
+      if grep -q "need a look" reports/events-check.md && ! grep -q " 0 need a look" reports/events-check.md; then note "Events check $(date -u +%F): dates to confirm" "$(cat reports/events-check.md)"; fi
+
+# 1st of the month 02:17 UTC: fuel, places and towns from OpenStreetMap (ONLY=towns,fuel to limit it)
+data:
+  timeout: 2h
+  rules: [{ if: '$TASK == "data"' }]
+  script:
+    - node scripts/fetch-data.mjs
+    - *save
+
+# On demand (Run pipeline, TASK=blog-media / blog-poi / trip-lines): one-off jobs for the blog
+blog-media:
+  rules: [{ if: '$TASK == "blog-media"' }]
+  script:
+    - apt-get update -qq && apt-get install -y -qq imagemagick >/dev/null
+    - node scripts/fetch-blog-media.mjs
+    - *save
+blog-poi:
+  rules: [{ if: '$TASK == "blog-poi"' }]
+  script:
+    - node scripts/geocode-blog-poi.mjs
+    - *save
+trip-lines:
+  rules: [{ if: '$TASK == "trip-lines"' }]
+  script:
+    - node scripts/fetch-trip-lines.mjs
+    - *save
