@@ -627,6 +627,7 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
 @media(max-width:640px){.hdrlinks{grid-template-columns:repeat(4,auto)!important}.modesw{grid-column:1/-1;justify-self:start;margin:4px 0 6px 8px}}
 .spstrip{display:flex;align-items:center;gap:8px;margin:6px 0 0;padding:3px 10px 3px 3px;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:6px;background:var(--panel);color:var(--ink);text-decoration:none;font-size:.95rem;order:9}.spstrip img{width:26px;height:26px;object-fit:cover;border-radius:4px}.spstrip{font-size:.85rem}.spstrip em{font-style:normal;color:var(--muted);font-size:.6rem;border:1px solid var(--line);border-radius:3px;padding:0 3px;margin-left:4px;text-transform:uppercase}
 .packbox{display:flex;align-items:center;gap:12px;margin:16px 0;padding:8px 12px 8px 8px;border:1px solid var(--line);border-radius:8px;background:var(--panel);color:var(--ink);text-decoration:none}.packbox img{width:72px;height:72px;object-fit:cover;border-radius:6px}.packbox span{display:block;color:var(--muted);font-size:.9rem}
+.trip{margin:22px 0}.triplab{font-size:.8rem;letter-spacing:.08em;color:var(--muted);text-transform:uppercase}.trip h2{margin:4px 0 2px}.tripsub{color:var(--muted);margin:0 0 12px}.trip .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px}.tt{background:#0F5874;color:#F4F8F9;border-radius:10px;padding:14px;display:flex;flex-direction:column;gap:6px;border-top:3px solid #E8A317}.tt .ic{font-size:22px}.tt b{font:800 1.25rem/1 var(--f-display,"Saira Condensed",sans-serif);text-transform:uppercase}.tt .d{color:#D6E7EE;font-size:.9rem;flex:1}.tt .p{font-size:.7rem;color:#9FC3D1;letter-spacing:.05em;text-transform:uppercase}.tt a{display:block;text-align:center;background:#E8A317;color:#0B1D21;font-weight:700;text-decoration:none;padding:9px;border-radius:6px;font-size:.9rem}.tt a.t2,.tt.alt a{background:transparent;color:#E8A317;border:2px solid #E8A317;padding:7px}.tt.alt{border-top-color:#2B7896}.tripf{font-size:.75rem;color:var(--muted);margin-top:8px}@media(max-width:560px){.trip .tiles{grid-template-columns:1fr 1fr}.tt:last-child:nth-child(odd){grid-column:span 2}}
 .nlbox{margin:28px 0 0;padding:14px 16px;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:6px;background:var(--panel);display:flex;flex-direction:column;gap:6px;color:var(--ink)}.nlbox span{color:var(--muted);font-size:.92rem}.nlf{display:flex;gap:8px;flex-wrap:wrap;position:relative}.nlf input[type=email]{flex:1;min-width:200px;padding:9px 10px;border:1px solid var(--line);border-radius:4px;background:var(--bg);color:var(--ink);font:inherit}.nlf button{padding:9px 16px;border:0;border-radius:4px;background:var(--accent);color:var(--onfill,#fff);font-weight:700;cursor:pointer}
 .byme{display:flex;align-items:center;gap:10px;color:var(--muted);text-decoration:none;font-size:.9rem;margin-top:4px}.byme b{color:var(--ink)}.byme img{width:40px;height:40px;border-radius:50%;object-fit:cover;object-position:50% 12%;border:2px solid var(--gold);flex:none}@media(max-width:640px){header .byme span{display:none}header .byme::after{content:"Built by Ashley";font-weight:700;color:var(--ink)}}
 .hdrlinks{display:flex!important;flex-wrap:wrap;align-items:center}.hdrlinks .modesw{margin-left:auto}.navtoggle{display:none}
@@ -1101,6 +1102,56 @@ function parseGpx(text){
   let nodes=[...doc.getElementsByTagName("trkpt")]; if(!nodes.length) nodes=[...doc.getElementsByTagName("rtept")];
   return nodes.map(n=>({lat:+n.getAttribute("lat"),lon:+n.getAttribute("lon")})).filter(p=>isFinite(p.lat)&&isFinite(p.lon));
 }
+
+/* "Make a trip of it": the same five tiles everywhere (event pages, Founder's fav's, the planner, the newsletter).
+   Stay, Flights, Car hire, Tickets and tours, Data. Plain partner links: Travelpayouts Drive and Stay22 turn them into paying links on the site.
+   Shared by the browser (window.OTMtrip) and the page builder (require). */
+(function (g) {
+  var AIR = null;
+  var rad = function (x) { return x * Math.PI / 180; };
+  var km = function (a, b) { var s = Math.sin(rad(b[0] - a[0]) / 2) ** 2 + Math.cos(rad(a[0])) * Math.cos(rad(b[0])) * Math.sin(rad(b[1] - a[1]) / 2) ** 2; return 12742 * Math.asin(Math.sqrt(s)); };
+  // the main airports people actually fly into; one of these within 260 km wins over a closer small one (Malpensa, not Linate)
+  var HUB = "JNB CPT DUR PLZ GRJ ELS BFN WDH MPM GBE NBO CMN RAK TNG CAI LHR LGW MAN BHX EDI GLA ABZ DUB IOM CDG NCE LYS MRS TLS BOD NTE FRA MUC DUS CGN STR HAM BER NUE LEJ AMS BRU VIE GRZ SZG ZRH GVA MXP FCO VCE BLQ FLR PSA NAP VRN TRN CTA PMO CAG MAD BCN VLC AGP SVQ PMI LPA LIS FAO OPO PRG BUD WAW KRK ZAG LJU ATH IST SAW ARN GOT CPH OSL HEL RIX TLL VNO DOH BAH AUH DXB JED RUH GYD SIN KUL BKK HKT BFV CGK DPS LOP HKG MFM PVG PEK NRT HND NGO KIX ICN DEL BOM MEL SYD ADL DRW PER BNE AKL GRU GIG EZE SCL MEX YUL YYZ YVR LAS MCO LAX SAN PHX DFW IAH AUS ATL CLT IND DTW ORD MDW MIA FLL JFK EWR LGA BOS SEA PDX SFO SJC OAK SMF DEN SLC MCI BNA PIT BWI DCA IAD TPA MSP MKE STL CLE CMH CVG RDU MSY SAT HOU ABQ TUS ONT SNA BUR LGB RIC ORF PHL BDL PVD BUF ROC SYR ALB GSP JAX".split(" ");
+  // the airport to fly into: the nearest main one within 260 km, else the nearest big one within 250 km, else a smaller one within 150 km
+  function airport(lat, lon, list) {
+    list = list || AIR || []; var hub = null, hd = 1e9;
+    for (var j = 0; j < list.length; j++) if (HUB.indexOf(list[j][0]) >= 0) { var dh = km([lat, lon], [list[j][2], list[j][3]]); if (dh < hd) { hd = dh; hub = list[j]; } }
+    if (hub && hd <= 260) return { iata: hub[0], name: hub[1], km: Math.round(hd) };
+    var big = null, small = null, bd = 1e9, sd = 1e9;
+    for (var i = 0; i < list.length; i++) { var a = list[i], d = km([lat, lon], [a[2], a[3]]); if (a[4]) { if (d < bd) { bd = d; big = a; } } else if (d < sd) { sd = d; small = a; } }
+    var a2 = bd <= 250 || !small || sd > 150 ? big : small; return a2 ? { iata: a2[0], name: a2[1], km: Math.round(a2 === big ? bd : sd) } : null;
+  }
+  var ESIM = { "united states": "united-states", usa: "united-states", uk: "united-kingdom", "united kingdom": "united-kingdom", "isle of man": "united-kingdom", turkiye: "turkey", czechia: "czech-republic", "united arab emirates": "united-arab-emirates", "saudi arabia": "saudi-arabia", "south africa": "south-africa", "new zealand": "new-zealand", korea: "south-korea", "south korea": "south-korea" };
+  var esimUrl = function (c) { var k = String(c || "").toLowerCase().trim(); if (!k) return "https://www.airalo.com/"; return "https://www.airalo.com/" + (ESIM[k] || k.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z]+/g, "-")) + "-esim"; };
+  var M = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var add = function (s, n) { var d = new Date(s + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+  var dm = function (s) { var d = new Date(s + "T12:00:00Z"); return d.getUTCDate() + " " + M[d.getUTCMonth()]; };
+  var span = function (a, b) { var x = new Date(a + "T12:00:00Z"), y = new Date(b + "T12:00:00Z"); return x.getUTCMonth() === y.getUTCMonth() ? x.getUTCDate() + "–" + dm(b) : dm(a) + " – " + dm(b); };
+  /* o: { place, town, country, lat, lon, from, to (dates, optional), tickets, tours, air: [name, IATA] (optional), bike, home } */
+  function tiles(o) {
+    var a = o.air && o.air[1] ? { iata: o.air[1], name: o.air[0] } : airport(o.lat, o.lon), when = o.from && o.to ? span(o.from, o.to) : "", T = [];
+    var where = o.town || o.place, abroad = !!o.country && (o.home ? o.country !== o.home : o.country !== "South Africa");
+    var bk = "https://www.booking.com/searchresults.html?latitude=" + o.lat + "&longitude=" + o.lon + "&radius=30" + (o.from ? "&checkin=" + o.from + "&checkout=" + o.to : "");
+    T.push({ k: "stay", ic: "🛏", t: "Stay", d: "Beds within 30 km of " + o.place + (when ? ", " + when : ""), p: "Booking.com", u: bk, b: "See places" });
+    if (a) T.push({ k: "fly", ic: "✈", t: "Flights", d: "To " + a.name + (o.from ? ", in " + dm(o.from) + ", out " + dm(o.to) : ""), p: "Kiwi.com", u: "https://www.kiwi.com/deep?to=" + a.iata + (o.from ? "&departure=" + o.from + "&return=" + o.to : ""), b: "Find flights" });
+    if (a && !o.bike) T.push({ k: "car", ic: "🚗", t: "Car hire", d: "Pick up at " + a.name + " airport" + (when ? ", " + when : ""), p: "Discover Cars", u: "https://www.discovercars.com/", b: "Compare cars" });
+    var tq = o.tours || where;
+    if (o.tickets) T.push({ k: "tix", ic: "🎟", t: "Tickets & tours", d: "Official tickets, plus tours and things to do around " + where, p: "Official site · GetYourGuide", u: o.tickets, b: "Get tickets", u2: "https://www.getyourguide.com/s/?q=" + encodeURIComponent(tq) + (o.from ? "&date_from=" + o.from + "&date_to=" + o.to : ""), b2: "Tours" });
+    else T.push({ k: "tix", ic: "🎟", t: "Tours & tickets", d: o.tours ? o.tours : "Tours and things to do around " + where, p: "GetYourGuide", u: "https://www.getyourguide.com/s/?q=" + encodeURIComponent(tq) + (o.from ? "&date_from=" + o.from + "&date_to=" + o.to : ""), b: "See tours" });
+    if (abroad) T.push({ k: "data", ic: "📶", t: "Data", d: "An eSIM for " + (o.country || "where you are going") + ", so your phone works when you land", p: "Airalo", u: esimUrl(o.country), b: "Get an eSIM", alt: 1 });
+    return T;
+  }
+  var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
+  // the block on the site (styles in .trip / .tt)
+  function html(o, head) {
+    var T = tiles(o);
+    return '<section class="trip">' + (head === false ? "" : '<div class="triplab">' + esc(head || "") + '</div><h2>Make a trip of it</h2>' + (o.from ? '<p class="tripsub">Everything for ' + esc(span(o.from, o.to)) + ', already filled in.</p>' : "")) +
+      '<div class="tiles">' + T.map(function (t) { return '<div class="tt' + (t.alt ? " alt" : "") + '"><span class="ic" aria-hidden="true">' + t.ic + '</span><b>' + esc(t.t) + '</b><span class="d">' + esc(t.d) + '</span><span class="p">' + esc(t.p) + '</span><a href="' + esc(t.u) + '" target="_blank" rel="noopener sponsored">' + esc(t.b) + ' ›</a>' + (t.u2 ? '<a class="t2" href="' + esc(t.u2) + '" target="_blank" rel="noopener sponsored">' + esc(t.b2) + ' ›</a>' : "") + '</div>'; }).join("") +
+      '</div><p class="tripf">Some of these links pay OneTrackMind a small fee, at no cost to you.</p></section>';
+  }
+  var T = { tiles: tiles, html: html, airport: airport, setAirports: function (l) { AIR = l; }, span: span };
+  if (typeof module !== "undefined" && module.exports) module.exports = T; else g.OTMtrip = T;
+})(typeof window !== "undefined" ? window : globalThis);
 
 /* place search: our own town list first (typo-tolerant), then the worldwide search */
 const norm=x=>String(x||"").toLowerCase().normalize("NFD").replace(/[^a-z]/g,"");
@@ -2200,10 +2251,10 @@ function overviewHtml(){
     det=(function(){ let h=hh;
   h+=tripTotals();
   h+=sleepList();
-  if(plan&&!planStale&&settings.vehicle!=="bike"&&trip.start) h+=`<div class="btns partnerrow"><a class="btn small ghost" href="${esc(carHireUrl(trip.start.name))}" target="_blank" rel="sponsored noopener">Hire a ${settings.vehicle==="jeep"?"4x4":"car"} ↗</a><span class="note">Self-drive? Compare hire companies.</span></div>`;
   if(plan&&!planStale) h+=`<div><span class="lbl">Ride files</span><div class="btns" style="margin-top:6px"><button class="btn small share" type="button" data-sharetrip title="A link anyone can open: the whole plan, then Google Maps / Waze or GPX">Share this trip ↗</button><button class="btn small wa" type="button" data-sharewa title="Send this trip on WhatsApp">WhatsApp this trip</button>${nameBtn()}${plan.days.map((d,k)=>d?`<button class="btn small" type="button" data-gpx="${k}">${esc(dayName(k))} GPX</button>`:"").join("")}<button class="btn small" type="button" data-gpx="all">Whole trip GPX</button><button class="btn small" type="button" data-navlinks title="Open each day in Google Maps or Waze on your phone">Google Maps / Waze</button><button class="btn small ghost" type="button" data-grouppack title="Every GPX format in one zip, with a read-me, for a group ride">Group ride pack ↓</button><button class="btn small ghost" type="button" data-print>Save as PDF</button>${saveRouteBtn()}</div></div>`;
       return h; })(); }
   h+=boxSec("detailbox","Details",det);
+  h+=tripBlockHtml();
   return h+(typeof flightHtml==="function"?flightHtml():"")+(typeof onDatesHtml==="function"?onDatesHtml():"")+clearLink()+footNote();
 }
 function footNote(){ return `<div class="note">${placesOk&&dataDate?`Map data from OpenStreetMap, as of ${esc(dataDate)}. Weather from Open-Meteo. Phone ahead on remote legs. `:""}Plan with it, check before you go: you ride at your own risk. <a href="/terms.html">Terms and disclaimer</a> · <a href="/privacy.html">Privacy</a></div>`; }
@@ -2576,6 +2627,15 @@ $("map").addEventListener("click",e=>{ const sn=e.target.closest&&e.target.close
   const [k2,id]=sn.dataset.staynight.split(":"), x=(stayFor(dayTo(+k2))?.places||[]).find(q=>q.id===id); if(x){ map.closePopup(); chooseStay(+k2,x); } });
 
 ["vehicle","wVehicle"].forEach(id=>{ const el=$(id); if(el) el.addEventListener("change",()=>{ if(settings.rangeSet) return; const r=$(id==="vehicle"?"range":"wRange"); if(r) r.value=RANGE_DEF[el.value]||200; }); });
+
+/* "Make a trip of it" at the finish: the same tiles as the event pages (src/js/03-trip.js) */
+fetch("/data/airports.json").then(r=>r.ok?r.json():[]).then(a=>{ OTMtrip.setAirports(a); if(trip.end&&trip.end.lat!=null&&typeof renderAll==="function") renderAll(); }).catch(()=>{});
+function tripBlockHtml(){
+  const e=trip.end; if(!plan||planStale||!e||e.lat==null||trip.round) return "";
+  const from=trip.startDate?addDays(trip.startDate,nDays()-1):"", to=from?addDays(from,1):"";
+  const ev=(typeof evList!=="undefined"&&evList||[]).find(x=>Math.abs(x.lat-e.lat)<0.01&&Math.abs(x.lon-e.lon)<0.01);
+  return OTMtrip.html({ place:e.name, town:e.name, country:ev?ev.country:null, lat:e.lat, lon:e.lon, from:ev?addDays(ev.start,-1):from, to:ev?addDays(ev.end,1):to, tickets:ev&&ev.tickets, bike:settings.vehicle==="bike" }, "At the finish · "+e.name);
+}
 
 /* ---------- good to know: per-day notes, worst first ----------
    Built only from data the app has: arrival times, opening hours, sunset, weather, fuel, towns,
