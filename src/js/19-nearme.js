@@ -25,7 +25,7 @@ function nearActions(p){
   const ensureStart=()=>{ if(!trip.start||trip.start.lat==null) trip.start=pt(near.name==="where you are"?"My location":near.name,near.lat,near.lon); };
   const P=pt(p.name||"Place",p.lat,p.lon,p.kind==="pass"?{type:"pass"}:{});
   return [
-    {label:"Go here",fn:()=>{ nearOff(); ensureStart(); const k=curDay(), last=nDays()-1; if(nDays()===1||k==null||k>=last){ setFinish(P); } else { trip.days[k].to=P; $("status").textContent=`Night ${k+1}: ${P.name}.`; changed(); } }},
+    {label:"Take me there",fn:()=>{ nearOff(); ensureStart(); const k=curDay(), last=nDays()-1; if(nDays()===1||k==null||k>=last){ setFinish(P); } else { trip.days[k].to=P; $("status").textContent=`Night ${k+1}: ${P.name}.`; changed(); } }},
     {label:"Add as a stop",fn:()=>{ nearOff(); ensureStart(); const k=curDay()??0; if(insertVia(k,P)!==false){ $("status").textContent=`Added ${P.name}.`; changed(); } }},
     {label:"There and back",fn:()=>{ const c=near; nearOff(); const today=ymd(new Date()); applyTrip({start:pt(c.name==="where you are"?"My location":c.name,c.lat,c.lon),end:null,round:true,startDate:today,endDate:today,sugV:5,days:[{to:null,vias:[P],style:"default",legs:[],fresh:true}]},null,`There and back: ${P.name}`); }}];
 }
@@ -50,7 +50,7 @@ const p0=n=>n||0;
 /* Petrolhead places near you: motor museums, tracks and karting from OpenStreetMap, plus the founder's motorsport places and upcoming events */
 async function nearMoto(c,R){
   const out=[], seen=new Set(), add=(lat,lon,name,extra)=>{ if(lat==null||!name) return; const k=name.toLowerCase().replace(/[^a-z0-9]/g,"").slice(0,24); if(seen.has(k)) return; seen.add(k); const d=hav(c,{lat,lon}); if(d>R) return; out.push({lat,lon,name,kind:"moto",ico:"moto",tags:{extra:extra||""},d}); };
-  try{ const fl=await loadFavs(); fl.filter(f=>f.group==="petrol").forEach(f=>add(f.lat,f.lon,f.name,"Founder's fav")); }catch(e){}
+  try{ const fl=await loadFavs(); fl.filter(f=>f.group==="petrol").forEach(f=>add(f.lat,f.lon,f.name,"POI")); }catch(e){}
   try{ const ev=await loadEvents(); const t=new Date().toISOString().slice(0,10); ev.filter(e=>e.end>=t).forEach(e=>add(e.lat,e.lon,`${e.name} (${e.start})`,"Event")); }catch(e){}
   const r=Math.round(Math.min(R,200)*1000), A=`(around:${r},${c.lat},${c.lon})`;
   const q=`[out:json][timeout:20];(nwr["tourism"="museum"]["name"~"motor|auto|car|vehicle|transport|racing|motorcycle|moto|vintage|classic|wheels|speed",i]${A};nwr["highway"="raceway"]["name"]${A};nwr["sport"~"motor|karting|motocross|speedway"]["name"]${A};nwr["leisure"="track"]["sport"~"motor|karting"]["name"]${A};);out center 150;`;

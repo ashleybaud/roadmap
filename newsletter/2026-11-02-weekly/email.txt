@@ -4,19 +4,19 @@ Hi {{NAME}},
 
 Last week: F1 in Mexico City, Killarney Motor Show, and MotoGP in Sepang. This week: SEMA opens in Las Vegas on Tuesday, EICMA opens in Milan on Thursday, and Sunday is a double: F1 at Interlagos and MotoGP in Lusail.
 
-LOCAL IS LEKKER: Saturday breakfast runs. One of my cars or bikes, somewhere new for breakfast, and the road there. https://onetrackmind.online/local-is-lekker/
+LOCAL IS LEKKER: Wimpy at the Engen 1-Stop, N7, Swartland. Burger and chips at the first fuel stop out of Cape Town on the N7. Table Mountain on the way back. https://onetrackmind.online/plan/?poi=-33.6739,18.55273&n=Wimpy%20at%20the%20Engen%201-Stop&go=1
 
 THIS WEEK
-<!--k:shows-->- SEMA, 3 Nov – 6 Nov, Las Vegas. Take me there: https://onetrackmind.online/plan/?ev=sema-show-2026&go=1<!--/k-->
-<!--k:shows-->- EICMA, 5 Nov – 8 Nov, Milan. Take me there: https://onetrackmind.online/plan/?ev=eicma-2026&go=1<!--/k-->
-<!--k:bikes-->- MotoGP Qatar Grand Prix, 6 Nov – 8 Nov, Lusail. Take me there: https://onetrackmind.online/plan/?ev=motogp-qatar-grand-prix-2026&go=1<!--/k-->
-<!--k:shows-->- Retro Classics Bavaria, 6 Nov – 8 Nov, Nuremberg. Take me there: https://onetrackmind.online/plan/?ev=retro-classics-bavaria-2026&go=1<!--/k-->
-<!--k:f1-->- São Paulo Grand Prix, 6 Nov – 8 Nov, São Paulo. Take me there: https://onetrackmind.online/plan/?ev=sao-paulo-grand-prix-2026&go=1<!--/k-->
+<!--k:shows-->- SEMA, 3–6 Nov, Las Vegas. Take me there: https://onetrackmind.online/plan/?ev=sema-show-2026&go=1<!--/k-->
+<!--k:shows-->- EICMA, 5–8 Nov, Milan. Take me there: https://onetrackmind.online/plan/?ev=eicma-2026&go=1<!--/k-->
+<!--k:bikes-->- MotoGP Qatar Grand Prix, 6–8 Nov, Lusail. Take me there: https://onetrackmind.online/plan/?ev=motogp-qatar-grand-prix-2026&go=1<!--/k-->
+<!--k:shows-->- Retro Classics Bavaria, 6–8 Nov, Nuremberg. Take me there: https://onetrackmind.online/plan/?ev=retro-classics-bavaria-2026&go=1<!--/k-->
+<!--k:f1-->- São Paulo Grand Prix, 6–8 Nov, São Paulo. Take me there: https://onetrackmind.online/plan/?ev=sao-paulo-grand-prix-2026&go=1<!--/k-->
 
 THE ROAD THERE
 Motor Valley and EICMA in a Fiat 500: https://onetrackmind.online/routes/motor-valley-2017/
 
-WORTH THE STOP
+POI
 Alfa Romeo Museum, Arese, Arese, near Milan, Italy: https://onetrackmind.online/favourites/alfa-romeo-museum/
 
 Racing is life. Everything else is preparation.
