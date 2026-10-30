@@ -90,8 +90,9 @@ function flightHtml(){
   const s=trip.start, e=trip.end; if(!s||!e||s.lat==null||e.lat==null) return "";
   const km=hav(s,e), noRoad=!plan||(plan&&plan.error);
   if(km<1500&&!(noRoad&&km>300)) return "";
-  const when=trip.startDate||"", q=`Flights from ${s.name==="My location"?"my nearest airport":s.name} to ${e.name}${when?" on "+when:""}`;
-  return `<div class="ondates flycard"><h3>✈ Fly part of it</h3><p class="note">${e.name} is about ${Math.round(km).toLocaleString("en-ZA")} km away${noRoad?" and there may be no road all the way":""}. Fly the long bit, then ride or drive the good part.</p><div class="btns"><a class="btn small" href="https://www.google.com/travel/flights?q=${encodeURIComponent(q)}" target="_blank" rel="noopener">Find flights ↗</a><a class="btn small ghost" href="${esc(carHireUrl(e.name))}" target="_blank" rel="sponsored noopener">Hire a car at ${esc(e.name)} ↗</a></div></div>`;
+  const A=typeof OTMtrip!=="undefined"?OTMtrip.airport(s.lat,s.lon):null, B=typeof OTMtrip!=="undefined"?OTMtrip.airport(e.lat,e.lon):null;
+  const fu=B?OTMtrip.flightUrl(B.iata,trip.startDate,trip.endDate,A&&A.iata):"https://flights.onetrackmind.online/";
+  return `<div class="ondates flycard"><h3>✈ Fly part of it</h3><p class="note">${esc(e.name)} is about ${Math.round(km).toLocaleString("en-ZA")} km away${noRoad?" and there may be no road all the way":""}. Fly the long bit${A&&B?` (${esc(A.iata)} to ${esc(B.iata)})`:""}, then ride or drive the good part.</p><div class="btns"><a class="btn small" href="${esc(fu)}" target="_blank" rel="noopener">Find flights ↗</a><a class="btn small ghost" href="${esc(carHireUrl(e.name))}" target="_blank" rel="sponsored noopener">Hire a car${B?` at ${esc(B.name)} airport`:""} ↗</a></div></div>`;
 }
 
 /* /plan/?mode=adventure or ?mode=motorsport: arrive from the Adventure or Petrolhead page with the right roads chosen */

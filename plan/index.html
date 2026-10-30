@@ -717,6 +717,7 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
 @media(max-width:700px){.evband{grid-template-columns:1fr!important}.evgrid{grid-template-columns:1fr 1fr}.evcard{grid-template-columns:44px 1fr}.evcard:nth-child(n+9){display:none}}
 
 .plantitle{margin:14px 0 6px;font:800 1.9rem var(--f-display,"Saira Condensed",sans-serif);text-transform:uppercase;text-align:center;color:var(--gold)}
+.lastbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:10px 0;padding:10px 14px;background:#0F5874;border-left:4px solid #E8A317;border-radius:12px;color:#fff}.lastbar .btns{display:flex;gap:8px;align-items:center}
 /* ===== House rules (docs: OneTrackMind house rules). Loaded last, so it wins. ===== */
 .ico{display:inline-block;vertical-align:-.15em;flex:none}
 /* menu: dropdowns (details/summary), same look as the plain links */
@@ -1088,6 +1089,8 @@ b.addEventListener("click",function(e){var t=e.target.closest("[data-ck]");if(t)
 </dialog>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+window.otmArriveQuery=location.search; /* read before any link handler tidies the address bar */
+try{ window.otmArriveEnd=(JSON.parse(localStorage.getItem("rr4-trip")||"{}")||{}).endDate||""; }catch(e){ window.otmArriveEnd=""; }
 const OSRM="https://router.project-osrm.org/route/v1/driving/";
 const PHOTON="https://photon.komoot.io/api/";
 /* routing and map tiles: Stadia Maps (paid, authorised by domain); free servers only as a fallback */
@@ -1218,8 +1221,8 @@ function parseGpx(text){
   var span = function (a, b) { var x = new Date(a + "T12:00:00Z"), y = new Date(b + "T12:00:00Z"); return x.getUTCMonth() === y.getUTCMonth() ? x.getUTCDate() + "–" + dm(b) : dm(a) + " – " + dm(b); };
   // our flight search (flights.onetrackmind.online): from Cape Town by default (changeable on the page), dates only when they're still ahead
   var ddmm = function (d) { return d.slice(8, 10) + d.slice(5, 7); };
-  function flightUrl(to, from, back) {
-    var o = to === "CPT" ? "JNB" : "CPT", today = new Date().toISOString().slice(0, 10);
+  function flightUrl(to, from, back, orig) {
+    var o = orig && orig !== to ? orig : to === "CPT" ? "JNB" : "CPT", today = new Date().toISOString().slice(0, 10);
     if (!from || from <= today) return "https://flights.onetrackmind.online/?origin_iata=" + o + "&destination_iata=" + to;
     return "https://flights.onetrackmind.online/?flightSearch=" + o + ddmm(from) + to + ddmm(back) + "1";
   }
@@ -1265,7 +1268,7 @@ function parseGpx(text){
   // the planner adds blocks after load, where inline scripts don't run
   if (typeof document !== "undefined" && !window.otmTabs) { try { (0, eval)(LOADER); } catch (e) {} }
   if (false) document.addEventListener("click", function (e) { if (window.otmTabs) return; var b = e.target.closest && e.target.closest(".ttab"); if (!b) return; var s = b.closest(".trip"); s.querySelectorAll(".ttab").forEach(function (x) { x.setAttribute("aria-selected", String(x === b)); }); s.querySelectorAll(".tpanel").forEach(function (p) { p.hidden = p.id !== b.getAttribute("aria-controls"); }); });
-  var T = { tiles: tiles, html: html, airport: airport, setAirports: function (l) { AIR = l; }, span: span };
+  var T = { flightUrl: flightUrl, tiles: tiles, html: html, airport: airport, setAirports: function (l) { AIR = l; }, span: span };
   if (typeof module !== "undefined" && module.exports) module.exports = T; else g.OTMtrip = T;
 })(typeof window !== "undefined" ? window : globalThis);
 
@@ -4129,6 +4132,12 @@ async function autoNights(){
 /* ---------- Founder's fav's in the planner: /?fav=<id> sets it as your finish; a map layer shows them all ---------- */
 var favList=null; // var: drawMap can run before this file does
 function loadFavs(){ return favList?Promise.resolve(favList):fetch("/data/favourites/favourites.json").then(r=>r.ok?r.json():[]).then(j=>favList=j).catch(()=>favList=[]); }
+/* A link that names a place (Take me there, the home page box, an event, a POI) always starts a fresh trip:
+   from where you are, days worked out again, nothing left over from the last trip. The old one stays in Open (recent trips). */
+function linkTrip(end){
+  snapTrip(true); ["gpx","pick","founder","daysSet","name"].forEach(k=>delete trip[k]);
+  Object.assign(trip,freshTrip()); trip.end=end; ui.tab="ov"; plan=null; fp=null; window.otmFromLink=true;
+}
 /* Take me there to somewhere overseas: it's a flight first, so the road trip starts at the airport you'd land at */
 async function farStart(dest,ev){
   if(!dest||dest.lat==null||hav({lat:-29,lon:24},dest)<2500) return false;
@@ -4144,7 +4153,7 @@ async function farStart(dest,ev){
 { const m=location.search.match(/[?&]fav=([\w-]+)/), go=/[?&]go=1/.test(location.search); if(m){ history.replaceState(null,"",location.pathname);
   setTimeout(async()=>{ const x=(await loadFavs()).find(f=>f.id===m[1]); if(!x) return;
     try{ localStorage.setItem("rr-welcome","1"); if($("welcome").open) $("welcome").close(); }catch(e){}
-    snapTrip(true); trip.end=pt(x.name,x.lat,x.lon); trip.round=false; trip.days.forEach(d=>{ d.vias=[]; d.legs=[]; d.to=null; delete d.noAutoNight; });
+    linkTrip(pt(x.name,x.lat,x.lon));
     if(trip.start&&trip.start.lat!=null&&hav(trip.start,x)<1) trip.start=pt("My location",null,null);
     changed();
     const t=$("toast"); t.innerHTML=`Finish set to <b>${esc(x.name)}</b>. Now set where you start (tap ⌖ or type a town) and your dates.`; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,15000);
@@ -4168,7 +4177,7 @@ document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closes
   setTimeout(async()=>{ let L=[]; try{ L=await (await fetch("/data/events/events.json")).json(); }catch(e){} const x=L.find(f=>f.id===m[1]); if(!x) return;
     try{ localStorage.setItem("rr-welcome","1"); if($("welcome").open) $("welcome").close(); }catch(e){}
     if(!settings.styleSet&&settings.style!=="tar"){ settings.style="tar"; if($("style")) $("style").value="tar"; store.set("rr2-settings",settings); showStyle(); } /* an event trip starts on main roads */
-    snapTrip(true); trip.end=pt(x.venue||x.name,x.lat,x.lon); trip.round=false; trip.days.forEach(d=>{ d.vias=[]; d.legs=[]; d.to=null; delete d.noAutoNight; });
+    linkTrip(pt(x.venue||x.name,x.lat,x.lon));
     if(trip.start&&trip.start.lat!=null&&hav(trip.start,x)<1) trip.start=pt("My location",null,null);
     changed();
     const t=$("toast"); t.innerHTML=`Finish set to <b>${esc(x.name)}</b> (${esc(x.start)}). Now set where you start and arrive by then.`; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,15000);
@@ -4184,7 +4193,7 @@ document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closes
   setTimeout(async()=>{ const lat=+m[1], lon=+m[2], name=nm?decodeURIComponent(nm.replace(/\+/g," ")).slice(0,80):"The place";
     if(!isFinite(lat)||!isFinite(lon)||Math.abs(lat)>90||Math.abs(lon)>180) return;
     try{ localStorage.setItem("rr-welcome","1"); if($("welcome").open) $("welcome").close(); }catch(e){}
-    snapTrip(true); trip.end=pt(name,lat,lon); trip.round=false; trip.days.forEach(d=>{ d.vias=[]; d.legs=[]; d.to=null; delete d.noAutoNight; });
+    linkTrip(pt(name,lat,lon));
     if(trip.start&&trip.start.lat!=null&&hav(trip.start,{lat,lon})<1) trip.start=pt("My location",null,null);
     changed();
     const t=$("toast"); t.innerHTML=`Finish set to <b>${esc(name)}</b>. Tap ⌖ to start from where you are, or type a town.`; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,15000);
@@ -4203,13 +4212,13 @@ document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closes
       const find=async t=>{ const r=await searchPlaces(t,c); return r&&r[0]?pt(r[0].name,r[0].lat,r[0].lon):null; };
       const ll=(q.get("tll")||"").split(",").map(Number), fl=(q.get("fll")||"").split(",").map(Number);
       const dest=ll.length===2&&ll.every(isFinite)&&ll[0]?pt(to,ll[0],ll[1]):await find(to); if(!dest){ $("status").textContent=`Couldn't find "${to}". Type it in Where to?`; return; }
-      snapTrip(true); trip.end=dest; trip.round=false; trip.days.forEach(d=>{ d.vias=[]; d.legs=[]; d.to=null; delete d.noAutoNight; });
+      linkTrip(dest);
       if((!fr||/^my location$/i.test(fr))&&await farStart(dest)) return;
       if(fr&&!/^my location$/i.test(fr)){ const st=fl.length===2&&fl.every(isFinite)&&fl[0]?pt(fr,fl[0],fl[1]):await find(fr); if(st) trip.start=st; }
       else if(!trip.start||trip.start.lat==null||hav(trip.start,dest)<1) trip.start=pt("My location",null,null);
       changed();
       const t=$("toast"); t.innerHTML=`Going to <b>${esc(dest.name)}</b>.${trip.start&&trip.start.lat!=null?"":" Tap ⌖ to start from where you are, or type a town."}`; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,12000);
-      if(!trip.start||trip.start.lat==null) $("startPlace").focus();
+      if(!trip.start||trip.start.lat==null){ if(!fr||/^my location$/i.test(fr)) useMyLocation(); else $("startPlace").focus(); }
     },300); } }
 
 /* ---------- Google Maps style trip panel: three boxes, each with its own border and heading ----------
@@ -4398,8 +4407,9 @@ function flightHtml(){
   const s=trip.start, e=trip.end; if(!s||!e||s.lat==null||e.lat==null) return "";
   const km=hav(s,e), noRoad=!plan||(plan&&plan.error);
   if(km<1500&&!(noRoad&&km>300)) return "";
-  const when=trip.startDate||"", q=`Flights from ${s.name==="My location"?"my nearest airport":s.name} to ${e.name}${when?" on "+when:""}`;
-  return `<div class="ondates flycard"><h3>✈ Fly part of it</h3><p class="note">${e.name} is about ${Math.round(km).toLocaleString("en-ZA")} km away${noRoad?" and there may be no road all the way":""}. Fly the long bit, then ride or drive the good part.</p><div class="btns"><a class="btn small" href="https://www.google.com/travel/flights?q=${encodeURIComponent(q)}" target="_blank" rel="noopener">Find flights ↗</a><a class="btn small ghost" href="${esc(carHireUrl(e.name))}" target="_blank" rel="sponsored noopener">Hire a car at ${esc(e.name)} ↗</a></div></div>`;
+  const A=typeof OTMtrip!=="undefined"?OTMtrip.airport(s.lat,s.lon):null, B=typeof OTMtrip!=="undefined"?OTMtrip.airport(e.lat,e.lon):null;
+  const fu=B?OTMtrip.flightUrl(B.iata,trip.startDate,trip.endDate,A&&A.iata):"https://flights.onetrackmind.online/";
+  return `<div class="ondates flycard"><h3>✈ Fly part of it</h3><p class="note">${esc(e.name)} is about ${Math.round(km).toLocaleString("en-ZA")} km away${noRoad?" and there may be no road all the way":""}. Fly the long bit${A&&B?` (${esc(A.iata)} to ${esc(B.iata)})`:""}, then ride or drive the good part.</p><div class="btns"><a class="btn small" href="${esc(fu)}" target="_blank" rel="noopener">Find flights ↗</a><a class="btn small ghost" href="${esc(carHireUrl(e.name))}" target="_blank" rel="sponsored noopener">Hire a car${B?` at ${esc(B.name)} airport`:""} ↗</a></div></div>`;
 }
 
 /* /plan/?mode=adventure or ?mode=motorsport: arrive from the Adventure or Petrolhead page with the right roads chosen */
@@ -4538,5 +4548,27 @@ $("evtDlg").addEventListener("change",e=>{ const c=e.target.closest("[data-evtse
 document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-evtrip]"); if(!b) return; e.preventDefault(); openEvTrip(); });
 // /?evtrip=1 (from the events page) opens it straight away
 if(/[?&]evtrip=1/.test(location.search)){ history.replaceState(null,"",location.pathname); setTimeout(openEvTrip,400); }
+
+/* Arriving at the planner from the menu (no place named in the link):
+   - a last trip still ahead: keep it, with a bar to carry on or start a new one;
+   - a last trip whose dates have passed: start fresh, with a link to open the old one (it's in recent trips). */
+(function(){
+  const q=window.otmArriveQuery||"";
+  if(/[?&](ev|fav|poi|to|s|pick|route|evtrip|mode|gpx|r)=/.test(q)) return;
+  const has=trip.start&&trip.start.lat!=null&&(trip.end||trip.days.some(d=>d.to||(d.vias&&d.vias.length)));
+  if(!has) return;
+  const today=new Date().toISOString().slice(0,10), past=!!window.otmArriveEnd&&window.otmArriveEnd<today, label=esc([trip.start.name,trip.end&&!trip.round?trip.end.name:""].filter(Boolean).join(" → ")+" · "+trip.days.length+(trip.days.length===1?" day":" days"));
+  const bar=document.createElement("div"); bar.className="lastbar"; bar.setAttribute("role","status");
+  const after=$("styleBanner"); if(!after||!after.parentNode) return; after.parentNode.insertBefore(bar,after);
+  const fresh=()=>{ snapTrip(true); ["gpx","pick","founder","daysSet","name"].forEach(k=>delete trip[k]); Object.assign(trip,freshTrip()); ui.tab="ov"; plan=null; fp=null; changed(); locateIfAllowed(); };
+  if(past){
+    const old=JSON.parse(JSON.stringify(trip)); fresh();
+    bar.innerHTML=`<span>New trip. Your last one (${label}) has been and gone.</span><span class="btns"><button type="button" class="btn small ghost" data-lb="open">Open your last trip</button><button type="button" class="linkbtn" data-lb="x">Close</button></span>`;
+    bar.addEventListener("click",e=>{ const b=e.target.closest("[data-lb]"); if(!b) return; if(b.dataset.lb==="open"){ old.startDate=tomorrow; old.endDate=addDays(tomorrow,old.days.length-1); Object.assign(trip,old); plan=null; fp=null; changed(); } bar.remove(); });
+  } else {
+    bar.innerHTML=`<span>Your last trip: <b>${label}</b></span><span class="btns"><button type="button" class="btn small" data-lb="keep">Keep going</button><button type="button" class="btn small ghost" data-lb="new">New trip</button></span>`;
+    bar.addEventListener("click",e=>{ const b=e.target.closest("[data-lb]"); if(!b) return; if(b.dataset.lb==="new") fresh(); bar.remove(); });
+  }
+})();
 
 </script></body></html>
