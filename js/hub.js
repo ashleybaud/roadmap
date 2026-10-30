@@ -26,7 +26,7 @@
         var days = Math.round((new Date(big.start + "T12:00:00") - new Date(today + "T12:00:00")) / 864e5), n = (NEWS[big.id] || [])[0];
         cd.innerHTML = '<div class="cdl"><span class="cdk">Next big one</span><b>' + esc(clean(big.name)) + '</b><span class="cdw">' + esc(big.city || big.venue || "") + ", " + esc(big.country || "") + '</span></div>' +
           '<div class="cdn"><b>' + days + '</b><span>day' + (days === 1 ? "" : "s") + ' to go</span></div>' +
-          '<div class="cdb"><a class="btn" href="/events/' + esc(big.id) + '/">Plan it ›</a>' + (big.tickets ? '<a class="btnline" href="' + esc(big.tickets) + '" target="_blank" rel="noopener sponsored">Tickets ›</a>' : "") + '</div>' +
+          '<div class="cdb"><a class="btn" href="/plan/?ev=' + esc(big.id) + '&go=1">Take me there ›</a><a class="btnline" href="/events/' + esc(big.id) + '/">Read about it</a>' + (big.tickets ? '<a class="btnline" href="' + esc(big.tickets) + '" target="_blank" rel="noopener sponsored">Tickets ›</a>' : "") + '</div>' +
           (n ? '<p class="cdnews"><span>' + esc(n.source) + ':</span> <a href="' + esc(n.url) + '" target="_blank" rel="noopener">' + esc(n.title) + ' ›</a></p>' : "");
         cd.hidden = false;
       }

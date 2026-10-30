@@ -34,13 +34,13 @@
     var a = o.air && o.air[1] ? { iata: o.air[1], name: o.air[0] } : airport(o.lat, o.lon), when = o.from && o.to ? span(o.from, o.to) : "", T = [];
     var where = o.town || o.place, abroad = !!o.country && (o.home ? o.country !== o.home : o.country !== "South Africa");
     var bk = "https://www.booking.com/searchresults.html?latitude=" + o.lat + "&longitude=" + o.lon + "&radius=30" + (o.from ? "&checkin=" + o.from + "&checkout=" + o.to : "");
-    T.push({ k: "stay", ic: "🛏", t: "Stay", d: "Beds within 30 km of " + o.place + (when ? ", " + when : ""), p: "Booking.com", u: bk, b: "See places" });
-    if (a) T.push({ k: "fly", ic: "✈", t: "Flights", d: "To " + a.name + " (" + a.iata + ")" + (o.from ? ", in " + dm(o.from) + ", out " + dm(o.to) : ""), p: "Our flight search: airlines and booking sites compared", u: flightUrl(a.iata, o.from, o.to), b: "Find flights" });
-    if (a && !o.bike) T.push({ k: "car", ic: "🚗", t: "Car hire", d: "Pick up at " + a.name + " airport (" + a.iata + ")" + (when ? ", " + when : ""), p: "Discover Cars", u: "https://www.discovercars.com/", b: "Compare cars" });
+    T.push({ k: "stay", t: "Stay", d: "Beds within 30 km of " + o.place + (when ? ", " + when : ""), p: "Booking.com", u: bk, b: "See places" });
+    if (a) T.push({ k: "fly", t: "Flights", d: "To " + a.name + " (" + a.iata + ")" + (o.from ? ", in " + dm(o.from) + ", out " + dm(o.to) : ""), p: "Our flight search: airlines and booking sites compared", u: flightUrl(a.iata, o.from, o.to), b: "Find flights" });
+    if (a && !o.bike) T.push({ k: "car", t: "Car hire", d: "Pick up at " + a.name + " airport (" + a.iata + ")" + (when ? ", " + when : ""), p: "Discover Cars", u: "https://www.discovercars.com/", b: "Compare cars" });
     var tq = o.tours || where;
-    if (o.tickets) T.push({ k: "tix", ic: "🎟", t: "Tickets & tours", d: "Official tickets, plus tours and things to do around " + where, p: "Official site · GetYourGuide", u: o.tickets, b: "Get tickets", u2: "https://www.getyourguide.com/s/?q=" + encodeURIComponent(tq) + (o.from ? "&date_from=" + o.from + "&date_to=" + o.to : ""), b2: "Tours" });
-    else T.push({ k: "tix", ic: "🎟", t: "Tours & tickets", d: o.tours ? o.tours : "Tours and things to do around " + where, p: "GetYourGuide", u: "https://www.getyourguide.com/s/?q=" + encodeURIComponent(tq) + (o.from ? "&date_from=" + o.from + "&date_to=" + o.to : ""), b: "See tours" });
-    if (abroad) T.push({ k: "data", ic: "📶", t: "Data", d: "An eSIM for " + (o.country || "where you are going") + ", so your phone works when you land", p: "Airalo", u: esimUrl(o.country), b: "Get an eSIM", alt: 1 });
+    if (o.tickets) T.push({ k: "tix", t: "Tickets & tours", d: "Official tickets, plus tours and things to do around " + where, p: "Official site · GetYourGuide", u: o.tickets, b: "Get tickets", u2: "https://www.getyourguide.com/s/?q=" + encodeURIComponent(tq) + (o.from ? "&date_from=" + o.from + "&date_to=" + o.to : ""), b2: "Tours" });
+    else T.push({ k: "tix", t: "Tours & tickets", d: o.tours ? o.tours : "Tours and things to do around " + where, p: "GetYourGuide", u: "https://www.getyourguide.com/s/?q=" + encodeURIComponent(tq) + (o.from ? "&date_from=" + o.from + "&date_to=" + o.to : ""), b: "See tours" });
+    if (abroad) T.push({ k: "data", t: "Data", d: "An eSIM for " + (o.country || "where you are going") + ", so your phone works when you land", p: "Airalo", u: esimUrl(o.country), b: "Get an eSIM", alt: 1 });
     return T;
   }
   var esc = function (s) { return String(s == null ? "" : s).replace(/[&<>"]/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]; }); };
@@ -48,13 +48,18 @@
   var HOW = '<div class="triphow"><div><b>You search here</b>Everything is filled in for you. Prices are live from the company you pick.</div><div><b>You pay them, not us</b>You book and pay on their site. We never see your card.</div><div><b>We get a small fee</b>If you book, they pay us a few percent. Same price to you. It keeps OneTrackMind free.</div></div>' +
     '<p class="tripf"><b>Who we work with.</b> We\'re picky. Only names we\'d hand our own money to: Booking.com, Agoda, Expedia and Hotels.com for beds, airlines and the big booking sites for flights, Discover Cars for car hire, GetYourGuide for tours and Airalo for eSIMs. If one lets us down, it goes. <a href="/partners/">The full list and how we earn ›</a></p>' +
     '<p class="tripf">OneTrackMind is not a travel agent. Bookings, payments, changes and refunds are between you and the company you book with, on their terms. Prices and availability are theirs and can change.</p>';
-  // the block on the site (styles in .trip / .tt)
+  // the block on the site: tabs, one panel each (styles in src/house.css)
+  var HS = typeof module !== "undefined" && module.exports ? require("./02-house.js") : g.OTMhouse;
+  var uid = 0;
   function html(o, head) {
-    var T = tiles(o);
-    return '<section class="trip">' + (head === false ? "" : '<div class="triplab">' + esc(head || "") + '</div><h2>Make a trip of it</h2>' + (o.unconfirmed ? '<p class="tripsub tripwarn">The organiser hasn\'t confirmed these dates yet, so nothing is filled in. Check the official site before you book anything.</p>' : o.from ? '<p class="tripsub">Everything for ' + esc(span(o.from, o.to)) + ', already filled in.</p>' : "")) +
-      '<div class="tiles">' + T.map(function (t) { return '<div class="tt' + (t.alt ? " alt" : "") + '"><span class="ic" aria-hidden="true">' + t.ic + '</span><b>' + esc(t.t) + '</b><span class="d">' + esc(t.d) + '</span><span class="p">' + esc(t.p) + '</span><a href="' + esc(t.u) + '" target="_blank" rel="noopener sponsored">' + esc(t.b) + ' ›</a>' + (t.u2 ? '<a class="t2" href="' + esc(t.u2) + '" target="_blank" rel="noopener sponsored">' + esc(t.b2) + ' ›</a>' : "") + '</div>'; }).join("") +
-      '</div>' + HOW + '</section>';
+    var T = tiles(o), id = "trip" + (++uid) + Math.random().toString(36).slice(2, 6), I = function (k, n) { return HS ? HS.icon(k, n) : ""; };
+    return '<section class="trip" data-trip="' + id + '">' + (head === false ? "" : '<div class="triplab">' + esc(head || "") + '</div><h2>Make a trip of it</h2>' + (o.unconfirmed ? '<p class="tripsub tripwarn">The organiser hasn\'t confirmed these dates yet, so nothing is filled in. Check the official site before you book anything.</p>' : o.from ? '<p class="tripsub">Everything for ' + esc(HS ? HS.range(o.from, o.to) : span(o.from, o.to)) + ', already filled in.</p>' : "")) +
+      '<div class="ttabs" role="tablist">' + T.map(function (t, i) { return '<button type="button" class="ttab" role="tab" id="' + id + t.k + '" aria-controls="' + id + t.k + 'p" aria-selected="' + (i === 0) + '">' + I(t.k, 18) + '<span>' + esc(t.t) + '</span></button>'; }).join("") + '</div>' +
+      '<div class="tpanels">' + T.map(function (t, i) { return '<div class="tpanel" role="tabpanel" id="' + id + t.k + 'p" aria-labelledby="' + id + t.k + '"' + (i ? " hidden" : "") + '><h3>' + I(t.k, 22) + esc(t.t) + '</h3><p class="d">' + esc(t.d) + '</p><p class="p">' + esc(t.p) + '</p><div class="acts"><a href="' + esc(t.u) + '" target="_blank" rel="noopener sponsored">' + esc(t.b) + I("out", 16) + '</a>' + (t.u2 ? '<a class="t2" href="' + esc(t.u2) + '" target="_blank" rel="noopener sponsored">' + esc(t.b2) + I("out", 16) + '</a>' : "") + '</div></div>'; }).join("") + '</div>' + HOW +
+      '<scr' + 'ipt>window.otmTabs||(window.otmTabs=1,document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".ttab");if(!b)return;var s=b.closest(".trip");s.querySelectorAll(".ttab").forEach(function(x){x.setAttribute("aria-selected",String(x===b))});s.querySelectorAll(".tpanel").forEach(function(p){p.hidden=p.id!==b.getAttribute("aria-controls")})}))<\/script></section>';
   }
+  // the planner adds blocks after load, where inline scripts don't run
+  if (typeof document !== "undefined") document.addEventListener("click", function (e) { if (window.otmTabs) return; var b = e.target.closest && e.target.closest(".ttab"); if (!b) return; var s = b.closest(".trip"); s.querySelectorAll(".ttab").forEach(function (x) { x.setAttribute("aria-selected", String(x === b)); }); s.querySelectorAll(".tpanel").forEach(function (p) { p.hidden = p.id !== b.getAttribute("aria-controls"); }); });
   var T = { tiles: tiles, html: html, airport: airport, setAirports: function (l) { AIR = l; }, span: span };
   if (typeof module !== "undefined" && module.exports) module.exports = T; else g.OTMtrip = T;
 })(typeof window !== "undefined" ? window : globalThis);

@@ -1,0 +1,42 @@
+/* ===== House rules (docs: OneTrackMind house rules). Loaded last, so it wins. ===== */
+.ico{display:inline-block;vertical-align:-.15em;flex:none}
+/* menu: dropdowns (details/summary), same look as the plain links */
+.hdrlinks .navdd{position:relative;display:inline-flex}
+.hdrlinks .navdd>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:4px;color:var(--ink);font:700 1.3rem var(--f-display,"Saira Condensed","Arial Narrow",sans-serif);letter-spacing:.01em;padding:8px 16px 6px;border-bottom:4px solid transparent;white-space:nowrap;width:auto;text-transform:none;background:none}
+.hdrlinks .navdd>summary::-webkit-details-marker{display:none}.hdrlinks .navdd>summary::after{content:none}
+.hdrlinks .navdd>summary:hover{color:var(--gold);background:none}.hdrlinks .navdd>summary.on{border-bottom-color:var(--gold)}
+.hdrlinks .navdd[open]>summary .chev{transform:rotate(180deg)}
+.hdrlinks .navdd .ddm{position:absolute;top:100%;left:0;z-index:2000;min-width:220px;background:#0F5874;border-radius:12px;padding:6px 0;box-shadow:0 10px 28px rgba(0,0,0,.35);display:none;flex-direction:column}
+.hdrlinks .navdd[open] .ddm{display:flex}
+@media(hover:hover) and (min-width:641px){.hdrlinks .navdd:hover .ddm{display:flex}}
+.hdrlinks .navdd .ddm a{display:flex!important;gap:10px;align-items:center;padding:9px 16px!important;color:#fff!important;font:600 1rem "IBM Plex Sans",Arial,sans-serif!important;text-transform:none!important;letter-spacing:0!important;border:0!important;text-decoration:none;white-space:nowrap}
+.hdrlinks .navdd .ddm a:hover{background:rgba(255,255,255,.08)!important}.hdrlinks .navdd .ddm .ico{color:#E8A317}
+.navtoggle{display:none;align-items:center;gap:6px}
+@media(max-width:640px){
+ .hdrlinks .navtoggle{display:inline-flex!important}
+ .hdrlinks>.navdd{display:none!important;width:100%;flex-direction:column}
+ .hdrlinks.open>.navdd{display:flex!important}
+ .hdrlinks .navdd>summary{padding:10px 14px}
+ .hdrlinks .navdd .ddm{position:static;box-shadow:none;border-radius:10px;margin:0 8px 6px}
+}
+/* buttons: two kinds. Gold = the main action; gold outline = everything else. 10px corners. */
+.btn,.cta,.b1,.wherebar button,.tt a:not(.t2){background:#E8A317!important;color:#0B1D21!important;border:2px solid #E8A317!important;border-radius:10px!important;font-weight:700;text-decoration:none}
+.btnline,.cta.ghost,.btn.ghost,.btn.small.ghost,.tt a.t2,.tt.alt a{background:transparent!important;color:#E8A317!important;border:2px solid #E8A317!important;border-radius:10px!important;font-weight:700;text-decoration:none}
+.btn,.cta,.btnline{display:inline-flex;align-items:center;gap:8px}
+/* cards and panels: one frame, 12px corners */
+.card,.pcard,.hubcard,.sq,.lilpanel,.door,.evcard,.camp,.cd,.nlbox,.box,.gethere,.fuel,.fuelyou,.tt,.triphow,.planown{border-radius:12px!important}
+.card img,.pcard img,.hubcard img{border-radius:12px 12px 0 0}
+/* Make a trip of it: tabs */
+.trip .ttabs{display:flex;gap:4px;flex-wrap:wrap;margin-top:10px}
+.trip .ttab{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border:0;border-radius:12px 12px 0 0;background:#0B3A4B;color:#B5D3DE;font:700 1rem "IBM Plex Sans",Arial,sans-serif;cursor:pointer}
+.trip .ttab[aria-selected="true"]{background:#0F5874;color:#fff;box-shadow:inset 0 3px 0 #E8A317}
+.trip .tpanels{background:#0F5874;border-radius:0 12px 12px 12px;padding:16px;color:#F4F8F9}
+.trip .tpanel[hidden]{display:none}
+.trip .tpanel h3{display:flex;gap:8px;align-items:center;margin:0 0 6px;font:800 1.3rem var(--f-display,"Saira Condensed",sans-serif);text-transform:uppercase}
+.trip .tpanel h3 .ico{color:#E8A317}.trip .tpanel .d{margin:0 0 4px;color:#D6E7EE}.trip .tpanel .p{font-size:.75rem;color:#9FC3D1;letter-spacing:.05em;text-transform:uppercase;margin:0 0 12px}
+.trip .tpanel .acts{display:flex;gap:10px;flex-wrap:wrap}
+.trip .tpanel .acts a{display:inline-flex;gap:8px;align-items:center;padding:10px 16px;border-radius:10px;font-weight:700;text-decoration:none;background:#E8A317;color:#0B1D21;border:2px solid #E8A317}
+.trip .tpanel .acts a.t2{background:transparent;color:#E8A317}
+@media(max-width:560px){.trip .ttab{padding:9px 10px;font-size:.9rem}.trip .ttab span{display:none}.trip .ttab[aria-selected="true"] span{display:inline}}
+.hdrlinks{overflow:visible!important;position:relative;z-index:1500}header{position:relative;z-index:1500}
+@media(max-width:640px){.hdrlinks.open>a:not(.navplan){text-align:left!important;padding-left:14px!important}}
