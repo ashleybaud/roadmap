@@ -2534,6 +2534,9 @@ function townLabels(){ if(!map||!lblLayer||!townList) return; lblLayer.clearLaye
   const own=plan?townPoints():[];
   const used=own.map(p=>map.latLngToContainerPoint([p.lat,p.lon])); list.forEach(t=>{ const pnt=map.latLngToContainerPoint([t.lat,t.lon]); if(used.some(u=>Math.abs(u.x-pnt.x)<90&&Math.abs(u.y-pnt.y)<22)) return; used.push(pnt);
     L.marker([t.lat,t.lon],{interactive:false,keyboard:false,icon:L.divIcon({className:"townlbl"+(t.place==="city"?" city":""),html:`<span>${esc(t.name)}</span>`,iconSize:[0,0]})}).addTo(lblLayer); }); }
+/* map labels are always plain text: Leaflet would treat a string as HTML, and names come from riders, shared links and OpenStreetMap */
+if(typeof L!=="undefined"&&!L.Layer.prototype._otmSafe){ const bt=L.Layer.prototype.bindTooltip; L.Layer.prototype._otmSafe=1;
+  L.Layer.prototype.bindTooltip=function(c,o){ if(typeof c==="string"){ const t=new DOMParser().parseFromString(c,"text/html").body.textContent, el=document.createElement("span"); el.textContent=t; c=el; } return bt.call(this,c,o); }; }
 function ensureMap(){ if(!map){map=L.map("map",{scrollWheelZoom:true});L.tileLayer(TILES.url,{maxZoom:TILES.maxZoom,attribution:TILES.attribution}).addTo(map);map.setView(...homeView()); setTimeout(()=>{ try{ map.invalidateSize(); if(!plan&&!startSeen) map.setView(...homeView(),{animate:false}); }catch(e){} },400); /* the map can be created before its box has a size; recentre once it has one */ lblLayer=L.layerGroup().addTo(map); map.on("moveend",townLabels); map.on("zoomend",()=>$("map").classList.toggle("zoomin",map.getZoom()>=12)); $("map").classList.toggle("zoomin",map.getZoom()>=12); if(window.ResizeObserver) new ResizeObserver(()=>map.invalidateSize()).observe($("map"));} map.invalidateSize(); if(layer) layer.remove(); layer=L.layerGroup().addTo(map); }
 const seg=(a,b)=>plan.geom.filter((g,i)=>plan.cum[i]>=a-0.01&&plan.cum[i]<=b+0.01);
 // where the map opens before there's a trip: the region of the device's time zone, no location prompt
@@ -3033,7 +3036,7 @@ function renderAcct(msg){
         <div class="ract">${acct.admin?`<button class="btn small ghost" type="button" data-rpick="${r.id}:${r.pick?0:1}">${r.pick?"Unpick":"Make pick"}</button>`:r.visibility==="public"?`<span class="note">Public</span>`:r.visibility==="review"?`<span class="note" title="We check every shared route before other riders see it">Waiting for approval</span>`:`<button class="btn small ghost" type="button" data-rpub="${r.id}" title="Let other riders find and rate it">Share publicly</button>`}<button class="btn small" type="button" data-ropen="${r.id}">Open</button><button class="icon" type="button" title="Delete" data-rdel="${r.id}">✕</button></div></div>`).join(""):`<div class="note">Nothing saved yet. Plan a trip, then tap Save route.</div>`}</div>
       ${typeof marksHtml==="function"?marksHtml():""}
       <label class="chk"><input type="checkbox" data-news ${acct.user.news?"checked":""}> Email me new routes and trip ideas, about once a month</label>
-      <div class="acctline"><span class="note">Signed in as <b>${esc(acct.user.email)}</b></span><span class="btns"><button class="linkbtn" type="button" data-signout>Sign out</button><button class="linkbtn" type="button" data-delacct>${acct.delArm?"Tap again to delete your account and routes":"Delete account"}</button></span></div>`;
+      <div class="acctline"><span class="note">Signed in as <b>${esc(acct.user.email)}</b></span><span class="btns"><button class="linkbtn" type="button" data-signout>Sign out</button><button class="linkbtn" type="button" data-signout="all">Sign out everywhere</button><button class="linkbtn" type="button" data-delacct>${acct.delArm?"Tap again to delete your account and routes":"Delete account"}</button></span></div>`;
   }
 }
 async function loadRoutes(){ if(typeof loadMyMarks==="function") loadMyMarks(); try{ acct.routes=(await api("/api/routes")).routes; }catch(e){ acct.routes=[]; renderAcct({err:1,text:e.message}); return; } if(acctMode==="routes") renderAcct(); }
@@ -3047,7 +3050,11 @@ async function saveRoute(update){
   }catch(e){ if(/Sign in/.test(e.message)){ acct.user=null; acct.why="Sign in to save this route."; openAcct("signin"); return; } renderAcct({err:1,text:e.message}); }
 }
 // put a trip into the planner (with Undo): from your saved routes or a pick
+/* trips from a link, an account or a shared route are outside data: strip anything that could be read as HTML before using it */
+function cleanData(v,d){ d=d||0; if(d>8) return null; if(typeof v==="string") return v.replace(/[<>"`]/g,"").slice(0,300); if(typeof v==="number") return isFinite(v)?v:null; if(typeof v==="boolean"||v==null) return v;
+  if(Array.isArray(v)) return v.slice(0,500).map(x=>cleanData(x,d+1)); if(typeof v==="object"){ const o={}; Object.keys(v).slice(0,80).forEach(k=>{ if(!/^(__proto__|constructor|prototype)$/.test(k)) o[k]=cleanData(v[k],d+1); }); return o; } return null; }
 function applyTrip(nt,st,label){
+  nt=cleanData(nt); st=st&&cleanData(st); label=String(label||"").replace(/[<>]/g,"");
   snapTrip(true); const prev=JSON.parse(JSON.stringify(trip)), prevS=Object.assign({},settings);
   Object.keys(trip).forEach(x=>delete trip[x]); Object.assign(trip,nt);
   if(trip.sugV!==5){ trip.days.forEach(d=>{ d.vias=(d.vias||[]).filter(v=>!v.auto); d.legs=[]; d.fresh=true; delete d.noMore; }); trip.sugV=5; }
@@ -3077,7 +3084,7 @@ $("acctDlg").addEventListener("click",async e=>{
   const pb=t.closest("[data-rpub]"); if(pb){ if(pb.dataset.arm!=="1"){ pb.dataset.arm="1"; pb.textContent="Share? Tap again"; return; } try{ await api("/api/routes/"+pb.dataset.rpub,{method:"PUT",body:{visibility:"public"}}); acct.routes=null; loadRoutes(); $("status").textContent=acct.admin?"Shared.":"Sent for approval. Other riders see it once we've checked it."; }catch(err){ renderAcct({err:1,text:err.message}); } return; }
   const d=t.closest("[data-rdel]"); if(d){ if(d.dataset.arm!=="1"){ d.dataset.arm="1"; d.textContent="Delete?"; d.classList.add("btn","small"); return; }
     try{ await api("/api/routes/"+d.dataset.rdel,{method:"DELETE"}); if(trip.savedId===d.dataset.rdel){ delete trip.savedId; delete trip.savedTitle; save(); renderDetails(); } acct.routes=acct.routes.filter(r=>r.id!==d.dataset.rdel); renderAcct({text:"Route deleted."}); }catch(err){ renderAcct({err:1,text:err.message}); } return; }
-  if(t.closest("[data-signout]")){ try{ await api("/api/auth/logout",{method:"POST"}); }catch(err){} acct.user=null; acct.routes=null; $("acctDlg").close(); loadMe(); $("status").textContent="Signed out."; return; }
+  if(t.closest("[data-signout]")){ const all=t.closest("[data-signout]").dataset.signout==="all"; try{ await api("/api/auth/logout",{method:"POST",body:all?{all:true}:{}}); }catch(err){} acct.user=null; acct.routes=null; $("acctDlg").close(); loadMe(); $("status").textContent=all?"Signed out on every device.":"Signed out."; return; }
   if(t.closest("[data-delacct]")){ if(!acct.delArm){ acct.delArm=true; renderAcct(); return; }
     try{ await api("/api/account",{method:"DELETE"}); acct.delArm=false; acct.user=null; acct.routes=null; delete trip.savedId; delete trip.savedTitle; save(); $("acctDlg").close(); loadMe(); $("status").textContent="Your account and saved routes are deleted."; }catch(err){ renderAcct({err:1,text:err.message}); } return; }
 });

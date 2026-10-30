@@ -1,9 +1,10 @@
 // POST {kind, text, page, data, lat, lon, email}: feedback or a suggested correction. Kept in the database and emailed to the feedback inbox.
-import { handle, json, body, db, currentUser, sameOrigin, clean, newId, now, sendEmail, validEmail, HttpError } from "../../server/otm.js";
+import { handle, json, body, db, currentUser, sameOrigin, clean, newId, now, sendEmail, validEmail, HttpError, limitIp } from "../../server/otm.js";
 
 const KINDS = { feedback: "Feedback", fix: "Suggested change", bug: "Something broke" };
 export const onRequestPost = handle(async ({ request, env }) => {
   sameOrigin(request);
+  await limitIp(env, request, "feedback", 10, 3600e3, "Thanks, that's plenty for now. Try again later.");
   const b = await body(request, 60000), kind = KINDS[b.kind] ? b.kind : "feedback", text = clean(b.text, 4000);
   if (text.length < 3) throw new HttpError(400, "Write a few words first.");
   const u = await currentUser(env, request).catch(() => null);

@@ -36,6 +36,10 @@ const SCHEMA = [
 ];
 // columns added after tables already existed (each runs once; "duplicate column" errors are expected afterwards)
 const MIGRATIONS = [
+  // rate limits per connection (only a hash of the address is kept) and where a sign-in was asked from
+  `CREATE TABLE IF NOT EXISTS hits (k TEXT NOT NULL, t INTEGER NOT NULL)`,
+  `CREATE INDEX IF NOT EXISTS hits_k ON hits(k, t)`,
+  `ALTER TABLE login_tokens ADD COLUMN req_where TEXT`,
   `ALTER TABLE reports ADD COLUMN status TEXT NOT NULL DEFAULT 'ok'`,
   `ALTER TABLE users ADD COLUMN contributor INTEGER NOT NULL DEFAULT 0`,
   `ALTER TABLE users ADD COLUMN blocked INTEGER NOT NULL DEFAULT 0`,
@@ -230,3 +234,31 @@ export async function humanCheck(env, request, token) {
 }
 /* the ticks a ride report can carry (fixed list, so reports stay short and comparable) */
 export const REPORT_TICKS = { goodgravel: "Good gravel", corrugations: "Corrugations", sand: "Sand", rocks: "Rocks", rivers: "River crossings", washaways: "Washaways", roadtyres: "Road tyres OK", twoup: "Two-up OK", need4x4: "Needs 4x4", lowrange: "Needs low range", towing: "Towing OK" };
+
+// outside data (trips from riders and share links): strip anything that could be read as HTML, cap sizes, drop odd keys
+export function cleanData(v, d = 0) {
+  if (d > 8) return null;
+  if (typeof v === "string") return v.replace(/[<>"`]/g, "").slice(0, 300);
+  if (typeof v === "number") return Number.isFinite(v) ? v : null;
+  if (typeof v === "boolean" || v == null) return v;
+  if (Array.isArray(v)) return v.slice(0, 500).map(x => cleanData(x, d + 1));
+  if (typeof v === "object") { const o = {}; for (const k of Object.keys(v).slice(0, 80)) if (!/^(__proto__|constructor|prototype)$/.test(k)) o[k] = cleanData(v[k], d + 1); return o; }
+  return null;
+}
+
+// how many times this connection did this in the window; throws when over the limit. Keeps only a hash of the address.
+export async function limitIp(env, request, tag, max, windowMs, msg) {
+  if (!env.DB) return;
+  const D = await db(env), t = now(), ip = request.headers.get("CF-Connecting-IP") || "local";
+  const k = (await sha256(ip + "|" + tag + "|otm-rate")).slice(0, 32);
+  const c = await D.prepare(`SELECT COUNT(*) AS n FROM hits WHERE k = ? AND t > ?`).bind(k, t - windowMs).first();
+  if (c && c.n >= max) throw new HttpError(429, msg || "That's a lot in a short time. Try again later.");
+  await D.prepare(`INSERT INTO hits (k, t) VALUES (?, ?)`).bind(k, t).run();
+  if (Math.random() < 0.01) await D.prepare(`DELETE FROM hits WHERE t < ?`).bind(t - 3 * 864e5).run();
+}
+// a same-site page asked for this (for GETs too: browsers send Sec-Fetch-Site; other servers can't fake a browser's)
+export function sameSite(request) {
+  const s = request.headers.get("Sec-Fetch-Site"), o = request.headers.get("Origin");
+  if (o && o !== new URL(request.url).origin) throw new HttpError(403, "Not allowed.");
+  if (s && !["same-origin", "same-site", "none"].includes(s)) throw new HttpError(403, "Not allowed.");
+}

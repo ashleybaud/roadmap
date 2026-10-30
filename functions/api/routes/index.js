@@ -1,8 +1,8 @@
 // GET: your saved routes (newest first). POST {title, trip, settings, summary...}: save a new one.
-import { handle, json, body, db, requireUser, sameOrigin, clean, newId, now, HttpError } from "../../../server/otm.js";
+import { handle, json, body, db, requireUser, sameOrigin, clean, newId, now, HttpError, cleanData } from "../../../server/otm.js";
 
 export function routeCols(b) {
-  const trip = b.trip;
+  const trip = cleanData(b.trip);
   if (!trip || typeof trip !== "object" || !Array.isArray(trip.days) || !trip.start) throw new HttpError(400, "There's no trip to save.");
   const s = b.settings || {};
   return {

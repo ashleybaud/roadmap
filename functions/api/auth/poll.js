@@ -7,6 +7,7 @@ export const onRequestPost = handle(async ({ request, env }) => {
   if (!tok || tok.created < now() - 30 * 60e3) return json({ expired: true });
   if (tok.poll_used) return json({ expired: true });
   if (!tok.approved_user) return json({ pending: true });
-  await D.prepare(`UPDATE login_tokens SET poll_used = 1 WHERE id = ?`).bind(tok.id).run();
+  const r = await D.prepare(`UPDATE login_tokens SET poll_used = 1 WHERE id = ? AND poll_used = 0`).bind(tok.id).run();
+  if (!r.meta || !r.meta.changes) return json({ expired: true });
   return json({ ok: true }, 200, { "Set-Cookie": await startSession(env, tok.approved_user) });
 });

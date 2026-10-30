@@ -18,7 +18,10 @@ export const onRequestGet = handle(async ({ request, env, params }) => {
 });
 export const onRequestPut = handle(async ({ request, env, params }) => {
   sameOrigin(request); const { u, D, r } = await own(env, request, params.id), b = await body(request);
+  if (u.blocked) throw new HttpError(403, "Your account can't change routes. Email hello@onetrackmind.online if you think that's wrong.");
   let vis = VIS.includes(b.visibility) ? b.visibility : r.visibility;
+  // a public route that changes goes back to review, unless OneTrackMind or a trusted rider changed it
+  if (vis === "public" && (b.trip || b.title) && liveStatus(env, u) !== "ok") vis = "review";
   if (vis === "public" && r.visibility !== "public") { requireContributor(env, u); if (liveStatus(env, u) !== "ok") vis = "review"; }
   if (b.pick != null) { if (!isAdmin(env, u)) throw new HttpError(403, "Only OneTrackMind can make a route a pick."); await D.prepare(`UPDATE routes SET pick = ?, visibility = CASE WHEN ? = 1 THEN 'public' ELSE visibility END WHERE id = ?`).bind(b.pick ? 1 : 0, b.pick ? 1 : 0, r.id).run(); }
   if (b.trip) {

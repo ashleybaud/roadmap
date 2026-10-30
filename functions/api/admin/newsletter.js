@@ -2,7 +2,7 @@
 // GET: the built issues (newsletter/index.json), whether each was sent, and how many subscribers it would reach.
 // POST {issue, test:true}: sends the issue to the founder only, marked [Test].
 // POST {issue}: sends it to every confirmed subscriber who chose that frequency. Each issue can only go out once.
-import { handle, json, body, db, requireUser, HttpError, isAdmin, now, sendBatch, forKinds } from "../../../server/otm.js";
+import { handle, json, body, db, requireUser, HttpError, isAdmin, now, sendBatch, forKinds, sameOrigin } from "../../../server/otm.js";
 const DAYS = { weekly: 7, fortnightly: 14, monthly: 28 };
 const dueSql = `FROM subscribers WHERE confirmed_at IS NOT NULL AND unsub_at IS NULL AND freq = ? AND (last_sent IS NULL OR last_sent < ?)`;
 async function asset(env, origin, p) {
@@ -22,6 +22,7 @@ export const onRequestGet = handle(async ({ request, env }) => {
   return json({ issues: list.slice(0, 8) });
 });
 export const onRequestPost = handle(async ({ request, env }) => {
+  sameOrigin(request);
   const u = await requireUser(env, request); if (!isAdmin(env, u)) throw new HttpError(403, "OneTrackMind only.");
   const b = await body(request, 500), id = String(b.issue || "");
   if (!/^\d{4}-\d\d-\d\d-(weekly|fortnightly|monthly)$/.test(id)) throw new HttpError(400, "Which issue?");

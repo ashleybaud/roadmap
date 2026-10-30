@@ -26,7 +26,7 @@ export const onRequestPost = handle(async ({ request, env }) => {
     D.prepare(`UPDATE users SET blocked = 1, trusted = 0 WHERE id = ?`).bind(id),
     D.prepare(`UPDATE spots SET status = 'rejected' WHERE user_id = ? AND status = 'pending'`).bind(id),
     D.prepare(`UPDATE reports SET status = 'rejected' WHERE user_id = ? AND status = 'pending'`).bind(id),
-    D.prepare(`UPDATE routes SET visibility = 'private' WHERE user_id = ? AND visibility = 'review'`).bind(id)]);
+    D.prepare(`UPDATE routes SET visibility = 'private' WHERE user_id = ? AND visibility IN ('review', 'public') AND pick = 0`).bind(id)]);
   else if (b.type === "user" && b.action === "trust") await D.prepare(`UPDATE users SET trusted = 1 WHERE id = ? AND blocked = 0`).bind(id).run();
   else throw new HttpError(400, "Unknown item.");
   return json({ ok: true });

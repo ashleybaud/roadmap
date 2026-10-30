@@ -11,6 +11,7 @@ async function checkRoute(D, id, u) {
 const parse = s => { try { return JSON.parse(s || "[]"); } catch (e) { return []; } };
 export const onRequestGet = handle(async ({ request, env }) => {
   const id = new URL(request.url).searchParams.get("route") || "", D = await db(env), u = await currentUser(env, request);
+  await checkRoute(D, id, u);
   const [s, list] = await D.batch([
     D.prepare(`SELECT ROUND(AVG(stars),1) AS stars, ROUND(AVG(grade),1) AS grade, COUNT(*) AS n FROM route_ratings WHERE route_id = ? AND status = 'ok'`).bind(id),
     D.prepare(`SELECT r.stars, r.grade, r.rode_on, r.vehicle, r.model, r.again, r.ticks, r.fuel, r.line, r.photos, u.name FROM route_ratings r JOIN users u ON u.id = r.user_id
