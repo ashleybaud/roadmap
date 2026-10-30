@@ -718,6 +718,67 @@ html[data-mode="motorsport"] .modesw button.on{background:#E8A317;color:#111}
 
 .plantitle{margin:14px 0 6px;font:800 1.9rem var(--f-display,"Saira Condensed",sans-serif);text-transform:uppercase;text-align:center;color:var(--gold)}
 .lastbar{display:flex;gap:12px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:10px 0;padding:10px 14px;background:#0F5874;border-left:4px solid #E8A317;border-radius:12px;color:#fff}.lastbar .btns{display:flex;gap:8px;align-items:center}
+/* ---------- day card: one card per day, tabs instead of icons (same tab look as Make a trip of it) ---------- */
+.box.daycard{container-type:inline-size;--ink:#F4F8F9;--muted:#B5D3DE;--line:#1E6A86;--chip:#14708F;--panel:#0F5874;--bg:#0B2A35;--accent:#E8A317;--warn:#E8A317;--bad:#E5674A;--ok:#3E9E63;--onfill:#0B1D21;
+  background:#0B2A35;border:1px solid #1F5568;border-radius:12px;padding:14px 16px 16px;color:var(--ink)}
+.daycard .dchead{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.daycard .dcl{color:var(--muted);font-size:1rem}.daycard .dcl b{font:800 1.45rem/1 var(--f-display,"Saira Condensed",sans-serif);text-transform:uppercase;color:#fff;letter-spacing:.01em}
+.daycard .dcr{background:none;border:0;padding:0;color:#fff;font:700 1rem "IBM Plex Sans",Arial,sans-serif;cursor:pointer;white-space:nowrap}.daycard .dcr .overt{color:var(--warn)}
+.daycard .dcft{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;margin:6px 0 10px;font-size:1.05rem}
+.daycard .dcft .ep{display:inline-flex;align-items:center;gap:6px}.daycard .dcft .ico{color:var(--muted)}.daycard .dcft .arr{color:var(--accent)}
+.daycard .dcft .tolink{color:#fff;font-weight:600}.daycard .dcft .nbadge{font-size:.7rem}
+.daycard .gradebar .gpc{display:none}
+.dcleg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.78rem;color:var(--muted);margin:5px 0 0}.dcleg>span{display:inline-flex;align-items:center;gap:5px}.dcleg i{width:9px;height:9px;border-radius:2px;display:inline-block}.dcleg .vn{opacity:.75}
+.dctabs{display:flex;gap:3px;flex-wrap:nowrap;margin-top:14px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.dctabs::-webkit-scrollbar{display:none}
+.dctab{flex:1 0 auto;display:inline-flex;align-items:center;justify-content:center;gap:4px;padding:9px 7px;border:0;border-radius:12px 12px 0 0;background:#0B3A4B;color:#B5D3DE;font:700 .82rem "IBM Plex Sans",Arial,sans-serif;white-space:nowrap;cursor:pointer}
+.dctab:hover{color:#fff}.dctab[aria-selected="true"]{background:#0F5874;color:#fff;box-shadow:inset 0 3px 0 #E8A317}
+.dctab:focus-visible{outline:2px solid #E8A317;outline-offset:-2px}
+.dctab.empty:not([aria-selected="true"]){opacity:.55}
+.dctab .cnt{font-style:normal;font-size:.68rem;line-height:1;background:#1F5568;color:#fff;border-radius:9px;padding:3px 5px;min-width:17px;text-align:center}
+.dctab .cnt.bad{background:#D9483B}.dctab .cnt.warn{background:#E8A317;color:#0B1D21}
+.dcpanels{background:#0F5874;border-radius:0 0 12px 12px;padding:12px 14px;color:#F4F8F9}
+.dcpanel[hidden]{display:none}
+.dcempty{margin:4px 0;color:var(--muted)}
+.dcroute{list-style:none;margin:0;padding:0}
+.dcst{display:grid;grid-template-columns:44px minmax(0,1fr) auto 58px;align-items:center;gap:8px;padding:8px 6px;border-bottom:1px solid #1E6A86;cursor:pointer;border-radius:8px}
+.dcst:last-child{border-bottom:0}.dcst:hover{background:rgba(255,255,255,.05)}.dcst.on{background:#14708F}
+.dcst .tm{font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums}.dcst .km{text-align:right;font-size:.82rem;color:var(--muted);white-space:nowrap}
+.dcst .nm{min-width:0}.dcst .nm b{font-weight:600}.dcst .autotag{font-size:.68rem;margin-left:4px}
+.dcst .mk{display:flex;gap:4px}
+.dcmk{width:26px;height:26px;border-radius:6px;border:0;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.dcmk.f{background:#E8A317;color:#0B1D21}.dcmk.b{background:#D6E7EE;color:#0B3A4B}.dcmk:focus-visible{outline:2px solid #fff;outline-offset:1px}
+.dcelev{margin-top:8px}.dcelev .elevprof svg{height:60px}.dcnote{margin:8px 0 0}
+.dcsum{display:flex;align-items:center;gap:10px;margin:0 0 6px}.dcsum .fbtn{background:none;border:0;padding:0;cursor:pointer}
+.dcrow{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 6px;border-bottom:1px solid #1E6A86;border-radius:8px}
+.dcrow>div:first-child{display:flex;flex-direction:column;min-width:0;gap:1px}.dcrow:last-child{border-bottom:0}.dcrow.on{background:#14708F}
+.dcrow .fgrp summary{margin:2px 0}.dcgap{border-bottom:1px solid #1E6A86}.dcrow.dcgap{padding-top:4px}.dcrow.dcgap.warn b{color:var(--warn)}.dcrow.dcgap.bad b{color:var(--bad)}
+.dcrow[data-ploc]{cursor:pointer}
+.dcpanel .verdict{margin:8px 0 0}
+.dcgrp{margin-bottom:10px}.dcgrp .linkbtn{margin-top:6px}.dcgrp h4{margin:10px 0 2px;font-size:.95rem}.dcgrp:first-child h4{margin-top:2px}
+.dcsel .dcgrp h4{color:var(--accent)}
+.dcpanel .srow{border-bottom-color:#1E6A86}.dcpanel .dsec{border-top:0;padding-top:0}.dcpanel .dsec+.dsec{border-top:1px solid #1E6A86;padding-top:10px;margin-top:8px}
+.dcpanel .staychips button{background:#0B3A4B;color:#F4F8F9;border-color:#1E6A86}.dcpanel .staychips button.on{background:#F4F8F9;color:#0B2A35}.dcpanel .staychips button.on span{color:#0B2A35}
+.dcpanel .mystay{border-color:#E8A317}
+.dcgtk.gtk{border:0;padding:0;margin:0}
+.dcnote2{display:flex;gap:10px;padding:9px 4px;border-bottom:1px solid #1E6A86}.dcnote2:last-child{border-bottom:0}
+.dcnote2 .dot{width:10px;height:10px;border-radius:50%;margin-top:6px;flex:none;background:#5E8C9C}
+.dcnote2.bad .dot{background:#D9483B}.dcnote2.warn .dot{background:#E8A317}
+.dcnote2>div{display:flex;flex-direction:column;gap:1px;min-width:0}.dcnote2 span{font-size:.88rem;color:#D6E7EE}.dcnote2 a{font-size:.85rem;color:var(--accent);font-weight:700}
+.dcnote2.info b{font-weight:500}
+.dcpanel .medbox{margin-top:10px;border-top:1px solid #1E6A86;padding-top:8px}
+.dcpanel .trip{margin:0}.dcpanel .trip .ttabs{margin-top:0}.dcpanel .trip .tpanels{background:#0B3A4B}
+.dcfoot{margin-top:12px;display:flex;flex-direction:column;gap:8px}
+@container (min-width:420px) and (max-width:600px){.dctab .ico{display:none}.dctab{padding:9px 6px}} /* a desktop details column: words and counts fit on one row without icons */
+.ibfollow{color:var(--gold,#E8A317);text-transform:none;letter-spacing:0;font-weight:600}
+@media (max-width:640px){
+  .box.daycard{padding:12px 12px 14px}
+  .dctabs{margin-right:-12px;padding-right:28px;-webkit-mask-image:linear-gradient(90deg,#000 calc(100% - 36px),transparent);mask-image:linear-gradient(90deg,#000 calc(100% - 36px),transparent)}
+  .dctab{flex:0 0 auto;padding:10px 10px}
+  .dcpanels{padding:10px 10px;border-radius:0 0 12px 12px}
+  .dcst{grid-template-columns:40px minmax(0,1fr) auto 50px;gap:6px;padding:8px 2px}
+  .dcrow{flex-wrap:wrap}
+}
 /*HOUSE_CSS*/
 </style>
 <!-- Booking partners (Travelpayouts, Stay22): their scripts load only after the visitor says OK -->
