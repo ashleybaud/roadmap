@@ -2,11 +2,14 @@
 var favList=null; // var: drawMap can run before this file does
 function loadFavs(){ return favList?Promise.resolve(favList):fetch("/data/favourites/favourites.json").then(r=>r.ok?r.json():[]).then(j=>favList=j).catch(()=>favList=[]); }
 /* Take me there to somewhere overseas: it's a flight first, so the road trip starts at the airport you'd land at */
-async function farStart(dest){
+async function farStart(dest,ev){
   if(!dest||dest.lat==null||hav({lat:-29,lon:24},dest)<2500) return false;
   try{ await window.otmAirP; }catch(e){}
   const a=typeof OTMtrip!=="undefined"&&OTMtrip.airport(dest.lat,dest.lon); if(!a||a.lat==null) return false;
-  trip.start=pt(a.name+" airport ("+a.iata+")",a.lat,a.lon); changed();
+  trip.start=pt(a.name+" airport ("+a.iata+")",a.lat,a.lon);
+  /* a short drive from the airport: one day, the day before the event if there is one */
+  const today=new Date().toISOString().slice(0,10); if(ev&&ev.start){ const d=addDays(ev.start,-1); trip.startDate=d>today?d:today; }
+  trip.endDate=trip.startDate; trip.daysSet=true; syncDays(); changed();
   const t=$("toast"); t.innerHTML=`It's a flight first, so the road trip starts at <b>${esc(a.name)} airport (${esc(a.iata)})</b>. Flights, beds and a hire car are under <b>Make a trip of it</b>, below the plan.`; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,20000);
   return true;
 }
@@ -43,7 +46,7 @@ document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closes
     const t=$("toast"); t.innerHTML=`Finish set to <b>${esc(x.name)}</b> (${esc(x.start)}). Now set where you start and arrive by then.`; t.hidden=false; clearTimeout(toastT); toastT=setTimeout(()=>t.hidden=true,15000);
     if(go){ /* "Take me there" from the newsletter: route from where you are, with the High Octane places and Founder's fav's along the way */
       ui.lay.moto=true; ui.lay.fav=true; ui.lay.sights=true; saveUi(); renderLayers(); renderAll();
-      if(await farStart(trip.end)) return;
+      if(await farStart(trip.end,x)) return;
       if(!trip.start||trip.start.lat==null){ t.innerHTML=`Routing you to <b>${esc(trip.end.name)}</b> from where you are. Racing places and POI along the way are on the map.`; useMyLocation(); return; } }
     if(!trip.start||trip.start.lat==null) $("startPlace").focus();
   },300); } }
