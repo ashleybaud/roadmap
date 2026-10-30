@@ -43,7 +43,7 @@
     // FOMO: Book ahead (1 to 6 months out, the big ones first) or This month
     var box = $("fomo");
     if (!box) return;
-    var view = store("otm-evview") || "ahead", reg = store("otm-evcome") || "";
+    var view = store("otm-evview2") || "soon", reg = store("otm-evcome") || "";
     function draw() {
       var a30 = add(today, 30), a183 = add(today, 183), inReg = function (e) { return !reg || region(e.country) === reg; }, L;
       if (view === "ahead") {
@@ -52,7 +52,7 @@
         [1, 2, 3].forEach(function (t) { pool.forEach(function (e) { if ((e.tier || 2) === t && !seen[e.id] && pick.length < 12) { seen[e.id] = 1; pick.push(e); } }); });
         L = pick.sort(function (a, b) { return a.start.localeCompare(b.start); });
       } else L = EV.filter(function (e) { return e.start <= a30 && inReg(e); }).sort(function (a, b) { return a.start.localeCompare(b.start) || (a.tier || 2) - (b.tier || 2); }).slice(0, 12);
-      $("fomoView").innerHTML = [["ahead", "Book ahead"], ["soon", "This month"]].map(function (x) { return '<button type="button" data-v="' + x[0] + '" class="' + (x[0] === view ? "on" : "") + '">' + x[1] + "</button>"; }).join("");
+      $("fomoView").innerHTML = [["soon", "Coming up"], ["ahead", "Book ahead"]].map(function (x) { return '<button type="button" data-v="' + x[0] + '" class="' + (x[0] === view ? "on" : "") + '">' + x[1] + "</button>"; }).join("");
       $("fomoReg").innerHTML = REG.map(function (x) { return '<button type="button" data-r="' + x[0] + '" class="' + (x[0] === reg ? "on" : "") + '">' + x[1] + "</button>"; }).join("");
       // keep the grid's rows full: a big card takes two places; drop the last small ones until the count fits the columns
       var w = window.innerWidth, cols = w > 1000 ? 4 : w > 560 ? 2 : 1, now = new Date(today + "T12:00:00"), slot = function (e) { var d = Math.round((new Date(e.start + "T12:00:00") - now) / 864e5); return d <= 7 && cols > 1 ? 2 : 1; };
@@ -60,11 +60,11 @@
       $("fomoList").innerHTML = L.length ? L.map(function (e) {
         var d = new Date(e.start + "T12:00:00"), dd = Math.round((d - new Date(today + "T12:00:00")) / 864e5), t = dd <= 7 ? 1 : dd <= 45 ? 2 : 3, live = e.start <= today, /* the closer it is, the bigger it shows */ yr = d.getFullYear() !== new Date().getFullYear() ? " " + String(d.getFullYear()).slice(2) : "";
         return '<a class="evcard t' + t + '" href="/events/' + esc(e.id) + '/"><span class="evdate"><b>' + d.getDate() + "</b><i>" + M[d.getMonth()] + yr + "</i></span><span>" + (e.genre ? '<span class="eg">' + esc(GEN[e.genre] || "") + "</span>" : "") + '<span class="en">' + esc(clean(e.name)) + '</span><span class="ew">' + esc(e.city || e.venue || "") + ", " + esc(e.country || "") + (e.confirmed ? "" : " · to confirm") + "</span>" + (live ? '<span class="ef">On now</span>' : dd <= 7 ? '<span class="ef">' + (dd <= 1 ? (dd === 1 ? 'Tomorrow' : 'Today') : 'In ' + dd + ' days') + '</span>' : e.tier === 1 && e.tickets ? '<span class="ef">Tickets on sale. Book early ›</span>' : "") + "</span></a>";
-      }).join("") : '<p class="note">Nothing ' + (view === "ahead" ? "in the next six months" : "this month") + " there yet.</p>";
+      }).join("") : '<p class="note">Nothing ' + (view === "ahead" ? "in the next six months" : "in the next month") + " there yet.</p>";
     }
     box.addEventListener("click", function (e) {
       var v = e.target.closest("[data-v]"), g = e.target.closest("[data-r]");
-      if (v) { view = v.dataset.v; store("otm-evview", view); draw(); }
+      if (v) { view = v.dataset.v; store("otm-evview2", view); draw(); }
       if (g) { reg = g.dataset.r; store("otm-evcome", reg); draw(); }
     });
     draw();
