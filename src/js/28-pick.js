@@ -12,7 +12,7 @@ function drawEvents(){
   const my=mySeries();
   evList.filter(near).filter(x=>!my.length||my.includes(x.series)).forEach(x=>{ const k=x.lat.toFixed(2)+","+x.lon.toFixed(2); if(seen.has(k)) return; seen.add(k);
     const html=`<b>${esc(x.name)}</b><br><span class="note">${esc(x.start)}${x.end!==x.start?" to "+esc(x.end):""} · ${esc(x.venue||x.city||"")}</span><br><a href="/events/">All events</a> · <button type="button" class="linkbtn" data-evgo="${esc(x.id)}">Go here</button>`;
-    L.marker([x.lat,x.lon],{icon:L.divIcon({className:"",html:`<div class="evmk" title="${esc(x.name)}">🏁</div>`,iconSize:[26,26],iconAnchor:[13,13]}),zIndexOffset:650}).bindTooltip(x.name).bindPopup(html).addTo(layer); });
+    L.marker([x.lat,x.lon],{icon:L.divIcon({className:"",html:`<div class="evmk" data-grp="${OTMhouse.group(x.genre)}" title="${esc(x.name)}">${OTMhouse.icon("race",14)}</div>`,iconSize:[26,26],iconAnchor:[13,13]}),zIndexOffset:650}).bindTooltip(x.name).bindPopup(html).addTo(layer); });
 }
 document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-evgo]"); if(!b) return; const x=(evList||[]).find(f=>f.id===b.dataset.evgo); if(!x) return; map.closePopup(); setFinish(pt(x.venue||x.name,x.lat,x.lon)); });
 const ADV_PICKS=["swartberg-loop","die-hel","namibia-2020-tortoise"];

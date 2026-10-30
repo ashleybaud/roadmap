@@ -30,6 +30,10 @@
       }).join("") +
       '<a href="/plan/" class="navplan' + (active === "/plan/" ? ' on" aria-current="page"' : '"') + '><svg class="pinic" viewBox="0 0 24 32" width="24" height="32" aria-hidden="true"><path d="M12 0C5.4 0 0 5.3 0 11.9 0 20.8 12 32 12 32s12-11.2 12-20.1C24 5.3 18.6 0 12 0z" fill="#E5262B"/><circle cx="12" cy="11.5" r="5" fill="#fff"/></svg>Plan a trip</a></nav>';
   }
-  var H = { icon: icon, range: range, nav: nav, MENU: MENU };
+  // one colour per kind of racing, everywhere (diary, FOMO, event pages, planner pins, newsletter)
+  var GROUPS = { home: ["Near you", "#E8A317"], f1: ["F1", "#E5484D"], bikes: ["Bikes", "#F08A24"], endurance: ["Endurance, rally and hill climbs", "#4FB8D8"], us: ["NASCAR and IndyCar", "#7EA3E6"], shows: ["Shows and classics", "#B9A2E8"] };
+  function group(g) { g = g || ""; return g === "f1" ? "f1" : /motogp|superbike|mx|roadrace|bikefest/.test(g) ? "bikes" : /endurance|rally|offroad|hillclimb|timeattack/.test(g) ? "endurance" : /nascar|indycar/.test(g) ? "us" : "shows"; }
+  function colour(g) { return GROUPS[group(g)][1]; }
+  var H = { icon: icon, range: range, nav: nav, MENU: MENU, GROUPS: GROUPS, group: group, colour: colour };
   if (typeof module !== "undefined" && module.exports) module.exports = H; else g.OTMhouse = H;
 })(typeof window !== "undefined" ? window : globalThis);
