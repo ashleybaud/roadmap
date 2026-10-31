@@ -2,9 +2,9 @@
  "_how": "The founder's own slots. Everything here stays hidden on the site until it's filled in. Event ids are the ids in data/events/events.json (the last part of an event page's address: /events/<id>/). Route ids: data/picks/picks.json. Place ids: data/favourites/favourites.json (the last part of /favourites/<id>/). Rebuild the pages (node scripts/make-pages.mjs) after editing.",
  "myPick": {
   "_how": "The event I'd go to this month: shows as a card on the home page and at the top of the newsletter. event = an event id; line = one line in my words; photo = an image address (optional); video = a YouTube or Instagram address (optional).",
-  "event": "",
-  "line": "",
-  "photo": "",
+  "event": "killarney-motor-show-2026",
+  "line": "I'll be there with the Bedford and the AlterEgo pop-up. Racing is life shirts on the table. Come and say hi.",
+  "photo": "/img/founder/killarney-ta-2026-number.webp",
   "video": ""
  },
  "preparing": {
@@ -27,7 +27,8 @@
   ]
  },
  "myTake": {
-  "_how": "My line on events I know: shows on that event's page under My take. One entry per event, like \"simola-hillclimb-2027\": \"one line\"."
+  "_how": "My line on events I know: shows on that event's page under My take. One entry per event, like \"simola-hillclimb-2027\": \"one line\".",
+  "killarney-motor-show-2026": "Find the Bedford: the AlterEgo pop-up is there with Racing is life shirts, and you can join the Members Club on the spot."
  },
  "top5": [],
  "_top5how": "My top 5 lists: each becomes a page under High Octane, My top 5. Add one like {\"id\": \"hill-climbs\", \"title\": \"Top 5 hill climbs worth the trip\", \"intro\": \"one or two lines\", \"items\": [{\"event\": \"simola-hillclimb-2027\", \"line\": \"why\"}, {\"route\": \"swartberg-loop\", \"line\": \"why\"}, {\"place\": \"franschhoek-motor-museum\", \"line\": \"why\"}]}. id = the page address, lower case with dashes.",
