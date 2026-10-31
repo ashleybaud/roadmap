@@ -976,6 +976,19 @@ main>.evpic{margin:14px 0 8px}
 @media(min-width:761px) and (max-width:1199px){.fomo .evhead .fomonl{flex-basis:100%}.fomonl .nlf{flex:1}}
 .evpic{max-width:none!important;width:100%}
 
+/* section headings: capitals, centred, on their own line above any controls (page titles and card titles unchanged) */
+main h2{text-transform:uppercase;text-align:center;max-width:none!important;margin-left:auto;margin-right:auto}
+main .card h2,main .pcard h2,main .lilpanel h2,main .ctile h2{text-align:left}
+.hubh{flex-direction:column;align-items:center!important;justify-content:center;text-align:center;gap:8px}
+.hubh .hubsub{text-align:center}
+/* Mates */
+.matesfoot{margin:0 0 6px}
+.mates{list-style:none;padding:0;margin:12px auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.mate{display:flex;gap:12px;align-items:flex-start;background:var(--panel,#0F5874);border:1px solid var(--line,#2B7896);border-radius:12px;padding:14px}
+.mate img{width:56px;height:56px;object-fit:contain;background:#fff;border-radius:12px;flex:none}
+.mate b{display:flex;gap:8px;align-items:center;font-size:1.05rem}.mate p{margin:4px 0 0}.mate .btnrow{margin-top:10px}
+.mrank{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#E8A317;color:#121A1E;font:800 .95rem "Saira Condensed",sans-serif;flex:none}
+
 </style>
 <!-- Booking partners (Travelpayouts, Stay22): their scripts load only after the visitor says OK -->
 <script>(function(){var K="otm-consent",v=null;try{v=localStorage.getItem(K)}catch(e){}
@@ -1067,6 +1080,7 @@ b.addEventListener("click",function(e){var t=e.target.closest("[data-ck]");if(t)
   <footer class="sitefoot">
     <section class="fuelrow"><a class="fuel" href="https://alterego.online/?utm_source=onetrackmind&utm_medium=sponsor&utm_content=fuelled" target="_blank" rel="noopener sponsored"><img src="/img/alterego-logo-white.png" width="96" height="84" alt="AlterEgo"><span><b>Fuelled by AlterEgo</b><span>OneTrackMind is free to use. AlterEgo keeps it that way.</span><span class="btnline">Shop AlterEgo ›</span></span></a><a class="fuelyou" href="/advertise/"><b>Your brand here</b><span>Sponsor a route, the diary or the whole site ›</span></a></section>
     <p class="bestfx">Our best effort to get the dates right. Always check with the organiser before you book.</p>
+    
     <div class="note">OneTrackMind: plan road trips anywhere, on the roads less travelled, then ride them on your GPS or phone. · <a href="/how-to/">How to</a> · <a href="/record/">Record a ride</a> · <a href="/list-your-event/">List your event</a> · <a href="/advertise/">Advertise</a> · <a href="/about/">About</a> · <a href="/terms.html">Terms</a> · <a href="/privacy.html">Privacy</a> · <a href="#" onclick="try{localStorage.removeItem('otm-consent')}catch(e){}location.reload();return false">Cookie choices</a> · <a href="mailto:hello@onetrackmind.online">hello@onetrackmind.online</a></div>
   </footer>
 </div>
@@ -1377,9 +1391,9 @@ const genreName=g=>(GENRES.find(x=>x[0]===g)||[0,""])[1];
   var MENU = [["/", "Home"],
     ["/high-octane/", "FOMO", [["/high-octane/#this-week", "This week", "event"], ["/high-octane/#coming-up", "Coming up", "clock"], ["/high-octane/#book-ahead", "Book ahead", "tix"], ["/adventure/in-season/", "In season", "sun"], ["/high-octane/my-top-5/", "My top 5", "list"], ["/routes/", "Routes", "route"], ["/favourites/#petrol", "Petrolhead places", "flag"], ["/favourites/", "Places worth the detour", "poi"], ["/how-to/", "How to", "howto"], ["/record/", "Record a ride", "bike"]]],
     ["/blog/", "Blog", [["/blog/", "Stories", "camera"], ["/local-is-lekker/", "Local is lekker", "lil"], ["/blog/autodidact/", "Autodidact", "wrench"], ["/blog/my-racing/", "My racing", "flag"]]],
-    ["/about/", "About", [["/about/", "About", "user"], ["/about/why-preparation/", "Why preparation", "quote"], ["/partners/", "How we earn", "info"], ["/list-your-event/", "List your event", "pen"], ["/advertise/", "Advertise", "star"], ["/about/#newsletter", "Newsletter", "mail"]]]];
+    ["/about/", "About", [["/about/", "About", "user"], ["/about/why-preparation/", "Why preparation", "quote"], ["/about/mates/", "Mates", "user"], ["/partners/", "How we earn", "info"], ["/list-your-event/", "List your event", "pen"], ["/advertise/", "Advertise", "star"], ["/about/#newsletter", "Newsletter", "mail"]]]];
   // pages that belong to a section of the menu (Adventure and High Octane are one section now: FOMO, at /high-octane/)
-  var SECTION = { "/adventure/": "/high-octane/", "/routes/": "/high-octane/", "/rides/": "/high-octane/", "/favourites/": "/high-octane/", "/adventure/in-season/": "/high-octane/", "/record/": "/high-octane/", "/how-to/": "/high-octane/", "/events/": "/high-octane/", "/high-octane/my-top-5/": "/high-octane/", "/partners/": "/about/", "/advertise/": "/about/", "/list-your-event/": "/about/", "/about/why-preparation/": "/about/", "/blog/autodidact/": "/blog/", "/local-is-lekker/": "/blog/", "/blog/my-racing/": "/blog/" };
+  var SECTION = { "/adventure/": "/high-octane/", "/routes/": "/high-octane/", "/rides/": "/high-octane/", "/favourites/": "/high-octane/", "/adventure/in-season/": "/high-octane/", "/record/": "/high-octane/", "/how-to/": "/high-octane/", "/events/": "/high-octane/", "/high-octane/my-top-5/": "/high-octane/", "/partners/": "/about/", "/advertise/": "/about/", "/list-your-event/": "/about/", "/about/why-preparation/": "/about/", "/about/mates/": "/about/", "/blog/autodidact/": "/blog/", "/local-is-lekker/": "/blog/", "/blog/my-racing/": "/blog/" };
   function nav(active) {
     var on = SECTION[active] || active;
     return '<nav class="hdrlinks" id="sitenav" aria-label="Site"><button type="button" class="navtoggle" aria-expanded="false" aria-controls="sitenav">' + icon("menu", 20) + " Menu</button>" +
@@ -1388,7 +1402,7 @@ const genreName=g=>(GENRES.find(x=>x[0]===g)||[0,""])[1];
         if (!m[2]) return '<a href="' + m[0] + '"' + cur + ">" + m[1] + "</a>";
         var own = m[2].some(function (s) { return s[0] === m[0]; });
         return '<details class="navdd"><summary' + (on === m[0] ? ' class="on"' : "") + ">" + m[1] + icon("chev", 16, "chev") + '</summary><div class="ddm">' + (own ? "" : '<a href="' + m[0] + '">' + m[1] + " home</a>") +
-          m[2].map(function (s) { return '<a href="' + s[0] + '"' + (active === s[0] ? ' aria-current="page"' : "") + ">" + icon(s[2], 16) + s[1] + "</a>"; }).join("") + "</div></details>";
+          m[2].filter(function (s) { return H.HIDE.indexOf(s[0]) < 0; }).map(function (s) { return '<a href="' + s[0] + '"' + (active === s[0] ? ' aria-current="page"' : "") + ">" + icon(s[2], 16) + s[1] + "</a>"; }).join("") + "</div></details>";
       }).join("") +
       '<a href="/plan/" class="navplan' + (active === "/plan/" ? ' on" aria-current="page"' : '"') + '><svg class="pinic" viewBox="0 0 24 32" width="24" height="32" aria-hidden="true"><path d="M12 0C5.4 0 0 5.3 0 11.9 0 20.8 12 32 12 32s12-11.2 12-20.1C24 5.3 18.6 0 12 0z" fill="#E5262B"/><circle cx="12" cy="11.5" r="5" fill="#fff"/></svg>Plan a trip</a></nav>';
   }
@@ -1415,7 +1429,8 @@ const genreName=g=>(GENRES.find(x=>x[0]===g)||[0,""])[1];
     for (i = s0; i < s0 + 12; i++) { var x = (i + 11) % 12 + 1; if (on(x) && start === null) start = x; if (start !== null && (!on(x % 12 + 1) || i === s0 + 11)) { out.push(start === x ? MON[x - 1] : MON[start - 1] + "–" + MON[x - 1]); start = null; } }
     return out.join(", ");
   }
-  var H = { icon: icon, range: range, nav: nav, MENU: MENU, GROUPS: GROUPS, group: group, colour: colour, season: season, months: months };
+  // menu entries switched off until they have content (the build fills this in, e.g. Mates)
+  var H = { HIDE: [], icon: icon, range: range, nav: nav, MENU: MENU, GROUPS: GROUPS, group: group, colour: colour, season: season, months: months };
   if (typeof module !== "undefined" && module.exports) module.exports = H; else g.OTMhouse = H;
 })(typeof window !== "undefined" ? window : globalThis);
 

@@ -335,6 +335,19 @@ main>.evpic{margin:14px 0 8px}
  .fomo .evview{display:grid;grid-template-columns:repeat(4,1fr)}.fomo .evview button{padding:8px 4px;font-size:.82rem;letter-spacing:.02em}}
 @media(min-width:761px) and (max-width:1199px){.fomo .evhead .fomonl{flex-basis:100%}.fomonl .nlf{flex:1}}
 .evpic{max-width:none!important;width:100%}
+
+/* section headings: capitals, centred, on their own line above any controls (page titles and card titles unchanged) */
+main h2{text-transform:uppercase;text-align:center;max-width:none!important;margin-left:auto;margin-right:auto}
+main .card h2,main .pcard h2,main .lilpanel h2,main .ctile h2{text-align:left}
+.hubh{flex-direction:column;align-items:center!important;justify-content:center;text-align:center;gap:8px}
+.hubh .hubsub{text-align:center}
+/* Mates */
+.matesfoot{margin:0 0 6px}
+.mates{list-style:none;padding:0;margin:12px auto;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.mate{display:flex;gap:12px;align-items:flex-start;background:var(--panel,#0F5874);border:1px solid var(--line,#2B7896);border-radius:12px;padding:14px}
+.mate img{width:56px;height:56px;object-fit:contain;background:#fff;border-radius:12px;flex:none}
+.mate b{display:flex;gap:8px;align-items:center;font-size:1.05rem}.mate p{margin:4px 0 0}.mate .btnrow{margin-top:10px}
+.mrank{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#E8A317;color:#121A1E;font:800 .95rem "Saira Condensed",sans-serif;flex:none}
 </style>
 
 <!-- Booking partners (Travelpayouts, Stay22): their scripts load only after the visitor says OK -->
@@ -375,7 +388,7 @@ i.addEventListener("blur",function(){setTimeout(function(){box.hidden=true},150)
 <section class="cd" id="cd" hidden></section>
 <div class="camps" id="camps"></div>
 
-<section class="hub"><div class="lilpanel"><img src="/media/founder/990-adventure-tortoise.jpg" alt="" loading="lazy"><div><b>How it started</b><p>In 2004 I took a KTM 950 Adventure, a paper map and a planning committee that mostly drank beer into Namibia, and I've been going back ever since. Then came the Alfas, the hill climbs and a racecar that wouldn't drive. Twenty-odd years of it is on the blog: the trips that went sideways, the race weekends, the factories.</p><div class="btnrow"><a class="btnline" href="/blog/">Read the stories ›</a><a class="btnline" href="/about/">More about me ›</a></div></div></div></section>
+<section class="hub"><div class="hubh"><h2>How it started</h2></div><div class="lilpanel"><img src="/media/founder/990-adventure-tortoise.jpg" alt="" loading="lazy"><div><p>In 2004 I took a KTM 950 Adventure, a paper map and a planning committee that mostly drank beer into Namibia, and I've been going back ever since. Then came the Alfas, the hill climbs and a racecar that wouldn't drive. Twenty-odd years of it is on the blog: the trips that went sideways, the race weekends, the factories.</p><div class="btnrow"><a class="btnline" href="/blog/">Read the stories ›</a><a class="btnline" href="/about/">More about me ›</a></div></div></div></section>
 
 <section class="hub planown"><h2>Plan your own</h2><p class="lede">Tell it where you're starting, where you're going and what you drive or ride. It finds the roads you like, the fuel, the beds and everything worth stopping for, then puts it on your GPS or phone. Free, no sign-up needed.</p><a class="btn" href="/plan/">Plan a trip ›</a></section>
 </main>

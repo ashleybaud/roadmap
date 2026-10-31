@@ -18,5 +18,13 @@
   "entries": []
  },
  "tours": [],
- "_tourshow": "My annual petrolhead tours and Wild Goose Chase rounds, as dated events in FOMO (Remind me and Take me there work on them). Add one like {\"id\": \"wild-goose-chase-round-1-2027\", \"name\": \"Wild Goose Chase, round 1\", \"start\": \"2027-03-06\", \"end\": \"2027-03-07\", \"venue\": \"\", \"city\": \"\", \"country\": \"South Africa\", \"lat\": -33.9, \"lon\": 18.6, \"url\": \"https://onetrackmind.online/...\", \"line\": \"one line\"}. Then run node scripts/merge-events.mjs."
+ "_tourshow": "My annual petrolhead tours and Wild Goose Chase rounds, as dated events in FOMO (Remind me and Take me there work on them). Add one like {\"id\": \"wild-goose-chase-round-1-2027\", \"name\": \"Wild Goose Chase, round 1\", \"start\": \"2027-03-06\", \"end\": \"2027-03-07\", \"venue\": \"\", \"city\": \"\", \"country\": \"South Africa\", \"lat\": -33.9, \"lon\": 18.6, \"url\": \"https://onetrackmind.online/...\", \"line\": \"one line\"}. Then run node scripts/merge-events.mjs.",
+ "mates": {
+  "_how": "Mates: people and places I rate (the page /about/mates/). Add entries to the groups below. Each one: {\"name\": \"\", \"url\": \"https://...\", \"line\": \"one line in my words\", \"logo\": \"/img/mates/name.png\" (optional), \"top\": 1 to 5 (optional: my top 5 in that group, 1 = best), \"poi\": \"a place id from data/favourites/favourites.json\" (optional: links to its page with Take me there), \"sponsored\": true (only if they pay)}. The page, the About menu item and the footer line stay hidden until there are 5 entries in total. Each group's top 5 also becomes a My top 5 list.",
+  "places": [],
+  "people": [],
+  "media": [],
+  "clubs": [],
+  "workshops": []
+ }
 }

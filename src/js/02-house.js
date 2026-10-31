@@ -16,9 +16,9 @@
   var MENU = [["/", "Home"],
     ["/high-octane/", "FOMO", [["/high-octane/#this-week", "This week", "event"], ["/high-octane/#coming-up", "Coming up", "clock"], ["/high-octane/#book-ahead", "Book ahead", "tix"], ["/adventure/in-season/", "In season", "sun"], ["/high-octane/my-top-5/", "My top 5", "list"], ["/routes/", "Routes", "route"], ["/favourites/#petrol", "Petrolhead places", "flag"], ["/favourites/", "Places worth the detour", "poi"], ["/how-to/", "How to", "howto"], ["/record/", "Record a ride", "bike"]]],
     ["/blog/", "Blog", [["/blog/", "Stories", "camera"], ["/local-is-lekker/", "Local is lekker", "lil"], ["/blog/autodidact/", "Autodidact", "wrench"], ["/blog/my-racing/", "My racing", "flag"]]],
-    ["/about/", "About", [["/about/", "About", "user"], ["/about/why-preparation/", "Why preparation", "quote"], ["/partners/", "How we earn", "info"], ["/list-your-event/", "List your event", "pen"], ["/advertise/", "Advertise", "star"], ["/about/#newsletter", "Newsletter", "mail"]]]];
+    ["/about/", "About", [["/about/", "About", "user"], ["/about/why-preparation/", "Why preparation", "quote"], ["/about/mates/", "Mates", "user"], ["/partners/", "How we earn", "info"], ["/list-your-event/", "List your event", "pen"], ["/advertise/", "Advertise", "star"], ["/about/#newsletter", "Newsletter", "mail"]]]];
   // pages that belong to a section of the menu (Adventure and High Octane are one section now: FOMO, at /high-octane/)
-  var SECTION = { "/adventure/": "/high-octane/", "/routes/": "/high-octane/", "/rides/": "/high-octane/", "/favourites/": "/high-octane/", "/adventure/in-season/": "/high-octane/", "/record/": "/high-octane/", "/how-to/": "/high-octane/", "/events/": "/high-octane/", "/high-octane/my-top-5/": "/high-octane/", "/partners/": "/about/", "/advertise/": "/about/", "/list-your-event/": "/about/", "/about/why-preparation/": "/about/", "/blog/autodidact/": "/blog/", "/local-is-lekker/": "/blog/", "/blog/my-racing/": "/blog/" };
+  var SECTION = { "/adventure/": "/high-octane/", "/routes/": "/high-octane/", "/rides/": "/high-octane/", "/favourites/": "/high-octane/", "/adventure/in-season/": "/high-octane/", "/record/": "/high-octane/", "/how-to/": "/high-octane/", "/events/": "/high-octane/", "/high-octane/my-top-5/": "/high-octane/", "/partners/": "/about/", "/advertise/": "/about/", "/list-your-event/": "/about/", "/about/why-preparation/": "/about/", "/about/mates/": "/about/", "/blog/autodidact/": "/blog/", "/local-is-lekker/": "/blog/", "/blog/my-racing/": "/blog/" };
   function nav(active) {
     var on = SECTION[active] || active;
     return '<nav class="hdrlinks" id="sitenav" aria-label="Site"><button type="button" class="navtoggle" aria-expanded="false" aria-controls="sitenav">' + icon("menu", 20) + " Menu</button>" +
@@ -27,7 +27,7 @@
         if (!m[2]) return '<a href="' + m[0] + '"' + cur + ">" + m[1] + "</a>";
         var own = m[2].some(function (s) { return s[0] === m[0]; });
         return '<details class="navdd"><summary' + (on === m[0] ? ' class="on"' : "") + ">" + m[1] + icon("chev", 16, "chev") + '</summary><div class="ddm">' + (own ? "" : '<a href="' + m[0] + '">' + m[1] + " home</a>") +
-          m[2].map(function (s) { return '<a href="' + s[0] + '"' + (active === s[0] ? ' aria-current="page"' : "") + ">" + icon(s[2], 16) + s[1] + "</a>"; }).join("") + "</div></details>";
+          m[2].filter(function (s) { return H.HIDE.indexOf(s[0]) < 0; }).map(function (s) { return '<a href="' + s[0] + '"' + (active === s[0] ? ' aria-current="page"' : "") + ">" + icon(s[2], 16) + s[1] + "</a>"; }).join("") + "</div></details>";
       }).join("") +
       '<a href="/plan/" class="navplan' + (active === "/plan/" ? ' on" aria-current="page"' : '"') + '><svg class="pinic" viewBox="0 0 24 32" width="24" height="32" aria-hidden="true"><path d="M12 0C5.4 0 0 5.3 0 11.9 0 20.8 12 32 12 32s12-11.2 12-20.1C24 5.3 18.6 0 12 0z" fill="#E5262B"/><circle cx="12" cy="11.5" r="5" fill="#fff"/></svg>Plan a trip</a></nav>';
   }
@@ -54,6 +54,7 @@
     for (i = s0; i < s0 + 12; i++) { var x = (i + 11) % 12 + 1; if (on(x) && start === null) start = x; if (start !== null && (!on(x % 12 + 1) || i === s0 + 11)) { out.push(start === x ? MON[x - 1] : MON[start - 1] + "–" + MON[x - 1]); start = null; } }
     return out.join(", ");
   }
-  var H = { icon: icon, range: range, nav: nav, MENU: MENU, GROUPS: GROUPS, group: group, colour: colour, season: season, months: months };
+  // menu entries switched off until they have content (the build fills this in, e.g. Mates)
+  var H = { HIDE: [], icon: icon, range: range, nav: nav, MENU: MENU, GROUPS: GROUPS, group: group, colour: colour, season: season, months: months };
   if (typeof module !== "undefined" && module.exports) module.exports = H; else g.OTMhouse = H;
 })(typeof window !== "undefined" ? window : globalThis);
