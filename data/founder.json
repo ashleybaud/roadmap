@@ -7,6 +7,21 @@
   "photo": "",
   "video": ""
  },
+ "preparing": {
+  "_how": "What I'm preparing for now: pinned at the top of the Blog and on the home page. event = an event id; line = one line in my words; side = a side project line (optional); updates = newest first: {\"date\": \"2026-10-31\", \"line\": \"\", \"photo\": \"\", \"video\": \"\"}.",
+  "event": "simola-hillclimb-2027",
+  "line": "",
+  "side": "",
+  "updates": []
+ },
+ "lastEvent": {
+  "_how": "My last event and what it taught me: shows under Preparing for on the Blog. name = the event; date = when; reflection = a few lines in my words; photo = an image address (optional). Stays hidden until reflection is filled.",
+  "name": "",
+  "date": "",
+  "event": "",
+  "reflection": "",
+  "photo": ""
+ },
  "myTake": {
   "_how": "My line on events I know: shows on that event's page under My take. One entry per event, like \"simola-hillclimb-2027\": \"one line\"."
  },
