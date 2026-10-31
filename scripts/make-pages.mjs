@@ -843,6 +843,8 @@ function newsCards({ prep = true, last = true, pick = true, top5 = true, auto = 
   if (last && (L.reflection || "").trim()) C.push(card("/blog/#last", L.photo, "Last time out", L.name, L.reflection.trim().split(/\n/).pop()));
   const mp = FD.myPick || {}, me = mp.event && evById(mp.event);
   if (pick && me && (mp.line || "").trim() && me.end >= today) C.push(card(`/events/${me.id}/`, mp.photo || me.photo || evPhoto(me), "My pick", me.name, mp.line.trim()));
+  const lil = LIL[0];
+  if (lil && lil.date && (Date.parse(today) - Date.parse(lil.date)) / 864e5 <= 14) C.push(card(lil.lat != null ? `/plan/?poi=${lil.lat},${lil.lon}&n=${encodeURIComponent(lil.place)}&go=1` : "/blog/", lil.photo2 || lil.photo, "Local", `${lil.place}, ${lil.town}`, lil.line || ""));
   if (top5) TOP5.forEach(l => C.push(card(`/high-octane/my-top-5/${l.id}/`, l.photo || "", "My top 5", l.title, l.intro || "")));
   if (auto && (FD.builds || []).length) C.push(card("/blog/autodidact/", "/img/founder/autodidact-homebuilt.webp", "Autodidact", "The builds", `${FD.builds.length} builds, from the Stepnose to the Safari Cobra.`));
   return C;
