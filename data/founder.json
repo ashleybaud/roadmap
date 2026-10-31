@@ -7,6 +7,25 @@
   "photo": "",
   "video": ""
  },
+ "preparing": {
+  "_how": "What I'm preparing for now: pinned at the top of the Blog and on the home page. event = an event id; line = one line in my words; side = a side project line (optional); updates = newest first: {\"date\": \"2026-10-31\", \"line\": \"\", \"photo\": \"\", \"video\": \"\"}.",
+  "event": "simola-hillclimb-2027",
+  "line": "Every year on the start line I look back on the year of preparation and realise I've already had my fun. The year is the living. The run is the report card: 60 seconds, in my case. And I'm finding out more about myself in the preparation than in the execution.",
+  "side": "",
+  "updates": []
+ },
+ "lastEvent": {
+  "_how": "My last event and what it taught me: shows under Preparing for on the Blog. name = the event; date = when; reflection = a few lines in my words; photo = an image address (optional). Stays hidden until reflection is filled. more = extra photo addresses (optional); video = a short .mp4 on the site (optional), poster = its still image.",
+  "name": "Killarney Time Attack",
+  "date": "October 2026",
+  "event": "",
+  "reflection": "Massive prep. Four test drives. Then a massive spin on turn two, the fastest incident yet. After the week motorsport had, I can't say it wasn't on my mind.\nI quickly became a passenger, watching to see where it was going to end. Momentum is your friend. Until it's not.\nPacked up, went home, and slept for four days. Almost.\nNo amount of preparation is ever enough. It's a lifestyle. And a road test and a track test are not the same thing.",
+  "photo": "/img/founder/killarney-ta-2026-number.webp",
+  "more": [
+   "/img/founder/killarney-ta-2026-helmet.webp",
+   "/img/founder/killarney-ta-2026-tow.webp"
+  ]
+ },
  "myTake": {
   "_how": "My line on events I know: shows on that event's page under My take. One entry per event, like \"simola-hillclimb-2027\": \"one line\"."
  },
@@ -14,7 +33,7 @@
  "_top5how": "My top 5 lists: each becomes a page under High Octane, My top 5. Add one like {\"id\": \"hill-climbs\", \"title\": \"Top 5 hill climbs worth the trip\", \"intro\": \"one or two lines\", \"items\": [{\"event\": \"simola-hillclimb-2027\", \"line\": \"why\"}, {\"route\": \"swartberg-loop\", \"line\": \"why\"}, {\"place\": \"franschhoek-motor-museum\", \"line\": \"why\"}]}. id = the page address, lower case with dashes.",
  "autodidact": {
   "_how": "The Autodidact page (Blog, Autodidact). intro = a short paragraph; entries = builds and the cars I road-trip, newest first: {\"title\": \"\", \"date\": \"2026-10-31\", \"line\": \"\", \"photo\": \"\", \"link\": \"\"}.",
-  "intro": "",
+  "intro": "Ducati taught me the road. KTM taught me off-road. Now I live on a farm and yearn for the safari life, so everything in the shed is being made to safari.",
   "entries": []
  },
  "tours": [],
