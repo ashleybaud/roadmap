@@ -830,8 +830,6 @@ function homePage() {
 <p class="h4line">Preparation is everything. <b>Do it here.</b></p>
 <a class="h4me" href="/about/"><img src="/img/ashley.jpg" alt="" width="44" height="44"><span>Ducati taught me the road, KTM taught me to live off it. These are the roads, the races and the places I'd tell a mate about. <b>More about me ›</b></span></a></div>
 <section class="hub homefomo"><div class="hubh"><h2>FOMO</h2></div>${FOMO_BOX_NL}<div class="btnrow"><a class="btnline" href="/high-octane/">Everything in FOMO ›</a><a class="btnline" href="/events/">The whole diary ›</a><a class="btnline" href="/events/wall-planner-2027.pdf" download>Get the Wall Planner (PDF) ›</a></div></section>
-${prepCard(1)}
-${top5Strip()}
 <form class="wherebar" action="/plan/" method="get"><span class="wbl">Plan a trip</span><label class="wbf"><i>From</i><input name="from" value="My location" autocomplete="off" onfocus="if(this.value==='My location')this.value=''" onblur="if(!this.value.trim())this.value='My location'"></label><label class="wbf wbto"><i>Where to?</i><input name="to" placeholder="A town, a pass, a race…" required autocomplete="off"></label><input type="hidden" name="fll"><input type="hidden" name="tll"><button class="btn" type="submit">${HOUSE.icon("go", 18)}Take me there</button></form>
 <script>(function(){var f=document.querySelector(".wherebar");if(!f)return;
 var TW=null;function towns(){return TW||(TW=Promise.all([["za","South Africa"],["na","Namibia"]].map(function(c){return fetch("/data/"+c[0]+"/towns.json").then(function(r){return r.ok?r.json():[]}).catch(function(){return[]}).then(function(a){return a.map(function(x){return[x[0],x[1],x[2],x[3],x[4],c[1]]})})})).then(function(a){return a[0].concat(a[1])}))}
@@ -849,8 +847,10 @@ i.addEventListener("keydown",function(e){if(e.key==="Enter"&&!box.hidden&&L.leng
 i.addEventListener("blur",function(){setTimeout(function(){box.hidden=true},150)})});})();</script>
 <section class="cd" id="cd" hidden></section>
 <div class="camps" id="camps"></div>
-${myPickCard()}
 <section class="hub planown"><h2>Plan your own</h2><p class="lede">Tell it where you're starting, where you're going and what you drive or ride. It finds the roads you like, the fuel, the beds and everything worth stopping for, then puts it on your GPS or phone. Free, no sign-up needed.</p><a class="btn" href="/plan/">Plan a trip ›</a></section>
+${prepCard(1)}
+${myPickCard()}
+${top5Strip()}
 </main>
 <script src="${HUB_SRC}" defer></script>${myPickCard() || prepCard() ? REMIND_JS : ""}
 <script>(function(){var q=location.search;if(/[?&](pick|poi|fav|ev|evtrip|s|mode|route)=/.test(q))location.replace("/plan/"+q+location.hash);})();</script>`;
