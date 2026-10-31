@@ -12,7 +12,19 @@
   "event": "simola-hillclimb-2027",
   "line": "Every year on the start line I look back on the year of preparation and realise I've already had my fun. The year is the living. The run is the report card: 60 seconds, in my case. And I'm finding out more about myself in the preparation than in the execution.",
   "side": "The widebody is becoming a rally car. The work's done and I've driven it. Hopefully the side gig becomes the bigger gig.",
-  "updates": []
+  "updates": [
+   {
+    "date": "October 2026",
+    "title": "Rally car: shakedown",
+    "line": "Suspension raised, rally tyres fitted. Shakedown and alignment done. Didn't end as planned: the alternator excite wire was connected wrong, and the battery died on the go.",
+    "photos": [
+     "/img/founder/rally-tyres.webp",
+     "/img/founder/rally-alignment.webp",
+     "/img/founder/rally-springs.webp",
+     "/img/founder/rally-tow-truck.webp"
+    ]
+   }
+  ]
  },
  "lastEvent": {
   "_how": "My last event and what it taught me: shows under Preparing for on the Blog. name = the event; date = when; reflection = a few lines in my words; photo = an image address (optional). Stays hidden until reflection is filled. more = extra photo addresses (optional); video = a short .mp4 on the site (optional), poster = its still image.",
