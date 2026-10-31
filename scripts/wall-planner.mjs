@@ -12,7 +12,7 @@ const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&am
 const clean = n => n.replace(/\s*\(.*?\)/g, "").replace(/\s+20\d\d$/, "").replace(/^(IMSA|NASCAR Cup|IndyCar|WEC|WRC): /, "");
 const dd = (a, b) => { const x = +a.slice(8, 10), y = +b.slice(8, 10); return a === b ? `${x}` : a.slice(5, 7) === b.slice(5, 7) ? `${x}–${y}` : `${x}–${y} ${M[+b.slice(5, 7) - 1].slice(0, 3)}`; };
 // what goes on the wall: the big ones, everything at home, the shows and classics, F1 and MotoGP. Long US series seasons stay on the website.
-const keep = e => e.tier === 1 || e.country === "South Africa" || ["f1", "motogp", "classics", "shows", "bikefest", "hillclimb", "roadrace", "offroad"].includes(e.genre);
+const keep = e => e.tier === 1 || e.country === "South Africa" || ["f1", "motogp", "classics", "shows", "bikefest", "hillclimb", "roadrace", "offroad", "adventure"].includes(e.genre);
 const ev = EV.filter(e => e.start.startsWith(Y) && keep(e));
 const hol = (HOL[Y] || []).concat(HOL["gifts" + Y] || []);
 const month = i => { const mm = String(i + 1).padStart(2, "0");

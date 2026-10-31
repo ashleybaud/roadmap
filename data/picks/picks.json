@@ -225,7 +225,18 @@
       "highM": null
      }
     ]
-   }
+   },
+   "season": {
+    "months": [
+     5,
+     6,
+     7,
+     8,
+     9
+    ],
+    "why": "Dry season: cooler days, and the game gathers at Etosha's waterholes."
+   },
+   "seasonDraft": true
   },
   {
    "id": "namibia-2004-orange-river-mouth",
@@ -400,7 +411,18 @@
       "highM": 996
      }
     ]
-   }
+   },
+   "season": {
+    "months": [
+     5,
+     6,
+     7,
+     8,
+     9
+    ],
+    "why": "Cooler months. The river valley and Ai-Ais bake in summer; Namaqualand flowers come in Aug–Sep."
+   },
+   "seasonDraft": true
   },
   {
    "id": "namibia-2020-orange-river",
@@ -586,7 +608,18 @@
       "highM": 996
      }
     ]
-   }
+   },
+   "season": {
+    "months": [
+     5,
+     6,
+     7,
+     8,
+     9
+    ],
+    "why": "Cool, dry months. The Fish River Canyon is too hot in summer."
+   },
+   "seasonDraft": true
   },
   {
    "id": "namibia-2017-epupa",
@@ -778,7 +811,18 @@
       "highM": 1989
      }
     ]
-   }
+   },
+   "season": {
+    "months": [
+     5,
+     6,
+     7,
+     8,
+     9
+    ],
+    "why": "Dry season: cooler days, firm gravel and no summer storms in the north."
+   },
+   "seasonDraft": true
   },
   {
    "id": "wild-coast-2019",
@@ -960,7 +1004,16 @@
       "highM": null
      }
     ]
-   }
+   },
+   "season": {
+    "months": [
+     3,
+     4,
+     5
+    ],
+    "why": "After the summer rains and before the winter cold: river crossings down, gravel holding up."
+   },
+   "seasonDraft": true
   },
   {
    "id": "seven-passes-prince-alfred",
@@ -1059,7 +1112,20 @@
       "highM": 1039
      }
     ]
-   }
+   },
+   "season": {
+    "months": [
+     10,
+     11,
+     12,
+     1,
+     2,
+     3,
+     4
+    ],
+    "why": "Long days and warm weather; the forest gravel dries out quickly between fronts."
+   },
+   "seasonDraft": true
   },
   {
    "id": "speedweek-hakskeenpan",
@@ -1189,7 +1255,18 @@
       "highM": null
      }
     ]
-   }
+   },
+   "season": {
+    "months": [
+     5,
+     6,
+     7,
+     8,
+     9
+    ],
+    "why": "Cool Kalahari months. Summer runs past 40 °C."
+   },
+   "seasonDraft": true
   },
   {
    "id": "eu-road-trip-2018",
@@ -1559,7 +1636,17 @@
       "km": 233
      }
     ]
-   }
+   },
+   "season": {
+    "months": [
+     6,
+     7,
+     8,
+     9
+    ],
+    "why": "The Alpine passes are open, roughly June to September."
+   },
+   "seasonDraft": true
   },
   {
    "id": "eu-road-trip-2019",
@@ -1711,7 +1798,17 @@
       "km": 48
      }
     ]
-   }
+   },
+   "season": {
+    "months": [
+     6,
+     7,
+     8,
+     9
+    ],
+    "why": "The Alpine passes are open, roughly June to September."
+   },
+   "seasonDraft": true
   },
   {
    "id": "motor-valley-2017",
@@ -1876,7 +1973,19 @@
       "km": 213
      }
     ]
-   }
+   },
+   "season": {
+    "months": [
+     4,
+     5,
+     6,
+     9,
+     10,
+     11
+    ],
+    "why": "Spring and autumn: no August heat or factory holidays. EICMA is in November."
+   },
+   "seasonDraft": true
   },
   {
    "id": "baviaanskloof-in-a-day",
@@ -1951,7 +2060,17 @@
       "km": 822
      }
     ]
-   }
+   },
+   "season": {
+    "months": [
+     5,
+     6,
+     7,
+     8
+    ],
+    "why": "Dry winter months: the river crossings are at their lowest."
+   },
+   "seasonDraft": true
   },
   {
    "id": "simola-road-trip",
@@ -2037,7 +2156,19 @@
       "km": 124
      }
     ]
-   }
+   },
+   "season": {
+    "months": [
+     3,
+     4,
+     5,
+     9,
+     10,
+     11
+    ],
+    "why": "Mild Karoo weather either side of the summer heat. Simola runs in autumn."
+   },
+   "seasonDraft": true
   },
   {
    "id": "montagu-classic",
@@ -2103,7 +2234,19 @@
       "km": 190
      }
     ]
-   }
+   },
+   "season": {
+    "months": [
+     3,
+     4,
+     5,
+     9,
+     10,
+     11
+    ],
+    "why": "Mild months; Route 62 is hot in summer."
+   },
+   "seasonDraft": true
   },
   {
    "id": "lesotho-2016",
@@ -2210,7 +2353,18 @@
       "highM": 2023
      }
     ]
-   }
+   },
+   "season": {
+    "months": [
+     3,
+     4,
+     5,
+     10,
+     11
+    ],
+    "why": "Autumn and late spring. Winter snow can close the passes; summer brings afternoon storms."
+   },
+   "seasonDraft": true
   },
   {
    "id": "swartberg-loop",
@@ -2290,7 +2444,19 @@
       "highM": 1571
      }
     ]
-   }
+   },
+   "season": {
+    "months": [
+     3,
+     4,
+     5,
+     9,
+     10,
+     11
+    ],
+    "why": "Mild months. Winter snow can close the pass and the Karoo bakes in summer."
+   },
+   "seasonDraft": true
   },
   {
    "id": "die-hel",
@@ -2338,7 +2504,19 @@
       "highM": 1440
      }
     ]
-   }
+   },
+   "season": {
+    "months": [
+     3,
+     4,
+     5,
+     9,
+     10,
+     11
+    ],
+    "why": "Mild months. The descent is steep and summer in the valley is very hot."
+   },
+   "seasonDraft": true
   },
   {
    "id": "tankwa-gannaga",
@@ -2416,7 +2594,18 @@
       "highM": 1614
      }
     ]
-   }
+   },
+   "season": {
+    "months": [
+     5,
+     6,
+     7,
+     8,
+     9
+    ],
+    "why": "Cooler months; flowers in Aug–Sep. Summer runs past 40 °C."
+   },
+   "seasonDraft": true
   },
   {
    "id": "cederberg-traverse",
@@ -2492,7 +2681,19 @@
       "highM": 1087
      }
     ]
-   }
+   },
+   "season": {
+    "months": [
+     3,
+     4,
+     5,
+     8,
+     9,
+     10
+    ],
+    "why": "Autumn and spring; wild flowers Aug–Sep. Winter rain turns the clay to mud."
+   },
+   "seasonDraft": true
   },
   {
    "id": "baviaanskloof",
@@ -2538,7 +2739,17 @@
       "highM": 1097
      }
     ]
-   }
+   },
+   "season": {
+    "months": [
+     5,
+     6,
+     7,
+     8
+    ],
+    "why": "Dry winter months: the river crossings are at their lowest."
+   },
+   "seasonDraft": true
   },
   {
    "id": "sani-pass",
@@ -2587,7 +2798,18 @@
       "highM": 2876
      }
     ]
-   }
+   },
+   "season": {
+    "months": [
+     3,
+     4,
+     5,
+     10,
+     11
+    ],
+    "why": "Before the snow. Winter can close the top of the pass."
+   },
+   "seasonDraft": true
   },
   {
    "id": "namaqua-coast",
@@ -2664,7 +2886,15 @@
       "highM": 1112
      }
     ]
-   }
+   },
+   "season": {
+    "months": [
+     8,
+     9
+    ],
+    "why": "Flower season, mid-August to mid-September."
+   },
+   "seasonDraft": true
   },
   {
    "id": "seweweekspoort-ouberg",
@@ -2741,7 +2971,19 @@
       "highM": 1014
      }
     ]
-   }
+   },
+   "season": {
+    "months": [
+     3,
+     4,
+     5,
+     9,
+     10,
+     11
+    ],
+    "why": "Mild months. The Ouberg and the poort are hot in summer."
+   },
+   "seasonDraft": true
   },
   {
    "id": "namib-sesriem",
@@ -2804,7 +3046,18 @@
       "highM": 1163
      }
     ]
-   }
+   },
+   "season": {
+    "months": [
+     5,
+     6,
+     7,
+     8,
+     9
+    ],
+    "why": "Cooler months. Summer in the dunes passes 40 °C."
+   },
+   "seasonDraft": true
   },
   {
    "id": "west-coast-gravel",
@@ -2862,7 +3115,16 @@
       "highM": 254
      }
     ]
-   }
+   },
+   "season": {
+    "months": [
+     8,
+     9,
+     10
+    ],
+    "why": "Flowers in Aug–Sep, then dry roads. Winter rain turns the clay to slush."
+   },
+   "seasonDraft": true
   }
  ]
 }

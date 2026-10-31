@@ -45,7 +45,7 @@
 .trip .twid{background:#fff;color:#11262B;border-radius:10px;padding:10px;margin:0 0 12px;min-height:60px}.trip .twid>div{margin-bottom:10px}.trip .twnote{margin:6px;color:#54666A;font-size:.9rem}
 
 /* category colours: data-grp on any event card, date block, label, chip or pin */
-[data-grp="f1"]{--grp:#E5484D}[data-grp="bikes"]{--grp:#F08A24}[data-grp="endurance"]{--grp:#4FB8D8}[data-grp="us"]{--grp:#7EA3E6}[data-grp="shows"]{--grp:#B9A2E8}[data-grp="home"],[data-za="1"]{--grp:#E8A317}
+[data-grp="f1"]{--grp:#E5484D}[data-grp="bikes"]{--grp:#F08A24}[data-grp="endurance"]{--grp:#4FB8D8}[data-grp="adventure"]{--grp:#5BBF7A}[data-grp="us"]{--grp:#7EA3E6}[data-grp="shows"]{--grp:#B9A2E8}[data-grp="home"],[data-za="1"]{--grp:#E8A317}
 .evc[data-grp] .fxd{background:var(--grp)}.evc[data-grp] .eg{color:var(--grp)}.evc[data-za="1"]{box-shadow:inset 3px 0 0 #E8A317}
 .chips button[data-grp]{border-color:var(--grp);box-shadow:inset 4px 0 0 var(--grp)}.chips button[data-grp].on{background:var(--grp);color:#121A1E;border-color:var(--grp)}
 .evtag{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:999px;background:var(--grp,#4FB8D8);color:#121A1E;font:700 .75rem "IBM Plex Sans",Arial,sans-serif;text-transform:uppercase;letter-spacing:.06em}
@@ -82,3 +82,46 @@
 .aecol span{font-size:.95rem}
 .aecol .aep{color:var(--muted);font-size:.85rem}
 .aecol i{font-style:normal;font-weight:700;margin-top:4px;align-self:flex-start;background:var(--gold);color:#0B1D21;border-radius:8px;padding:9px 14px}
+
+/* under-promise line (footer and How we earn) */
+.bestfx{margin:0 0 6px;color:var(--ink,#F4F8F9);font-weight:600}
+footer .bestfx{font-size:.95rem}
+/* event pages: the founder's line, and the closing line */
+.mytake{display:flex;gap:12px;align-items:flex-start;background:var(--panel,#0F5874);border-left:4px solid #E8A317;border-radius:12px;padding:12px 14px;margin:14px 0}.mytake img{width:48px;height:48px;border-radius:50%;object-fit:cover;flex:none}.mytake b{font:700 .8rem "IBM Plex Sans",Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:#E8A317}.mytake p{margin:2px 0 0}
+.evclose{font:700 1.6rem "Saira Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.02em;color:#E8A317;text-align:center;margin:34px 0 10px!important;line-height:1.15}
+.evcta{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.evcta .cta{margin:0}
+button.cta,button.btnline{font:inherit;font-weight:700;cursor:pointer}
+.evl button.lnk{background:none;border:0;padding:0;font:inherit;color:var(--accent);cursor:pointer}.evl button.lnk:hover{text-decoration:underline}
+/* "Remind me" form */
+dialog.rmd{max-width:440px;width:calc(100% - 24px);border:0;border-top:4px solid #E8A317;border-radius:12px;padding:20px 20px 16px;background:#0F5874;color:#F4F8F9;font:16px/1.45 "IBM Plex Sans",Arial,sans-serif}
+dialog.rmd::backdrop{background:rgba(0,0,0,.6)}
+dialog.rmd h2{margin:0 0 4px;font:700 1.4rem "Saira Condensed","Arial Narrow",sans-serif;text-transform:uppercase}
+dialog.rmd .rmw{color:#B5D3DE;margin:0 0 12px}
+dialog.rmd label{display:flex;gap:10px;align-items:flex-start;margin:6px 0;cursor:pointer}dialog.rmd label.off{opacity:.5;cursor:default}
+dialog.rmd input[type=checkbox]{width:18px;height:18px;margin:3px 0 0;accent-color:#E8A317;flex:none}
+dialog.rmd input[type=email]{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:8px;border:1px solid #2B7896;background:#0B1D21;color:#fff;font:inherit;margin:10px 0 4px}
+dialog.rmd .rmb{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 6px}dialog.rmd .rmb button{font:700 1rem "IBM Plex Sans",Arial,sans-serif;padding:9px 16px;cursor:pointer}
+dialog.rmd .rmm{min-height:1.4em;margin:4px 0;color:#E8A317;font-weight:600}
+dialog.rmd .rmn{font-size:.85rem;color:#B5D3DE;margin:6px 0 0}
+/* new pages */
+.blogril{margin:16px auto 0;text-align:center;line-height:0}.blogril img{width:min(540px,100%);height:auto}
+.mypick .pickvid{position:relative;aspect-ratio:16/9;border-radius:8px;overflow:hidden}.mypick .pickvid iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.jux{list-style:none;padding:0;margin:20px 0;display:grid;gap:0}
+.jux li{display:grid;grid-template-columns:1fr 1fr;gap:18px;padding:10px 0;border-bottom:1px solid var(--line,#2B7896);font-size:1.12rem}
+.jux li span:first-child{color:#E8A317;font-weight:600}
+@media(max-width:640px){.jux li{grid-template-columns:1fr;gap:2px;font-size:1.05rem}}
+.juxend{font:700 1.5rem/1.25 "Saira Condensed","Arial Narrow",sans-serif;text-transform:uppercase;margin:26px 0 8px}.juxend span{display:block}.juxend span:nth-last-child(-n+2){color:#E8A317}
+.juxsig{font:700 1.3rem "Saira Condensed","Arial Narrow",sans-serif;margin:8px 0 26px}
+.carsline{font:700 1.6rem "Saira Condensed","Arial Narrow",sans-serif;text-transform:uppercase;color:#E8A317;margin:8px 0 4px}
+.soon{background:var(--panel,#0F5874);border:1px solid var(--line,#2B7896);border-radius:12px;padding:18px;margin:18px 0}
+.lyf{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;max-width:760px;margin:18px 0}
+.lyf label{display:flex;flex-direction:column;gap:4px;font-weight:600}.lyf .full{grid-column:1/-1}
+.lyf input,.lyf select{padding:10px 12px;border-radius:8px;border:1px solid var(--line,#2B7896);background:#0B1D21;color:#fff;font:inherit;font-weight:400}
+.lyf button{justify-self:start}
+@media(max-width:640px){.lyf{grid-template-columns:1fr}}
+.t5{counter-reset:t5;list-style:none;padding:0;margin:16px 0;display:grid;gap:12px}
+.t5 li{counter-increment:t5;display:grid;grid-template-columns:54px 1fr;gap:12px;background:var(--panel,#0F5874);border-radius:12px;padding:14px}
+.t5 li::before{content:counter(t5);font:800 2.2rem/1 "Saira Condensed",sans-serif;color:#E8A317;text-align:center}
+.t5 .btnrow{margin-top:8px}
+.seasons .fxd b{font-size:1.6rem}
+.fx .fxb .btnrow{display:flex;flex-direction:row;flex-wrap:wrap;gap:8px;margin-top:8px}.fx .fxb .btnrow>*{margin:0}

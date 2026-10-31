@@ -1,0 +1,22 @@
+{
+ "_how": "The founder's own slots. Everything here stays hidden on the site until it's filled in. Event ids are the ids in data/events/events.json (the last part of an event page's address: /events/<id>/). Route ids: data/picks/picks.json. Place ids: data/favourites/favourites.json (the last part of /favourites/<id>/). Rebuild the pages (node scripts/make-pages.mjs) after editing.",
+ "myPick": {
+  "_how": "The event I'd go to this month: shows as a card on the home page and at the top of the newsletter. event = an event id; line = one line in my words; photo = an image address (optional); video = a YouTube or Instagram address (optional).",
+  "event": "",
+  "line": "",
+  "photo": "",
+  "video": ""
+ },
+ "myTake": {
+  "_how": "My line on events I know: shows on that event's page under My take. One entry per event, like \"simola-hillclimb-2027\": \"one line\"."
+ },
+ "top5": [],
+ "_top5how": "My top 5 lists: each becomes a page under High Octane, My top 5. Add one like {\"id\": \"hill-climbs\", \"title\": \"Top 5 hill climbs worth the trip\", \"intro\": \"one or two lines\", \"items\": [{\"event\": \"simola-hillclimb-2027\", \"line\": \"why\"}, {\"route\": \"swartberg-loop\", \"line\": \"why\"}, {\"place\": \"franschhoek-motor-museum\", \"line\": \"why\"}]}. id = the page address, lower case with dashes.",
+ "autodidact": {
+  "_how": "The Autodidact page (Blog, Autodidact). intro = a short paragraph; entries = builds and the cars I road-trip, newest first: {\"title\": \"\", \"date\": \"2026-10-31\", \"line\": \"\", \"photo\": \"\", \"link\": \"\"}.",
+  "intro": "",
+  "entries": []
+ },
+ "tours": [],
+ "_tourshow": "My annual petrolhead tours and Wild Goose Chase rounds, as dated events in FOMO (Remind me and Take me there work on them). Add one like {\"id\": \"wild-goose-chase-round-1-2027\", \"name\": \"Wild Goose Chase, round 1\", \"start\": \"2027-03-06\", \"end\": \"2027-03-07\", \"venue\": \"\", \"city\": \"\", \"country\": \"South Africa\", \"lat\": -33.9, \"lon\": 18.6, \"url\": \"https://onetrackmind.online/...\", \"line\": \"one line\"}. Then run node scripts/merge-events.mjs."
+}

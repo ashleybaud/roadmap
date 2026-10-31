@@ -6,7 +6,7 @@
   var ymd = function (d) { return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); };
   var add = function (s, n) { var d = new Date(s + "T12:00:00"); d.setDate(d.getDate() + n); return ymd(d); };
   var M = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  var GEN = { f1: "F1", motogp: "MotoGP", superbike: "Superbikes", endurance: "Endurance and 24 hours", nascar: "NASCAR", indycar: "IndyCar", rally: "Rally", offroad: "Dakar and off-road", mx: "Motocross and Supercross", hillclimb: "Hill climbs", roadrace: "Road racing and the TT", timeattack: "Time attack", classics: "Classics and festivals", shows: "Motor shows", bikefest: "Bike festivals" };
+  var GEN = { adventure: "Adventure", f1: "F1", motogp: "MotoGP", superbike: "Superbikes", endurance: "Endurance and 24 hours", nascar: "NASCAR", indycar: "IndyCar", rally: "Rally", offroad: "Dakar and off-road", mx: "Motocross and Supercross", hillclimb: "Hill climbs", roadrace: "Road racing and the TT", timeattack: "Time attack", classics: "Classics and festivals", shows: "Motor shows", bikefest: "Bike festivals" };
   var REG = [["", "Everywhere"], ["za", "Southern Africa"], ["eu", "Europe"], ["us", "USA"], ["sa", "South America"], ["me", "Middle East"], ["as", "Asia"]];
   var REGOF = { za: ["South Africa", "Namibia", "Botswana", "Lesotho", "Zimbabwe", "Mozambique", "Eswatini", "Kenya"], us: ["United States", "USA", "Canada", "Mexico"], sa: ["Brazil", "Argentina", "Chile", "Paraguay", "Uruguay", "Colombia"], me: ["Qatar", "Bahrain", "Saudi Arabia", "United Arab Emirates", "Azerbaijan"], as: ["Japan", "China", "Macau", "Singapore", "Malaysia", "Thailand", "Indonesia", "India", "Australia", "New Zealand", "Korea"] };
   var region = function (c) { for (var k in REGOF) if (REGOF[k].indexOf(c) >= 0) return k; return "eu"; };
@@ -15,8 +15,8 @@
   var today = ymd(new Date());
   var J = function (u, d) { return fetch(u).then(function (r) { return r.ok ? r.json() : d; }).catch(function () { return d; }); };
 
-  Promise.all([J("/data/events/events.json", []), J("/data/campaigns.json", { campaigns: [] }), J("/data/events/news.json", {})]).then(function (r) {
-    var EV = r[0].filter(function (e) { return e.end >= today; }), CAMP = r[1].campaigns || [], NEWS = r[2] || {};
+  Promise.all([J("/data/events/events.json", []), J("/data/campaigns.json", { campaigns: [] }), J("/data/events/news.json", {}), J("/data/picks/picks.json", { routes: [] })]).then(function (r) {
+    var EV = r[0].filter(function (e) { return e.end >= today; }), CAMP = r[1].campaigns || [], NEWS = r[2] || {}, ROUTES = (r[3].routes || []).filter(function (x) { return !x.draft && x.season; });
 
     // countdown to the next big one
     var cd = $("cd");
@@ -48,9 +48,15 @@
     var HOME = /^Africa\/(Johannesburg|Windhoek|Gaborone|Maseru|Mbabane)/.test(tz) ? ["South Africa", "Namibia", "Botswana", "Lesotho", "Eswatini"] : /^Europe\/(London|Dublin)/.test(tz) ? ["United Kingdom", "UK", "Isle of Man", "Ireland"] : /^America\/|^US\//.test(tz) ? ["United States", "USA", "Canada"] : /^Australia\//.test(tz) ? ["Australia"] : /^Europe\//.test(tz) ? null : [];
     var homeName = HOME && HOME[0] === "South Africa" ? "In South Africa" : HOME && HOME.length ? "Near you" : "In Europe";
     var isHome = function (e) { return HOME ? HOME.indexOf(e.country) >= 0 : region(e.country) === "eu"; };
-    var GROUPS = [["home", homeName, "#E8A317"], ["f1", "F1", "#E5484D"], ["bikes", "Bikes", "#F08A24"], ["endurance", "Endurance, rally and hill climbs", "#4FB8D8"], ["us", "NASCAR and IndyCar", "#7EA3E6"], ["shows", "Shows and classics", "#B9A2E8"]];
-    var groupOf = function (e) { var g = e.genre; return g === "f1" ? "f1" : /motogp|superbike|mx|roadrace|bikefest/.test(g) ? "bikes" : /endurance|rally|offroad|hillclimb|timeattack/.test(g) ? "endurance" : /nascar|indycar/.test(g) ? "us" : "shows"; };
-    var view = store("otm-evview3") || "soon";
+    var GROUPS = [["home", homeName, "#E8A317"], ["adventure", "Adventure", "#5BBF7A"], ["f1", "F1", "#E5484D"], ["bikes", "Bikes", "#F08A24"], ["endurance", "Endurance, rally and hill climbs", "#4FB8D8"], ["us", "NASCAR and IndyCar", "#7EA3E6"], ["shows", "Shows and classics", "#B9A2E8"]];
+    var groupOf = function (e) { var g = e.genre; return g === "adventure" ? "adventure" : g === "f1" ? "f1" : /motogp|superbike|mx|roadrace|bikefest/.test(g) ? "bikes" : /endurance|rally|offroad|hillclimb|timeattack/.test(g) ? "endurance" : /nascar|indycar/.test(g) ? "us" : "shows"; };
+    // the menu's This week / Coming up / Book ahead land here as #this-week, #coming-up, #book-ahead
+    var HASH = { "this-week": "week", "coming-up": "soon", "book-ahead": "ahead" };
+    var view = HASH[location.hash.slice(1)] || store("otm-evview3") || "soon";
+    // routes in season today, and the days left in their season (the same sum as the In season page)
+    var seasonLeft = function (M) { var t = new Date(today + "T12:00:00Z"), m = t.getUTCMonth() + 1, y = t.getUTCFullYear(), k = m, n = 0; if (M.indexOf(m) < 0) return -1;
+      while (n < 11 && M.indexOf(k % 12 + 1) >= 0) { k = k % 12 + 1; if (k === 1) y++; n++; } if (n === 11) return null; return Math.round((new Date(Date.UTC(y, k, 0, 12)) - t) / 864e5) + 1; };
+    var inSeason = ROUTES.map(function (x) { return { r: x, left: seasonLeft(x.season.months) }; }).filter(function (x) { return x.left !== -1; }).sort(function (a, b) { return (a.left == null ? 999 : a.left) - (b.left == null ? 999 : b.left); });
     var days = function (s) { return Math.round((new Date(s + "T12:00:00") - new Date(today + "T12:00:00")) / 864e5); };
     var when = function (e) { var d = days(e.start); return e.start <= today ? "On now" : d === 1 ? "Tomorrow" : d <= 13 ? "In " + d + " days" : d <= 60 ? "In " + Math.round(d / 7) + " weeks" : "In " + Math.round(d / 30) + " months"; };
     function draw() {
@@ -71,9 +77,15 @@
           // every other event is its own small card too, so nobody mistakes them for small print
           L.slice(1).map(function (e) { var x = new Date(e.start + "T12:00:00"); return '<a class="sqrow" href="/events/' + esc(e.id) + '/"><span class="evdate"><b>' + x.getDate() + "</b><i>" + M[x.getMonth()] + '</i></span><span><b>' + esc(clean(e.name)) + '</b><span class="ew">' + esc((e.city || e.venue || "").split(",")[0]) + ", " + esc(e.country || "") + '</span></span><span class="sqwhen">' + when(e) + "</span></a>"; }).join("") + "</div>";
       }).join("");
+      // This week also shows the routes in season now, with the days their season has left
+      if (view === "week" && inSeason.length) html = '<div class="sq" style="--c:#5BBF7A"><div class="sqh">In season now</div>' + inSeason.slice(0, 6).map(function (x, i) {
+        return '<a class="' + (i ? "sqrow" : "sqtop") + '" href="/routes/' + esc(x.r.id) + '/"><span class="evdate"><b>' + (x.left == null ? "All" : x.left) + "</b><i>" + (x.left == null ? "year" : x.left === 1 ? "day left" : "days left") + '</i></span><span><b>' + esc(x.r.title) + '</b><span class="ew">' + esc(x.r.region || "") + '</span></span><span class="sqwhen">' + (x.left === 1 ? "Last day" : x.left != null && x.left <= 14 ? "Ends soon" : "") + "</span></a>"; }).join("") +
+        '<a class="sqrow" href="/adventure/in-season/"><span></span><span><b>Everything in season ›</b></span><span></span></a></div>' + html;
       $("fomoList").innerHTML = html || '<p class="note">' + (view === "week" ? "Nothing on this week. Try Coming up." : "Nothing on yet.") + "</p>";
     }
     box.addEventListener("click", function (e) { var v = e.target.closest("[data-v]"); if (v) { view = v.dataset.v; store("otm-evview3", view); draw(); } });
-    draw();
+    var jump = function () { var v = HASH[location.hash.slice(1)]; if (!v) return; view = v; draw(); box.scrollIntoView({ block: "start" }); };
+    window.addEventListener("hashchange", jump);
+    draw(); if (HASH[location.hash.slice(1)]) setTimeout(function () { box.scrollIntoView({ block: "start" }); }, 50);
   });
 })();

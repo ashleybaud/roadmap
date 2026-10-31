@@ -232,6 +232,8 @@ def main():
         ph = HERE.parent.parent / "img" / "trips" / t["id"]  # photos: img/trips/<id>/*.jpg, shown on the route page
         fd["photos"] = sorted("/img/trips/%s/%s" % (t["id"], f.name) for f in ph.glob("*.jpg")) if ph.is_dir() else []
         if old.get(t["id"], {}).get("stats"): t["stats"] = old[t["id"]]["stats"]
+        for k in ("season", "seasonDraft"):  # best riding months, edited in picks.json (seasonDraft: true until the founder has checked them)
+            if k in old.get(t["id"], {}): t[k] = old[t["id"]][k]
         out.append(t)
     d["routes"] = out + keep
     f.write_text(json.dumps(d, ensure_ascii=False, indent=1) + "\n")

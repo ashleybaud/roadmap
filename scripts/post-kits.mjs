@@ -112,7 +112,7 @@ else { const doy = s => { const d = new Date(s + "T12:00:00Z"); return (d - Date
     title: n.vehicle || "In the garage", sub: n.line || "", cta: ["More builds", SHORT], link: `${SITE}/about/`,
     ig: [n.vehicle ? `${n.vehicle}.` : "", n.line || "", n.more || "", "", "#thegarage #projectcar #onetrackmind"] });
   else if (W % 2 === 1 && FPH.some(x => x.use === "garage" && x.line)) { const x = pickFresh(FPH.filter(y => y.use === "garage" && y.line), y => y.id, "garagePhoto", 10); used.garagePhoto = x.id;
-    days.push(photoPost(x, { day: "Friday", theme: "The Garage", slug: "5-garage", tex: "tar", title: "In the garage", sub: "", cta: ["Plan a ride", SHORT], tags: "#thegarage #onetrackmind" })); }
+    days.push(photoPost(x, { day: "Friday", theme: "The Garage", slug: "5-garage", tex: "tar", title: "In the garage", sub: "", cta: ["Plan a trip", SHORT], tags: "#thegarage #onetrackmind" })); }
   else { const BUILD = /KTM \d|690|790|390|1290|Porsche|McLaren|Aston|GSXR|Suzuki|Africa Twin|1250|Audi|Giulia|Cafe Racer|Duke|Scalpel|Fuorilegge|996|356|Stepnose|Bedford|Widebody/i, TRIP = /trip|tour|day \d|factory|museum|gallery|road|launch|conference|eicma|archivo/i;
     const pool = STORIES.filter(s => BUILD.test(s.title) && !TRIP.test(s.title) && storyPhotos(s).length);
     const st = pickFresh(pool, x => x.slug, "garage", 30); used.garage = st.slug; const lead = plainText(st) || st.lead;

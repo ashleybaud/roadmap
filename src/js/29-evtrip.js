@@ -54,7 +54,7 @@ function renderEvTrip(){
   else if(!$("evtFrom").value||!$("evtTo").value||$("evtTo").value<$("evtFrom").value) h=`<p class="note">Set your first and last day.</p>`;
   else if(!L.length) h=`<p class="note">Nothing on in those places on those dates. Try more places or wider dates.</p>`;
   else L.forEach(e=>{ const w=wk(e.start); if(w!==cur){ cur=w; h+=`<div class="evtwk">Week of ${fmtD(w)}</div>`; }
-    h+=`<label class="evtrow${evt.sel.has(e.id)?" on":""}"><input type="checkbox" data-evtsel="${esc(e.id)}"${evt.sel.has(e.id)?" checked":""}><span><b>${esc(e.name)}</b>${my.includes(e.series)?' <span class="evtmy" title="In My racing">★</span>':""}<br><span class="note">${fmtD(e.start)}${e.end!==e.start?" – "+fmtD(e.end):""}${e.confirmed?"":" (dates to confirm)"} · ${esc(e.venue||e.city||"")}, ${esc(e.country||"")}</span></span><a class="note" href="/events/${esc(e.id)}/" target="_blank" rel="noopener">More ›</a></label>`; });
+    h+=`<label class="evtrow${evt.sel.has(e.id)?" on":""}"><input type="checkbox" data-evtsel="${esc(e.id)}"${evt.sel.has(e.id)?" checked":""}><span><b>${esc(e.name)}</b>${my.includes(e.series)?' <span class="evtmy" title="Following">★</span>':""}<br><span class="note">${fmtD(e.start)}${e.end!==e.start?" – "+fmtD(e.end):""}${e.confirmed?"":" (dates to confirm)"} · ${esc(e.venue||e.city||"")}, ${esc(e.country||"")}</span></span><a class="note" href="/events/${esc(e.id)}/" target="_blank" rel="noopener">More ›</a></label>`; });
   $("evtList").innerHTML=h;
   const P=evtPlan(), n=P.chosen.length;
   $("evtWarn").innerHTML=P.warn.map(w=>`<p class="evtw">⚠ ${esc(w)}</p>`).join("");
