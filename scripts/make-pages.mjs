@@ -809,7 +809,7 @@ function prepCard(home) {
 function lastCard() {
   const L = FD.lastEvent || {};
   if (!(L.reflection || "").trim() || !(L.name || "").trim()) return "";
-  return `<section class="hub"><div class="hubh"><h2>Last time out</h2></div><div class="lilpanel">${L.photo ? `<img src="${esc(L.photo)}" alt="" loading="lazy">` : ""}<div><b>${esc(L.name)}</b>${L.date ? `<p class="note">${esc(L.date)}</p>` : ""}${L.reflection.trim().split(/\n+/).map(t => `<p>${esc(t)}</p>`).join("")}</div></div></section>`;
+  return `<section class="hub"><div class="hubh"><h2>Last time out</h2></div><div class="lilpanel"${L.photo ? "" : ' style="grid-template-columns:1fr"'}>${L.photo ? `<img src="${esc(L.photo)}" alt="" loading="lazy">` : ""}<div><b>${esc(L.name)}</b>${L.date ? `<p class="note">${esc(L.date)}</p>` : ""}${L.reflection.trim().split(/\n+/).map(t => `<p>${esc(t)}</p>`).join("")}</div></div></section>`;
 }
 function top5Strip() {
   if (!TOP5.length) return "";
