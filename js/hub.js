@@ -87,5 +87,5 @@
     var jump = function () { var v = HASH[location.hash.slice(1)]; if (!v) return; view = v; draw(); box.scrollIntoView({ block: "start" }); };
     window.addEventListener("hashchange", jump);
     draw(); if (HASH[location.hash.slice(1)]) setTimeout(function () { box.scrollIntoView({ block: "start" }); }, 50);
-  });
+  }).catch(function () { var l = $("fomoList"); if (l && /Loading/.test(l.textContent)) l.innerHTML = '<p class="note">The diary didn\'t load. <a href="/events/">Open the whole diary ›</a></p>'; });
 })();

@@ -2,7 +2,7 @@
 // /routes/<id>/ for every published pick, /routes/, /about/, sitemap.xml, robots.txt, llms.txt.
 // Source: data/picks/picks.json (stats come from scripts/pick-stats, run in a browser).
 // Run: node scripts/make-pages.mjs   (build.sh runs it)
-import fs from "node:fs"; import path from "node:path"; import { createRequire } from "node:module";
+import fs from "node:fs"; import path from "node:path"; import crypto from "node:crypto"; import { createRequire } from "node:module";
 const ROOT = path.resolve(path.dirname(new URL(import.meta.url).pathname), "..");
 const SITE = "https://onetrackmind.online";
 const BLOG = "https://onetrackmind.co.za";
@@ -11,6 +11,9 @@ const STORIES = JSON.parse(fs.readFileSync(path.join(ROOT, "data/stories/stories
 const HOWTO = JSON.parse(fs.readFileSync(path.join(ROOT, "data/howto/howto.json"), "utf8"));
 const FAV = JSON.parse(fs.readFileSync(path.join(ROOT, "data/favourites/favourites.json"), "utf8"));
 // "Make a trip of it": the same tiles as the planner and the newsletter (src/js/03-trip.js)
+// cache-busting: a short hash of the file, so phones never run an old script against new pages
+const V = f => crypto.createHash("md5").update(fs.readFileSync(path.join(ROOT, f))).digest("hex").slice(0, 8);
+const HUB_SRC = `/js/hub.js?v=${V("js/hub.js")}`, REMIND_SRC = `/js/remind.js?v=${V("js/remind.js")}`;
 const TRIP = createRequire(import.meta.url)(path.join(ROOT, "src/js/03-trip.js"));
 const HOUSE = createRequire(import.meta.url)(path.join(ROOT, "src/js/02-house.js"));
 const MATES_HIDE = () => { if (!MATES_ON && !HOUSE.HIDE.includes("/about/mates/")) HOUSE.HIDE.push("/about/mates/"); };
@@ -149,7 +152,7 @@ body.blogdark{--bg:#0E1417;--panel:#0F5874;--line:#2B7896;--chip:#13617E;backgro
 /* home */
 .hero3{display:grid;grid-template-columns:1fr minmax(0,560px) 1fr;gap:24px;align-items:center;margin:18px 0 14px}.wherebar .wbf{position:relative}.wbsug{position:absolute;left:0;right:0;top:100%;z-index:3000;list-style:none;margin:4px 0 0;padding:6px 0;background:#fff;color:#11262B;border-radius:10px;box-shadow:0 10px 28px rgba(0,0,0,.35);text-align:left}.wbsug li{padding:8px 14px;cursor:pointer;display:flex;flex-direction:column;line-height:1.3}.wbsug li:hover{background:#EEF3F3}.wbsug li span{font-size:.85rem;color:#54666A}.wbsug[hidden]{display:none}
 .lilwide{grid-template-columns:minmax(0,1.2fr) 1fr}.lilwide .lilpics{display:grid;grid-template-columns:2fr 1fr;gap:8px}.lilwide .lilpics img{width:100%;height:260px;object-fit:cover;border-radius:10px}.lilwide .lilpics img:only-child{grid-column:1/-1}.lilwide .lilk{display:inline-flex;gap:6px;align-items:center;color:#E8A317;font-size:.8rem;letter-spacing:.06em;text-transform:uppercase}.lilwide b{display:block;font:800 1.6rem var(--f-display,"Saira Condensed",sans-serif);text-transform:uppercase;margin:4px 0}@media(max-width:760px){.lilwide{grid-template-columns:1fr}.lilwide .lilpics img{height:200px}}
-.homeril{margin:0;text-align:center;line-height:0}.homeril img{width:100%;height:auto}.h3l{display:flex;flex-direction:column;gap:10px;color:var(--ink);text-decoration:none;font-size:1.05rem;line-height:1.45}.h3l img{border-radius:50%;border:2px solid var(--gold);object-fit:cover}.h3l b{color:var(--gold)}.h3r{margin:0;font:800 clamp(1.5rem,2.4vw,2.1rem)/1.1 var(--f-display,"Saira Condensed",sans-serif);text-transform:uppercase;color:var(--ink)}.h3r b{color:var(--gold)}@media(max-width:860px){.hero3{grid-template-columns:1fr;gap:14px;text-align:center}.homeril{order:-1}.homeril img{width:min(520px,94%)}.h3l{align-items:center}.h3r{font-size:1.5rem}}
+.homeril{position:relative}.homeril{display:block;width:fit-content;max-width:100%;margin-inline:auto!important}.hostamp{position:absolute;right:-9%;top:-10%;width:26%;max-width:230px;height:auto;color:#EF3B2F;transform:rotate(14deg);filter:drop-shadow(0 2px 6px rgba(0,0,0,.6));pointer-events:none}@media(max-width:760px){.hostamp{width:25%;right:-3%;top:-14%}}.homeril{margin:0;text-align:center;line-height:0}.homeril img{width:100%;height:auto}.h3l{display:flex;flex-direction:column;gap:10px;color:var(--ink);text-decoration:none;font-size:1.05rem;line-height:1.45}.h3l img{border-radius:50%;border:2px solid var(--gold);object-fit:cover}.h3l b{color:var(--gold)}.h3r{margin:0;font:800 clamp(1.5rem,2.4vw,2.1rem)/1.1 var(--f-display,"Saira Condensed",sans-serif);text-transform:uppercase;color:var(--ink)}.h3r b{color:var(--gold)}@media(max-width:860px){.hero3{grid-template-columns:1fr;gap:14px;text-align:center}.homeril{order:-1}.homeril img{width:min(520px,94%)}.h3l{align-items:center}.h3r{font-size:1.5rem}}
 .home .oneliner{display:flex;align-items:center;justify-content:center;gap:14px;margin:18px auto 16px;max-width:820px;color:var(--ink);text-decoration:none;font-size:1.08rem}.home .oneliner img{border-radius:50%;border:2px solid var(--gold);object-fit:cover}.home .oneliner b{color:var(--gold)}
 .doors{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:8px 0 18px}.door{position:relative;display:flex;flex-direction:column;gap:10px;align-items:flex-start;padding:26px 24px;border-radius:12px;min-height:240px;color:#fff;text-decoration:none;border:2px solid transparent}.door:hover{border-color:var(--gold)}.door>b{font:800 2rem/1.05 "Saira Condensed","Arial Narrow",sans-serif;text-transform:uppercase}.door>span:not(.pk):not(.btn){max-width:460px;font-size:1rem;line-height:1.45}.door .btn{margin-top:auto}
 .cd{display:grid;grid-template-columns:1fr auto auto;gap:18px;align-items:center;background:var(--panel);border:1px solid var(--line);border-left:6px solid var(--gold);border-radius:12px;padding:16px 20px;margin:0 0 12px}.cd[hidden]{display:none}.cdk{display:block;font:700 .75rem/1 var(--f-body,sans-serif);text-transform:uppercase;letter-spacing:.1em;color:#8FD3EA;margin-bottom:4px}.cdl b{display:block;font:800 1.7rem/1.05 "Saira Condensed","Arial Narrow",sans-serif;text-transform:uppercase}.cdw{color:var(--muted)}.cdn{text-align:center}.cdn b{display:block;font:800 3rem/1 "Saira Condensed","Arial Narrow",sans-serif;color:var(--gold)}.cdn span{color:var(--muted);font-size:.85rem}.cdb{display:flex;gap:8px;flex-wrap:wrap}.cdnews{grid-column:1/-1;margin:0;font-size:.92rem;border-top:1px solid var(--line);padding-top:10px}.cdnews span{color:var(--muted)}.cdnews a{color:var(--ink)}
@@ -477,7 +480,7 @@ function storiesIndex(M) {
 <nav class="bpick" aria-label="Show">
 <button type="button" class="bbox on" data-f="all"><b>Everything</b></button>
 <button type="button" class="bbox tex-gravel" data-f="adventure"><b>Adventure</b><span>Recce. Ride. Report.</span></button>
-<button type="button" class="bbox tex-tar" data-f="motorsport"><b>FOMO</b><span>Plan it. Book it. Be there.</span></button>
+<button type="button" class="bbox tex-tar" data-f="motorsport"><b>Motorsport</b><span>Race weekends, garages and car culture.</span></button>
 </nav>
 <nav class="tagchips" aria-label="Tags">${Object.entries({ route: "Routes", place: "Places", story: "Stories" }).map(([k, t]) => `<button type="button" class="kchip" data-kind="${k}">${t}</button>`).join("")}<span class="chipsep"></span>${TAGS.map(([k, t]) => `<button type="button" data-tag="${k}">${t}</button>`).join("")}<a class="aboutlink" href="/about/"><img src="/img/ashley.jpg" alt="">About Ashley ›</a></nav>
 <div class="collage">${(() => {
@@ -493,6 +496,8 @@ function storiesIndex(M) {
     all.forEach((h, i) => { outT.push(h); if (i % 12 === 7) outT.push(toCard(AD[Math.floor(i / 12) % AD.length], "", "Shop it ›", true)); });
     return outT.join("");
   })()}</div>
+<section class="prog" id="roads"><h2>Roads I've ridden</h2><div class="fix">${live.filter(r => r.founder).slice(0, 6).map(routeRow).join("")}</div><a class="btnline" href="/routes/">All the routes ›</a></section>
+<section class="hub" id="how-to"><div class="hubh"><h2>How to</h2></div>${HOWTO.map(g => `<div class="lilpanel">${g.cover ? `<img src="${esc(g.cover)}" alt="" loading="lazy">` : ""}<div><b>${esc(g.title)}</b><p>${esc(g.short || "")}</p><div class="btnrow"><a class="btn" href="/how-to/${g.id}/">Read the guide ›</a></div></div></div>`).join("")}</section>
 <p class="note"><a href="/favourites/">The places I'd send you: POI ›</a> · <a href="/blog/autodidact/">Autodidact ›</a> · <a href="/blog/my-racing/">My racing ›</a></p>
 <a class="cta" href="/">Plan your own</a></main>
 <script>(function(){var b=document.querySelectorAll(".bbox"),tg=document.querySelectorAll(".tagchips button[data-tag]"),kc=document.querySelectorAll(".tagchips button[data-kind]"),cat="all",tag="",kind="";
@@ -661,7 +666,7 @@ const dayFmt = s => { const d = new Date(s + "T12:00:00Z"); return `${DOW[d.getU
 const evById = id => EVENTS.find(e => e.id === id);
 // "Remind me": the button; /js/remind.js opens the form (email, which reminders, newsletter tick-box)
 const remindBtn = (e, cls = "cta ghost") => e.start > today ? `<button type="button" class="${cls}" data-remind="${esc(e.id)}" data-name="${esc(e.name)}" data-start="${e.start}" data-end="${e.end}"${e.bookingOpens ? ` data-book="${esc(e.bookingOpens)}"` : ""}>${cls.includes("cta") ? HOUSE.icon("bell", 18) : ""}Remind me${cls.includes("cta") ? "" : " ›"}</button>` : "";
-const REMIND_JS = `<script src="/js/remind.js" defer></script>`;
+const REMIND_JS = `<script src="${REMIND_SRC}" defer></script>`;
 const rideThere = e => `<a class="cta ghost" href="/plan/?ev=${esc(e.id)}&go=1&sty=rough" title="Back roads and gravel: the planner's Road less travelled setting">${HOUSE.icon("mountain", 18)}Ride there</a>`;
 // the header photo for an event: its own "photo" (in its data/events part file), else the artwork for its kind of event (img/events/fallback-<kind>.svg)
 const evPhoto = e => e.photo || `/img/events/fallback-${HOUSE.group(e.genre)}.svg`;
@@ -799,7 +804,7 @@ function homePage() {
   const lat = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data/latest.json"), "utf8")); } catch (e) { return []; } })();
   { const C = STORIES.find(x => x.slug === "kalahari-speedweek-2014"); if (C && C.cover && lat.length < 4) lat.push({ title: "Kalahari SpeedWeek 2014", hook: "A dry pan, grown men trying to go very fast, and I came home wanting a faster car.", url: `/blog/${C.slug}/`, cover: C.cover }); }
   const body = `<main class="home">
-<div class="hero4"><h1 class="homeril"><picture><source srcset="/img/racing-is-life.webp" type="image/webp"><img src="/img/racing-is-life.png" alt="Racing is life. Everything else is preparation." width="1081" height="638" fetchpriority="high"></picture></h1>
+<div class="hero4"><h1 class="homeril"><svg class="hostamp" viewBox="0 0 200 200" role="img" aria-label="Warning: explicit high octane content"><defs><filter id="ink"><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="7"/><feColorMatrix values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.1 1.55"/><feComposite in="SourceGraphic" operator="in"/></filter><path id="stTop" d="M34,100 A66,66 0 0 1 166,100"/><path id="stBot" d="M26,100 A74,74 0 0 0 174,100"/></defs><g filter="url(#ink)" fill="none" stroke="currentColor"><circle cx="100" cy="100" r="94" stroke-width="5"/><circle cx="100" cy="100" r="84" stroke-width="1.6"/><g fill="currentColor" stroke="none" font-family="'Saira Condensed',Impact,sans-serif" font-weight="800" text-anchor="middle"><text font-size="16" letter-spacing="2.5"><textPath href="#stTop" startOffset="50%">★ WARNING ★</textPath></text><text font-size="16" letter-spacing="2.5"><textPath href="#stBot" startOffset="50%">EXPLICIT CONTENT</textPath></text><rect x="22" y="80" width="156" height="40" rx="2"/><text x="100" y="111" font-size="33" textLength="136" lengthAdjust="spacingAndGlyphs" fill="var(--bg,#0E1417)">HIGH OCTANE</text></g></g></svg><picture><source srcset="/img/racing-is-life.webp" type="image/webp"><img src="/img/racing-is-life.png" alt="Racing is life. Everything else is preparation." width="1081" height="638" fetchpriority="high"></picture></h1>
 <p class="h4line">Preparation is everything. <b>Do it here.</b></p>
 <a class="h4me" href="/about/"><img src="/img/ashley.jpg" alt="" width="44" height="44"><span>Ducati taught me the road, KTM taught me to live off it. These are the roads, the races and the places I'd tell a mate about. <b>More about me ›</b></span></a></div>
 <section class="hub homefomo"><div class="hubh"><h2>FOMO</h2></div>${FOMO_BOX_NL}<div class="btnrow"><a class="btnline" href="/high-octane/">Everything in FOMO ›</a><a class="btnline" href="/events/">The whole diary ›</a><a class="btnline" href="/events/wall-planner-2027.pdf" download>Get the Wall Planner (PDF) ›</a></div></section>
@@ -827,27 +832,25 @@ ${myPickCard()}
 ${SOCIAL.length ? `<section class="hub"><div class="hubh"><h2>Lately</h2></div>${cardGrid(SOCIAL.slice(0, 3).map(x => `<a class="card pcard hubcard" href="${esc(x.url)}" target="_blank" rel="noopener"><img src="${esc(x.img)}" alt="" loading="lazy"><span>${esc((x.text || "").slice(0, 110))}${(x.text || "").length > 110 ? "…" : ""}</span></a>`).join(""))}<div class="btnrow"><a class="btnline" href="https://www.instagram.com/ashleybaud/" target="_blank" rel="noopener">Instagram ›</a></div></section>` : ""}
 <section class="hub planown"><h2>Plan your own</h2><p class="lede">Tell it where you're starting, where you're going and what you drive or ride. It finds the roads you like, the fuel, the beds and everything worth stopping for, then puts it on your GPS or phone. Free, no sign-up needed.</p><a class="btn" href="/plan/">Plan a trip ›</a></section>
 </main>
-<script src="/js/hub.js" defer></script>${myPickCard() ? REMIND_JS : ""}
+<script src="${HUB_SRC}" defer></script>${myPickCard() ? REMIND_JS : ""}
 <script>(function(){var q=location.search;if(/[?&](pick|poi|fav|ev|evtrip|s|mode|route)=/.test(q))location.replace("/plan/"+q+location.hash);})();</script>`;
   return page({ active: "/", url: "/", title: "OneTrackMind: Racing is life. Everything else is preparation.", desc: "Back roads and gravel, races and car culture: routes ridden by the founder, the motorsport diary, places worth the detour, and a free trip planner for bikes, 4x4s and cars.", body });
 }
 
 // FOMO, the one section (it was Adventure and High Octane): what's on, what's in season, the roads and the places. /adventure/ now lands here.
 function petrolheadPage() {
-  const fdr = live.filter(r => r.founder), oth = live.filter(r => !r.founder), adv = FAV.filter(x => x.group !== "petrol"), petrol = FAV.filter(x => x.group === "petrol");
+  const adv = FAV.filter(x => x.group !== "petrol"), petrol = FAV.filter(x => x.group === "petrol");
   const body = `<main class="hubpage">
 <div class="hubhero tex-tar hohero"><img class="hostick big" src="/img/high-octane.png" alt="Warning: explicit high octane content" width="210" height="256"><span class="pk">FOMO</span><h1>Plan it. Book it. Be there.</h1><p>Race weekends, shows, rallies and the roads at their best. What's on, what to book early, what's in season, and everything worth seeing on the way.</p><div class="btnrow"><a class="btn" href="/plan/">Plan a trip ›</a><a class="btnline" href="/plan/?evtrip=1">Build a trip around several events ›</a></div></div>
 <section class="cd" id="cd" hidden></section>
 <div class="camps" id="camps"></div>
 <section class="hub"><div class="hubh"><h2>What's on</h2></div>${FOMO_BOX_NL}<div class="btnrow"><a class="btnline" href="/events/">The whole diary ›</a><a class="btnline" href="/high-octane/my-top-5/">My top 5 ›</a><a class="btnline" href="/list-your-event/">List your event ›</a><a class="btnline" href="/events/wall-planner-2027.pdf" download>Get the Wall Planner (PDF) ›</a></div></section>
-<section class="prog"><h2>Roads I've ridden</h2><p class="note"><a href="/adventure/in-season/">${HOUSE.icon("sun", 16)} What's in season now ›</a></p><div class="fix">${fdr.slice(0, 6).map(routeRow).join("")}</div><a class="btnline" href="/routes/">All the routes ›</a></section>
-<section class="hub"><div class="hubh"><h2>Places worth the detour</h2></div>${cardGrid(`${placeCards(adv, 4)}`)}<div class="btnrow"><a class="btnline" href="/favourites/">All my places ›</a></div></section>
+${myPickCard()}
+<section class="hub"><div class="hubh"><h2>My top 5</h2></div>${TOP5.length ? cardGrid(TOP5.slice(0, 3).map(l => `<a class="card pcard hubcard" href="/high-octane/my-top-5/${l.id}/"><b>${esc(l.title)}</b>${l.intro ? `<span>${esc(l.intro)}</span>` : ""}<span class="go">See the list ›</span></a>`).join("")) : `<p class="note">The events, roads and places I'd go to, and why. One new list a month.</p>`}<div class="btnrow"><a class="btnline" href="/high-octane/my-top-5/">All my top 5 lists ›</a></div></section>
 <section class="hub"><div class="hubh"><h2>Petrolhead places</h2></div>${cardGrid(`${placeCards(petrol, 4)}`)}<div class="btnrow"><a class="btnline" href="/favourites/#petrol">All the petrolhead places ›</a></div></section>
-<section class="prog"><h2>Short and sharp</h2><div class="fix">${oth.slice(0, 6).map(routeRow).join("")}</div></section>
-<section class="hub"><div class="hubh"><h2>Race weekends, garages and the road</h2></div>${cardGrid(`${storyCards(new RegExp(MOTOR_RX.source + "|" + MOT_STORY_RX.source + "|" + ADV_RX.source, "i"), 8)}`)}<div class="btnrow"><a class="btnline" href="/blog/">All the stories ›</a></div></section>
-<section class="hub"><div class="hubh"><h2>How to</h2></div>${HOWTO.map(g => `<div class="lilpanel">${g.cover ? `<img src="${esc(g.cover)}" alt="" loading="lazy">` : ""}<div><b>${esc(g.title)}</b><p>${esc(g.short || "")}</p><div class="btnrow"><a class="btn" href="/how-to/${g.id}/">Read the guide ›</a><a class="btnline" href="/how-to/">All the guides ›</a></div></div></div>`).join("")}</section>
+<section class="hub"><div class="hubh"><h2>Places worth the detour</h2></div>${cardGrid(`${placeCards(adv, 4)}`)}<div class="btnrow"><a class="btnline" href="/favourites/">All my places ›</a></div></section>
 </main>
-<script src="/js/hub.js" defer></script>`;
+<script src="${HUB_SRC}" defer></script>${myPickCard() ? REMIND_JS : ""}`;
   return page({ active: "/high-octane/", url: "/high-octane/", title: "FOMO: events, roads in season and places worth the trip · OneTrackMind", desc: "What's on in motorsport and car culture, what to book early, which roads are in season, and the museums, tracks and places worth the trip. With a planner that gets you there.", body });
 }
 
