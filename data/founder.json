@@ -15,12 +15,18 @@
   "updates": []
  },
  "lastEvent": {
-  "_how": "My last event and what it taught me: shows under Preparing for on the Blog. name = the event; date = when; reflection = a few lines in my words; photo = an image address (optional). Stays hidden until reflection is filled.",
+  "_how": "My last event and what it taught me: shows under Preparing for on the Blog. name = the event; date = when; reflection = a few lines in my words; photo = an image address (optional). Stays hidden until reflection is filled. more = extra photo addresses (optional); video = a short .mp4 on the site (optional), poster = its still image.",
   "name": "Killarney Time Attack",
   "date": "October 2026",
   "event": "",
   "reflection": "Massive prep. Four test drives. Then a massive spin on turn two, the fastest incident yet. After the week motorsport had, I can't say it wasn't on my mind.\nI quickly became a passenger, watching to see where it was going to end. Momentum is your friend. Until it's not.\nPacked up, went home, and slept for four days. Almost.\nNo amount of preparation is ever enough. It's a lifestyle. And a road test and a track test are not the same thing.",
-  "photo": ""
+  "photo": "/img/founder/killarney-ta-2026-number.webp",
+  "more": [
+   "/img/founder/killarney-ta-2026-helmet.webp",
+   "/img/founder/killarney-ta-2026-tow.webp"
+  ],
+  "video": "/media/video/killarney-ta-2026-tow.mp4",
+  "poster": "/img/founder/killarney-ta-2026-tow-poster.jpg"
  },
  "myTake": {
   "_how": "My line on events I know: shows on that event's page under My take. One entry per event, like \"simola-hillclimb-2027\": \"one line\"."
