@@ -52,5 +52,5 @@ function hostelUrl(town){ return partnerUrl("hostelworld","https://www.hostelwor
 const whereP=fetch("/api/where").then(r=>r.ok?r.json():null).catch(()=>null);
 
 // kinds of motorsport (each event has one: data/events/events.json "genre")
-const GENRES=[["f1","F1"],["motogp","MotoGP"],["superbike","Superbikes"],["endurance","Endurance and 24 hours"],["nascar","NASCAR"],["indycar","IndyCar"],["rally","Rally"],["offroad","Dakar and off-road"],["mx","Motocross and Supercross"],["hillclimb","Hill climbs"],["roadrace","Road racing and the TT"],["timeattack","Time attack"],["classics","Classics and festivals"],["shows","Motor shows"],["bikefest","Bike festivals"]];
+const GENRES=[["adventure","Adventure"],["f1","F1"],["motogp","MotoGP"],["superbike","Superbikes"],["endurance","Endurance and 24 hours"],["nascar","NASCAR"],["indycar","IndyCar"],["rally","Rally"],["offroad","Dakar and off-road"],["mx","Motocross and Supercross"],["hillclimb","Hill climbs"],["roadrace","Road racing and the TT"],["timeattack","Time attack"],["classics","Classics and festivals"],["shows","Motor shows"],["bikefest","Bike festivals"]];
 const genreName=g=>(GENRES.find(x=>x[0]===g)||[0,""])[1];

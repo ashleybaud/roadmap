@@ -42,10 +42,11 @@ function drawFavs(){
 document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-favgo]"); if(!b) return; const x=(favList||[]).find(f=>f.id===b.dataset.favgo); if(!x) return; map.closePopup(); setFinish(pt(x.name,x.lat,x.lon)); });
 
 /* /?ev=<id>: set an event's venue as the finish */
-{ const m=location.search.match(/[?&]ev=([\w-]+)/), go=/[?&]go=1/.test(location.search); if(m){ history.replaceState(null,"",location.pathname);
+{ const m=location.search.match(/[?&]ev=([\w-]+)/), go=/[?&]go=1/.test(location.search), sty=(location.search.match(/[?&]sty=(rough|mixed|tar)\b/)||[])[1]; if(m){ history.replaceState(null,"",location.pathname);
   setTimeout(async()=>{ let L=[]; try{ L=await (await fetch("/data/events/events.json")).json(); }catch(e){} const x=L.find(f=>f.id===m[1]); if(!x) return;
     try{ localStorage.setItem("rr-welcome","1"); if($("welcome").open) $("welcome").close(); }catch(e){}
-    if(!settings.styleSet&&settings.style!=="tar"){ settings.style="tar"; if($("style")) $("style").value="tar"; store.set("rr2-settings",settings); showStyle(); } /* an event trip starts on main roads */
+    if(sty){ if(settings.style!==sty){ settings.style=sty; if($("style")) $("style").value=sty; store.set("rr2-settings",settings); showStyle(); } } /* "Ride there" (&sty=rough): the back roads and gravel way in */
+    else if(!settings.styleSet&&settings.style!=="tar"){ settings.style="tar"; if($("style")) $("style").value="tar"; store.set("rr2-settings",settings); showStyle(); } /* an event trip starts on main roads */
     linkTrip(pt(x.venue||x.name,x.lat,x.lon));
     if(trip.start&&trip.start.lat!=null&&hav(trip.start,x)<1) trip.start=pt("My location",null,null);
     changed();

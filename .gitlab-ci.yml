@@ -1,7 +1,7 @@
 # OneTrackMind scheduled jobs on GitLab (the same jobs as .github/workflows).
 # Pipelines only run from a schedule or the "Run pipeline" button, never on a push, so the jobs' own commits can't loop.
 # Each schedule sets one variable, TASK, to pick its job (see docs/gitlab-setup.md for the list and times).
-# CI/CD variables (Settings → CI/CD → Variables, masked): PUSH_TOKEN (project access token, scopes api + write_repository), META_TOKEN.
+# CI/CD variables (Settings → CI/CD → Variables, masked): PUSH_TOKEN (project access token, scopes api + write_repository), META_TOKEN, REMIND_SECRET (same value as the REMIND_SECRET secret on Cloudflare Pages).
 
 workflow:
   rules:
@@ -53,11 +53,12 @@ results:
     - node scripts/sniff-results.mjs && ./build.sh --no-test
     - *save
 
-# Daily 05:15 UTC: headlines for the races coming up
+# Daily 05:15 UTC: headlines for the races coming up, and the "Remind me" emails due today (needs the REMIND_SECRET variable, the same value as on Cloudflare)
 news:
   rules: [{ if: '$TASK == "news"' }]
   script:
     - node scripts/fetch-news.mjs && node scripts/make-pages.mjs
+    - node scripts/send-reminders.mjs
     - *save
 
 # Daily 04:17 UTC: Instagram and Facebook posts into the blog

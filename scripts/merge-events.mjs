@@ -11,9 +11,18 @@ for (const f of parts) {
   for (const e of arr) {
     const ok = e.id && e.name && /^\d{4}-\d\d-\d\d$/.test(e.start || "") && /^\d{4}-\d\d-\d\d$/.test(e.end || "") && e.end >= e.start && typeof e.lat === "number" && typeof e.lon === "number" && /^https:\/\//.test(e.source || e.url || "");
     if (!ok) { bad++; console.log("rejected:", e.id || e.name); continue; }
-    all.set(e.id, Object.assign({ category: "festival", tickets: "", confirmed: true }, e, e.tier ? { tierSet: true } : {}, e.genre ? { genreSet: true } : {}, { checked: e.checked || new Date().toISOString().slice(0, 10) }));
+    all.set(e.id, Object.assign({ category: "festival", tickets: "", confirmed: true }, e, e.tier ? { tierSet: true } : {}, e.genre ? { genreSet: true } : {}, { checked: e.checked || (all.get(e.id) || {}).checked || new Date().toISOString().slice(0, 10) }));
   }
 }
+// the founder's own tours and Wild Goose Chase rounds (data/founder.json "tours"): dated events like any other, rebuilt from that file every time
+for (const [id, e] of all) if (e.founderTour) all.delete(id);
+{ let F = {}; try { F = JSON.parse(fs.readFileSync(path.join(D, "..", "founder.json"), "utf8")); } catch (e) {}
+  for (const t of F.tours || []) {
+    const e = Object.assign({ series: "OneTrackMind", category: "adventure", genre: "adventure", tier: 2, url: "https://onetrackmind.online/blog/my-racing/" }, t, { founderTour: true, confirmed: true, tierSet: true, genreSet: true });
+    e.source = e.source || e.url;
+    if (e.id && e.name && /^\d{4}-\d\d-\d\d$/.test(e.start || "") && /^\d{4}-\d\d-\d\d$/.test(e.end || e.start) && typeof e.lat === "number" && typeof e.lon === "number") { e.end = e.end || e.start; e.checked = new Date().toISOString().slice(0, 10); all.set(e.id, e); }
+    else { bad++; console.log("rejected tour:", t.id || t.name); }
+  } }
 // the same event added twice from two sources: keep the better one
 const DROP = ["24h-kyalami-2027", "imsa-rolex-24-at-daytona-2027", "wec-24-hours-of-le-mans-2027", "rally-finland-2027"];
 DROP.forEach(id => all.delete(id));

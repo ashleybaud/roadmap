@@ -82,7 +82,7 @@ function onDatesHtml(){
   const L=evList.filter(e=>e.end>=a&&e.start<=b).map(e=>Object.assign({},e,{km:near(e)})).filter(e=>e.km<=far).sort((x,y)=>x.start.localeCompare(y.start)).slice(0,5);
   if(!L.length) return "";
   const fmt=d=>new Date(d+"T12:00:00").toLocaleDateString("en-GB",{day:"numeric",month:"short"});
-  return `<div class="ondates"><h3>🏁 On your dates</h3><ul>${L.map(e=>`<li><span><b>${esc(e.name)}</b> · ${fmt(e.start)}${e.end!==e.start?"–"+fmt(e.end):""}${e.confirmed?"":" (dates unconfirmed)"}<br><span class="note">${esc(e.venue||e.city||"")} · ${e.km<5?"on your route":Math.round(e.km)+" km off your route"}</span></span><span><button type="button" class="linkbtn" data-evgo="${esc(e.id)}">Make it the finish</button> · <a href="${esc(e.tickets||e.url||"/events/")}" target="_blank" rel="noopener">Tickets ›</a></span></li>`).join("")}</ul></div>`;
+  return `<div class="ondates"><h3>${OTMhouse.icon("flag",16)} On your dates</h3><ul>${L.map(e=>`<li><span><b>${esc(e.name)}</b> · ${fmt(e.start)}${e.end!==e.start?"–"+fmt(e.end):""}${e.confirmed?"":" (dates unconfirmed)"}<br><span class="note">${esc(e.venue||e.city||"")} · ${e.km<5?"on your route":Math.round(e.km)+" km off your route"}</span></span><span><button type="button" class="linkbtn" data-evgo="${esc(e.id)}">Make it the finish</button> · <a href="${esc(e.tickets||e.url||"/events/")}" target="_blank" rel="noopener">Tickets ›</a></span></li>`).join("")}</ul></div>`;
 }
 
 /* Fly part of it: when the start and finish are far apart (or across the sea), offer flights and a car at the far end */

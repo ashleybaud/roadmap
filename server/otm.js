@@ -68,7 +68,14 @@ const MIGRATIONS = [
   `ALTER TABLE subscribers ADD COLUMN name TEXT`,
   // which kinds of racing they want in it (comma list); empty means all of them
   `ALTER TABLE subscribers ADD COLUMN kinds TEXT`,
+  // "List your event": an optional photo from the organiser (R2 key)
+  `ALTER TABLE event_listings ADD COLUMN photo TEXT`,
   `CREATE TABLE IF NOT EXISTS newsletter_sends (issue TEXT PRIMARY KEY, sent_at INTEGER NOT NULL, sent_by TEXT, count INTEGER NOT NULL DEFAULT 0)`,
+  // "Remind me" on an event: double opt-in like the newsletter. kinds = which reminders (4m, book, week); sent = the ones already sent or skipped
+  `CREATE TABLE IF NOT EXISTS reminders (id TEXT PRIMARY KEY, email TEXT NOT NULL, event_id TEXT NOT NULL, kinds TEXT NOT NULL, news INTEGER NOT NULL DEFAULT 0, token_hash TEXT, unsub TEXT NOT NULL, created INTEGER NOT NULL, confirmed_at INTEGER, unsub_at INTEGER, sent TEXT NOT NULL DEFAULT '', UNIQUE (email, event_id))`,
+  `CREATE INDEX IF NOT EXISTS reminders_live ON reminders(confirmed_at, unsub_at)`,
+  // "List your event": organisers send their event; it waits in Review until the founder has checked the dates
+  `CREATE TABLE IF NOT EXISTS event_listings (id TEXT PRIMARY KEY, name TEXT NOT NULL, start TEXT NOT NULL, end TEXT NOT NULL, venue TEXT, town TEXT, country TEXT, website TEXT, tickets TEXT, email TEXT NOT NULL, category TEXT, status TEXT NOT NULL DEFAULT 'pending', created INTEGER NOT NULL, reviewed INTEGER)`,
 ];
 let schemaReady = null;
 export async function db(env) {
@@ -174,7 +181,30 @@ export const brandPage = (title, inner = "") => new Response(`<!doctype html><ht
 <div style="background:#0F5874;border-radius:14px;padding:26px 24px;border-top:4px solid #E8A317"><div style="font-weight:800;letter-spacing:.06em;color:#E8A317;font-size:.85rem;margin-bottom:10px">ONETRACKMIND</div>
 <h1 style="font-size:1.35rem;margin:0 0 10px">${title}</h1>${inner}<p style="margin:18px 0 0"><a href="/" style="color:#E8A317;font-weight:700;text-decoration:none">Back to OneTrackMind ›</a></p></div></div></body></html>`,
   { headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-store" } });
-export const KINDS = { f1: "F1", bikes: "Bikes: MotoGP, superbikes, the TT", endurance: "Endurance, rally and hill climbs", us: "NASCAR and IndyCar", shows: "Shows, classics and festivals" };
+export const KINDS = { f1: "F1", bikes: "Bikes: MotoGP, superbikes, the TT", endurance: "Endurance, rally and hill climbs", adventure: "Adventure: rallies, enduros and organised rides", us: "NASCAR and IndyCar", shows: "Shows, classics and festivals" };
+// the site's own event list (the same file the pages are built from)
+export async function siteEvents(env, request) {
+  const u = new URL("/data/events/events.json", request.url).toString();
+  const r = env.ASSETS ? await env.ASSETS.fetch(new Request(u)) : await fetch(u);
+  if (!r.ok) throw new HttpError(503, "Couldn't read the event list. Try again in a minute.");
+  return r.json();
+}
+// "Remind me": which reminders, and the day each one is due (YYYY-MM-DD; null when it can't be sent)
+export const REMIND_KINDS = { "4m": "Four months out", book: "When booking opens", week: "The week before" };
+const addDays = (s, n) => { const d = new Date(s + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); };
+export function remindDue(e, kind) {
+  if (kind === "4m") return addDays(e.start, -120);
+  if (kind === "week") return addDays(e.start, -7);
+  if (kind === "book") return /^\d{4}-\d\d-\d\d$/.test(e.bookingOpens || "") ? e.bookingOpens : null;
+  return null;
+}
+// a reminder is still worth sending: due today or earlier, and the event hasn't started (4 months out is pointless inside the last month)
+export function remindLive(e, kind, today) {
+  const d = remindDue(e, kind); if (!d || d > today || e.start <= today) return false;
+  if (kind === "4m") return today < addDays(e.start, -30);
+  if (kind === "book") return today <= addDays(d, 14);
+  return true;
+}
 // the newsletter for one subscriber: drop the events in kinds they've switched off; if that leaves none, say so
 export function forKinds(s, kinds) {
   const want = String(kinds || "").split(",").filter(k => KINDS[k]), all = !want.length || want.length >= Object.keys(KINDS).length;

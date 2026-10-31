@@ -18,7 +18,7 @@ RoadMap lives on GitLab for good (decided 30 Oct 2026). GitHub is kept for the f
 |---|---|---|
 | Newsletter, posts, Wall Planner | `30 3 * * 1` | TASK = newsletter |
 | Race results | `0 4 * * 2,4,5` | TASK = results |
-| Headlines | `15 5 * * *` | TASK = news |
+| Headlines and Remind me emails | `15 5 * * *` | TASK = news |
 | Instagram and Facebook | `17 4 * * *` | TASK = social |
 | Event dates check | `0 5 * * 1` | TASK = events-check |
 | Map data | `17 2 1 * *` | TASK = data |
@@ -29,6 +29,7 @@ One-off jobs: Build → Pipelines → Run pipeline, variable TASK = blog-media, 
 - Pages project connected to `onetrackmind/roadmap` on GitLab. Production branch `main`; previews for other branches.
 - Build command: none (the site is committed built). Output directory: `/`.
 - Bindings, copied from the old `routeandrange` project: D1 `DB`, R2 `MEDIA`; variables `ADMIN_EMAILS`, `RESEND_API_KEY` (entered by the founder).
+- "Remind me" emails: add a secret `REMIND_SECRET` (any long random text) on Cloudflare Pages, and the same value as a masked CI/CD variable `REMIND_SECRET` on GitLab. Until both are set, the daily job sends nothing.
 - Custom domains: `onetrackmind.online`, `www.onetrackmind.online`, `onetrackmind.co.za`, `www.onetrackmind.co.za` moved from the old project once the preview is approved.
 - Stadia Maps: add the new `*.pages.dev` address to the allowed domains.
 
