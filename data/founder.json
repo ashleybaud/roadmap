@@ -4,7 +4,7 @@
   "_how": "The event I'd go to this month: shows as a card on the home page and at the top of the newsletter. event = an event id; line = one line in my words; photo = an image address (optional); video = a YouTube or Instagram address (optional).",
   "event": "killarney-motor-show-2026",
   "line": "I'll be there with the Bedford and the AlterEgo pop-up. Racing is life shirts on the table. Come and say hi.",
-  "photo": "/img/founder/killarney-ta-2026-number.webp",
+  "photo": "/img/founder/killarney-ta-2026-tow.webp",
   "video": ""
  },
  "preparing": {
@@ -57,7 +57,8 @@
      "route": "speedweek-hakskeenpan",
      "line": "A Prado, a KTM on the trailer and the Kalahari. The road to Speedweek is half the reason to go."
     }
-   ]
+   ],
+   "photo": "/media/founder/990-adventure-gravel-view.jpg"
   },
   {
    "id": "petrolhead-places",
@@ -85,7 +86,8 @@
      "place": "simola-hill-climb",
      "line": "Where I race. The event to plan a Garden Route trip around."
     }
-   ]
+   ],
+   "photo": "/media/founder/790-duke-karussell-nurburgring.jpg"
   }
  ],
  "_top5how": "My top 5 lists: each becomes a page under High Octane, My top 5. Add one like {\"id\": \"hill-climbs\", \"title\": \"Top 5 hill climbs worth the trip\", \"intro\": \"one or two lines\", \"items\": [{\"event\": \"simola-hillclimb-2027\", \"line\": \"why\"}, {\"route\": \"swartberg-loop\", \"line\": \"why\"}, {\"place\": \"franschhoek-motor-museum\", \"line\": \"why\"}]}. id = the page address, lower case with dashes.",
