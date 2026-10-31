@@ -30,7 +30,64 @@
   "_how": "My line on events I know: shows on that event's page under My take. One entry per event, like \"simola-hillclimb-2027\": \"one line\".",
   "killarney-motor-show-2026": "Find the Bedford: the AlterEgo pop-up is there with Racing is life shirts, and you can join the Members Club on the spot."
  },
- "top5": [],
+ "top5": [
+  {
+   "id": "roads-ive-ridden",
+   "from": "2026-10-31",
+   "title": "Top 5 roads I've ridden",
+   "intro": "Out of twenty-odd years of trips, these are the five I'd ride again tomorrow.",
+   "items": [
+    {
+     "route": "namibia-2020-orange-river",
+     "line": "The Orange River road between Rosh Pinah and Noordoewer. Still my favourite piece of riding anywhere."
+    },
+    {
+     "route": "namibia-2017-epupa",
+     "line": "A long way to go for a waterfall. Worth every corrugation."
+    },
+    {
+     "route": "wild-coast-2019",
+     "line": "Goats, taxis and potholes in equal measure. It tried to take me out and I'd still go back."
+    },
+    {
+     "route": "seven-passes-prince-alfred",
+     "line": "Seven passes in a day. Prince Alfred's is the one you'll talk about."
+    },
+    {
+     "route": "speedweek-hakskeenpan",
+     "line": "A Prado, a KTM on the trailer and the Kalahari. The road to Speedweek is half the reason to go."
+    }
+   ]
+  },
+  {
+   "id": "petrolhead-places",
+   "from": "2026-10-31",
+   "title": "Top 5 petrolhead places I've been",
+   "intro": "Places I'd send a mate. Go once and you'll understand.",
+   "items": [
+    {
+     "place": "nurburgring",
+     "line": "Twenty kilometres of the most famous track on earth, open to the public on a Sunday."
+    },
+    {
+     "place": "goodwood",
+     "line": "The hill, the paddock, the noise. A garden party where everything runs on petrol."
+    },
+    {
+     "place": "motor-valley",
+     "line": "Ducati, Ferrari, Lamborghini, Pagani and Maserati, all within an hour of each other."
+    },
+    {
+     "place": "hakskeenpan",
+     "line": "A dry pan in the Kalahari where grown men try to go very, very fast."
+    },
+    {
+     "place": "simola-hill-climb",
+     "line": "Where I race. The event to plan a Garden Route trip around."
+    }
+   ]
+  }
+ ],
  "_top5how": "My top 5 lists: each becomes a page under High Octane, My top 5. Add one like {\"id\": \"hill-climbs\", \"title\": \"Top 5 hill climbs worth the trip\", \"intro\": \"one or two lines\", \"items\": [{\"event\": \"simola-hillclimb-2027\", \"line\": \"why\"}, {\"route\": \"swartberg-loop\", \"line\": \"why\"}, {\"place\": \"franschhoek-motor-museum\", \"line\": \"why\"}]}. id = the page address, lower case with dashes.",
  "autodidact": {
   "_how": "The Autodidact page (Blog, Autodidact). intro = a short paragraph; entries = builds and the cars I road-trip, newest first: {\"title\": \"\", \"date\": \"2026-10-31\", \"line\": \"\", \"photo\": \"\", \"link\": \"\"}.",
@@ -46,5 +103,45 @@
   "media": [],
   "clubs": [],
   "workshops": []
- }
+ },
+ "_top5next": "Next lists, one a month (titles only until filled in; a list goes live on its 'from' date): Dec: Top 5 lessons from ten years of racing · Jan: Top 5 events worth flying for · Feb: Top 5 builds · Mar: Top 5 museums · Apr: Top 5 drives in a classic · May: Top 5 festivals · Jun: Top 5 bikes I've owned · Jul: Top 5 factories · Aug: Top 5 memories",
+ "builds": [
+  {
+   "name": "Stepnose Alfa",
+   "what": "Commissioned, not built. Where it all started.",
+   "status": "Done",
+   "photo": ""
+  },
+  {
+   "name": "Bedford CF 4x4",
+   "what": "My first build. Tows the race car and carries the AlterEgo pop-up.",
+   "status": "On the road",
+   "photo": "/img/founder/killarney-ta-2026-tow.webp"
+  },
+  {
+   "name": "Widebody Alfa 105",
+   "what": "Built solo in about four months. Raced at Simola and the Cape Town Hill Climb. Preparing for Simola 2027.",
+   "status": "Racing",
+   "photo": "/img/founder/autodidact-homebuilt.webp"
+  },
+  {
+   "name": "1971 Alfa 1750 GTV",
+   "what": "The classic.",
+   "status": "To review",
+   "photo": ""
+  },
+  {
+   "name": "Safari Cobra",
+   "what": "A rolling chassis, being made to safari.",
+   "status": "Building",
+   "photo": ""
+  },
+  {
+   "name": "Jeep CJ6",
+   "what": "For the safari life.",
+   "status": "To review",
+   "photo": ""
+  }
+ ],
+ "_buildshow": "Autodidact build matrix: name, what (one line), status (Done / On the road / Racing / Building / Parked), photo (optional). Newest first or in any order you like."
 }
