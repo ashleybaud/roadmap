@@ -64,7 +64,7 @@
       // This week: every event in the next 7 days, no limit. Coming up: the next four of each kind. Book ahead: the big ones 1 to 6 months out.
       var from = view === "ahead" ? add(today, 30) : today, to = view === "week" ? add(today, 6) : view === "soon" ? add(today, 30) : add(today, 183);
       var fd = function (s) { var x = new Date(s + "T12:00:00"); return x.getDate() + " " + M[x.getMonth()]; };
-      $("fomoReg").innerHTML = '<span class="fomonote">' + (view === "season" ? "Roads at their best this month. Flowers, dry gravel, open passes." : view === "week" ? "Everything on from " + fd(today) + " to " + fd(to) + "." : view === "soon" ? "The next four of each kind, however far off." : "The big ones from " + fd(from) + " to " + fd(to) + ". Book these early.") + "</span>";
+      if ($("fomoReg")) $("fomoReg").innerHTML = '<span class="fomonote">' + (view === "season" ? "Roads at their best this month. Flowers, dry gravel, open passes." : view === "week" ? "Everything on from " + fd(today) + " to " + fd(to) + "." : view === "soon" ? "The next four of each kind, however far off." : "The big ones from " + fd(from) + " to " + fd(to) + ". Book these early.") + "</span>";
       var html = GROUPS.map(function (G) {
         // Coming up: the next four in each square, however far off, so no square is ever empty. Book ahead: from a month out, the big ones first.
         var L = EV.filter(function (e) { return (G[0] === "home" ? isHome(e) : !isHome(e) && groupOf(e) === G[0]) && e.end >= from && (view === "soon" || e.start <= to); })

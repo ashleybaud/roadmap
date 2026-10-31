@@ -299,9 +299,10 @@ function getThere(x) {
   return TRIP.html({ place: x.name, town: x.name, country: favCountry(x), lat: x.lat, lon: x.lon, air: x.air, tours: x.tours }, x.name);
 }
 function favPage(x) {
-  const r = x.trip && pickById(x.trip);
+  const r = x.trip && pickById(x.trip), ve = venueEvents(x), vp = ve.find(e => e.photo);
   const body = `<main>
 <p class="note"><a href="/favourites/">POI</a> · ${esc(GROUPS.find(g => g[0] === x.group)[1])}</p>
+${ve.length ? `${evPic(x.photo || (vp ? vp.photo : evPhoto(ve[0])), x.photo || vp ? x.name : "")}<p class="venuev">${HOUSE.icon("event", 16)}Next here: ${ve.slice(0, 3).map(e => `<a href="/events/${esc(e.id)}/">${esc(e.name)}</a>, ${dRange(e)}`).join(" · ")}</p>` : ""}
 <h1>${esc(x.name)}</h1>
 <div class="meta">${esc(x.area)}${x.year ? ` · first went ${x.year}` : ""}</div>
 <p class="intro">${esc(x.short)}</p>
@@ -652,6 +653,11 @@ const evById = id => EVENTS.find(e => e.id === id);
 const remindBtn = (e, cls = "cta ghost") => e.start > today ? `<button type="button" class="${cls}" data-remind="${esc(e.id)}" data-name="${esc(e.name)}" data-start="${e.start}" data-end="${e.end}"${e.bookingOpens ? ` data-book="${esc(e.bookingOpens)}"` : ""}>${cls.includes("cta") ? HOUSE.icon("bell", 18) : ""}Remind me${cls.includes("cta") ? "" : " ›"}</button>` : "";
 const REMIND_JS = `<script src="/js/remind.js" defer></script>`;
 const rideThere = e => `<a class="cta ghost" href="/plan/?ev=${esc(e.id)}&go=1&sty=rough" title="Back roads and gravel: the planner's Road less travelled setting">${HOUSE.icon("mountain", 18)}Ride there</a>`;
+// the header photo for an event: its own "photo" (in its data/events part file), else the artwork for its kind of event (img/events/fallback-<kind>.svg)
+const evPhoto = e => e.photo || `/img/events/fallback-${HOUSE.group(e.genre)}.svg`;
+const evPic = (src, alt) => `<figure class="evpic"><img src="${esc(src)}" alt="${esc(alt || "")}" width="1600" height="600" fetchpriority="high"></figure>`;
+// a place that is an event's venue (within 6 km): its events, soonest first
+const venueEvents = x => EVENTS.filter(e => e.end >= today && hav2(e, x) <= 6).sort((a, b) => a.start.localeCompare(b.start));
 const myTakeOf = id => { const t = (FD.myTake || {})[id]; return typeof t === "string" && t.trim() ? t.trim() : ""; };
 const WATCH = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data/events/watch.json"), "utf8")); } catch (e) { return {}; } })();
 const NEWS = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data/events/news.json"), "utf8")); } catch (e) { return {}; } })();
@@ -695,6 +701,7 @@ ${routes.length ? `<h3>Ride or drive it</h3><ul>${routes.map(r => `<li><a href="
 <p class="note">In the planner, turn on ${HOUSE.icon("flag", 16)} High Octane and tap Near me for every museum, track and car place around the venue.</p>` : `<p>Nothing on our list near here yet. In the planner, turn on ${HOUSE.icon("flag", 16)} High Octane and tap Near me for every museum, track and car place around the venue.</p>`]];
   const body = `<main class="evpage">
 <div class="evhdr" data-grp="${HOUSE.group(e.genre)}">
+${evPic(evPhoto(e), e.photo ? e.name : "")}
 <p class="evcrumb"><a href="/events/">FOMO</a>${e.series ? ` / ${esc(e.series)}` : ""}</p>
 <span class="evtag" data-grp="${HOUSE.group(e.genre)}">${esc(HOUSE.GROUPS[HOUSE.group(e.genre)][0])}</span>
 <h1>${esc(e.name)}</h1>
@@ -765,7 +772,10 @@ const routeRow = r => { const n = r.trip.days.length, km = r.stats && r.stats.km
 // one or two runs: the latest as one wide panel (photos left, story right), the same shape as "How it started"
 const lilWide = x => `<div class="lilpanel lilwide"><div class="lilpics"><img src="${esc(x.photo)}" alt="" loading="lazy">${x.photo2 ? `<img src="${esc(x.photo2)}" alt="" loading="lazy">` : ""}</div><div><span class="lilk">${HOUSE.icon("lil", 16)} Local is lekker</span><b>${esc(x.place)}, ${esc(x.town)}</b><p class="note">${esc(x.vehicle || "")}${x.date ? " · " + fmtDate(x.date) : ""}</p>${x.line ? `<p>${esc(x.line)}</p>` : ""}<div class="btnrow"><a class="btn" href="${x.lat != null ? `/plan/?poi=${x.lat},${x.lon}&n=${encodeURIComponent(x.place)}&go=1` : "/local-is-lekker/"}">${HOUSE.icon("go", 18)}Take me there</a><a class="btnline" href="/local-is-lekker/">Every run ›</a></div></div></div>`;
 const lilCard = x => `<a class="card pcard hubcard" href="${x.lat != null ? `/plan/?poi=${x.lat},${x.lon}&n=${encodeURIComponent(x.place)}&go=1` : "/local-is-lekker/"}">${x.photo ? `<img src="${esc(x.photo)}" alt="" loading="lazy">` : ""}<b>${esc(x.place)}, ${esc(x.town)}</b><span class="area">${esc(x.vehicle || "")}${x.date ? " · " + fmtDate(x.date) : ""}</span>${x.line ? `<span>${esc(x.line)}</span>` : ""}<span class="go">${HOUSE.icon("go", 18)}Take me there</span></a>`;
+// the FOMO box with "Never miss another event" (newsletter sign-up, double opt-in) where the note sits
+const FOMO_NL = `<div class="evregs fomonl"><b>Never miss another event</b><form class="nlf" data-source="fomo-header" novalidate><input type="email" name="email" placeholder="Your email" autocomplete="email" aria-label="Your email" required><input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px"><button type="submit">Sign me up</button></form><span class="nlm" aria-live="polite"></span></div>`;
 const FOMO_BOX = `<section class="fomo" id="fomo"><div class="evhead"><div class="evview" id="fomoView"></div><div class="evregs" id="fomoReg"></div></div><div class="sqgrid" id="fomoList"><p class="note">Loading the diary…</p></div></section>`;
+const FOMO_BOX_NL = FOMO_BOX.replace('<div class="evregs" id="fomoReg"></div>', FOMO_NL);
 
 // "My pick": the event the founder would go to this month (data/founder.json myPick). Nothing shows until it's filled in and the event is still to come.
 function myPickCard() {
@@ -779,10 +789,12 @@ function homePage() {
   const lat = (() => { try { return JSON.parse(fs.readFileSync(path.join(ROOT, "data/latest.json"), "utf8")); } catch (e) { return []; } })();
   { const C = STORIES.find(x => x.slug === "kalahari-speedweek-2014"); if (C && C.cover && lat.length < 4) lat.push({ title: "Kalahari SpeedWeek 2014", hook: "A dry pan, grown men trying to go very fast, and I came home wanting a faster car.", url: `/blog/${C.slug}/`, cover: C.cover }); }
   const body = `<main class="home">
-<div class="hero3"><a class="h3l" href="/about/"><img src="/img/ashley.jpg" alt="" width="64" height="64"><span>Ducati taught me the road, KTM taught me to live off it. These are the roads, the races and the places I'd tell a mate about. <b>More about me ›</b></span></a>
-<h1 class="homeril"><picture><source srcset="/img/racing-is-life.webp" type="image/webp"><img src="/img/racing-is-life.png" alt="Racing is life. Everything else is preparation." width="1081" height="638" fetchpriority="high"></picture></h1>
-<p class="h3r">Preparation is everything.<br><b>Do it here</b> and do not miss a thing.</p></div>
-<section class="hub homefomo"><div class="hubh"><h2>FOMO</h2><span class="hubsub">Events you'll kick yourself for missing, and the roads in season</span></div>${FOMO_BOX}<div class="btnrow"><a class="btnline" href="/high-octane/">Everything in FOMO ›</a><a class="btnline" href="/events/">The whole diary ›</a><a class="btnline" href="/events/wall-planner-2027.pdf" download>Get the Wall Planner (PDF) ›</a></div></section>
+<div class="hero4"><h1 class="homeril"><picture><source srcset="/img/racing-is-life.webp" type="image/webp"><img src="/img/racing-is-life.png" alt="Racing is life. Everything else is preparation." width="1081" height="638" fetchpriority="high"></picture></h1>
+<p class="h4line">Preparation is everything. <b>Do it here.</b></p>
+<a class="h4me" href="/about/"><img src="/img/ashley.jpg" alt="" width="44" height="44"><span>Ducati taught me the road, KTM taught me to live off it. These are the roads, the races and the places I'd tell a mate about. <b>More about me ›</b></span></a></div>
+<section class="hub homefomo"><div class="hubh"><h2>FOMO</h2></div>${FOMO_BOX_NL}<div class="btnrow"><a class="btnline" href="/high-octane/">Everything in FOMO ›</a><a class="btnline" href="/events/">The whole diary ›</a><a class="btnline" href="/events/wall-planner-2027.pdf" download>Get the Wall Planner (PDF) ›</a></div></section>
+<section class="hub homelil"><div class="hubh"><h2>Local is lekker</h2><a class="btnline" href="/local-is-lekker/">Every run ›</a></div>
+${LIL.length ? (LIL.length < 3 ? lilWide(LIL[LIL.length - 1]) : cardGrid(LIL.slice(-3).reverse().map(lilCard).join(""))) : `<div class="lilpanel"><img src="/media/founder/porsche-cayman-portimao-pitlane.jpg" alt="" loading="lazy"><div><b>Saturdays: breakfast somewhere new</b><p>One of my cars or bikes, a place I haven't eaten at, and the best road there. If I'd go back, it goes up here, with a button that routes you there from wherever you are.</p><p class="note">Coming soon.</p></div></div>`}</section>
 <form class="wherebar" action="/plan/" method="get"><span class="wbl">Plan a trip</span><label class="wbf"><i>From</i><input name="from" value="My location" autocomplete="off" onfocus="if(this.value==='My location')this.value=''" onblur="if(!this.value.trim())this.value='My location'"></label><label class="wbf wbto"><i>Where to?</i><input name="to" placeholder="A town, a pass, a race…" required autocomplete="off"></label><input type="hidden" name="fll"><input type="hidden" name="tll"><button class="btn" type="submit">${HOUSE.icon("go", 18)}Take me there</button></form>
 <script>(function(){var f=document.querySelector(".wherebar");if(!f)return;
 var TW=null;function towns(){return TW||(TW=Promise.all([["za","South Africa"],["na","Namibia"]].map(function(c){return fetch("/data/"+c[0]+"/towns.json").then(function(r){return r.ok?r.json():[]}).catch(function(){return[]}).then(function(a){return a.map(function(x){return[x[0],x[1],x[2],x[3],x[4],c[1]]})})})).then(function(a){return a[0].concat(a[1])}))}
@@ -801,8 +813,6 @@ i.addEventListener("blur",function(){setTimeout(function(){box.hidden=true},150)
 <section class="cd" id="cd" hidden></section>
 <div class="camps" id="camps"></div>
 ${myPickCard()}
-<section class="hub"><div class="hubh"><h2>Local is lekker</h2></div>
-${LIL.length ? (LIL.length < 3 ? lilWide(LIL[LIL.length - 1]) : `${cardGrid(`${LIL.slice(-3).reverse().map(lilCard).join("")}`)}`) : `<div class="lilpanel"><img src="/media/founder/porsche-cayman-portimao-pitlane.jpg" alt="" loading="lazy"><div><b>Saturdays: breakfast somewhere new</b><p>One of my cars or bikes, a place I haven't eaten at, and the best road there. No stars, no reviews: if I'd go back, it goes up here, with a button that routes you there from wherever you are.</p><p class="note">Coming soon.</p><a class="btnline" href="https://www.instagram.com/ashleybaud/" target="_blank" rel="noopener">Follow along on Instagram ›</a></div></div>`}${LIL.length >= 3 ? '<div class="btnrow"><a class="btnline" href="/local-is-lekker/">Every run ›</a></div>' : ""}</section>
 <section class="hub"><div class="lilpanel"><img src="/media/founder/990-adventure-tortoise.jpg" alt="" loading="lazy"><div><b>How it started</b><p>In 2004 I took a KTM 950 Adventure, a paper map and a planning committee that mostly drank beer into Namibia, and I've been going back ever since. Then came the Alfas, the hill climbs and a racecar that wouldn't drive. Twenty-odd years of it is on the blog: the trips that went sideways, the race weekends, the factories.</p><div class="btnrow"><a class="btnline" href="/blog/">Read the stories ›</a><a class="btnline" href="/about/">More about me ›</a></div></div></div></section>
 ${SOCIAL.length ? `<section class="hub"><div class="hubh"><h2>Lately</h2></div>${cardGrid(SOCIAL.slice(0, 3).map(x => `<a class="card pcard hubcard" href="${esc(x.url)}" target="_blank" rel="noopener"><img src="${esc(x.img)}" alt="" loading="lazy"><span>${esc((x.text || "").slice(0, 110))}${(x.text || "").length > 110 ? "…" : ""}</span></a>`).join(""))}<div class="btnrow"><a class="btnline" href="https://www.instagram.com/ashleybaud/" target="_blank" rel="noopener">Instagram ›</a></div></section>` : ""}
 <section class="hub planown"><h2>Plan your own</h2><p class="lede">Tell it where you're starting, where you're going and what you drive or ride. It finds the roads you like, the fuel, the beds and everything worth stopping for, then puts it on your GPS or phone. Free, no sign-up needed.</p><a class="btn" href="/plan/">Plan a trip ›</a></section>
@@ -819,7 +829,7 @@ function petrolheadPage() {
 <div class="hubhero tex-tar hohero"><img class="hostick big" src="/img/high-octane.png" alt="Warning: explicit high octane content" width="210" height="256"><span class="pk">FOMO</span><h1>Plan it. Book it. Be there.</h1><p>Race weekends, shows, rallies and the roads at their best. What's on, what to book early, what's in season, and everything worth seeing on the way.</p><div class="btnrow"><a class="btn" href="/plan/">Plan a trip ›</a><a class="btnline" href="/plan/?evtrip=1">Build a trip around several events ›</a></div></div>
 <section class="cd" id="cd" hidden></section>
 <div class="camps" id="camps"></div>
-<section class="hub"><div class="hubh"><h2>What's on</h2><span class="hubsub">Events you'll kick yourself for missing, and the roads in season</span></div>${FOMO_BOX}<div class="btnrow"><a class="btnline" href="/events/">The whole diary ›</a><a class="btnline" href="/high-octane/my-top-5/">My top 5 ›</a><a class="btnline" href="/list-your-event/">List your event ›</a><a class="btnline" href="/events/wall-planner-2027.pdf" download>Get the Wall Planner (PDF) ›</a></div></section>
+<section class="hub"><div class="hubh"><h2>What's on</h2></div>${FOMO_BOX_NL}<div class="btnrow"><a class="btnline" href="/events/">The whole diary ›</a><a class="btnline" href="/high-octane/my-top-5/">My top 5 ›</a><a class="btnline" href="/list-your-event/">List your event ›</a><a class="btnline" href="/events/wall-planner-2027.pdf" download>Get the Wall Planner (PDF) ›</a></div></section>
 <section class="prog"><h2>Roads I've ridden</h2><p class="note"><a href="/adventure/in-season/">${HOUSE.icon("sun", 16)} What's in season now ›</a></p><div class="fix">${fdr.slice(0, 6).map(routeRow).join("")}</div><a class="btnline" href="/routes/">All the routes ›</a></section>
 <section class="hub"><div class="hubh"><h2>Places worth the detour</h2></div>${cardGrid(`${placeCards(adv, 4)}`)}<div class="btnrow"><a class="btnline" href="/favourites/">All my places ›</a></div></section>
 <section class="hub"><div class="hubh"><h2>Petrolhead places</h2></div>${cardGrid(`${placeCards(petrol, 4)}`)}<div class="btnrow"><a class="btnline" href="/favourites/#petrol">All the petrolhead places ›</a></div></section>
@@ -854,6 +864,7 @@ function listEventPage() {
 <label class="full">Organiser website (where the dates are)<input name="site" type="url" required maxlength="300" placeholder="https://"></label>
 <label class="full">Ticket page<input name="tickets" type="url" maxlength="300" placeholder="https://"></label>
 <label>Your email<input name="email" type="email" required maxlength="200" autocomplete="email"></label>
+<label class="full">Photo (optional: JPG, PNG or WebP, up to 5 MB)<input type="file" name="photo" accept="image/jpeg,image/png,image/webp"></label>
 <label>Category<select name="category">${CATS_LYE.map(([k, t]) => `<option value="${k}">${esc(t)}</option>`).join("")}</select></label>
 <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
 <button type="submit" class="btn full">Send it</button>
@@ -861,9 +872,9 @@ function listEventPage() {
 </form>
 <p class="bestfx">Our best effort to get the dates right. Always check with the organiser before you book.</p>
 </main>
-<script>(function(){var f=document.getElementById("lyf"),m=document.getElementById("lyfm");f.addEventListener("submit",function(e){e.preventDefault();var d={};[].forEach.call(f.elements,function(x){if(x.name)d[x.name]=x.value.trim()});
+<script>(function(){var f=document.getElementById("lyf"),m=document.getElementById("lyfm");f.addEventListener("submit",function(e){e.preventDefault();var d={};[].forEach.call(f.elements,function(x){if(x.name&&x.type!=="file")d[x.name]=x.value.trim()});var ph=f.photo.files[0];if(ph&&ph.size>5e6){m.textContent="That photo is too big. Up to 5 MB.";return}if(ph&&["image/jpeg","image/png","image/webp"].indexOf(ph.type)<0){m.textContent="The photo must be a JPG, PNG or WebP.";return}
 if(!d.name){m.textContent="What's the event called?";return}if(!d.start){m.textContent="When does it start?";return}if(!d.site){m.textContent="Add your website, so we can check the dates.";return}if(!/^[^\\s@]+@[^\\s@]+\\.[^\\s@]{2,}$/.test(d.email)){m.textContent="That email doesn't look right.";return}
-var b=f.querySelector("button");b.disabled=true;m.textContent="Sending…";fetch("/api/list-event",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(d)}).then(function(r){return r.json().then(function(j){return[r.ok,j]})}).then(function(x){if(x[0]){f.reset();m.textContent="Thanks. We'll check the dates on your site and email you once it's in FOMO.";}else m.textContent=x[1].error||"Something went wrong. Try again.";b.disabled=false}).catch(function(){b.disabled=false;m.textContent="No connection. Try again."})})})();</script>`;
+var b=f.querySelector("button");b.disabled=true;m.textContent="Sending…";var fd=new FormData();Object.keys(d).forEach(function(k){fd.append(k,d[k])});if(ph)fd.append("photo",ph);fetch("/api/list-event",{method:"POST",body:fd}).then(function(r){return r.json().then(function(j){return[r.ok,j]})}).then(function(x){if(x[0]){f.reset();m.textContent="Thanks. We'll check the dates on your site and email you once it's in FOMO.";}else m.textContent=x[1].error||"Something went wrong. Try again.";b.disabled=false}).catch(function(){b.disabled=false;m.textContent="No connection. Try again."})})})();</script>`;
   return page({ active: "/list-your-event/", url: "/list-your-event/", title: "List your event · OneTrackMind", desc: "Organisers: add your race, rally, ride, show or festival to FOMO, the OneTrackMind event calendar. Free; tickets link straight to you.", body });
 }
 const seasonRow = (r, left) => `<a class="fx" href="/routes/${r.id}/"><span class="fxd"><b>${left == null ? "All" : left}</b><i>${left == null ? "year" : left === 1 ? "day left" : "days left"}</i></span><span class="fxb"><b>${esc(r.title)}</b><span class="fxs">${esc(r.region)}</span><span class="fxs">Best: ${esc(HOUSE.months(r.season.months))}. ${esc(r.season.why || "")}</span></span></a>`;

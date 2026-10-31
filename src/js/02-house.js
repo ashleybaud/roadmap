@@ -15,11 +15,10 @@
   // the menu: every page reachable from the top
   var MENU = [["/", "Home"],
     ["/high-octane/", "FOMO", [["/high-octane/#this-week", "This week", "event"], ["/high-octane/#coming-up", "Coming up", "clock"], ["/high-octane/#book-ahead", "Book ahead", "tix"], ["/adventure/in-season/", "In season", "sun"], ["/high-octane/my-top-5/", "My top 5", "list"], ["/routes/", "Routes", "route"], ["/favourites/#petrol", "Petrolhead places", "flag"], ["/favourites/", "Places worth the detour", "poi"], ["/how-to/", "How to", "howto"], ["/record/", "Record a ride", "bike"]]],
-    ["/local-is-lekker/", "Local is lekker"],
-    ["/blog/", "Blog", [["/blog/", "Stories", "camera"], ["/blog/autodidact/", "Autodidact", "wrench"], ["/blog/my-racing/", "My racing", "flag"]]],
+    ["/blog/", "Blog", [["/blog/", "Stories", "camera"], ["/local-is-lekker/", "Local is lekker", "lil"], ["/blog/autodidact/", "Autodidact", "wrench"], ["/blog/my-racing/", "My racing", "flag"]]],
     ["/about/", "About", [["/about/", "About", "user"], ["/about/why-preparation/", "Why preparation", "quote"], ["/partners/", "How we earn", "info"], ["/list-your-event/", "List your event", "pen"], ["/advertise/", "Advertise", "star"], ["/about/#newsletter", "Newsletter", "mail"]]]];
   // pages that belong to a section of the menu (Adventure and High Octane are one section now: FOMO, at /high-octane/)
-  var SECTION = { "/adventure/": "/high-octane/", "/routes/": "/high-octane/", "/rides/": "/high-octane/", "/favourites/": "/high-octane/", "/adventure/in-season/": "/high-octane/", "/record/": "/high-octane/", "/how-to/": "/high-octane/", "/events/": "/high-octane/", "/high-octane/my-top-5/": "/high-octane/", "/partners/": "/about/", "/advertise/": "/about/", "/list-your-event/": "/about/", "/about/why-preparation/": "/about/", "/blog/autodidact/": "/blog/", "/blog/my-racing/": "/blog/" };
+  var SECTION = { "/adventure/": "/high-octane/", "/routes/": "/high-octane/", "/rides/": "/high-octane/", "/favourites/": "/high-octane/", "/adventure/in-season/": "/high-octane/", "/record/": "/high-octane/", "/how-to/": "/high-octane/", "/events/": "/high-octane/", "/high-octane/my-top-5/": "/high-octane/", "/partners/": "/about/", "/advertise/": "/about/", "/list-your-event/": "/about/", "/about/why-preparation/": "/about/", "/blog/autodidact/": "/blog/", "/local-is-lekker/": "/blog/", "/blog/my-racing/": "/blog/" };
   function nav(active) {
     var on = SECTION[active] || active;
     return '<nav class="hdrlinks" id="sitenav" aria-label="Site"><button type="button" class="navtoggle" aria-expanded="false" aria-controls="sitenav">' + icon("menu", 20) + " Menu</button>" +

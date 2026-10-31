@@ -10,7 +10,7 @@ export const onRequestGet = handle(async ({ request, env }) => {
     D.prepare(`SELECT r.id, r.kind, r.text, r.lat, r.lon, r.seen_on, r.created, u.email, u.name AS who, u.id AS uid FROM reports r JOIN users u ON u.id = r.user_id WHERE r.status = 'pending' AND r.expires > ? ORDER BY r.created LIMIT 200`).bind(now()),
     D.prepare(`SELECT id, kind, text, email, page, lat, lon, created FROM feedback WHERE status = 'new' ORDER BY created DESC LIMIT 200`),
     D.prepare(`SELECT r.route_id, r.user_id AS uid, r.stars, r.grade, r.rode_on, r.vehicle, r.model, r.again, r.ticks, r.fuel, r.line, r.photos, r.created, u.email, u.name AS who FROM route_ratings r JOIN users u ON u.id = r.user_id WHERE r.status = 'pending' ORDER BY r.created LIMIT 100`),
-    D.prepare(`SELECT id, name, start, end, venue, town, country, website, tickets, email, category, created FROM event_listings WHERE status = 'pending' ORDER BY created LIMIT 100`),
+    D.prepare(`SELECT id, name, start, end, venue, town, country, website, tickets, email, category, created, photo FROM event_listings WHERE status = 'pending' ORDER BY created LIMIT 100`),
   ]);
   return json({ routes: routes.results, spots: spots.results.map(s => ({ ...s, label: SPOT_KINDS[s.kind] || s.kind })),
     reports: reports.results.map(r => ({ ...r, label: (REPORT_KINDS[r.kind] || {}).label || r.kind })), feedback: feedback.results,

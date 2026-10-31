@@ -167,3 +167,30 @@ dialog.rmd .rmn{font-size:.85rem;color:#B5D3DE;margin:6px 0 0}
  body.evbody .fuelrow{margin-top:10px}
 }
 @media(prefers-reduced-motion:reduce){.evtab{transition:none}}
+
+/* home hero: the artwork centred, one line under it, then a slim strip about the founder */
+.hero4{display:flex;flex-direction:column;align-items:center;text-align:center;margin:18px 0 22px}
+.hero4 .homeril{margin:0;line-height:0}.hero4 .homeril img{width:min(620px,88vw);height:auto}
+.h4line{margin:8px 0 0;font:800 clamp(1.6rem,2.8vw,2.4rem)/1.1 "Saira Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.01em;color:#F4F8F9}.h4line b{color:#E8A317;font-weight:800}
+.h4me{display:inline-flex;align-items:center;gap:12px;margin:16px auto 0;padding:8px 18px 8px 8px;max-width:760px;border:1px solid var(--line,#2B7896);border-radius:999px;color:var(--ink,#F4F8F9);text-decoration:none;text-align:left;font-size:.98rem;line-height:1.4}
+.h4me img{width:44px;height:44px;border-radius:50%;border:2px solid #E8A317;object-fit:cover;flex:none}.h4me b{color:#E8A317;white-space:nowrap}.h4me:hover{border-color:#E8A317}
+@media(max-width:640px){.h4me{border-radius:12px;font-size:.92rem;padding:8px 12px 8px 8px}}
+/* FOMO header sign-up: "Never miss another event" where the note was */
+.fomonl{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.fomonl>b{font:700 1.15rem "Saira Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.02em;color:#F4F8F9;white-space:nowrap}
+.fomonl .nlf{flex-wrap:nowrap;gap:6px}.fomonl .nlf input[type=email]{min-width:220px;flex:1 1 220px;border-radius:8px}
+.fomonl .nlf button{background:#E8A317;color:#121A1E;border-radius:8px;white-space:nowrap}
+.fomonl .nlm:empty{display:none}.fomonl .nlm{flex-basis:100%;text-align:right;color:#E8A317;font-weight:600}
+@media(max-width:760px){.fomo .evhead{flex-direction:column;align-items:stretch}.fomonl{flex-direction:column;align-items:stretch;gap:6px}.fomonl .nlf input[type=email]{min-width:0}.fomonl .nlm{text-align:left}}
+.homelil .hubh{align-items:center}
+/* event and venue header photo: own photo, or the artwork for its kind */
+.evpic{margin:0 0 16px;border-radius:12px;overflow:hidden;aspect-ratio:16/6;background:#0B1D21;position:relative}
+.evpic img{display:block;width:100%;height:100%;object-fit:cover}
+.evpic::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,29,33,0) 55%,rgba(11,29,33,.45));pointer-events:none}
+main>.evpic{margin:14px 0 8px}
+.venuev{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:0 0 6px;color:var(--muted,#B5D3DE)}.venuev .ico{color:#E8A317}
+@media(max-width:700px){.evpic{aspect-ratio:16/9}}
+@media(max-width:760px){.fomonl .nlf input[type=email]{flex:1 1 auto;width:0;min-width:0}
+ .fomo .evview{display:grid;grid-template-columns:repeat(4,1fr)}.fomo .evview button{padding:8px 4px;font-size:.82rem;letter-spacing:.02em}}
+@media(min-width:761px) and (max-width:1199px){.fomo .evhead .fomonl{flex-basis:100%}.fomonl .nlf{flex:1}}
+.evpic{max-width:none!important;width:100%}

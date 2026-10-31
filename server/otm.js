@@ -68,6 +68,8 @@ const MIGRATIONS = [
   `ALTER TABLE subscribers ADD COLUMN name TEXT`,
   // which kinds of racing they want in it (comma list); empty means all of them
   `ALTER TABLE subscribers ADD COLUMN kinds TEXT`,
+  // "List your event": an optional photo from the organiser (R2 key)
+  `ALTER TABLE event_listings ADD COLUMN photo TEXT`,
   `CREATE TABLE IF NOT EXISTS newsletter_sends (issue TEXT PRIMARY KEY, sent_at INTEGER NOT NULL, sent_by TEXT, count INTEGER NOT NULL DEFAULT 0)`,
   // "Remind me" on an event: double opt-in like the newsletter. kinds = which reminders (4m, book, week); sent = the ones already sent or skipped
   `CREATE TABLE IF NOT EXISTS reminders (id TEXT PRIMARY KEY, email TEXT NOT NULL, event_id TEXT NOT NULL, kinds TEXT NOT NULL, news INTEGER NOT NULL DEFAULT 0, token_hash TEXT, unsub TEXT NOT NULL, created INTEGER NOT NULL, confirmed_at INTEGER, unsub_at INTEGER, sent TEXT NOT NULL DEFAULT '', UNIQUE (email, event_id))`,
