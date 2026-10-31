@@ -904,7 +904,7 @@ function inSeasonPage() {
 // the founder's choice for this page: five of the 31, in this order (the rest still close the event pages and sign off the newsletter)
 const WHY_PAIRS = [8, 22, 23, 29, 31];
 function whyPage() {
-  const body = `<main><p class="note"><a class="btnline" href="/about/">‹ About</a></p><h1>Why preparation</h1>
+  const body = `<main><p class="note"><a class="btnline" href="/about/">‹ About</a></p>${evPic("/img/founder/why-preparation.webp", "Ashley in the mirror before a run")}<h1>Why preparation</h1>
 <p class="intro"><b>${esc(JUX.heading || "")}</b></p>
 <ol class="jux">${WHY_PAIRS.map(n => JUX.pairs[n - 1]).filter(Boolean).map(([a, b]) => `<li><span>${esc(a)}</span><span>${esc(b)}</span></li>`).join("")}</ol>
 <p class="juxend">${(JUX.closing || []).map(x => `<span>${esc(x)}</span>`).join("")}</p>
@@ -919,7 +919,7 @@ const myRacing = () => EVENTS.filter(e => e.end >= today && e.country === "South
 const evRowCard = e => `<div class="fx evc" data-grp="${HOUSE.group(e.genre)}"><span class="fxd"><b>${+e.start.slice(8, 10)}</b><i>${MON3[+e.start.slice(5, 7) - 1]}</i></span><span class="fxb"><b><a href="/events/${esc(e.id)}/">${esc(e.name)}</a></b><span class="evd">${dRange(e)}${e.confirmed ? "" : ' <em class="unc">dates unconfirmed</em>'}</span><span class="area">${esc([e.venue, e.city].filter(Boolean).join(", "))}</span>${myTakeOf(e.id) ? `<span>${esc(myTakeOf(e.id))}</span>` : ""}<span class="btnrow"><a class="btn" href="/plan/?ev=${esc(e.id)}&go=1">${HOUSE.icon("go", 18)}Take me there</a>${remindBtn(e, "btnline")}</span></span></div>`;
 function myRacingPage() {
   const L = myRacing();
-  const body = `<main class="hubpage"><p class="note"><a class="btnline" href="/blog/">‹ Blog</a></p><h1>My racing</h1>
+  const body = `<main class="hubpage"><p class="note"><a class="btnline" href="/blog/">‹ Blog</a></p>${evPic("/img/founder/my-racing.webp", "The OneTrackMind Alfa, number 37, at the Simola Hillclimb")}<h1>My racing</h1>
 <p class="intro">The events I race at. The dates come from the organisers. Tap Remind me and you'll get an email before each one.</p>
 <section class="prog"><div class="fix">${L.length ? L.map(evRowCard).join("") : `<p class="note">No dates out yet. They go up here as soon as the organisers publish them.</p>`}</div></section>
 ${L.length ? `<p class="note">Cape Town hill climb, Killarney time attack and rally dates go up as soon as the organisers publish them.</p>` : ""}
@@ -929,7 +929,7 @@ ${L.length ? `<p class="note">Cape Town hill climb, Killarney time attack and ra
 }
 function autodidactPage() {
   const A = FD.autodidact || {}, E = (A.entries || []).filter(x => x && x.title);
-  const body = `<main class="hubpage"><p class="note"><a class="btnline" href="/blog/">‹ Blog</a></p>${carsLine() ? `<p class="carsline">${esc(carsLine())}</p>` : ""}<h1>Autodidact</h1>
+  const body = `<main class="hubpage"><p class="note"><a class="btnline" href="/blog/">‹ Blog</a></p>${carsLine() ? `<p class="carsline">${esc(carsLine())}</p>` : ""}${evPic("/img/founder/autodidact-homebuilt.webp", "The homebuilt Alfa at Simola")}<h1>Autodidact</h1>
 ${(A.intro || "").trim() ? `<p class="intro">${esc(A.intro.trim())}</p>` : ""}
 ${E.length ? cardGrid(E.map(x => `<${x.link ? `a href="${esc(x.link)}"` : "div"} class="card pcard hubcard">${x.photo ? `<img src="${esc(x.photo)}" alt="" loading="lazy">` : ""}<b>${esc(x.title)}</b>${x.date ? `<span class="area">${fmtDate(x.date)}</span>` : ""}${x.line ? `<span>${esc(x.line)}</span>` : ""}</${x.link ? "a" : "div"}>`).join("")) : `<div class="soon"><b>Coming soon</b><p class="note">The builds, and the cars I road-trip.</p></div>`}
 <div class="btnrow"><a class="btnline" href="/blog/my-racing/">My racing ›</a><a class="btnline" href="/about/why-preparation/">Why preparation ›</a></div>
