@@ -26,7 +26,7 @@
         var cur = on === m[0] ? ' class="on" aria-current="page"' : "";
         if (!m[2]) return '<a href="' + m[0] + '"' + cur + ">" + m[1] + "</a>";
         var own = m[2].some(function (s) { return s[0] === m[0]; });
-        return '<details class="navdd"><summary' + (on === m[0] ? ' class="on"' : "") + ">" + m[1] + icon("chev", 16, "chev") + '</summary><div class="ddm">' + (own ? "" : '<a href="' + m[0] + '">' + m[1] + " home</a>") +
+        return '<details class="navdd"><summary' + (on === m[0] ? ' class="on"' : "") + ">" + '<a class="ddh" href="' + m[0] + '">' + m[1] + "</a>" + icon("chev", 16, "chev") + '</summary><div class="ddm">' + (own ? "" : '<a href="' + m[0] + '">' + m[1] + " home</a>") +
           m[2].filter(function (s) { return H.HIDE.indexOf(s[0]) < 0; }).map(function (s) { return '<a href="' + s[0] + '"' + (active === s[0] ? ' aria-current="page"' : "") + ">" + icon(s[2], 16) + s[1] + "</a>"; }).join("") + "</div></details>";
       }).join("") +
       '<a href="/plan/" class="navplan' + (active === "/plan/" ? ' on" aria-current="page"' : '"') + '><svg class="pinic" viewBox="0 0 24 32" width="24" height="32" aria-hidden="true"><path d="M12 0C5.4 0 0 5.3 0 11.9 0 20.8 12 32 12 32s12-11.2 12-20.1C24 5.3 18.6 0 12 0z" fill="#E5262B"/><circle cx="12" cy="11.5" r="5" fill="#fff"/></svg>Plan a trip</a></nav>';
