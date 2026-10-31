@@ -88,7 +88,6 @@
 footer .bestfx{font-size:.95rem}
 /* event pages: the founder's line, and the closing line */
 .mytake{display:flex;gap:12px;align-items:flex-start;background:var(--panel,#0F5874);border-left:4px solid #E8A317;border-radius:12px;padding:12px 14px;margin:14px 0}.mytake img{width:48px;height:48px;border-radius:50%;object-fit:cover;flex:none}.mytake b{font:700 .8rem "IBM Plex Sans",Arial,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:#E8A317}.mytake p{margin:2px 0 0}
-.evclose{font:700 1.6rem "Saira Condensed","Arial Narrow",sans-serif;text-transform:uppercase;letter-spacing:.02em;color:#E8A317;text-align:center;margin:34px 0 10px!important;line-height:1.15}
 .evcta{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.evcta .cta{margin:0}
 button.cta,button.btnline{font:inherit;font-weight:700;cursor:pointer}
 .evl button.lnk{background:none;border:0;padding:0;font:inherit;color:var(--accent);cursor:pointer}.evl button.lnk:hover{text-decoration:underline}
@@ -125,3 +124,46 @@ dialog.rmd .rmn{font-size:.85rem;color:#B5D3DE;margin:6px 0 0}
 .t5 .btnrow{margin-top:8px}
 .seasons .fxd b{font-size:1.6rem}
 .fx .fxb .btnrow{display:flex;flex-direction:row;flex-wrap:wrap;gap:8px;margin-top:8px}.fx .fxb .btnrow>*{margin:0}
+.sq.sqwide{grid-column:1/-1}
+
+/* event page: one header card, one tab strip, a quiet closing line */
+.evpage{min-width:0}
+.evpage .evhdr{background:var(--panel,#0F5874);border:1px solid var(--line,#2B7896);border-left:6px solid var(--grp,#E8A317);border-radius:12px;padding:20px 24px 22px;margin:18px 0 22px}
+.evpage .evcrumb{margin:0 0 10px;font-size:.9rem;color:var(--muted,#B5D3DE)}.evpage .evcrumb a{color:inherit}
+.evpage .evhdr h1{font-size:clamp(2rem,3.4vw,2.8rem);margin:10px 0 8px;max-width:22ch}
+.evpage .evwhen{margin:0 0 4px;font-size:1.15rem}.evpage .evwhen b{font:700 1.35rem "Saira Condensed","Arial Narrow",sans-serif;letter-spacing:.01em}
+.evpage .evcount{color:#E8A317;font-weight:700;margin-left:6px}
+.evpage .evwhere{display:flex;gap:6px;align-items:center;margin:0 0 16px;color:var(--muted,#B5D3DE)}.evpage .evwhere .ico{color:#E8A317;flex:none}
+.evpage .evcta{display:flex;flex-wrap:wrap;gap:10px;margin:0}.evpage .evcta .cta{margin:0;padding:10px 16px;font-size:1rem}
+.evpage .mytake{margin:18px 0 0;background:rgba(0,0,0,.18)}
+.evtabs{display:flex;gap:4px;margin:0;border-bottom:2px solid #0F5874;overflow-x:auto;scrollbar-width:none}.evtabs::-webkit-scrollbar{display:none}
+.evtab{display:inline-flex;align-items:center;gap:8px;padding:11px 18px;border:0;border-radius:12px 12px 0 0;background:#0B3A4B;color:#B5D3DE;font:700 1rem "IBM Plex Sans",Arial,sans-serif;cursor:pointer;white-space:nowrap}
+.evtab:hover{color:#fff}.evtab[aria-selected="true"]{background:#0F5874;color:#fff;box-shadow:inset 0 3px 0 #E8A317}
+.evtab:focus-visible{outline:2px solid #E8A317;outline-offset:2px}
+.evpanel{background:#0F5874;border-radius:0 12px 12px 12px;padding:20px 24px 22px;margin:0 0 24px}
+.evpanel>*{max-width:70ch}.evpanel>.trip,.evpanel>.evmapbox{max-width:none}
+.evpanel h3{font:600 1.15rem "IBM Plex Sans",Arial,sans-serif;margin:18px 0 8px;text-transform:none;letter-spacing:0}.evpanel h3:first-child{margin-top:0}
+.evpanel p,.evpanel li{line-height:1.6}.evpanel ul,.evpanel ol{padding-left:20px;margin:0 0 12px}
+.evpanel .evlede{font-size:1.1rem;margin-top:0}.evpanel .evwarn{border-left:3px solid var(--warn,#FF9A1A);padding:4px 12px}
+.evpanel .nw{margin:0 0 14px}.evpanel .nw p{margin:4px 0}
+.evpage .evmapbox{height:280px!important;margin:0 0 10px;border-radius:12px}
+.evpanel .trip{margin:18px 0 6px}.evpanel .trip .tpanel{border-radius:0 12px 12px 12px}
+.evpanel .tripf{font-size:.9rem;color:var(--muted,#B5D3DE);margin:12px 0 0}
+.evpage .evclose{margin:8px 0 30px;padding:2px 0 2px 16px;border-left:2px solid #E8A317;background:none;max-width:60ch}
+.evpage .evclose p{margin:0;font:italic 400 1.15rem/1.5 "IBM Plex Sans",Arial,sans-serif;color:var(--ink,#F4F8F9)}
+.evpage .evclose cite{display:block;margin-top:4px;font-style:normal;font-size:.9rem;color:var(--muted,#B5D3DE)}
+.evbar{display:none}
+@media(max-width:700px){
+ .evpage .evhdr{padding:16px 16px 18px;margin:12px 0 16px}
+ .evpage .evhdr h1{font-size:1.9rem}
+ .evpage .evcta .evmain{display:none}.evpage .evcta .cta{padding:8px 12px;font-size:.95rem}
+ .evtab{padding:10px 12px;font-size:.95rem}.evtab .ico{display:none}
+ .evpanel{padding:16px 14px 18px;border-radius:0 0 12px 12px}
+ .evpage .evmapbox{height:200px!important}
+ .evbar{display:flex;gap:8px;position:fixed;left:0;right:0;bottom:0;z-index:1200;padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:#0B1D21;border-top:2px solid #E8A317}
+ .evbar .cta{flex:1;justify-content:center;margin:0;padding:11px 10px}
+ body.evbody{padding-bottom:76px}
+ body.evbody .nlbox{display:none}
+ body.evbody .fuelrow{margin-top:10px}
+}
+@media(prefers-reduced-motion:reduce){.evtab{transition:none}}

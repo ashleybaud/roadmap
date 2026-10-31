@@ -175,7 +175,7 @@ function aePick(seed, n = 1, ctx = "") {
 const aeUrl = (x, where) => `https://alterego.online/products/${x.h}?utm_source=onetrackmind&utm_medium=${where}&utm_content=${x.h}`;
 const aeCard = (x, where) => `<a class="adcard" href="${aeUrl(x, where)}" target="_blank" rel="noopener sponsored"><img src="${x.i}&width=360" alt="AlterEgo ${esc(x.b.replace(/\.$/, ""))} ${x.c.split(" ").pop()}" loading="lazy"><span class="adt"><em>AlterEgo · Ad</em><b>${esc(x.b)}</b><span>${esc(x.s)} $${x.p}.</span><i>${esc(x.c)} ›</i></span></a>`;
 const aeSide = (x) => `<aside class="aeside"><a class="aecol" href="${aeUrl(x, "sidebar")}" target="_blank" rel="noopener sponsored"><em>AlterEgo · Ad</em><img src="${x.i}&width=600" alt="AlterEgo ${esc(x.b.replace(/\.$/, ""))} ${x.c.split(" ").pop()}" loading="lazy"><b>${esc(x.b)}</b><span>${esc(x.s)}</span><span class="aep">$${x.p} · made to order</span><i>${esc(x.c)} ›</i></a></aside>`;
-function page({ url, title, desc, body, ld, image, active, ads = true, dark = false, side = false }) {
+function page({ url, title, desc, body, ld, image, active, ads = true, dark = false, side = false, cls = "" }) {
   const aeP = aePick(url, 3, title);
   return `<!doctype html>
 <html lang="en">
@@ -209,7 +209,7 @@ b.innerHTML='<span style="flex:1 1 320px">Our booking partners use cookies so th
 b.addEventListener("click",function(e){var t=e.target.closest("[data-ck]");if(t)set(t.dataset.ck)});document.body.appendChild(b);});})();</script>
 
 </head>
-<body${dark ? ' class="blogdark"' : ""}><div class="wrap">
+<body${dark || cls ? ` class="${[dark ? "blogdark" : "", cls].filter(Boolean).join(" ")}"` : ""}><div class="wrap">
 <header><a class="logo" href="/">OneTrackMind</a>${HOUSE.nav(active)}</header><script>document.addEventListener("click",function(e){var b=e.target.closest&&e.target.closest(".navtoggle");if(!b)return;var n=b.closest(".hdrlinks"),o=n.classList.toggle("open");b.setAttribute("aria-expanded",String(o))});document.addEventListener("click",function(e){document.querySelectorAll(".navdd[open]").forEach(function(d){if(!d.contains(e.target))d.open=false;});});</script>
 ${side ? `<div class="withad">${body}${aeSide(aeP[0])}</div>` : body}
 ${ads ? `<div class="adrow">${aeCard(aeP[side ? 1 : 0], "sponsor")}${aeCard(aeP[side ? 2 : 1], "sponsor")}</div>` : ""}
@@ -466,7 +466,7 @@ function storiesIndex(M) {
 <nav class="bpick" aria-label="Show">
 <button type="button" class="bbox on" data-f="all"><b>Everything</b></button>
 <button type="button" class="bbox tex-gravel" data-f="adventure"><b>Adventure</b><span>Recce. Ride. Report.</span></button>
-<button type="button" class="bbox tex-tar" data-f="motorsport"><b>High Octane</b><span>Plan it. Book it. Be there.</span></button>
+<button type="button" class="bbox tex-tar" data-f="motorsport"><b>FOMO</b><span>Plan it. Book it. Be there.</span></button>
 </nav>
 <nav class="tagchips" aria-label="Tags">${Object.entries({ route: "Routes", place: "Places", story: "Stories" }).map(([k, t]) => `<button type="button" class="kchip" data-kind="${k}">${t}</button>`).join("")}<span class="chipsep"></span>${TAGS.map(([k, t]) => `<button type="button" data-tag="${k}">${t}</button>`).join("")}<a class="aboutlink" href="/about/"><img src="/img/ashley.jpg" alt="">About Ashley ›</a></nav>
 <div class="collage">${(() => {
@@ -665,41 +665,56 @@ function eventPage(e) {
   const sameTime = EVENTS.filter(x => x.id !== e.id && x.end >= e.start && x.start <= e.end && hav2(e, x) <= 400).slice(0, 5);
   const routes = live.filter(r => r.trip && r.trip.start && hav2(e, r.trip.start) <= 250).slice(0, 3);
   const city = e.city || e.venue || e.name;
-  const map = `<div id="evmap" class="tripmap" style="height:300px" role="img" aria-label="Map: ${esc(e.venue || city)}"></div>
+  const map = `<div id="evmap" class="tripmap evmapbox" role="img" aria-label="Map: ${esc(e.venue || city)}"></div>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"><script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>(function(){var m=L.map("evmap",{scrollWheelZoom:false}).setView([${e.lat},${e.lon}],11);L.tileLayer("https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png",{maxZoom:18,attribution:'&copy; Stadia Maps &copy; OpenMapTiles &copy; OpenStreetMap'}).addTo(m);L.circleMarker([${e.lat},${e.lon}],{radius:10,color:"#11262B",weight:3,fillColor:"${HOUSE.colour(e.genre)}",fillOpacity:1}).bindTooltip(${JSON.stringify(e.venue || city).replace(/</g, "\\u003c")},{permanent:true,direction:"right"}).addTo(m);var A=${JSON.stringify((a => a && a.km <= 300 ? a : null)(TRIP.airport(e.lat, e.lon))).replace(/</g, "\\u003c")};if(!A)return;
+<script>window.evMap=function(){if(window.evMapDone||typeof L==="undefined")return;window.evMapDone=1;var m=L.map("evmap",{scrollWheelZoom:false}).setView([${e.lat},${e.lon}],11);L.tileLayer("https://tiles.stadiamaps.com/tiles/outdoors/{z}/{x}/{y}{r}.png",{maxZoom:18,attribution:'&copy; Stadia Maps &copy; OpenMapTiles &copy; OpenStreetMap'}).addTo(m);L.circleMarker([${e.lat},${e.lon}],{radius:10,color:"#11262B",weight:3,fillColor:"${HOUSE.colour(e.genre)}",fillOpacity:1}).bindTooltip(${JSON.stringify(e.venue || city).replace(/</g, "\\u003c")},{permanent:true,direction:"right"}).addTo(m);var A=${JSON.stringify((a => a && a.km <= 300 ? a : null)(TRIP.airport(e.lat, e.lon))).replace(/</g, "\\u003c")};if(!A)return;
 L.circleMarker([A.lat,A.lon],{radius:8,color:"#11262B",weight:3,fillColor:"#fff",fillOpacity:1}).bindTooltip(A.name+" airport ("+A.iata+")",{permanent:true,direction:"left"}).addTo(m);
 m.fitBounds([[${e.lat},${e.lon}],[A.lat,A.lon]],{padding:[50,50],maxZoom:12});
 var say=function(t){document.querySelectorAll(".airdrive").forEach(function(x){x.textContent=t;x.hidden=false})};
 say("From "+A.name+" airport ("+A.iata+"): about "+A.km+" km as the crow flies.");
 function dec(s){var i=0,la=0,lo=0,o=[];while(i<s.length){var b,sh=0,r=0;do{b=s.charCodeAt(i++)-63;r|=(b&31)<<sh;sh+=5}while(b>=32);la+=r&1?~(r>>1):r>>1;sh=0;r=0;do{b=s.charCodeAt(i++)-63;r|=(b&31)<<sh;sh+=5}while(b>=32);lo+=r&1?~(r>>1):r>>1;o.push([la/1e6,lo/1e6])}return o}
 fetch("https://api.stadiamaps.com/route/v1",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({locations:[{lat:A.lat,lon:A.lon},{lat:${e.lat},lon:${e.lon}}],costing:"auto",units:"kilometers"})}).then(function(r){return r.json()}).then(function(j){if(!j.trip)return;var t=j.trip.summary,mn=Math.round(t.time/60);
-L.polyline(dec(j.trip.legs[0].shape),{color:"#E8A317",weight:5,opacity:.9}).addTo(m);say("From "+A.name+" airport ("+A.iata+") to the venue: "+Math.round(t.length)+" km, about "+(mn<60?mn+" min":Math.floor(mn/60)+" h "+(mn%60?mn%60+" min":""))+" by car. Beds near either end save you the drive.")}).catch(function(){});})();</script>
+L.polyline(dec(j.trip.legs[0].shape),{color:"#E8A317",weight:5,opacity:.9}).addTo(m);say("From "+A.name+" airport ("+A.iata+") to the venue: "+Math.round(t.length)+" km, about "+(mn<60?mn+" min":Math.floor(mn/60)+" h "+(mn%60?mn%60+" min":""))+" by car. Beds near either end save you the drive.")}).catch(function(){});};</script>
 <p class="airdrive note" hidden></p>`;
+  const where = [e.venue, e.city, e.country].filter(Boolean).map(esc).join(", ");
+  const news = NEWS[e.id] || [], take = myTakeOf(e.id), off = esc(e.url || e.source);
+  const about = `${esc(e.name)} runs ${dRange(e)}${e.venue ? ` at ${esc(e.venue)}` : ""}${e.city ? `, ${esc(e.city)}` : ""}${e.country ? `, ${esc(e.country)}` : ""}.${e.series && !e.name.includes(e.series) ? ` Part of the ${esc(e.series)}.` : ""}`;
+  const T = [
+    ["about", "About", "info", `<p class="evlede">${about}</p>
+${e.confirmed ? "" : `<p class="evwarn">The organiser hasn't confirmed these dates yet. Check the <a href="${off}" target="_blank" rel="noopener">official site</a> before you book anything.</p>`}
+${news.length ? `<h3>In the news</h3>${news.map(n => `<div class="nw"><b>${esc(n.title)}</b>${n.summary ? `<p>${esc(n.summary)}</p>` : ""}<a href="${esc(n.url)}" target="_blank" rel="noopener">Read more on ${esc(n.source)} ›</a></div>`).join("")}<p class="note">Headlines and summaries are ${esc(news[0].source)}'s own words, updated daily.</p>` : ""}
+<p class="note">Dates and details come from the organiser and are checked every week. Always confirm on the <a href="${off}" target="_blank" rel="noopener">official site</a> before you book.</p>`],
+    ["get-there", "Get there", "go", `${map}
+${TRIP.html({ brief: true, place: e.venue || city, town: (e.city || e.venue || "").split(",")[0], country: e.country, lat: e.lat, lon: e.lon, from: e.confirmed ? addDays(e.start, -1) : "", to: e.confirmed ? addDays(e.end, 1) : "", tickets: e.tickets, unconfirmed: !e.confirmed }, `${e.name.replace(/\s*\(.*?\)/g, "")} · ${(e.city || e.venue || "").split(",")[0]} · ${dRange(e)}`)}
+<p class="note">Beds near big events go early. Book first, then plan the road trip around them.</p>`],
+    ["watch", "Watch", "eye", `<h3>How to watch</h3>${w.watch && w.watch.length ? `<ul>${w.watch.map(x => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.label)} ›</a></li>`).join("")}</ul>${w.note ? `<p class="note">${esc(w.note)}</p>` : ""}` : `<p>Check the <a href="${off}" target="_blank" rel="noopener">official site</a> for live streams and TV.</p>`}
+<h3>Results</h3>${res && res.podium ? `<ol>${res.podium.map(p => `<li>${esc(p)}</li>`).join("")}</ol><p class="note">From <a href="${esc(res.source)}" target="_blank" rel="noopener">the official results</a>.</p>` : res && res.link ? `<p><a href="${esc(res.link)}" target="_blank" rel="noopener">${res.fresh ? "Results are in ›" : "Official results ›"}</a></p>` : `<p>${w.results ? `Results go up <a href="${esc(w.results)}" target="_blank" rel="noopener">here</a> once it has run.` : "Results appear here once it has run."}</p>`}`],
+    ["nearby", "Nearby", "poi", near.length || sameTime.length || routes.length ? `${sameTime.length ? `<h3>Also on that week</h3><ul>${sameTime.map(x => `<li><a href="/events/${esc(x.id)}/">${esc(x.name)}</a> · ${dRange(x)} · ${Math.round(hav2(e, x))} km away</li>`).join("")}</ul>` : ""}
+${near.length ? `<h3>Places nearby</h3><ul>${near.map(({ f, d }) => `<li><a href="/favourites/${esc(f.id)}/">${esc(f.name)}</a> · ${Math.round(d)} km</li>`).join("")}</ul>` : ""}
+${routes.length ? `<h3>Ride or drive it</h3><ul>${routes.map(r => `<li><a href="/routes/${esc(r.id)}/">${esc(r.title)}</a></li>`).join("")}</ul>` : ""}
+<p class="note">In the planner, turn on ${HOUSE.icon("flag", 16)} High Octane and tap Near me for every museum, track and car place around the venue.</p>` : `<p>Nothing on our list near here yet. In the planner, turn on ${HOUSE.icon("flag", 16)} High Octane and tap Near me for every museum, track and car place around the venue.</p>`]];
   const body = `<main class="evpage">
-<p class="note"><a href="/events/">FOMO</a> · ${esc(e.series || "")}</p>
+<div class="evhdr" data-grp="${HOUSE.group(e.genre)}">
+<p class="evcrumb"><a href="/events/">FOMO</a>${e.series ? ` / ${esc(e.series)}` : ""}</p>
 <span class="evtag" data-grp="${HOUSE.group(e.genre)}">${esc(HOUSE.GROUPS[HOUSE.group(e.genre)][0])}</span>
 <h1>${esc(e.name)}</h1>
-<p class="evwhen"><b>${dRange(e)}</b>${e.confirmed ? "" : ' <em class="unc">dates unconfirmed</em>'} · ${esc(e.venue || "")}${e.city ? ", " + esc(e.city) : ""}${e.country ? ", " + esc(e.country) : ""} <span class="evcount" data-start="${e.start}" data-end="${e.end}"></span></p>
-<div class="btns evcta"><a class="cta" href="/plan/?ev=${esc(e.id)}&go=1">${HOUSE.icon("go", 18)}Take me there</a> ${rideThere(e)} ${remindBtn(e)}${e.tickets ? ` <a class="cta ghost" href="${esc(e.tickets)}" target="_blank" rel="noopener sponsored">Tickets ›</a>` : ""} <a class="cta ghost" href="${esc(e.url || e.source)}" target="_blank" rel="noopener">Official site ›</a></div>
-${myTakeOf(e.id) ? `<aside class="mytake"><img src="/img/ashley.jpg" alt="" width="48" height="48"><div><b>My take</b><p>${esc(myTakeOf(e.id))}</p></div></aside>` : ""}
-${map}
-${(NEWS[e.id] || []).length ? `<section class="evsec evnews"><h2>In the news</h2>${NEWS[e.id].map(n => `<div class="nw"><b>${esc(n.title)}</b>${n.summary ? `<p>${esc(n.summary)}</p>` : ""}<a class="btnline" href="${esc(n.url)}" target="_blank" rel="noopener">Read more on ${esc(n.source)} ›</a></div>`).join("")}<p class="note">Headlines and summaries are ${esc(NEWS[e.id][0].source)}'s own words, updated daily.</p></section>` : ""}
-<section class="evsec"><h2>How to watch</h2>${w.watch && w.watch.length ? `<ul>${w.watch.map(x => `<li><a href="${esc(x.url)}" target="_blank" rel="noopener">${esc(x.label)} ›</a></li>`).join("")}</ul>${w.note ? `<p class="note">${esc(w.note)}</p>` : ""}` : `<p class="note">Check the <a href="${esc(e.url || e.source)}" target="_blank" rel="noopener">official site</a> for live streams and TV.</p>`}</section>
-<section class="evsec"><h2>Results</h2>${res && res.podium ? `<ol>${res.podium.map(p => `<li>${esc(p)}</li>`).join("")}</ol><p class="note">From <a href="${esc(res.source)}" target="_blank" rel="noopener">the official results</a>.</p>` : res && res.link ? `<p><a href="${esc(res.link)}" target="_blank" rel="noopener">${res.fresh ? "Results are in ›" : "Official results ›"}</a></p>` : `<p class="note">${w.results ? `Results go up <a href="${esc(w.results)}" target="_blank" rel="noopener">here</a> once it has run.` : "Results appear here once it has run."}</p>`}</section>
-${TRIP.html({ place: e.venue || city, town: (e.city || e.venue || "").split(",")[0], country: e.country, lat: e.lat, lon: e.lon, from: e.confirmed ? addDays(e.start, -1) : "", to: e.confirmed ? addDays(e.end, 1) : "", tickets: e.tickets, unconfirmed: !e.confirmed }, `${e.name.replace(/\s*\(.*?\)/g, "")} · ${(e.city || e.venue || "").split(",")[0]} · ${dRange(e)}`)}
-<p class="note">Beds near big events go early. Book first, then plan the road trip around them.</p>
-${near.length || sameTime.length || routes.length ? `<section class="evsec"><h2>While you're there</h2>
-${sameTime.length ? `<h3>Also on that week</h3><ul>${sameTime.map(x => `<li><a href="/events/${esc(x.id)}/">${esc(x.name)}</a> · ${dRange(x)} · ${Math.round(hav2(e, x))} km away</li>`).join("")}</ul>` : ""}
-${near.length ? `<h3>POI nearby</h3><ul>${near.map(({ f, d }) => `<li><a href="/favourites/${esc(f.id)}/">${esc(f.name)}</a> · ${Math.round(d)} km</li>`).join("")}</ul>` : ""}
-${routes.length ? `<h3>Ride or drive it</h3><ul>${routes.map(r => `<li><a href="/routes/${esc(r.id)}/">${esc(r.title)}</a></li>`).join("")}</ul>` : ""}
-<p class="note">In the planner, turn on ${HOUSE.icon("flag", 16)} High Octane and tap Near me for every museum, track and car place around the venue.</p></section>` : ""}
-<p class="note">Dates and details come from the organiser and are checked every week. Always confirm on the <a href="${esc(e.url || e.source)}" target="_blank" rel="noopener">official site</a> before you book.</p>
-${eventLine(e.id) ? `<p class="evclose">${esc(eventLine(e.id))}</p>` : ""}
-</main>${REMIND_JS}
-<script>(function(){var s=document.querySelector(".evcount");if(!s)return;var t=new Date();t.setHours(12,0,0,0);var a=new Date(s.dataset.start+"T12:00:00"),b=new Date(s.dataset.end+"T12:00:00"),d=Math.round((a-t)/864e5);s.textContent=t>b?"· finished":t>=a?"· on now":d===1?"· tomorrow":"· in "+d+" days";})();</script>`;
+<p class="evwhen"><b>${dRange(e)}</b>${e.confirmed ? "" : ' <em class="unc">dates unconfirmed</em>'} <span class="evcount" data-start="${e.start}" data-end="${e.end}"></span></p>
+<p class="evwhere">${HOUSE.icon("poi", 16)}${where}</p>
+<div class="evcta"><a class="cta evmain" href="/plan/?ev=${esc(e.id)}&go=1">${HOUSE.icon("go", 18)}Take me there</a>${rideThere(e)}${remindBtn(e, "cta ghost evmain")}${e.tickets ? `<a class="cta ghost" href="${esc(e.tickets)}" target="_blank" rel="noopener">${HOUSE.icon("tix", 18)}Tickets</a>` : ""}<a class="cta ghost" href="${off}" target="_blank" rel="noopener">${HOUSE.icon("out", 18)}Official site</a></div>
+${take ? `<aside class="mytake"><img src="/img/ashley.jpg" alt="" width="48" height="48"><div><b>My take</b><p>${esc(take)}</p></div></aside>` : ""}
+</div>
+<div class="evtabs" role="tablist" aria-label="About this event">${T.map(([k, t, ic], i) => `<button type="button" class="evtab" role="tab" id="evt-${k}" aria-controls="evp-${k}" aria-selected="${i === 0}" data-tab="${k}">${HOUSE.icon(ic, 18)}<span>${t}</span></button>`).join("")}</div>
+${T.map(([k, , , html], i) => `<section class="evpanel" role="tabpanel" id="evp-${k}" aria-labelledby="evt-${k}"${i ? " hidden" : ""}>${html}</section>`).join("\n")}
+${eventLine(e.id) ? `<blockquote class="evclose"><p>${esc(eventLine(e.id))}</p><cite>Ashley</cite></blockquote>` : ""}
+</main>
+<div class="evbar"><a class="cta" href="/plan/?ev=${esc(e.id)}&go=1">${HOUSE.icon("go", 18)}Take me there</a>${remindBtn(e)}</div>${REMIND_JS}
+<script>(function(){var s=document.querySelector(".evcount");if(s){var t=new Date();t.setHours(12,0,0,0);var a=new Date(s.dataset.start+"T12:00:00"),b=new Date(s.dataset.end+"T12:00:00"),d=Math.round((a-t)/864e5);s.textContent=t>b?"finished":t>=a?"on now":d===1?"tomorrow":"in "+d+" days";}
+var tabs=document.querySelectorAll(".evtab");function show(k,go){var ok=false;tabs.forEach(function(b){var on=b.dataset.tab===k;if(on)ok=true;b.setAttribute("aria-selected",String(on));document.getElementById(b.getAttribute("aria-controls")).hidden=!on});if(!ok)return;if(k==="get-there"&&window.evMap)window.evMap();if(go)document.querySelector(".evtabs").scrollIntoView({block:"start"})}
+tabs.forEach(function(b){b.addEventListener("click",function(){show(b.dataset.tab);try{history.replaceState(null,"","#"+b.dataset.tab)}catch(e){}})});
+document.querySelector(".evtabs").addEventListener("keydown",function(e){var L=[].slice.call(tabs),i=L.indexOf(document.activeElement);if(i<0)return;var j=e.key==="ArrowRight"?(i+1)%L.length:e.key==="ArrowLeft"?(i+L.length-1)%L.length:-1;if(j<0)return;e.preventDefault();L[j].focus();L[j].click()});
+if(location.hash.length>1)show(location.hash.slice(1),true);})();</script>`;
   const ld = { "@context": "https://schema.org", "@type": /shows/.test(e.genre || "") ? "ExhibitionEvent" : /classics|bikefest/.test(e.genre || "") ? "Festival" : "SportsEvent", name: e.name, startDate: e.start, endDate: e.end, url: `${SITE}/events/${e.id}/`, description: `${e.name}, ${dRange(e)}${e.venue ? " at " + e.venue : ""}. How to watch, tickets, beds near the venue and the road trip there.`, image: [`${SITE}/img/og.png`], eventStatus: "https://schema.org/EventScheduled", eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode", ...(e.series ? { organizer: { "@type": "Organization", name: e.series, url: e.url || e.source } } : {}), location: { "@type": "Place", name: e.venue || city, geo: { "@type": "GeoCoordinates", latitude: e.lat, longitude: e.lon }, address: { "@type": "PostalAddress", addressLocality: e.city, addressCountry: e.country } } };
-  return page({ side: true, active: "/events/", url: `/events/${e.id}/`, title: `${e.name} ${e.start.slice(0, 4)}: dates, how to watch, tickets and road trip · OneTrackMind`, desc: `${e.name}, ${dRange(e)}${e.venue ? " at " + e.venue : ""}. How to watch live, tickets, beds near the venue and the road trip there.`, body, ld });
+  return page({ side: true, ads: false, cls: "evbody", active: "/events/", url: `/events/${e.id}/`, title: `${e.name} ${e.start.slice(0, 4)}: dates, how to watch, tickets and road trip · OneTrackMind`, desc: `${e.name}, ${dRange(e)}${e.venue ? " at " + e.venue : ""}. How to watch live, tickets, beds near the venue and the road trip there.`, body, ld });
 }
 function addDays(s, n) { const d = new Date(s + "T12:00:00Z"); d.setUTCDate(d.getUTCDate() + n); return d.toISOString().slice(0, 10); }
 function eventsPage() {
@@ -711,7 +726,7 @@ function eventsPage() {
   const card = e => `<div class="fx evc" data-start="${e.start}" data-cat="${esc(e.genre || "")}" data-grp="${HOUSE.group(e.genre)}" data-za="${e.country === "South Africa" ? 1 : 0}" data-series="${esc(e.series || "")}"><span class="fxd"><b>${+e.start.slice(8, 10)}</b><i>${MONTHS[+e.start.slice(5, 7) - 1].slice(0, 3)}</i></span><span class="fxb">${e.genre ? `<span class="eg">${esc(genreName(e.genre))}</span>` : ""}<b><a href="/events/${esc(e.id)}/">${esc(e.name)}</a></b><button type="button" class="follow" data-series="${esc(e.series || "")}" title="Follow ${esc(e.series || "")}">☆ ${esc(e.series || "")}</button><span class="evd">${rng(e)}${e.confirmed ? "" : ' <em class="unc">dates unconfirmed</em>'}</span><span class="area">${esc(e.venue || "")}${e.city ? ", " + esc(e.city) : ""}${e.country ? " · " + esc(e.country) : ""}</span><span class="evl"><a href="${esc(e.url || e.source)}" target="_blank" rel="noopener">Official site ›</a>${e.tickets ? ` <a href="${esc(e.tickets)}" target="_blank" rel="noopener sponsored">Tickets ›</a>` : ""} <a href="/plan/?ev=${esc(e.id)}&go=1">Take me there ›</a> ${remindBtn(e, "lnk")} <a href="/events/${esc(e.id)}/">Read about it ›</a></span></span></div>`;
   const months = [...new Set(L.map(e => e.start.slice(0, 7)))], first27 = months.find(m => m >= "2027-01"), n27 = L.filter(e => e.start >= "2027-01-01").length;
   const sec = ym => { const [y, mo] = ym.split("-"); return `<section class="fsec evm prog" id="m-${ym}"${ym === first27 ? ' data-y27' : ""}>${ym === first27 ? '<span id="y2027"></span>' : ""}<h2>${MONTHS[+mo - 1]} ${y}</h2><div class="fix">${L.filter(e => e.start.slice(0, 7) === ym).map(card).join("")}</div></section>`; };
-  const body = `<main><p class="note"><a class="btnline" href="/high-octane/">‹ High Octane</a></p><h1>FOMO</h1>
+  const body = `<main><p class="note"><a class="btnline" href="/high-octane/">‹ FOMO</a></p><h1>FOMO</h1>
 <p class="intro"><b>Events you'll kick yourself for missing.</b> Every date comes from the organiser's own page and is checked every week. Nobody decides on Friday to go to a Grand Prix on Sunday, so book early.</p>
 <p class="btnrow"><a class="btn" href="/plan/?evtrip=1">Build a trip around several events ›</a><a class="btnline" href="/events/wall-planner-2027.pdf" download>Get the Wall Planner (PDF) ›</a><a class="btnline" href="/list-your-event/">List your event ›</a></p>
 <nav class="chips" aria-label="Show"><button type="button" data-f="mine" class="mine">★ Following</button>${CAT.map(([k, t], i) => `<button type="button" data-f="${k}"${k === "za" ? ' data-grp="home"' : k !== "all" ? ` data-grp="${HOUSE.group(k)}"` : ""}${i ? "" : ' class="on"'}>${t}</button>`).join("")}</nav>
@@ -767,10 +782,7 @@ function homePage() {
 <div class="hero3"><a class="h3l" href="/about/"><img src="/img/ashley.jpg" alt="" width="64" height="64"><span>Ducati taught me the road, KTM taught me to live off it. These are the roads, the races and the places I'd tell a mate about. <b>More about me ›</b></span></a>
 <h1 class="homeril"><picture><source srcset="/img/racing-is-life.webp" type="image/webp"><img src="/img/racing-is-life.png" alt="Racing is life. Everything else is preparation." width="1081" height="638" fetchpriority="high"></picture></h1>
 <p class="h3r">Preparation is everything.<br><b>Do it here</b> and do not miss a thing.</p></div>
-<div class="doors">
-<a class="door tex-gravel" href="/adventure/"><span class="pk">Adventure</span><b>Recce. Ride. Report.</b><span>Back roads, gravel, passes and farm stalls. My routes, the places worth the detour, and the trips that went sideways.</span><span class="btn">Go Adventure ›</span></a>
-<a class="door tex-tar" href="/high-octane/"><img class="hostick" src="/img/high-octane.png" alt="Warning: explicit high octane content" width="150" height="183"><span class="pk">High Octane</span><b>Plan it. Book it. Be there.</b><span>Races, shows, museums and the cars and bikes that matter. What's on, what to book, and how to get there.</span><span class="btn">Go High Octane ›</span></a>
-</div>
+<section class="hub homefomo"><div class="hubh"><h2>FOMO</h2><span class="hubsub">Events you'll kick yourself for missing, and the roads in season</span></div>${FOMO_BOX}<div class="btnrow"><a class="btnline" href="/high-octane/">Everything in FOMO ›</a><a class="btnline" href="/events/">The whole diary ›</a><a class="btnline" href="/events/wall-planner-2027.pdf" download>Get the Wall Planner (PDF) ›</a></div></section>
 <form class="wherebar" action="/plan/" method="get"><span class="wbl">Plan a trip</span><label class="wbf"><i>From</i><input name="from" value="My location" autocomplete="off" onfocus="if(this.value==='My location')this.value=''" onblur="if(!this.value.trim())this.value='My location'"></label><label class="wbf wbto"><i>Where to?</i><input name="to" placeholder="A town, a pass, a race…" required autocomplete="off"></label><input type="hidden" name="fll"><input type="hidden" name="tll"><button class="btn" type="submit">${HOUSE.icon("go", 18)}Take me there</button></form>
 <script>(function(){var f=document.querySelector(".wherebar");if(!f)return;
 var TW=null;function towns(){return TW||(TW=Promise.all([["za","South Africa"],["na","Namibia"]].map(function(c){return fetch("/data/"+c[0]+"/towns.json").then(function(r){return r.ok?r.json():[]}).catch(function(){return[]}).then(function(a){return a.map(function(x){return[x[0],x[1],x[2],x[3],x[4],c[1]]})})})).then(function(a){return a[0].concat(a[1])}))}
@@ -788,7 +800,6 @@ i.addEventListener("keydown",function(e){if(e.key==="Enter"&&!box.hidden&&L.leng
 i.addEventListener("blur",function(){setTimeout(function(){box.hidden=true},150)})});})();</script>
 <section class="cd" id="cd" hidden></section>
 <div class="camps" id="camps"></div>
-<section class="hub"><div class="hubh"><h2>FOMO</h2><span class="hubsub">Events you'll kick yourself for missing</span></div>${FOMO_BOX}<div class="btnrow"><a class="btnline" href="/events/">The whole diary ›</a><a class="btnline" href="/events/wall-planner-2027.pdf" download>Get the Wall Planner (PDF) ›</a></div></section>
 ${myPickCard()}
 <section class="hub"><div class="hubh"><h2>Local is lekker</h2></div>
 ${LIL.length ? (LIL.length < 3 ? lilWide(LIL[LIL.length - 1]) : `${cardGrid(`${LIL.slice(-3).reverse().map(lilCard).join("")}`)}`) : `<div class="lilpanel"><img src="/media/founder/porsche-cayman-portimao-pitlane.jpg" alt="" loading="lazy"><div><b>Saturdays: breakfast somewhere new</b><p>One of my cars or bikes, a place I haven't eaten at, and the best road there. No stars, no reviews: if I'd go back, it goes up here, with a button that routes you there from wherever you are.</p><p class="note">Coming soon.</p><a class="btnline" href="https://www.instagram.com/ashleybaud/" target="_blank" rel="noopener">Follow along on Instagram ›</a></div></div>`}${LIL.length >= 3 ? '<div class="btnrow"><a class="btnline" href="/local-is-lekker/">Every run ›</a></div>' : ""}</section>
@@ -801,31 +812,23 @@ ${SOCIAL.length ? `<section class="hub"><div class="hubh"><h2>Lately</h2></div>$
   return page({ active: "/", url: "/", title: "OneTrackMind: Racing is life. Everything else is preparation.", desc: "Back roads and gravel, races and car culture: routes ridden by the founder, the motorsport diary, places worth the detour, and a free trip planner for bikes, 4x4s and cars.", body });
 }
 
-function adventurePage() {
-  const fdr = live.filter(r => r.founder), oth = live.filter(r => !r.founder), places = FAV.filter(x => x.group !== "petrol");
-  const body = `<main class="hubpage">
-<div class="hubhero tex-gravel"><span class="pk">Adventure</span><h1>Recce. Ride. Report.</h1><p>For years I planned trips without really knowing what was around me, and rode straight past great places right under my nose. These are the roads I'd ride again, and the places worth the detour.</p><a class="btn" href="/plan/?mode=adventure">Plan a trip ›</a></div>
-<section class="prog"><h2>Roads I've ridden</h2><p class="note"><a href="/adventure/in-season/">${HOUSE.icon("sun", 16)} What's in season now ›</a></p><div class="fix">${fdr.slice(0, 6).map(routeRow).join("")}</div><a class="btnline" href="/routes/">All the routes ›</a></section>
-<section class="hub"><div class="hubh"><h2>Places worth the detour</h2></div>${cardGrid(`${placeCards(places, 4)}`)}<div class="btnrow"><a class="btnline" href="/favourites/">All my places ›</a></div></section>
-<section class="prog"><h2>Short and sharp</h2><div class="fix">${oth.slice(0, 6).map(routeRow).join("")}</div></section>
-<section class="hub"><div class="hubh"><h2>Stories from the road</h2></div>${cardGrid(`${storyCards(ADV_RX, 8)}`)}<div class="btnrow"><a class="btnline" href="/blog/">All the stories ›</a></div></section>
-</main>`;
-  return page({ active: "/adventure/", url: "/adventure/", title: "Adventure: back roads, gravel routes and places worth the detour · OneTrackMind", desc: "Multi-day gravel and back-road routes in South Africa, Namibia, Lesotho and Europe, ridden by the founder, with the places worth the detour.", body });
-}
-
+// FOMO, the one section (it was Adventure and High Octane): what's on, what's in season, the roads and the places. /adventure/ now lands here.
 function petrolheadPage() {
-  const places = FAV.filter(x => x.group === "petrol");
+  const fdr = live.filter(r => r.founder), oth = live.filter(r => !r.founder), adv = FAV.filter(x => x.group !== "petrol"), petrol = FAV.filter(x => x.group === "petrol");
   const body = `<main class="hubpage">
-<div class="hubhero tex-tar hohero"><img class="hostick big" src="/img/high-octane.png" alt="Warning: explicit high octane content" width="210" height="256"><span class="pk">High Octane</span><h1>Plan it. Book it. Be there.</h1><p>Same story at race weekends: a museum, a factory or a famous corner ten minutes away that I only heard about afterwards. Here's what's on, what to book early, and everything worth seeing on the way.</p><a class="btn" href="/plan/?evtrip=1">Plan an event trip ›</a></div>
+<div class="hubhero tex-tar hohero"><img class="hostick big" src="/img/high-octane.png" alt="Warning: explicit high octane content" width="210" height="256"><span class="pk">FOMO</span><h1>Plan it. Book it. Be there.</h1><p>Race weekends, shows, rallies and the roads at their best. What's on, what to book early, what's in season, and everything worth seeing on the way.</p><div class="btnrow"><a class="btn" href="/plan/">Plan a trip ›</a><a class="btnline" href="/plan/?evtrip=1">Build a trip around several events ›</a></div></div>
 <section class="cd" id="cd" hidden></section>
 <div class="camps" id="camps"></div>
-<section class="hub"><div class="hubh"><h2>FOMO</h2><span class="hubsub">Events you'll kick yourself for missing</span></div>${FOMO_BOX}<div class="btnrow"><a class="btnline" href="/events/">The whole diary ›</a><a class="btnline" href="/high-octane/my-top-5/">My top 5 ›</a><a class="btnline" href="/list-your-event/">List your event ›</a><a class="btnline" href="/events/wall-planner-2027.pdf" download>Get the Wall Planner (PDF) ›</a></div></section>
-<section class="hub"><div class="hubh"><h2>Museums, tracks and factories</h2></div>${cardGrid(`${placeCards(places, 4)}`)}<div class="btnrow"><a class="btnline" href="/favourites/">All my places ›</a></div></section>
-<section class="hub"><div class="hubh"><h2>Race weekends and garages</h2></div>${cardGrid(`${storyCards(new RegExp(MOTOR_RX.source + "|" + MOT_STORY_RX.source, "i"), 8)}`)}<div class="btnrow"><a class="btnline" href="/blog/">All the stories ›</a></div></section>
+<section class="hub"><div class="hubh"><h2>What's on</h2><span class="hubsub">Events you'll kick yourself for missing, and the roads in season</span></div>${FOMO_BOX}<div class="btnrow"><a class="btnline" href="/events/">The whole diary ›</a><a class="btnline" href="/high-octane/my-top-5/">My top 5 ›</a><a class="btnline" href="/list-your-event/">List your event ›</a><a class="btnline" href="/events/wall-planner-2027.pdf" download>Get the Wall Planner (PDF) ›</a></div></section>
+<section class="prog"><h2>Roads I've ridden</h2><p class="note"><a href="/adventure/in-season/">${HOUSE.icon("sun", 16)} What's in season now ›</a></p><div class="fix">${fdr.slice(0, 6).map(routeRow).join("")}</div><a class="btnline" href="/routes/">All the routes ›</a></section>
+<section class="hub"><div class="hubh"><h2>Places worth the detour</h2></div>${cardGrid(`${placeCards(adv, 4)}`)}<div class="btnrow"><a class="btnline" href="/favourites/">All my places ›</a></div></section>
+<section class="hub"><div class="hubh"><h2>Petrolhead places</h2></div>${cardGrid(`${placeCards(petrol, 4)}`)}<div class="btnrow"><a class="btnline" href="/favourites/#petrol">All the petrolhead places ›</a></div></section>
+<section class="prog"><h2>Short and sharp</h2><div class="fix">${oth.slice(0, 6).map(routeRow).join("")}</div></section>
+<section class="hub"><div class="hubh"><h2>Race weekends, garages and the road</h2></div>${cardGrid(`${storyCards(new RegExp(MOTOR_RX.source + "|" + MOT_STORY_RX.source + "|" + ADV_RX.source, "i"), 8)}`)}<div class="btnrow"><a class="btnline" href="/blog/">All the stories ›</a></div></section>
 <section class="hub"><div class="hubh"><h2>How to</h2></div>${HOWTO.map(g => `<div class="lilpanel">${g.cover ? `<img src="${esc(g.cover)}" alt="" loading="lazy">` : ""}<div><b>${esc(g.title)}</b><p>${esc(g.short || "")}</p><div class="btnrow"><a class="btn" href="/how-to/${g.id}/">Read the guide ›</a><a class="btnline" href="/how-to/">All the guides ›</a></div></div></div>`).join("")}</section>
 </main>
 <script src="/js/hub.js" defer></script>`;
-  return page({ active: "/high-octane/", url: "/high-octane/", title: "High Octane: races, shows, museums and road trips to them · OneTrackMind", desc: "What's on in motorsport and car culture, what to book early, and the museums, tracks and factories worth the trip. With a planner that gets you there.", body });
+  return page({ active: "/high-octane/", url: "/high-octane/", title: "FOMO: events, roads in season and places worth the trip · OneTrackMind", desc: "What's on in motorsport and car culture, what to book early, which roads are in season, and the museums, tracks and places worth the trip. With a planner that gets you there.", body });
 }
 
 function lilPage() {
@@ -868,7 +871,7 @@ function inSeasonPage() {
   const S = live.filter(r => r.season), now = S.map(r => ({ r, s: HOUSE.season(r.season, today) })).filter(x => x.s).sort((a, b) => (a.s.left ?? 999) - (b.s.left ?? 999));
   const nextM = r => { const m0 = +today.slice(5, 7); for (let i = 1; i <= 12; i++) if (r.season.months.includes((m0 + i - 1) % 12 + 1)) return i; return 13; };
   const later = S.filter(r => !HOUSE.season(r.season, today)).sort((a, b) => nextM(a) - nextM(b));
-  const body = `<main class="hubpage"><p class="note"><a class="btnline" href="/adventure/">‹ Adventure</a></p><h1>In season</h1>
+  const body = `<main class="hubpage"><p class="note"><a class="btnline" href="/high-octane/">‹ FOMO</a></p><h1>In season</h1>
 <p class="intro">Every road has its months: flowers, dry gravel, open passes, no snow. These are in season now, the ones closing soonest first.</p>
 <section class="prog seasons"><h2>In season now</h2><div class="fix" id="isnow">${now.length ? now.map(x => seasonRow(x.r, x.s.left)).join("") : `<p class="note">Nothing in season this month.</p>`}</div></section>
 <section class="prog seasons"><h2>Later in the year</h2><div class="fix">${later.map(r => `<a class="fx" href="/routes/${r.id}/" data-months="${r.season.months.join(",")}"><span class="fxd"><b>${MON3[(m0 => { for (let i = 1; i <= 12; i++) { const k = (m0 + i - 1) % 12 + 1; if (r.season.months.includes(k)) return k - 1; } return 0; })(+today.slice(5, 7))]}</b><i>from</i></span><span class="fxb"><b>${esc(r.title)}</b><span class="fxs">${esc(r.region)}</span><span class="fxs">Best: ${esc(HOUSE.months(r.season.months))}. ${esc(r.season.why || "")}</span></span></a>`).join("")}</div></section>
@@ -877,10 +880,12 @@ function inSeasonPage() {
 </main>`;
   return page({ active: "/adventure/in-season/", url: "/adventure/in-season/", title: "In season: routes at their best right now · OneTrackMind", desc: "Gravel roads, passes and flower routes in South Africa, Namibia and Lesotho that are at their best this month, with how long the season has left.", body });
 }
+// the founder's choice for this page: five of the 31, in this order (the rest still close the event pages and sign off the newsletter)
+const WHY_PAIRS = [8, 22, 23, 29, 31];
 function whyPage() {
   const body = `<main><p class="note"><a class="btnline" href="/about/">‹ About</a></p><h1>Why preparation</h1>
 <p class="intro"><b>${esc(JUX.heading || "")}</b></p>
-<ol class="jux">${JUX.pairs.map(([a, b]) => `<li><span>${esc(a)}</span><span>${esc(b)}</span></li>`).join("")}</ol>
+<ol class="jux">${WHY_PAIRS.map(n => JUX.pairs[n - 1]).filter(Boolean).map(([a, b]) => `<li><span>${esc(a)}</span><span>${esc(b)}</span></li>`).join("")}</ol>
 <p class="juxend">${(JUX.closing || []).map(x => `<span>${esc(x)}</span>`).join("")}</p>
 <p class="juxsig">${esc(JUX.signed || "")}</p>
 <div class="btnrow"><a class="btn" href="/events/">FOMO: the events ›</a><a class="btnline" href="/blog/autodidact/">Autodidact: the cars ›</a></div>
@@ -920,7 +925,7 @@ function top5Item(x) {
   return "";
 }
 function top5Index() {
-  const body = `<main class="hubpage"><p class="note"><a class="btnline" href="/high-octane/">‹ High Octane</a></p><h1>My top 5</h1>
+  const body = `<main class="hubpage"><p class="note"><a class="btnline" href="/high-octane/">‹ FOMO</a></p><h1>My top 5</h1>
 <p class="intro">My picks: what I'd go to, ride or see, and why.</p>
 ${TOP5.length ? cardGrid(TOP5.map(l => `<a class="card pcard hubcard" href="/high-octane/my-top-5/${l.id}/"><b>${esc(l.title)}</b>${l.intro ? `<span>${esc(l.intro)}</span>` : ""}<span class="go">See the list ›</span></a>`).join("")) : `<div class="soon"><b>Coming soon</b><p class="note">One new list a month.</p></div>`}
 </main>`;
@@ -940,7 +945,7 @@ function write(rel, s) { const p = path.join(ROOT, rel); fs.mkdirSync(path.dirna
 fs.rmSync(path.join(ROOT, "routes"), { recursive: true, force: true });
 live.forEach(r => write(`routes/${r.id}/index.html`, routePage(r)));
 write("index.html", homePage());
-write("adventure/index.html", adventurePage());
+fs.writeFileSync(path.join(ROOT, "adventure/index.html"), redirectPage("/high-octane/")); // Adventure is part of FOMO now; the old address keeps working
 write("high-octane/index.html", petrolheadPage());
 write("petrolhead/index.html", redirectPage("/high-octane/"));
 write("local-is-lekker/index.html", lilPage());
@@ -976,7 +981,7 @@ TOP5.forEach(l => write(`high-octane/my-top-5/${l.id}/index.html`, top5Page(l)))
     ["Namibia by Tortoise", "Nine days up the Skeleton Coast and Epupa, with the air conditioning on.", tort ? `/blog/${tripSlug(tort[0], tort[1])}/` : "", tort ? { cover: coverOf(tort[1]) } : null]];
   fs.writeFileSync(path.join(ROOT, "data/latest.json"), JSON.stringify(pick.filter(x => x[3] && x[3].cover && x[2]).map(([title, hook, url, s]) => ({ title, hook, url, cover: s.cover })))); }
 HOWTO.forEach(g => write(`how-to/${g.id}/index.html`, howtoPage(g)));
-const urls = ["/", "/adventure/", "/adventure/in-season/", "/high-octane/", "/high-octane/my-top-5/", ...TOP5.map(l => `/high-octane/my-top-5/${l.id}/`), "/list-your-event/", "/about/why-preparation/", "/blog/my-racing/", "/blog/autodidact/", "/plan/", "/local-is-lekker/", "/routes/", "/favourites/", "/about/", "/partners/", "/advertise/", "/how-to/", "/record/", "/events/", ...EVENTS.filter(e => e.end >= new Date().toISOString().slice(0, 10)).map(e => `/events/${e.id}/`), ...HOWTO.map(g => `/how-to/${g.id}/`), ...live.map(r => `/routes/${r.id}/`), ...FAV.map(x => `/favourites/${x.id}/`), "/blog/", ...STORIES.map(x => `/blog/${x.slug}/`), ...[...seriesOf().entries()].filter(([, L]) => L.length > 1).map(([n, L]) => `/blog/${tripSlug(n, L)}/`), "/terms.html", "/privacy.html", "/rules.html"];
+const urls = ["/", "/adventure/in-season/", "/high-octane/", "/high-octane/my-top-5/", ...TOP5.map(l => `/high-octane/my-top-5/${l.id}/`), "/list-your-event/", "/about/why-preparation/", "/blog/my-racing/", "/blog/autodidact/", "/plan/", "/local-is-lekker/", "/routes/", "/favourites/", "/about/", "/partners/", "/advertise/", "/how-to/", "/record/", "/events/", ...EVENTS.filter(e => e.end >= new Date().toISOString().slice(0, 10)).map(e => `/events/${e.id}/`), ...HOWTO.map(g => `/how-to/${g.id}/`), ...live.map(r => `/routes/${r.id}/`), ...FAV.map(x => `/favourites/${x.id}/`), "/blog/", ...STORIES.map(x => `/blog/${x.slug}/`), ...[...seriesOf().entries()].filter(([, L]) => L.length > 1).map(([n, L]) => `/blog/${tripSlug(n, L)}/`), "/terms.html", "/privacy.html", "/rules.html"];
 write("sitemap.xml", `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.map(u => `<url><loc>${SITE}${u}</loc><lastmod>${today}</lastmod></url>`).join("\n")}\n</urlset>\n`);
 write("robots.txt", `# Everyone welcome, search engines and AI assistants included.\nUser-agent: *\nAllow: /\nDisallow: /api/\nDisallow: /kits/\nDisallow: /newsletter/\n\nSitemap: ${SITE}/sitemap.xml\n`);
 write("llms.txt", `# OneTrackMind
