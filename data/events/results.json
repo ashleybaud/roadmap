@@ -1,1 +1,30 @@
-{}
+{
+ "mexico-city-grand-prix-2026": {
+  "link": "https://www.formula1.com/en/results/2026/races",
+  "hash": "171259c2cf6ca6c2",
+  "first": "2026-11-03",
+  "fresh": false,
+  "checked": "2026-11-03"
+ },
+ "motogp-malaysian-grand-prix-2026": {
+  "link": "https://www.motogp.com/en/world-standing/2026/motogp/championship-standings",
+  "hash": "5ce05362cd72e9f3",
+  "first": "2026-11-03",
+  "fresh": false,
+  "checked": "2026-11-03"
+ },
+ "motogp-qatar-grand-prix-2026": {
+  "link": "https://www.motogp.com/en/world-standing/2026/motogp/championship-standings",
+  "hash": "5ce05362cd72e9f3",
+  "first": "2026-11-03",
+  "fresh": false,
+  "checked": "2026-11-03"
+ },
+ "sao-paulo-grand-prix-2026": {
+  "link": "https://www.formula1.com/en/results/2026/races",
+  "hash": "171259c2cf6ca6c2",
+  "first": "2026-11-03",
+  "fresh": false,
+  "checked": "2026-11-03"
+ }
+}
