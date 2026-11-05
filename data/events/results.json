@@ -4,14 +4,14 @@
   "hash": "171259c2cf6ca6c2",
   "first": "2026-11-03",
   "fresh": false,
-  "checked": "2026-11-03"
+  "checked": "2026-11-05"
  },
  "motogp-malaysian-grand-prix-2026": {
   "link": "https://www.motogp.com/en/world-standing/2026/motogp/championship-standings",
-  "hash": "5ce05362cd72e9f3",
+  "hash": "933d747683726bc6",
   "first": "2026-11-03",
-  "fresh": false,
-  "checked": "2026-11-03"
+  "fresh": true,
+  "checked": "2026-11-05"
  },
  "motogp-qatar-grand-prix-2026": {
   "link": "https://www.motogp.com/en/world-standing/2026/motogp/championship-standings",
