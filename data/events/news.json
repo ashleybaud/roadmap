@@ -1,20 +1,4 @@
 {
- "nine-hour-kyalami-2026": [
-  {
-   "title": "Sebastien Bourdais hopes latest WEC success will remind teams of his value",
-   "url": "https://www.motorsport.com/wec/news/sebastien-bourdais-hopes-latest-wec-success-will-remind-teams-of-his-value/10874204/?utm_source=RSS&utm_medium=referral&utm_campaign=RSS-WEC&utm_term=News&utm_content=www",
-   "summary": "Sebastien Bourdais hopes his victory in the World Endurance Championship’s Monza finale will help his chances of securing a drive for 2027, even though he insists he does not need to prove his worth.",
-   "date": "2026-11-13",
-   "source": "Motorsport.com"
-  },
-  {
-   "title": "Why Corvette’s new LMGT3 champion Jonny Edgar has a bright future",
-   "url": "https://www.motorsport.com/wec/news/why-corvettes-new-lmgt3-champion-jonny-edgar-has-a-bright-future/10874124/?utm_source=RSS&utm_medium=referral&utm_campaign=RSS-WEC&utm_term=News&utm_content=www",
-   "summary": "Jonny Edgar is emerging as one of the brightest prospects in the World Endurance Championship following his title-winning campaign with TF Sport in 2026.",
-   "date": "2026-11-12",
-   "source": "Motorsport.com"
-  }
- ],
  "las-vegas-grand-prix-2026": [
   {
    "title": "Mercedes and Audi unveil adidas collections for F1 Las Vegas Grand Prix",
@@ -40,6 +24,13 @@
  ],
  "motogp-portuguese-grand-prix-2026": [
   {
+   "title": "The numbers that reveal how sprint races have turned the MotoGP title fight upside down",
+   "url": "https://www.motorsport.com/motogp/news/the-numbers-that-reveal-how-sprint-races-have-turned-motogp-title-fight-upside-down/10874447/?utm_source=RSS&utm_medium=referral&utm_campaign=RSS-MOTOGP&utm_term=News&utm_content=www",
+   "summary": "MotoGP’s title race is heading towards a foregone conclusion at next week’s Portuguese Grand Prix, with Marc Marquez all but certain to take his 10th world championship crown.",
+   "date": "2026-11-14",
+   "source": "Motorsport.com"
+  },
+  {
    "title": "Jorge Martin will be \"almost 100% fit\" in Portugal as heroic Qatar display keeps title hopes alive",
    "url": "https://www.motorsport.com/motogp/news/jorge-martin-will-be-almost-100-fit-in-portugal-as-heroic-qatar-display-keeps-title-open/10873086/?utm_source=RSS&utm_medium=referral&utm_campaign=RSS-MOTOGP&utm_term=News&utm_content=www",
    "summary": "Jorge Martin, who finished seventh in Sunday's MotoGP race at Lusail, showcased his trademark resilience throughout the weekend in Qatar.",
@@ -51,24 +42,6 @@
    "url": "https://www.motorsport.com/motogp/news/motogp-qatar-gp-marco-bezzecchi-wins-as-marc-marquez-has-title-triumph-delayed/10873016/?utm_source=RSS&utm_medium=referral&utm_campaign=RSS-MOTOGP&utm_term=News&utm_content=www",
    "summary": "Marco Bezzecchi bounced back from his crash in the sprint to take Qatar Grand Prix victory, ahead of Marc Marquez who must wait until the Portuguese round to seal the MotoGP world title.",
    "date": "2026-11-08",
-   "source": "Motorsport.com"
-  }
- ],
- "qatar-grand-prix-2026": [
-  {
-   "title": "F1 2026 calendar update: Imola GP off the table, no plan B if war escalates",
-   "url": "https://www.motorsport.com/f1/news/f1-2026-calendar-update-imola-gp-off-the-table-no-plan-b-if-war-escalates/10873637/?utm_source=RSS&utm_medium=referral&utm_campaign=RSS-F1&utm_term=News&utm_content=www",
-   "summary": "The Qatar and Abu Dhabi grands prix which will conclude Formula 1’s 2026 season are set to proceed as planned, provided there is no dramatic escalation of the Iran war.",
-   "date": "2026-11-10",
-   "source": "Motorsport.com"
-  }
- ],
- "abu-dhabi-grand-prix-2026": [
-  {
-   "title": "F1 2026 calendar update: Imola GP off the table, no plan B if war escalates",
-   "url": "https://www.motorsport.com/f1/news/f1-2026-calendar-update-imola-gp-off-the-table-no-plan-b-if-war-escalates/10873637/?utm_source=RSS&utm_medium=referral&utm_campaign=RSS-F1&utm_term=News&utm_content=www",
-   "summary": "The Qatar and Abu Dhabi grands prix which will conclude Formula 1’s 2026 season are set to proceed as planned, provided there is no dramatic escalation of the Iran war.",
-   "date": "2026-11-10",
    "source": "Motorsport.com"
   }
  ]
