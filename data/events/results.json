@@ -4,41 +4,55 @@
   "hash": "a4d847a3bf17f65c",
   "first": "2026-11-03",
   "fresh": true,
-  "checked": "2026-11-13"
+  "checked": "2026-11-17"
  },
  "motogp-malaysian-grand-prix-2026": {
   "link": "https://www.motogp.com/en/world-standing/2026/motogp/championship-standings",
   "hash": "c00124e32218ecc7",
   "first": "2026-11-03",
   "fresh": true,
-  "checked": "2026-11-13"
+  "checked": "2026-11-17"
  },
  "motogp-qatar-grand-prix-2026": {
   "link": "https://www.motogp.com/en/world-standing/2026/motogp/championship-standings",
   "hash": "c00124e32218ecc7",
   "first": "2026-11-03",
   "fresh": true,
-  "checked": "2026-11-13"
+  "checked": "2026-11-17"
  },
  "sao-paulo-grand-prix-2026": {
   "link": "https://www.formula1.com/en/results/2026/races",
   "hash": "a4d847a3bf17f65c",
   "first": "2026-11-03",
   "fresh": true,
-  "checked": "2026-11-13"
+  "checked": "2026-11-17"
  },
  "gta-finals-buttonwillow-2026": {
   "link": "https://globaltimeattack.com/schedule/2026-brp/",
-  "hash": "c41c5a90a8463346",
+  "hash": "ce0f8a575be6800c",
   "first": "2026-11-10",
-  "fresh": false,
-  "checked": "2026-11-10"
+  "fresh": true,
+  "checked": "2026-11-17"
  },
  "nine-hour-kyalami-2026": {
   "link": "https://www.saeseries.com/",
   "hash": "3a3ec21b5e8a407d",
   "first": "2026-11-10",
   "fresh": false,
-  "checked": "2026-11-10"
+  "checked": "2026-11-17"
+ },
+ "las-vegas-grand-prix-2026": {
+  "link": "https://www.formula1.com/en/results/2026/races",
+  "hash": "a4d847a3bf17f65c",
+  "first": "2026-11-17",
+  "fresh": false,
+  "checked": "2026-11-17"
+ },
+ "motogp-portuguese-grand-prix-2026": {
+  "link": "https://www.motogp.com/en/world-standing/2026/motogp/championship-standings",
+  "hash": "c00124e32218ecc7",
+  "first": "2026-11-17",
+  "fresh": false,
+  "checked": "2026-11-17"
  }
 }
