@@ -15,44 +15,58 @@
  },
  "motogp-qatar-grand-prix-2026": {
   "link": "https://www.motogp.com/en/world-standing/2026/motogp/championship-standings",
-  "hash": "fe35e8b390ee2b62",
+  "hash": "7583101878a21c2c",
   "first": "2026-11-03",
   "fresh": true,
-  "checked": "2026-11-20"
+  "checked": "2026-11-24"
  },
  "sao-paulo-grand-prix-2026": {
   "link": "https://www.formula1.com/en/results/2026/races",
-  "hash": "a4d847a3bf17f65c",
+  "hash": "f0abc5c5d23472bb",
   "first": "2026-11-03",
   "fresh": true,
-  "checked": "2026-11-20"
+  "checked": "2026-11-24"
  },
  "gta-finals-buttonwillow-2026": {
   "link": "https://globaltimeattack.com/schedule/2026-brp/",
   "hash": "ce0f8a575be6800c",
   "first": "2026-11-10",
   "fresh": true,
-  "checked": "2026-11-20"
+  "checked": "2026-11-24"
  },
  "nine-hour-kyalami-2026": {
   "link": "https://www.saeseries.com/",
-  "hash": "3a3ec21b5e8a407d",
+  "hash": "50ca7a33a37e7b13",
   "first": "2026-11-10",
-  "fresh": false,
-  "checked": "2026-11-20"
+  "fresh": true,
+  "checked": "2026-11-24"
  },
  "las-vegas-grand-prix-2026": {
   "link": "https://www.formula1.com/en/results/2026/races",
-  "hash": "a4d847a3bf17f65c",
+  "hash": "f0abc5c5d23472bb",
   "first": "2026-11-17",
-  "fresh": false,
-  "checked": "2026-11-17"
+  "fresh": true,
+  "checked": "2026-11-24"
  },
  "motogp-portuguese-grand-prix-2026": {
   "link": "https://www.motogp.com/en/world-standing/2026/motogp/championship-standings",
-  "hash": "c00124e32218ecc7",
+  "hash": "7583101878a21c2c",
   "first": "2026-11-17",
+  "fresh": true,
+  "checked": "2026-11-24"
+ },
+ "motogp-valencia-grand-prix-2026": {
+  "link": "https://www.motogp.com/en/world-standing/2026/motogp/championship-standings",
+  "hash": "7583101878a21c2c",
+  "first": "2026-11-24",
   "fresh": false,
-  "checked": "2026-11-17"
+  "checked": "2026-11-24"
+ },
+ "qatar-grand-prix-2026": {
+  "link": "https://www.formula1.com/en/results/2026/races",
+  "hash": "f0abc5c5d23472bb",
+  "first": "2026-11-24",
+  "fresh": false,
+  "checked": "2026-11-24"
  }
 }
