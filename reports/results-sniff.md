@@ -1,4 +1,4 @@
-# Results check 2026-11-26
+# Results check 2026-11-27
 
 6 races finished in the last 21 days.
 
